@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/demonGirls.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/demonGirls.ts's crits, spread into CONFIG.crit
 export const DEMON_GIRLS_BALANCE = {
   hellfireHeartbreakerChance: 0.0103252607,
   hellfireHeartbreakerTierSteps: 1,

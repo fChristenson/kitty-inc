@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/cyberpunk.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/cyberpunk.ts's crits, spread into CONFIG.crit
 export const CYBERPUNK_BALANCE = {
   circuitDuchessChance: 0.0123914529,
   circuitDuchessDiscount: 0.011,

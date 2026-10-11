@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/showbiz.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/showbiz.ts's crits, spread into CONFIG.crit
 export const SHOWBIZ_BALANCE = {
   bombshellBrawnChance: 0.00161551502,
   bombshellBrawnShare: 0.465,

@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/fantasyFeet.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/fantasyFeet.ts's crits, spread into CONFIG.crit
 export const FANTASY_FEET_BALANCE = {
   magentaScaleSolesChance: 0.00326330856,
   magentaScaleSolesDiscount: 0.174,

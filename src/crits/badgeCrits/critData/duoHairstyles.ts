@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const DUO_HAIRSTYLES_CRITS = {
   baldAndBraided: {
@@ -206,4 +206,4 @@ export const DUO_HAIRSTYLES_CRITS = {
     image: "crits/duoHairstyles/turtleneckBob.webp",
     description: "Promotes 59.5% of this building's workers one perma tier",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

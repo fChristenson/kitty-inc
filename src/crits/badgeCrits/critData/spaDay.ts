@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const SPA_DAY_CRITS = {
   barrelSoak: {
@@ -236,4 +236,4 @@ export const SPA_DAY_CRITS = {
     image: "crits/spaDay/scaleboundSoles.webp",
     description: "Cuts every price in this building by 17.9%",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

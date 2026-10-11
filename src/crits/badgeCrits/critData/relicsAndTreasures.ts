@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const RELICS_AND_TREASURES_CRITS = {
   ancientRelic: {
@@ -179,4 +179,4 @@ export const RELICS_AND_TREASURES_CRITS = {
     image: "crits/relicsAndTreasures/heavyIsTheHead.webp",
     description: "Arms this floor's next click as an x25 crit",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

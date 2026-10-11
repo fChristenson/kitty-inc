@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const MUSCLE_FEET_CRITS = {
   soleMate: {
@@ -161,4 +161,4 @@ export const MUSCLE_FEET_CRITS = {
     image: "crits/muscleFeet/matchingSneakers.webp",
     description: "Spreads 154 free upgrades over the lowest-level floors",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

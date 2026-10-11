@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/arcadeAndLuckyGames.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/arcadeAndLuckyGames.ts's crits, spread into CONFIG.crit
 export const ARCADE_AND_LUCKY_GAMES_BALANCE = {
   bullseyeChance: 0.0110282237,
   chainReactionChance: 0.0106555618,

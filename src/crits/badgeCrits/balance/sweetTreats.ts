@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/sweetTreats.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/sweetTreats.ts's crits, spread into CONFIG.crit
 export const SWEET_TREATS_BALANCE = {
   berryParfaitChance: 0.00498649892,
   berryParfaitPayouts: 32,

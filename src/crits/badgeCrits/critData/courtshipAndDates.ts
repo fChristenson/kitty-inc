@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const COURTSHIP_AND_DATES_CRITS = {
   airKissAssets: {
@@ -188,4 +188,4 @@ export const COURTSHIP_AND_DATES_CRITS = {
     image: "crits/courtshipAndDates/smoochDelivery.webp",
     description: "Spreads 21 free upgrades over the lowest-level floors",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

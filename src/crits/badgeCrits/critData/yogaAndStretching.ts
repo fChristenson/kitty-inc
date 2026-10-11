@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const YOGA_AND_STRETCHING_CRITS = {
   hipHingeHeroine: {
@@ -163,4 +163,4 @@ export const YOGA_AND_STRETCHING_CRITS = {
     image: "crits/yogaAndStretching/pewterPlunge.webp",
     description: "Adds 40.3% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

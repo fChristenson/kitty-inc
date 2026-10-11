@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const LOWER_BODY_TRAINING_CRITS = {
   peachyKeen: {
@@ -192,4 +192,4 @@ export const LOWER_BODY_TRAINING_CRITS = {
     image: "crits/lowerBodyTraining/quadricepPrayer.webp",
     description: "Grows this floor's level by 5.3% in free upgrades",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

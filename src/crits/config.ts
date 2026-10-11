@@ -1,7 +1,7 @@
 // every crit's tunables, spread into CONFIG (src/config.ts). Pure data whose
 // only imports are the equally pure balance files, so config.ts can read it
 // at load time
-import { FEATURED_CRIT_BALANCE } from "./badgeCrits/balance";
+import { BADGE_CRIT_BALANCE } from "./badgeCrits/balance";
 import { PROC_CRIT_BALANCE } from "./floorCrits/balance";
 import { FLOOR_CRIT_CONFIG } from "./floorCrits/config";
 import { INCOME_CRIT_CONFIG } from "./incomeCrits/config";
@@ -12,7 +12,7 @@ export const CRIT_CONFIG = {
   // sale-payout/permanent-rate multiplier per tier (color/label are cosmetic,
   // not balance, and stay defined alongside CRIT_TIER_CONFIG itself).
   crit: {
-    ...FEATURED_CRIT_BALANCE,
+    ...BADGE_CRIT_BALANCE,
     ...PROC_CRIT_BALANCE,
     crit: { chance: 0.08, multiplier: 3 },
     mega: { chance: 0.015, multiplier: 7 },
@@ -48,7 +48,7 @@ export const CRIT_CONFIG = {
   // (relative to their sum). One that can't play (an animated or floor crit
   // cooling down) is a badge crit instead
   specialCrits: {
-    // a badge crit: the featured and other special crits in badgeCrits/balance
+    // a badge crit: the badge and other special crits in badgeCrits/balance
     badgeCrit: {
       chance: 0.46,
     },

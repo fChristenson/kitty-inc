@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const FOOT_KISSES_CRITS = {
   armsWideKiss: {
@@ -194,4 +194,4 @@ export const FOOT_KISSES_CRITS = {
     image: "crits/footKisses/leanInKiss.webp",
     description: "Pays 109 times this floor's upgrade price in cash",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

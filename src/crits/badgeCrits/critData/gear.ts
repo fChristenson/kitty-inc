@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const GEAR_CRITS = {
   annaNyavarre: {
@@ -281,4 +281,4 @@ export const GEAR_CRITS = {
     image: "crits/gear/potion.webp",
     description: "Hires a free manager for this floor",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

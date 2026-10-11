@@ -1,14 +1,14 @@
-// every crit's icon by image name -> its file under public/: featured crits
+// every crit's icon by image name -> its file under public/: badge crits
 // by their own kind, every other proc by the icon named in CRIT_PROC_INFO.
 // Registered with loadAssets as the crits load (crits/index imports this).
-// Read through critTypes: it has to load before the featured catalog it imports
+// Read through critTypes: it has to load before the badge catalog it imports
 import { registerImageFiles } from "../loadAssets";
-import { featuredCritImages } from "./critTypes";
+import { badgeCritImages } from "./critTypes";
 
-const FEATURED_CRIT_IMAGE_FILES = featuredCritImages();
+const BADGE_CRIT_IMAGE_FILES = badgeCritImages();
 
 export const CRIT_IMAGE_FILES = {
-  ...FEATURED_CRIT_IMAGE_FILES,
+  ...BADGE_CRIT_IMAGE_FILES,
   chain: "crits/classics/chain.webp", // Chain crit flash's own backdrop icon
   dominoEffect: "crits/classics/dominoEffect.webp", // Domino Effect crit flash's own backdrop icon
   blueprint: "crits/classics/blueprint.webp", // Blueprint crit flash's own backdrop icon

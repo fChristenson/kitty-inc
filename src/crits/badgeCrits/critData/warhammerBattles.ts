@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const WARHAMMER_BATTLES_CRITS = {
   emperorsFinest: {
@@ -154,4 +154,4 @@ export const WARHAMMER_BATTLES_CRITS = {
     image: "crits/warhammerBattles/redEyeGunner.webp",
     description: "Adds 35.5% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

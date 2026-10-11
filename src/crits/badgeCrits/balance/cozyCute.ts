@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/cozyCute.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/cozyCute.ts's crits, spread into CONFIG.crit
 export const COZY_CUTE_BALANCE = {
   plushieDogChance: 0.00700321324,
   plushieDogBoostSeconds: 48,

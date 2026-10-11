@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const GLAMOUR_AND_RUNWAY_CRITS = {
   leotardLuster: {
@@ -201,4 +201,4 @@ export const GLAMOUR_AND_RUNWAY_CRITS = {
     image: "crits/glamourAndRunway/sterlingProwl.webp",
     description: "Adds 40.4% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

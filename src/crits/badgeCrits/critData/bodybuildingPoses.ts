@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const BODYBUILDING_POSES_CRITS = {
   bicepBombshell: {
@@ -240,4 +240,4 @@ export const BODYBUILDING_POSES_CRITS = {
     image: "crits/bodybuildingPoses/blondeBicep.webp",
     description: "Adds 44.5% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

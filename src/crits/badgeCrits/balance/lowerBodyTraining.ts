@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/lowerBodyTraining.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/lowerBodyTraining.ts's crits, spread into CONFIG.crit
 export const LOWER_BODY_TRAINING_BALANCE = {
   peachyKeenChance: 0.0063047512,
   peachyKeenDiscount: 0.072,

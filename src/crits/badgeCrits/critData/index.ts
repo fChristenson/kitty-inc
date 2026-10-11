@@ -1,5 +1,5 @@
-// every featured crit's display data (label, colour, icon, description), one
-// file per themed category; their rewards load later (critTypes/featured)
+// every badge crit's display data (label, colour, icon, description), one
+// file per themed category; their rewards load later (badgeCrits/rewards)
 import { CYBERPUNK_CRITS } from "./cyberpunk";
 import { HEROES_CRITS } from "./heroes";
 import { GAME_QUOTES_CRITS } from "./gameQuotes";
@@ -88,7 +88,7 @@ import { FARM_FRESH_CRITS } from "./farmFresh";
 import { SPA_DAY_CRITS } from "./spaDay";
 import { FIGHTERS_CRITS } from "./fighters";
 
-export const FEATURED_CRITS = {
+export const BADGE_CRITS = {
   ...CYBERPUNK_CRITS,
   ...HEROES_CRITS,
   ...GAME_QUOTES_CRITS,

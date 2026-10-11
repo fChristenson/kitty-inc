@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/chromePerformers.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/chromePerformers.ts's crits, spread into CONFIG.crit
 export const CHROME_PERFORMERS_BALANCE = {
   heartOfChromeChance: 0.0102354633,
   heartOfChromeTierSteps: 1,

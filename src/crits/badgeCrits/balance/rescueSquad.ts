@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/rescueSquad.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/rescueSquad.ts's crits, spread into CONFIG.crit
 export const RESCUE_SQUAD_BALANCE = {
   bedsideMannerChance: 0.00161573894,
   bedsideMannerShare: 0.439,

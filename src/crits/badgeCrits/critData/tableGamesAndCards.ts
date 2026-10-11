@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const TABLE_GAMES_AND_CARDS_CRITS = {
   highRoller: {
@@ -146,4 +146,4 @@ export const TABLE_GAMES_AND_CARDS_CRITS = {
     image: "crits/tableGamesAndCards/sicBoShaker.webp",
     description: "Raises every floor below this one to its level",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

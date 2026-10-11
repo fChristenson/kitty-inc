@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/steampunk.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/steampunk.ts's crits, spread into CONFIG.crit
 export const STEAMPUNK_BALANCE = {
   aetherLanternChance: 0.0121657201,
   aetherLanternUpgrades: 19,

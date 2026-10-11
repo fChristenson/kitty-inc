@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/footPoses.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/footPoses.ts's crits, spread into CONFIG.crit
 export const FOOT_POSES_BALANCE = {
   cooldownStretchChance: 0.00184274331,
   cooldownStretchSeconds: 53,

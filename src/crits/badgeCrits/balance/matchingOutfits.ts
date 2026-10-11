@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/matchingOutfits.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/matchingOutfits.ts's crits, spread into CONFIG.crit
 export const MATCHING_OUTFITS_BALANCE = {
   ankleWrapDuoChance: 0.012924,
   ankleWrapDuoShare: 0.05,

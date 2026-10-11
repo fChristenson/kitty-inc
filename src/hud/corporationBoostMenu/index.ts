@@ -9,7 +9,7 @@ import {
   getCritProcIncomeModifierPercent,
   getCritProcNextMilestoneCount,
   getBadgeFoil,
-  withFeaturedCatalog,
+  withBadgeCatalog,
   type BadgeFoil,
   type CritProcKind,
 } from "../../crits";
@@ -37,7 +37,7 @@ export type { MergeCompaniesResult } from "./economy";
 // instead of this menu hand-duplicating every label/icon/description a
 // second time. Sorted alphabetically by label — CRIT_PROC_KINDS' own order is
 // roll-rarity-driven, not a sensible reading order for a lookup list. Built
-// on the first open, once the featured catalog is in
+// on the first open, once the badge catalog is in
 type BadgeInfo = {
   kind: CritProcKind;
   icon: string;
@@ -447,7 +447,7 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
   const ghostClickGuard = createGhostClickGuard();
 
   function open(): void {
-    withFeaturedCatalog(show);
+    withBadgeCatalog(show);
   }
 
   function show(): void {

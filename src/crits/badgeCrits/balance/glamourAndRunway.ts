@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/glamourAndRunway.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/glamourAndRunway.ts's crits, spread into CONFIG.crit
 export const GLAMOUR_AND_RUNWAY_BALANCE = {
   leotardLusterChance: 0.00371249539,
   leotardLusterPayouts: 64,

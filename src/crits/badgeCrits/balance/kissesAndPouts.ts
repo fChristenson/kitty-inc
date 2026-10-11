@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/kissesAndPouts.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/kissesAndPouts.ts's crits, spread into CONFIG.crit
 export const KISSES_AND_POUTS_BALANCE = {
   butterflyKissChance: 0.00673808412,
   butterflyKissFloors: 5,

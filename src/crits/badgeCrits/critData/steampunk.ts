@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const STEAMPUNK_CRITS = {
   aetherLantern: {
@@ -112,4 +112,4 @@ export const STEAMPUNK_CRITS = {
     description:
       "Repeats the crit above and below, 63% chance to keep spreading",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const CYBERPUNK_CRITS = {
   chromeDome: {
@@ -254,4 +254,4 @@ export const CYBERPUNK_CRITS = {
     image: "crits/cyberpunk/deusEx.webp",
     description: "Grows this floor's level by 12.7% in free upgrades",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

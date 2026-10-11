@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/partyTime.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/partyTime.ts's crits, spread into CONFIG.crit
 export const PARTY_TIME_BALANCE = {
   doughDivisionChance: 0.0128301454,
   profitPopcornChance: 0.011998502,

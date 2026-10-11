@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/catGirls.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/catGirls.ts's crits, spread into CONFIG.crit
 export const CAT_GIRLS_BALANCE = {
   pawsAndEffectChance: 0.00953062564,
   catwalkQueenChance: 0.00771039369,

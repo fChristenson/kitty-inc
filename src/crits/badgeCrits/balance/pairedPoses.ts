@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/pairedPoses.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/pairedPoses.ts's crits, spread into CONFIG.crit
 export const PAIRED_POSES_BALANCE = {
   blueLipsReclineChance: 0.011065672,
   blueLipsReclineShare: 0.255,

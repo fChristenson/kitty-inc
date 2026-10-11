@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/pedicureAndAdornments.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/pedicureAndAdornments.ts's crits, spread into CONFIG.crit
 export const PEDICURE_AND_ADORNMENTS_BALANCE = {
   pedicurePayoutChance: 0.0016155,
   toeRingRichesChance: 0.0103337357,

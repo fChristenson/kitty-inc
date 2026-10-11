@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const GAMER_LIFE_CRITS = {
   dungeonAccountant: {
@@ -254,4 +254,4 @@ export const GAMER_LIFE_CRITS = {
     image: "crits/gamerLife/ponytailPowerPlay.webp",
     description: "Repeats the crit above and below, 100% chance to keep spreading",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

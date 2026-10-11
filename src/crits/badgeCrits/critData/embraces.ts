@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const EMBRACES_CRITS = {
   cheekToCheek: {
@@ -164,4 +164,4 @@ export const EMBRACES_CRITS = {
     image: "crits/embraces/pinkBraidSnuggle.webp",
     description: "Spreads 40 free upgrades over the lowest-level floors",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

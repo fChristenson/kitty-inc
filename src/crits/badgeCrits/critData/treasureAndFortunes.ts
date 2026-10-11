@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const TREASURE_AND_FORTUNES_CRITS = {
   adamWhiskersen: {
@@ -154,4 +154,4 @@ export const TREASURE_AND_FORTUNES_CRITS = {
     image: "crits/treasureAndFortunes/velvetLockbox.webp",
     description: "Cuts every price in this building by 7.9%",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

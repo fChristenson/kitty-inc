@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const SHOWBIZ_CRITS = {
   bombshellBrawn: {
@@ -234,4 +234,4 @@ export const SHOWBIZ_CRITS = {
     image: "crits/showbiz/wreckIt.webp",
     description: "Spreads 93 free upgrades over the lowest-level floors",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

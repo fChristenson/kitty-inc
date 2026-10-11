@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/courtshipAndDates.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/courtshipAndDates.ts's crits, spread into CONFIG.crit
 export const COURTSHIP_AND_DATES_BALANCE = {
   airKissAssetsChance: 0.0106354662,
   blownKissBonusChance: 0.0108611056,

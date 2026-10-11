@@ -7,7 +7,7 @@ import {
   CRIT_PROC_INFO,
   CRIT_PROC_KINDS,
   onCritProcsArmed,
-  onFeaturedCatalog,
+  onBadgeCatalog,
   type CritProcKind,
 } from "../critTypes";
 import { critFont, drawCritText } from "./critText";
@@ -47,7 +47,7 @@ const CRIT_ICON_EXTRA_ROTATION: Partial<Record<CritProcKind, number>> = {
 // text below, keyed by that flash's own label. Derived from critTypes'
 // canonical CRIT_PROC_INFO rather than hand-listed here — a third copy of the
 // label -> icon mapping is exactly how Bull Market ended up flashing with no
-// icon at all. The featured crits join once their catalog loads
+// icon at all. The badge crits join once their catalog loads
 const CRIT_ICON_BY_LABEL: Partial<
   Record<string, { name: ImageName; rotateDeg?: number }>
 > = {};
@@ -62,7 +62,7 @@ function addCritIcons(): void {
   }
 }
 addCritIcons();
-onFeaturedCatalog(addCritIcons);
+onBadgeCatalog(addCritIcons);
 
 // the Sale boost's own flash isn't a piggyback proc, so it isn't in
 // CRIT_PROC_INFO and still needs its own entry
@@ -300,7 +300,7 @@ function startFlash(req: FlashRequest): void {
     : req.priority;
   flashEndsAt = now + GROWTH_DURATION_MS + holdMs + fadeDurationMs;
   buzzForFlash(now, req.pulseMs);
-  // a featured crit's image is its own show; a cash crit throws money instead
+  // a badge crit's image is its own show; a cash crit throws money instead
   if (CRIT_ICON_BY_LABEL[req.label] || req.letters) stopCritSparks();
   else startCritSparks(req.priority, now);
 }

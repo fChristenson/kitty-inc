@@ -1,4 +1,4 @@
-// From a raw image to a playable featured crit. Everything in progress lives in
+// From a raw image to a playable badge crit. Everything in progress lives in
 // the gitignored tmp/ work area; only a finished crit reaches public/ and src/.
 //   1. drop raw images into the project root (or tmp/), then
 //      node scripts/crit-intake.mjs
@@ -23,7 +23,7 @@
 //        cut-out and uses it from then on; tweak that script and re-run
 //   5. node scripts/new-crits.mjs --apply
 //        writes public/crits/<category>/<kind>.webp, its sticker and
-//        silhouette, the featured entry and balance lines
+//        silhouette, the badge entry and balance lines
 //        (creating a new category's files), upscales icons cut smaller than
 //        640x640 area with Real-ESRGAN (scripts/lib/crit-upscale.mjs), then
 //        deletes the raw and its processor script from tmp/
@@ -55,7 +55,7 @@ import { addStickerBorder, writeSilhouette } from "./lib/sticker-border.mjs";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const INBOX = WORK;
 const SHEETS = path.join(WORK, "_sheets");
-const FEATURED = path.join(ROOT, "src/crits/badgeCrits/featured");
+const REWARDS = path.join(ROOT, "src/crits/badgeCrits/rewards");
 const DATA = path.join(ROOT, "src/crits/badgeCrits/critData");
 const BALANCE = path.join(ROOT, "src/crits/badgeCrits/balance");
 const RAW_EXTENSIONS = [".jfif", ".jpg", ".jpeg", ".webp", ".png"];
@@ -238,7 +238,7 @@ async function scan() {
 }
 
 // the chance strictly between the bounds that sits in the widest gap between
-// existing featured chances, so it never ties one
+// existing badge chances, so it never ties one
 function pickChance(catalog, low, high) {
   const inside = catalog
     .map((entry) => entry.chance)
@@ -488,7 +488,7 @@ function paletteColors() {
     }));
 }
 
-// the crit colour already used by featured crits nearest the icon's dominant hue
+// the crit colour already used by badge crits nearest the icon's dominant hue
 async function pickColor(icon, colors) {
   const { data, info } = await sharp(icon)
     .ensureAlpha()
@@ -571,19 +571,19 @@ function ensureCategory(category) {
   register(
     DATA,
     `${constant}_CRITS`,
-    'import { COLOR } from "../../../palette";\nimport type { FeaturedCritData } from "./types";\n\n',
-    "} as const satisfies Record<string, FeaturedCritData>;",
+    'import { COLOR } from "../../../palette";\nimport type { BadgeCritData } from "./types";\n\n',
+    "} as const satisfies Record<string, BadgeCritData>;",
   );
   register(
-    FEATURED,
+    REWARDS,
     `${constant}_REWARDS`,
-    `import type { ${constant}_CRITS } from "../critData/${category}";\nimport type { FeaturedRewards } from "./types";\n\n`,
-    `} satisfies FeaturedRewards<typeof ${constant}_CRITS>;`,
+    `import type { ${constant}_CRITS } from "../critData/${category}";\nimport type { BadgeRewards } from "./types";\n\n`,
+    `} satisfies BadgeRewards<typeof ${constant}_CRITS>;`,
   );
   register(
     BALANCE,
     `${constant}_BALANCE`,
-    `// odds and reward sizes for featured/${category}.ts's crits, spread into CONFIG.crit\n`,
+    `// odds and reward sizes for rewards/${category}.ts's crits, spread into CONFIG.crit\n`,
     "} as const;",
   );
   if (isNew)
@@ -636,7 +636,7 @@ async function apply(specs, plans) {
         : await pickColor(icon, colors);
     if (!colors.some((entry) => entry.name === color))
       console.warn(
-        `${kind}: COLOR.${color} isn't used by any featured crit yet`,
+        `${kind}: COLOR.${color} isn't used by any badge crit yet`,
       );
     insertBefore(
       path.join(DATA, `${category}.ts`),
@@ -652,7 +652,7 @@ async function apply(specs, plans) {
     );
     // templates indent the reward as a field of the entry; it's the entry here
     insertBefore(
-      path.join(FEATURED, `${category}.ts`),
+      path.join(REWARDS, `${category}.ts`),
       "} satisfies",
       `  ${kind}: ${plan.template.reward(kind).replaceAll("\n  ", "\n")},\n`,
     );

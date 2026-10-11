@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/cakes.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/cakes.ts's crits, spread into CONFIG.crit
 export const CAKES_BALANCE = {
   browniePointsChance: 0.00896222207,
   browniePointsUpgrades: 25,

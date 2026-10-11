@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/combatAthletics.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/combatAthletics.ts's crits, spread into CONFIG.crit
 export const COMBAT_ATHLETICS_BALANCE = {
   kneelingKnockoutChance: 0.0104127933,
   kneelingKnockoutTierSteps: 1,

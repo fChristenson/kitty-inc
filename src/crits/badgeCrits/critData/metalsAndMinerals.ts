@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const METALS_AND_MINERALS_CRITS = {
   mendeleviumMajesty: {
@@ -192,4 +192,4 @@ export const METALS_AND_MINERALS_CRITS = {
     image: "crits/metalsAndMinerals/quicksilverDrop.webp",
     description: "Adds 41.4% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

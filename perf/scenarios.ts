@@ -7,7 +7,7 @@ import {
   CRIT_PROC_KINDS,
   CRIT_TIER_CONFIG,
   CRIT_TIER_ORDER,
-  FEATURED_CRIT_KINDS,
+  BADGE_CRIT_KINDS,
   SPECIAL_CRIT_GATEWAY,
   setCritRandom,
 } from "../src/crits";
@@ -199,8 +199,8 @@ function forceCrit(bridge: PerfBridge, kind: string, tier: string): void {
   setTimeout(() => tap(bridge, ground(bridge)), 50);
 }
 
-const FEATURED = new Set<string>(FEATURED_CRIT_KINDS);
-const PROCS = CRIT_PROC_KINDS.filter((kind) => !FEATURED.has(kind));
+const BADGE = new Set<string>(BADGE_CRIT_KINDS);
+const PROCS = CRIT_PROC_KINDS.filter((kind) => !BADGE.has(kind));
 // procs that reach past the crit's floor: every floor, building or worker
 const WIDE_PROCS = PROCS.filter((kind) =>
   /\b(every|all)\b/i.test(CRIT_PROC_INFO[kind]?.description ?? ""),
@@ -454,13 +454,13 @@ export const SCENARIOS: Scenario[] = [
     run: critSeries("cash-crits", 1000, () => "cash"),
   },
   {
-    name: "featured",
-    about: "a featured crit (icon reveal) every 1.5s, tiers in turn",
-    run: critSeries("featured", 1500, () => pick(FEATURED_CRIT_KINDS)),
+    name: "badge",
+    about: "a badge crit (icon reveal) every 1.5s, tiers in turn",
+    run: critSeries("badge", 1500, () => pick(BADGE_CRIT_KINDS)),
   },
   {
     name: "procs",
-    about: "a special (non-featured) crit every 1.5s, tiers in turn",
+    about: "a special (non-badge) crit every 1.5s, tiers in turn",
     run: critSeries("procs", 1500, () => pick(PROCS)),
   },
   {

@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const EAST_ASIAN_FEASTS_CRITS = {
   bentoBox: {
@@ -152,4 +152,4 @@ export const EAST_ASIAN_FEASTS_CRITS = {
     image: "crits/eastAsianFeasts/stickyRiceCloud.webp",
     description: "Spreads 108 free upgrades over this floor and the ones below",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

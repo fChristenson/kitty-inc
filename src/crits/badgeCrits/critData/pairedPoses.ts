@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const PAIRED_POSES_CRITS = {
   blueLipsRecline: {
@@ -188,4 +188,4 @@ export const PAIRED_POSES_CRITS = {
     image: "crits/pairedPoses/plumLipsPower.webp",
     description: "Promotes 80.5% of this floor's workers two perma tiers",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

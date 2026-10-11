@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/gameQuotes.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/gameQuotes.ts's crits, spread into CONFIG.crit
 export const GAME_QUOTES_BALANCE = {
   wizardChance: 0.00979904679,
   wizardTierSteps: 2,

@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const SKY_AND_SPACE_ELEMENTS_CRITS = {
   hassiumMeteor: {
@@ -161,4 +161,4 @@ export const SKY_AND_SPACE_ELEMENTS_CRITS = {
     image: "crits/skyAndSpaceElements/rheniumRocket.webp",
     description: "Unlocks the next floor for free",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

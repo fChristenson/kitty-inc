@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/runes.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/runes.ts's crits, spread into CONFIG.crit
 export const RUNES_BALANCE = {
   axeOfAssetsChance: 0.00955053806,
   axeOfAssetsUpgrades: 56,

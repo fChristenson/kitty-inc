@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/yakuza.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/yakuza.ts's crits, spread into CONFIG.crit
 export const YAKUZA_BALANCE = {
   oyabunsBlessingChance: 0.0108207308,
   oyabunsBlessingTierSteps: 1,

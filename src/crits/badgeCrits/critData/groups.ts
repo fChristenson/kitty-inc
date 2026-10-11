@@ -1,10 +1,10 @@
-// the main categories a featured roll picks between, evenly, before landing
+// the main categories a badge roll picks between, evenly, before landing
 // one of the group's crits by its chance; every image category
 // (critData/<category>.ts) belongs to exactly one
-import type { FEATURED_CRITS } from ".";
+import type { BADGE_CRITS } from ".";
 
-type Crits = typeof FEATURED_CRITS;
-export type FeaturedCategory = {
+type Crits = typeof BADGE_CRITS;
+export type BadgeCategory = {
   [K in keyof Crits]: Crits[K]["image"] extends `crits/${infer C}/${string}`
     ? C
     : never;
@@ -106,10 +106,10 @@ export const CRIT_GROUPS = {
     "skyAndSpaceElements",
     "energyAndNature",
   ],
-} as const satisfies Record<string, readonly FeaturedCategory[]>;
+} as const satisfies Record<string, readonly BadgeCategory[]>;
 
 type Ungrouped = Exclude<
-  FeaturedCategory,
+  BadgeCategory,
   (typeof CRIT_GROUPS)[keyof typeof CRIT_GROUPS][number]
 >;
 // doesn't compile while a category is in no group (the error names it)

@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/critters.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/critters.ts's crits, spread into CONFIG.crit
 export const CRITTERS_BALANCE = {
   crownHedgehogChance: 0.011392058,
   crownHedgehogTierSteps: 1,

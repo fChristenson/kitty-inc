@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const WRESTLING_CRITS = {
   goblinArmbar: {
@@ -200,4 +200,4 @@ export const WRESTLING_CRITS = {
     image: "crits/wrestling/undercutUpperHand.webp",
     description: "Grows this floor's level by 19.4% in free upgrades",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

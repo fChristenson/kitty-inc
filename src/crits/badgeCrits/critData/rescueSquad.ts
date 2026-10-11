@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const RESCUE_SQUAD_CRITS = {
   bedsideManner: {
@@ -140,4 +140,4 @@ export const RESCUE_SQUAD_CRITS = {
     image: "crits/rescueSquad/wreathedSkullHelm.webp",
     description: "Promotes 64% of this building's workers one perma tier",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

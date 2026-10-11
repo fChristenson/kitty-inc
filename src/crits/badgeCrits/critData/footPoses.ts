@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const FOOT_POSES_CRITS = {
   cooldownStretch: {
@@ -206,4 +206,4 @@ export const FOOT_POSES_CRITS = {
     image: "crits/footPoses/silverBuzzFlex.webp",
     description: "Spreads 128 free upgrades over the lowest-level floors",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

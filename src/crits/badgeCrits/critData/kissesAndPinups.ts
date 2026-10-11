@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const KISSES_AND_PINUPS_CRITS = {
   swingAndASmooch: {
@@ -236,4 +236,4 @@ export const KISSES_AND_PINUPS_CRITS = {
     image: "crits/kissesAndPinups/royalHandKiss.webp",
     description: "Spreads 36 free upgrades over this floor and the ones below",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

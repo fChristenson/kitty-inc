@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/baldursGate.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/baldursGate.ts's crits, spread into CONFIG.crit
 export const BALDURS_GATE_BALANCE = {
   astapurrionChance: 0.011407937,
   astapurrionPayouts: 19,

@@ -1,4 +1,4 @@
-// every non-featured proc's odds and effect sizes, one file per reward shape
+// every non-badge proc's odds and effect sizes, one file per reward shape
 import { CASCADES_BALANCE } from "./cascades";
 import { TIERS_BALANCE } from "./tiers";
 import { FLOOR_UNLOCKS_BALANCE } from "./floorUnlocks";

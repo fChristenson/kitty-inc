@@ -2,7 +2,7 @@ import fs from "node:fs";
 import { defineConfig, type Plugin } from "vite";
 import { writeCritKinds } from "./scripts/crit-kinds.mjs";
 
-// critData/kinds.ts follows the featured crit catalog: written on start and
+// critData/kinds.ts follows the badge crit catalog: written on start and
 // whenever a critData file changes
 const critKinds: Plugin = {
   name: "crit-kinds",

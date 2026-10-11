@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/treasureAndFortunes.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/treasureAndFortunes.ts's crits, spread into CONFIG.crit
 export const TREASURE_AND_FORTUNES_BALANCE = {
   adamWhiskersenChance: 0.00952893275,
   adamWhiskersenTierSteps: 2,

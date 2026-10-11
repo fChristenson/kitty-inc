@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const WEIGHT_TRAINING_CRITS = {
   barbellBelle: {
@@ -161,4 +161,4 @@ export const WEIGHT_TRAINING_CRITS = {
     image: "crits/weightTraining/backpackBabes.webp",
     description: "Adds 44.4% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

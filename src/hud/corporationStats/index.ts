@@ -25,7 +25,7 @@ import {
   CRIT_PROC_KINDS,
   getCritProcCount,
   getCritProcIncomeModifierPercent,
-  withFeaturedCatalog,
+  withBadgeCatalog,
 } from "../../crits";
 
 // read-only "Corporation income rate"/"Income modifiers" breakdown — split
@@ -190,7 +190,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
   }
 
   function open(): void {
-    withFeaturedCatalog(show);
+    withBadgeCatalog(show);
   }
 
   function show(): void {

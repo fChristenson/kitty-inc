@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/yogaAndStretching.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/yogaAndStretching.ts's crits, spread into CONFIG.crit
 export const YOGA_AND_STRETCHING_BALANCE = {
   hipHingeHeroineChance: 0.00691861747,
   hipHingeHeroineContinueChance: 0.56,

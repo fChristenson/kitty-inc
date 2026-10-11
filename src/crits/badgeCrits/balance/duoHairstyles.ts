@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/duoHairstyles.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/duoHairstyles.ts's crits, spread into CONFIG.crit
 export const DUO_HAIRSTYLES_BALANCE = {
   baldAndBraidedChance: 0.0114187888,
   baldAndBraidedShare: 0.25,

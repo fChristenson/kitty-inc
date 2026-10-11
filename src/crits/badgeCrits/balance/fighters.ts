@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/fighters.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/fighters.ts's crits, spread into CONFIG.crit
 export const FIGHTERS_BALANCE = {
   blackBeltBiscuitChance: 0.00407943273,
   blackBeltBiscuitDiscount: 0.157,

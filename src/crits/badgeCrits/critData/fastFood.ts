@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const FAST_FOOD_CRITS = {
   bbqChickenLickin: {
@@ -155,4 +155,4 @@ export const FAST_FOOD_CRITS = {
     image: "crits/fastFood/towerBurger.webp",
     description: "Cuts every price in this building by 22.4%",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/heroes.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/heroes.ts's crits, spread into CONFIG.crit
 export const HEROES_BALANCE = {
   blessedChance: 0.012900923,
   blessedTierSteps: 1,

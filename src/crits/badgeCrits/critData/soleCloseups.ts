@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const SOLE_CLOSEUPS_CRITS = {
   archEnemyAssets: {
@@ -200,4 +200,4 @@ export const SOLE_CLOSEUPS_CRITS = {
     image: "crits/soleCloseups/soleSandwich.webp",
     description: "Grows every unlocked floor's level by 7.1% in free upgrades",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

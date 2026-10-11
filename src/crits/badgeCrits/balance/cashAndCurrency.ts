@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/cashAndCurrency.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/cashAndCurrency.ts's crits, spread into CONFIG.crit
 export const CASH_AND_CURRENCY_BALANCE = {
   bankrollChance: 0.00586598069,
   bankrollShare: 0.064,

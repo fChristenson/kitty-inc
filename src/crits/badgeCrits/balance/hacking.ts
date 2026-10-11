@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/hacking.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/hacking.ts's crits, spread into CONFIG.crit
 export const HACKING_BALANCE = {
   wrenchWraithChance: 0.00554261319,
   wrenchWraithBoostSeconds: 61,

@@ -118,10 +118,10 @@ import {
   type EventProcContext,
 } from "../animatedCrits/eventProcs";
 import {
-  featuredCritFlags,
-  isFeaturedCritKind,
-  type FeaturedCritKind,
-} from "../badgeCrits/featuredProcs";
+  badgeCritFlags,
+  isBadgeCritKind,
+  type BadgeCritKind,
+} from "../badgeCrits/badgeProcs";
 import { preloadFloorCritWhenIdle } from "./critPlayer";
 
 const critTiers = snapshotMap<Floor, CritTier>();
@@ -164,9 +164,9 @@ export function forceTestCrit(
   if (kind) forceCritProc(kind, floor);
 }
 
-export function forceFeaturedCritUpgrade(
+export function forceBadgeCritUpgrade(
   floor: Floor,
-  kind: FeaturedCritKind,
+  kind: BadgeCritKind,
   tier: CritTier = "crit",
 ): void {
   consumeCritProcs(floor);
@@ -174,8 +174,8 @@ export function forceFeaturedCritUpgrade(
   forceCritProc(kind, floor);
 }
 
-export function forceFeaturedFloorBuyCrit(
-  kind: FeaturedCritKind,
+export function forceBadgeFloorBuyCrit(
+  kind: BadgeCritKind,
   tier: CritTier = "crit",
 ): void {
   forceFloorBuyCrit(tier);
@@ -248,7 +248,7 @@ export function rollCritUpgrade(
       if (result.critUp) critUpCrits.add(floor);
       if (result.critDown) critDownCrits.add(floor);
       for (const kind of landedProcs) {
-        if (isFeaturedCritKind(kind)) forceCritProc(kind, floor);
+        if (isBadgeCritKind(kind)) forceCritProc(kind, floor);
       }
       if (result.chain) forceChainCritProc(floor);
       if (result.dominoEffect) forceDominoEffectCritProc(floor);
@@ -443,7 +443,7 @@ export function forceFloorBuyCrit(
   rainCheck = false,
 ): void {
   forcedFloorBuyCrit = {
-    ...featuredCritFlags(),
+    ...badgeCritFlags(),
     tier,
     chain,
     dominoEffect,

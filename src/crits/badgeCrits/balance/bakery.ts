@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/bakery.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/bakery.ts's crits, spread into CONFIG.crit
 export const BAKERY_BALANCE = {
   butterCroissantChance: 0.0118204114,
   butterCroissantFloors: 1,

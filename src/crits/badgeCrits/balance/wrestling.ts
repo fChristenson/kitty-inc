@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/wrestling.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/wrestling.ts's crits, spread into CONFIG.crit
 export const WRESTLING_BALANCE = {
   goblinArmbarChance: 0.00823653102,
   goblinArmbarGrowth: 0.029,

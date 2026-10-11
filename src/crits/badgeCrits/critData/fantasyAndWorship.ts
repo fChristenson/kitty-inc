@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const FANTASY_AND_WORSHIP_CRITS = {
   hellfireHug: {
@@ -230,4 +230,4 @@ export const FANTASY_AND_WORSHIP_CRITS = {
     image: "crits/fantasyAndWorship/blondeDisciple.webp",
     description: "Spreads 61 free upgrades over this floor and the ones below",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

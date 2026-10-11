@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/energyAndNature.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/energyAndNature.ts's crits, spread into CONFIG.crit
 export const ENERGY_AND_NATURE_BALANCE = {
   californiumCrescendoChance: 0.00230494098,
   californiumCrescendoUpgrades: 98,

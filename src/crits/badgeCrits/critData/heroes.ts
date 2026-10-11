@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const HEROES_CRITS = {
   blessed: {
@@ -246,4 +246,4 @@ export const HEROES_CRITS = {
     image: "crits/heroes/thePenguin2.webp",
     description: "Adds 7.2% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

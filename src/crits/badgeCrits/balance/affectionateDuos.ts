@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/affectionateDuos.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/affectionateDuos.ts's crits, spread into CONFIG.crit
 export const AFFECTIONATE_DUOS_BALANCE = {
   curvyCuddleChance: 0.00928097331,
   curvyCuddleShare: 0.28,

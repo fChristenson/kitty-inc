@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const MAFIA_CRITS = {
   theCatfather: {
@@ -172,4 +172,4 @@ export const MAFIA_CRITS = {
     image: "crits/mafia/mindYourOwnBusiness.webp",
     description: "Hires a free manager on alternating floors",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

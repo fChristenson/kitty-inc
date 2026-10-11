@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/gamerLife.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/gamerLife.ts's crits, spread into CONFIG.crit
 export const GAMER_LIFE_BALANCE = {
   dungeonAccountantChance: 0.0126104399,
   lootGoblinChance: 0.0109750519,

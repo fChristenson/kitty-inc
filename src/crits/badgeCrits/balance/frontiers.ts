@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/frontiers.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/frontiers.ts's crits, spread into CONFIG.crit
 export const FRONTIERS_BALANCE = {
   blackHoleChance: 0.0113504505,
   bottledNebulaChance: 0.0117409822,

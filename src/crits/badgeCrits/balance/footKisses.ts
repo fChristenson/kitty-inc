@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/footKisses.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/footKisses.ts's crits, spread into CONFIG.crit
 export const FOOT_KISSES_BALANCE = {
   armsWideKissChance: 0.00228154822,
   armsWideKissMultiple: 22,

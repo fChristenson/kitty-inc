@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const FRONTIERS_CRITS = {
   blackHole: {
@@ -134,4 +134,4 @@ export const FRONTIERS_CRITS = {
     image: "crits/frontiers/lemonSails.webp",
     description: "Grows this floor's level by 20% in free upgrades",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

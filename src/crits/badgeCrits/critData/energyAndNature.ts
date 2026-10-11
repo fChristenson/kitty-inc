@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const ENERGY_AND_NATURE_CRITS = {
   californiumCrescendo: {
@@ -209,4 +209,4 @@ export const ENERGY_AND_NATURE_CRITS = {
     image: "crits/energyAndNature/uraniumUplift.webp",
     description: "Unlocks the next floor for free",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

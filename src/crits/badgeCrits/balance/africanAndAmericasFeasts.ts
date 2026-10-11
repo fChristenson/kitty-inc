@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/africanAndAmericasFeasts.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/africanAndAmericasFeasts.ts's crits, spread into CONFIG.crit
 export const AFRICAN_AND_AMERICAS_FEASTS_BALANCE = {
   barbecuePotChance: 0.00166707311,
   barbecuePotShare: 0.81,

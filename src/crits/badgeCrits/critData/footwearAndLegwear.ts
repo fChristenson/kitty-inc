@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const FOOTWEAR_AND_LEGWEAR_CRITS = {
   sockItAway: {
@@ -170,4 +170,4 @@ export const FOOTWEAR_AND_LEGWEAR_CRITS = {
     image: "crits/footwearAndLegwear/redCarpetClearance.webp",
     description: "Cuts every price in this building by 21.6%",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

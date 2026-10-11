@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/elementalWomen.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/elementalWomen.ts's crits, spread into CONFIG.crit
 export const ELEMENTAL_WOMEN_BALANCE = {
   flameFlirtChance: 0.00784787203,
   flameFlirtBoostSeconds: 36,

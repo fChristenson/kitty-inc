@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const BIG_ATTITUDE_CRITS = {
   goldenSkull: {
@@ -147,4 +147,4 @@ export const BIG_ATTITUDE_CRITS = {
     image: "crits/bigAttitude/queenOfQueens.webp",
     description: "One tier promotion and 11 upgrades here",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

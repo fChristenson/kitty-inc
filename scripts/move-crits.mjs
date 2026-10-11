@@ -1,4 +1,4 @@
-// Moves shipped featured crits to other categories: their data, reward and
+// Moves shipped badge crits to other categories: their data, reward and
 // balance entries, icon, sticker and silhouette, and raws in tmp/crits. Creates
 // target categories and deletes emptied ones (a deleted category's leftover proc
 // icons move to crits/classics).
@@ -9,7 +9,7 @@ import path from "node:path";
 import { ROOT } from "./lib/crit-asset-paths.mjs";
 
 const DATA = path.join(ROOT, "src/crits/badgeCrits/critData");
-const FEATURED = path.join(ROOT, "src/crits/badgeCrits/featured");
+const REWARDS = path.join(ROOT, "src/crits/badgeCrits/rewards");
 const BALANCE = path.join(ROOT, "src/crits/badgeCrits/balance");
 const SRC = path.join(ROOT, "src");
 const RAWS = path.join(ROOT, "tmp/crits");
@@ -92,7 +92,7 @@ function load(category) {
   if (categories.has(category)) return categories.get(category);
   const files = {
     data: path.join(DATA, `${category}.ts`),
-    rewards: path.join(FEATURED, `${category}.ts`),
+    rewards: path.join(REWARDS, `${category}.ts`),
     balance: path.join(BALANCE, `${category}.ts`),
   };
   const constant = constOf(category);
@@ -113,26 +113,26 @@ function load(category) {
       data: {
         header: [
           'import { COLOR } from "../../../palette";',
-          'import type { FeaturedCritData } from "./types";',
+          'import type { BadgeCritData } from "./types";',
           "",
           `export const ${constant}_CRITS = {`,
         ],
         entries: new Map(),
-        closing: ["} as const satisfies Record<string, FeaturedCritData>;", ""],
+        closing: ["} as const satisfies Record<string, BadgeCritData>;", ""],
       },
       rewards: {
         header: [
           `import type { ${constant}_CRITS } from "../critData/${category}";`,
-          'import type { FeaturedRewards } from "./types";',
+          'import type { BadgeRewards } from "./types";',
           "",
           `export const ${constant}_REWARDS = {`,
         ],
         entries: new Map(),
-        closing: [`} satisfies FeaturedRewards<typeof ${constant}_CRITS>;`, ""],
+        closing: [`} satisfies BadgeRewards<typeof ${constant}_CRITS>;`, ""],
       },
       balance: {
         header: [
-          `// odds and reward sizes for featured/${category}.ts's crits, spread into CONFIG.crit`,
+          `// odds and reward sizes for rewards/${category}.ts's crits, spread into CONFIG.crit`,
           `export const ${constant}_BALANCE = {`,
         ],
         entries: new Map(),
@@ -149,7 +149,7 @@ for (const file of fs.readdirSync(DATA))
   if (file.endsWith(".ts") && !NOT_CATEGORIES.has(file))
     load(path.basename(file, ".ts"));
 for (const [kind, category] of moves) {
-  if (!categoryOf.has(kind)) throw new Error(`${kind}: no featured crit`);
+  if (!categoryOf.has(kind)) throw new Error(`${kind}: no badge crit`);
   if (!/^[a-z][a-zA-Z]*$/.test(category))
     throw new Error(`${category}: not a camelCase category`);
 }
@@ -179,12 +179,12 @@ for (const [kind, to] of moves) {
         : lines,
     );
   }
-  // reward files only ever import their own crit type and FeaturedRewards
+  // reward files only ever import their own crit type and BadgeRewards
   const extra = source.rewards.header.filter(
     (line) =>
       /^import /.test(line) &&
       !line.includes("_CRITS }") &&
-      !line.includes("FeaturedRewards"),
+      !line.includes("BadgeRewards"),
   );
   for (const line of extra)
     if (!target.rewards.header.includes(line))
@@ -221,7 +221,7 @@ for (const [category, entry] of categories) {
 
 for (const [dir, suffix] of [
   [DATA, "_CRITS"],
-  [FEATURED, "_REWARDS"],
+  [REWARDS, "_REWARDS"],
   [BALANCE, "_BALANCE"],
 ]) {
   const index = path.join(dir, "index.ts");

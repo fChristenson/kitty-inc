@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const LUCKY_CHARMS_CRITS = {
   bubbleEconomy: {
@@ -194,4 +194,4 @@ export const LUCKY_CHARMS_CRITS = {
     image: "crits/luckyCharms/platinumPlume.webp",
     description: "Free office supplies for this floor",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

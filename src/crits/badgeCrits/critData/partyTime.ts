@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const PARTY_TIME_CRITS = {
   doughDivision: {
@@ -137,4 +137,4 @@ export const PARTY_TIME_CRITS = {
     image: "crits/partyTime/prehistoric.webp",
     description: "One tier promotion and forty upgrades here",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

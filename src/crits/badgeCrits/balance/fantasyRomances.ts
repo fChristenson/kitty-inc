@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/fantasyRomances.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/fantasyRomances.ts's crits, spread into CONFIG.crit
 export const FANTASY_ROMANCES_BALANCE = {
   scaleSmoochChance: 0.00346683786,
   scaleSmoochContinueChance: 0.86,

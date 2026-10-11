@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/bodybuildingPoses.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/bodybuildingPoses.ts's crits, spread into CONFIG.crit
 export const BODYBUILDING_POSES_BALANCE = {
   bicepBombshellChance: 0.00963972531,
   bicepBombshellTierSteps: 1,

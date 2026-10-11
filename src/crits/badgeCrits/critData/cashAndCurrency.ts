@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const CASH_AND_CURRENCY_CRITS = {
   bankroll: {
@@ -168,4 +168,4 @@ export const CASH_AND_CURRENCY_CRITS = {
     image: "crits/cashAndCurrency/looseChangeLauncher.webp",
     description: "Unlocks the next 2 floors for free",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

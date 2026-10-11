@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const LUCKY_CATS_CRITS = {
   purrfectUnit: {
@@ -188,4 +188,4 @@ export const LUCKY_CATS_CRITS = {
     image: "crits/luckyCats/tealAppeal.webp",
     description: "Grows every unlocked floor's level by 4.9% in free upgrades",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

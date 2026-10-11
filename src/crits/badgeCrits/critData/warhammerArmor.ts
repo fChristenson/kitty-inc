@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const WARHAMMER_ARMOR_CRITS = {
   amberVisor: {
@@ -200,4 +200,4 @@ export const WARHAMMER_ARMOR_CRITS = {
     image: "crits/warhammerArmor/yellowVisor.webp",
     description: "Adds 37.2% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

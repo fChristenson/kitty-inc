@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const COMBAT_ATHLETICS_CRITS = {
   kneelingKnockout: {
@@ -173,4 +173,4 @@ export const COMBAT_ATHLETICS_CRITS = {
     image: "crits/combatAthletics/trackStar.webp",
     description: "Adds 45.5% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

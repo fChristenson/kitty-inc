@@ -26,37 +26,37 @@ import {
   type BadgeFoil,
 } from "../badgeCrits/critProcCounts";
 import {
-  FEATURED_CRIT_KINDS,
-  getFeaturedRewards,
-  isFeaturedCritKind,
-  onFeaturedCatalog,
-  rollFeaturedCrit,
-  type FeaturedCritKind,
-} from "../badgeCrits/featuredProcs";
+  BADGE_CRIT_KINDS,
+  getBadgeRewards,
+  isBadgeCritKind,
+  onBadgeCatalog,
+  rollBadgeCrit,
+  type BadgeCritKind,
+} from "../badgeCrits/badgeProcs";
 
 export {
-  FEATURED_CRIT_KINDS,
-  featuredCritFlags,
-  featuredCritImages,
-  isFeaturedCritKind,
-  isFeaturedCatalogLoaded,
-  loadFeaturedCatalog,
-  loadFeaturedRewards,
-  getFeaturedRewards,
-  onFeaturedCatalog,
-  withFeaturedCatalog,
-  type FeaturedCritKind,
-} from "../badgeCrits/featuredProcs";
+  BADGE_CRIT_KINDS,
+  badgeCritFlags,
+  badgeCritImages,
+  isBadgeCritKind,
+  isBadgeCatalogLoaded,
+  loadBadgeCatalog,
+  loadBadgeRewards,
+  getBadgeRewards,
+  onBadgeCatalog,
+  withBadgeCatalog,
+  type BadgeCritKind,
+} from "../badgeCrits/badgeProcs";
 export {
   createRewardHelpers,
-  type FeaturedRewardActions,
+  type BadgeRewardActions,
   type RewardHelpers,
-} from "../badgeCrits/featured/rewardHelpers";
-export type { FeaturedCritData } from "../badgeCrits/critData/types";
+} from "../badgeCrits/rewards/rewardHelpers";
+export type { BadgeCritData } from "../badgeCrits/critData/types";
 export type {
-  FeaturedReward,
-  FeaturedRewardContext,
-} from "../badgeCrits/featured/types";
+  BadgeReward,
+  BadgeRewardContext,
+} from "../badgeCrits/rewards/types";
 
 export {
   getCritProcCount,
@@ -979,7 +979,7 @@ export function pickAtMost<T>(
 // one shape both rollCritUpgrade (per-click, upgradeButton.ts) and
 // rollFloorBuyCrit (one-shot floor/building purchase, also upgradeButton.ts)
 // now get back from the exact same shared roll
-export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
+export interface CritRollResult extends Record<BadgeCritKind, boolean> {
   tier: CritTier;
   // a cash crit: pays its upgrades' price instead of them
   cash?: boolean;
@@ -1188,23 +1188,23 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "recruitmentDrive",
   "merger",
   "shareholders",
-  ...FEATURED_CRIT_KINDS,
+  ...BADGE_CRIT_KINDS,
 ];
 
 // the one kind -> "is this proc armed on this floor" registry. Every per-proc
 // WeakSet above is reachable from here, so anything that needs to act on procs
 // generically (consumeCritProcs, readCritProcs, forceCritProc) walks
-// CRIT_PROC_KINDS instead of hand-listing all 59 of them again. A featured
+// CRIT_PROC_KINDS instead of hand-listing all 59 of them again. A badge
 // crit's set is made the first time it's armed: thousands of empty sets made
 // at load were a measurable slice of startup
-const featuredProcSets = new Map<FeaturedCritKind, WeakSet<Floor>>();
+const badgeProcSets = new Map<BadgeCritKind, WeakSet<Floor>>();
 function procSet(kind: CritProcKind): WeakSet<Floor> | undefined {
-  return isFeaturedCritKind(kind)
-    ? featuredProcSets.get(kind)
+  return isBadgeCritKind(kind)
+    ? badgeProcSets.get(kind)
     : CRIT_PROC_SETS[kind];
 }
 const CRIT_PROC_SETS: Record<
-  Exclude<CritProcKind, FeaturedCritKind>,
+  Exclude<CritProcKind, BadgeCritKind>,
   WeakSet<Floor>
 > = {
   chain: chainCrits,
@@ -1342,8 +1342,8 @@ function notifyCritProcsArmed(kinds: readonly CritProcKind[]): void {
 export function forceCritProc(kind: CritProcKind, floor: Floor): void {
   let set = procSet(kind);
   if (!set)
-    featuredProcSets.set(
-      kind as FeaturedCritKind,
+    badgeProcSets.set(
+      kind as BadgeCritKind,
       (set = snapshotSet<Floor>()),
     );
   set.add(floor);
@@ -1369,12 +1369,12 @@ export function applyCritProcs<TContext>(
   result: Pick<CritRollResult, CritProcKind>,
   ctx: TContext,
   handlers: CritProcHandlers<TContext>,
-  featured?: (kind: FeaturedCritKind, ctx: TContext) => void,
+  badge?: (kind: BadgeCritKind, ctx: TContext) => void,
 ): void {
   for (const kind of landedProcKinds(result)) {
     const handler = handlers[kind];
     if (handler) handler(ctx);
-    else if (featured && isFeaturedCritKind(kind)) featured(kind, ctx);
+    else if (badge && isBadgeCritKind(kind)) badge(kind, ctx);
   }
 }
 
@@ -1463,13 +1463,13 @@ export function getCritProcIncomeModifierPercent(
   return getCritProcMilestone(count) * (CRIT_PROC_MODIFIER_WEIGHT / chance);
 }
 
-// featured crits join once their catalog loads (onFeaturedCatalog below): a
-// featured kind reads undefined till then; every other proc is here from the start
+// badge crits join once their catalog loads (onBadgeCatalog below): a
+// badge kind reads undefined till then; every other proc is here from the start
 export const CRIT_PROC_INFO: Record<
-  Exclude<CritProcKind, FeaturedCritKind>,
+  Exclude<CritProcKind, BadgeCritKind>,
   CritProcDisplayInfo
 > &
-  Partial<Record<FeaturedCritKind, CritProcDisplayInfo>> = {
+  Partial<Record<BadgeCritKind, CritProcDisplayInfo>> = {
   chain: {
     label: CHAIN_CRIT_LABEL,
 
@@ -2052,17 +2052,17 @@ export const CRIT_PROC_INFO: Record<
   },
 };
 
-// loadAssets registers each featured crit's image under its kind
-onFeaturedCatalog((catalog) => {
-  for (const kind of FEATURED_CRIT_KINDS) {
+// loadAssets registers each badge crit's image under its kind
+onBadgeCatalog((catalog) => {
+  for (const kind of BADGE_CRIT_KINDS) {
     const { label, color, description } = catalog[kind];
     CRIT_PROC_INFO[kind] = { label, color, icon: kind, description };
   }
 });
 
-// a proc's icon, known before the featured catalog loads
+// a proc's icon, known before the badge catalog loads
 export function critProcIcon(kind: CritProcKind): ImageName {
-  return isFeaturedCritKind(kind) ? kind : CRIT_PROC_INFO[kind].icon;
+  return isBadgeCritKind(kind) ? kind : CRIT_PROC_INFO[kind].icon;
 }
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -2271,7 +2271,7 @@ export function pickCritTierByOdds(): CritTier {
   return CRIT_TIER_ORDER[CRIT_TIER_ORDER.length - 1];
 }
 
-// every non-featured proc bucketed by its exact chance, so rollLandedProcs can
+// every non-badge proc bucketed by its exact chance, so rollLandedProcs can
 // jump straight from one landed proc to the next inside a bucket; built at the
 // first roll
 type ProcChanceGroup = { logMiss: number; kinds: CritProcKind[] };
@@ -2284,7 +2284,7 @@ function getProcChanceGroups(): ProcChanceGroup[] {
     if (!(chance >= 0 && chance <= 1)) {
       throw new Error(`CONFIG.crit.${kind}Chance must be in [0, 1]: ${chance}`);
     }
-    if (chance === 0 || isFeaturedCritKind(kind)) continue;
+    if (chance === 0 || isBadgeCritKind(kind)) continue;
     const kinds = byChance.get(chance);
     if (kinds) kinds.push(kind);
     else byChance.set(chance, [kind]);
@@ -2302,8 +2302,8 @@ function landedGap(logMiss: number): number {
 }
 
 // every proc that lands this roll, each independently against its own chance
-// (O(distinct chances + landed), not O(all procs)); plus one featured crit from
-// a main category picked at random (rollFeaturedCrit), so every one is seen as often
+// (O(distinct chances + landed), not O(all procs)); plus one badge crit from
+// a main category picked at random (rollBadgeCrit), so every one is seen as often
 export function rollLandedProcs(): CritProcKind[] {
   const landed: CritProcKind[] = [];
   for (const { logMiss, kinds } of getProcChanceGroups()) {
@@ -2314,8 +2314,8 @@ export function rollLandedProcs(): CritProcKind[] {
     )
       landed.push(kinds[i]);
   }
-  if (getFeaturedRewards() !== null)
-    landed.push(...rollFeaturedCrit(critRandom));
+  if (getBadgeRewards() !== null)
+    landed.push(...rollBadgeCrit(critRandom));
   return landed;
 }
 

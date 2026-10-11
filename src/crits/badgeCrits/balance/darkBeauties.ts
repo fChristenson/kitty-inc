@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/darkBeauties.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/darkBeauties.ts's crits, spread into CONFIG.crit
 export const DARK_BEAUTIES_BALANCE = {
   fishnetSleevesChance: 0.00177267525,
   fishnetSleevesUpgrades: 144,

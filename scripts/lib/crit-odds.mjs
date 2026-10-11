@@ -1,4 +1,4 @@
-// Sets every featured crit's Chance so each effect group's summed chances
+// Sets every badge crit's Chance so each effect group's summed chances
 // match its target share (GROUPS in crit-catalog.mjs). Image categories need
 // nothing here: the game picks one category file at random per roll and rolls
 // only its crits, so every category is seen as often however many it has.

@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const CRITTERS_CRITS = {
   crownHedgehog: {
@@ -188,4 +188,4 @@ export const CRITTERS_CRITS = {
     image: "crits/critters/wavingBruin.webp",
     description: "Promotes 65.5% of this floor's workers two perma tiers",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

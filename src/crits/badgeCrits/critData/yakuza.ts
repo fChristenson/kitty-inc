@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const YAKUZA_CRITS = {
   oyabunsBlessing: {
@@ -137,4 +137,4 @@ export const YAKUZA_CRITS = {
     image: "crits/yakuza/tanukiTreasurer.webp",
     description: "Hires 3 free workers and a manager on every unlocked floor",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

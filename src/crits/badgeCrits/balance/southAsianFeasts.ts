@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/southAsianFeasts.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/southAsianFeasts.ts's crits, spread into CONFIG.crit
 export const SOUTH_ASIAN_FEASTS_BALANCE = {
   bananaFishPlateChance: 0.00167174484,
   bananaFishPlateShare: 0.805,

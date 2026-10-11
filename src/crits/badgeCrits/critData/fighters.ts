@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const FIGHTERS_CRITS = {
   blackBeltBiscuit: {
@@ -176,4 +176,4 @@ export const FIGHTERS_CRITS = {
     image: "crits/fighters/carpoolCool.webp",
     description: "Adds 41.9% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

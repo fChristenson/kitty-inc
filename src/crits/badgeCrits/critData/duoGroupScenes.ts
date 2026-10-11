@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const DUO_GROUP_SCENES_CRITS = {
   ballroomSnapshot: {
@@ -188,4 +188,4 @@ export const DUO_GROUP_SCENES_CRITS = {
     image: "crits/duoGroupScenes/jewelTones.webp",
     description: "Adds 60.6% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

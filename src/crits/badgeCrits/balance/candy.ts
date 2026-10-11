@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/candy.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/candy.ts's crits, spread into CONFIG.crit
 export const CANDY_BALANCE = {
   chocolateFountainOfYouthChance: 0.011281536,
   chocolateFountainOfYouthPayouts: 20,

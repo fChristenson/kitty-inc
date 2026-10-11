@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const DAY_JOB_CRITS = {
   executiveSpin: {
@@ -144,4 +144,4 @@ export const DAY_JOB_CRITS = {
     image: "crits/dayJob/underTheMicroscope.webp",
     description: "Spreads 166 free upgrades over the lowest-level floors",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/voyages.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/voyages.ts's crits, spread into CONFIG.crit
 export const VOYAGES_BALANCE = {
   anchorInkChance: 0.00169614545,
   anchorInkGrowth: 0.201,

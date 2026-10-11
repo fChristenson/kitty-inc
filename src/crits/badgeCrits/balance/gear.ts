@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/gear.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/gear.ts's crits, spread into CONFIG.crit
 export const GEAR_BALANCE = {
   annaNyavarreChance: 0.0109444165,
   annaNyavarrePayouts: 23,

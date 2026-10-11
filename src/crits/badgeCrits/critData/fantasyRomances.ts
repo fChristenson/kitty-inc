@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const FANTASY_ROMANCES_CRITS = {
   scaleSmooch: {
@@ -170,4 +170,4 @@ export const FANTASY_ROMANCES_CRITS = {
     image: "crits/fantasyRomances/greenCheekLick.webp",
     description: "Grows this floor's level by 9.6% in free upgrades",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

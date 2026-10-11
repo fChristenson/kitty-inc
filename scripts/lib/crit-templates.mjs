@@ -1,4 +1,4 @@
-// Reward templates for new featured crits, one list per effect group
+// Reward templates for new badge crits, one list per effect group
 // (docs/critEffectGroups.md). Each template is a reward the game already
 // supports: its reward code, description, balance keys and the amounts it
 // starts from in each magnitude tier (T1 smallest .. T6 biggest). The same

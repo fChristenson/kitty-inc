@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/fastFood.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/fastFood.ts's crits, spread into CONFIG.crit
 export const FAST_FOOD_BALANCE = {
   bbqChickenLickinChance: 0.00593666404,
   bbqChickenLickinContinueChance: 0.62,

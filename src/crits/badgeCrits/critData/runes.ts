@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const RUNES_CRITS = {
   axeOfAssets: {
@@ -134,4 +134,4 @@ export const RUNES_CRITS = {
     image: "crits/runes/thunderMalletMargin.webp",
     description: "Adds 26.7% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

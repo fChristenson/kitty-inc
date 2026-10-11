@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/dayJob.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/dayJob.ts's crits, spread into CONFIG.crit
 export const DAY_JOB_BALANCE = {
   executiveSpinChance: 0.0128704971,
   executiveSpinContinueChance: 0.1,

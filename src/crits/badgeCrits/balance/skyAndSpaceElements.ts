@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/skyAndSpaceElements.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/skyAndSpaceElements.ts's crits, spread into CONFIG.crit
 export const SKY_AND_SPACE_ELEMENTS_BALANCE = {
   hassiumMeteorChance: 0.00711455301,
   hassiumMeteorBoostSeconds: 47,

@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/warhammerArmor.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/warhammerArmor.ts's crits, spread into CONFIG.crit
 export const WARHAMMER_ARMOR_BALANCE = {
   amberVisorChance: 0.00189434968,
   amberVisorShare: 0.87,

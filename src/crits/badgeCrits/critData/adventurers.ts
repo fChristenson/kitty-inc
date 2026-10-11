@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const ADVENTURERS_CRITS = {
   alchemyAtDusk: {
@@ -240,4 +240,4 @@ export const ADVENTURERS_CRITS = {
     image: "crits/adventurers/facelessFixer.webp",
     description: "Boosts every worker for 22s",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

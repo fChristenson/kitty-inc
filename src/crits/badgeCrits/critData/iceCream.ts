@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const ICE_CREAM_CRITS = {
   bananaSplitBonus: {
@@ -234,4 +234,4 @@ export const ICE_CREAM_CRITS = {
     image: "crits/iceCream/vanillaVenture.webp",
     description: "Forty free upgrades on this floor",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

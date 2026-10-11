@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/duoGroupScenes.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/duoGroupScenes.ts's crits, spread into CONFIG.crit
 export const DUO_GROUP_SCENES_BALANCE = {
   ballroomSnapshotChance: 0.00161550001,
   ballroomSnapshotSeconds: 157,

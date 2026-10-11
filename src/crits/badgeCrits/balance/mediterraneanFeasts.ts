@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/mediterraneanFeasts.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/mediterraneanFeasts.ts's crits, spread into CONFIG.crit
 export const MEDITERRANEAN_FEASTS_BALANCE = {
   batteredBrunchChance: 0.00165855627,
   batteredBrunchShare: 0.82,

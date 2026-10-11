@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/footwearAndLegwear.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/footwearAndLegwear.ts's crits, spread into CONFIG.crit
 export const FOOTWEAR_AND_LEGWEAR_BALANCE = {
   sockItAwayChance: 0.00924222996,
   sockItAwayBoostSeconds: 19,

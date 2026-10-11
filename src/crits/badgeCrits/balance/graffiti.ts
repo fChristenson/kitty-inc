@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/graffiti.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/graffiti.ts's crits, spread into CONFIG.crit
 export const GRAFFITI_BALANCE = {
   alleyCatPieceChance: 0.00539815989,
   alleyCatPieceTierSteps: 2,

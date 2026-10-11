@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/iceCream.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/iceCream.ts's crits, spread into CONFIG.crit
 export const ICE_CREAM_BALANCE = {
   bananaSplitBonusChance: 0.00745097266,
   bananaSplitBonusBoostSeconds: 39,

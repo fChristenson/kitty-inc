@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const PINUPS_CRITS = {
   swimsuitSweetheart: {
@@ -230,4 +230,4 @@ export const PINUPS_CRITS = {
     image: "crits/pinups/peekabooPair.webp",
     description: "Adds 46.4% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

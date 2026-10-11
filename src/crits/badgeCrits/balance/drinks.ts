@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/drinks.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/drinks.ts's crits, spread into CONFIG.crit
 export const DRINKS_BALANCE = {
   berrySmoothieChance: 0.010499789,
   spicedChaiChance: 0.00976388778,

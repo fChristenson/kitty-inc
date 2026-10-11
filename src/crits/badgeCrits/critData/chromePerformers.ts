@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const CHROME_PERFORMERS_CRITS = {
   heartOfChrome: {
@@ -146,4 +146,4 @@ export const CHROME_PERFORMERS_CRITS = {
     image: "crits/chromePerformers/satinSalute.webp",
     description: "Adds 63.6% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

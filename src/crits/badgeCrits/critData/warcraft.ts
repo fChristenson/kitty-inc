@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const WARCRAFT_CRITS = {
   arfthas: {
@@ -192,4 +192,4 @@ export const WARCRAFT_CRITS = {
     image: "crits/warcraft/lightforgedPaladin.webp",
     description: "Free office supplies for this floor",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

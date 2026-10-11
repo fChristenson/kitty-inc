@@ -1,11 +1,11 @@
-// The featured crits as data: effect group, reward template, size and chance
+// The badge crits as data: effect group, reward template, size and chance
 // of each, plus each effect group's target share (GROUPS). Used by
 // scripts/new-crits.mjs to give each new crit a unique, balanced effect, and
 // by lib/crit-odds.mjs to set every chance so no group dominates.
 import { createServer } from "vite";
 import { TEMPLATES, matchTemplate } from "./crit-templates.mjs";
 
-// [id, label, target % of featured crits, reward-source test]; checked in
+// [id, label, target % of badge crits, reward-source test]; checked in
 // order, so the specific action groups come before the upgrade/payout catch-alls
 export const GROUPS = [
   ["events", "Event triggers", 3, /actions\.startEvent/],
@@ -53,7 +53,7 @@ export const tierOf = (chance) => {
 };
 // share of each group's crits that should sit in each tier
 export const TIER_QUOTAS = [0.3, 0.25, 0.2, 0.13, 0.08, 0.04];
-// featured chances stay inside this range (below Boost, above Heavenly)
+// badge chances stay inside this range (below Boost, above Heavenly)
 export const CHANCE_RANGE = [tierBand(6)[0], TIER_CHANCES[0]];
 
 export const groupOf = (rewardSource) =>
@@ -68,14 +68,14 @@ export async function withGame(run) {
   try {
     const { CONFIG } = await server.ssrLoadModule("/src/config.ts");
     const types = await server.ssrLoadModule("/src/crits/critTypes/index.ts");
-    const { FEATURED_REWARDS } = await server.ssrLoadModule(
-      "/src/crits/badgeCrits/featured/index.ts",
+    const { BADGE_REWARDS } = await server.ssrLoadModule(
+      "/src/crits/badgeCrits/rewards/index.ts",
     );
-    // the game loads the featured catalog after startup; CRIT_PROC_INFO fills then
-    const FEATURED_CRITS = await types.loadFeaturedCatalog();
+    // the game loads the badge catalog after startup; CRIT_PROC_INFO fills then
+    const BADGE_CRITS = await types.loadBadgeCatalog();
     return await run({
       CONFIG,
-      crit: { ...types, FEATURED_CRITS, FEATURED_REWARDS },
+      crit: { ...types, BADGE_CRITS, BADGE_REWARDS },
     });
   } finally {
     await server.close();
@@ -83,8 +83,8 @@ export async function withGame(run) {
 }
 
 export function loadCatalog({ CONFIG, crit }) {
-  return Object.entries(crit.FEATURED_CRITS).map(([kind, def]) => {
-    const source = crit.FEATURED_REWARDS[kind].toString();
+  return Object.entries(crit.BADGE_CRITS).map(([kind, def]) => {
+    const source = crit.BADGE_REWARDS[kind].toString();
     const template = matchTemplate(kind, source, def.description);
     const chance = CONFIG.crit[`${kind}Chance`];
     return {

@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/weightTraining.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/weightTraining.ts's crits, spread into CONFIG.crit
 export const WEIGHT_TRAINING_BALANCE = {
   barbellBelleChance: 0.00876762338,
   ponytailPressChance: 0.00722629627,

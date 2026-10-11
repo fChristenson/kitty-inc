@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const HACKING_CRITS = {
   wrenchWraith: {
@@ -284,4 +284,4 @@ export const HACKING_CRITS = {
     image: "crits/hacking/usbHood.webp",
     description: "Promotes 86% of this floor's workers two perma tiers",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

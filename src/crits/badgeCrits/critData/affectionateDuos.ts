@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const AFFECTIONATE_DUOS_CRITS = {
   curvyCuddle: {
@@ -164,4 +164,4 @@ export const AFFECTIONATE_DUOS_CRITS = {
     image: "crits/affectionateDuos/sideBySide.webp",
     description: "Promotes 63% of this floor's workers two perma tiers",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

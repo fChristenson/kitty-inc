@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const AFRICAN_AND_AMERICAS_FEASTS_CRITS = {
   barbecuePot: {
@@ -224,4 +224,4 @@ export const AFRICAN_AND_AMERICAS_FEASTS_CRITS = {
     image: "crits/africanAndAmericasFeasts/suyaAndStew.webp",
     description: "Grows every unlocked floor's level by 10.5% in free upgrades",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

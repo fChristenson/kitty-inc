@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/farmFresh.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/farmFresh.ts's crits, spread into CONFIG.crit
 export const FARM_FRESH_BALANCE = {
   watermelonWindfallChance: 0.00517809698,
   watermelonWindfallBoostSeconds: 68,

@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/relicsAndTreasures.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/relicsAndTreasures.ts's crits, spread into CONFIG.crit
 export const RELICS_AND_TREASURES_BALANCE = {
   ancientRelicChance: 0.00967952566,
   ancientRelicPayouts: 35,

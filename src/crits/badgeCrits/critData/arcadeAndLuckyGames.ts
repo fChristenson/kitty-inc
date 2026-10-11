@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const ARCADE_AND_LUCKY_GAMES_CRITS = {
   bullseye: {
@@ -175,4 +175,4 @@ export const ARCADE_AND_LUCKY_GAMES_CRITS = {
     image: "crits/arcadeAndLuckyGames/earpieceEnforcer.webp",
     description: "Raises every floor below this one to its level",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

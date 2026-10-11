@@ -434,7 +434,7 @@ function queueProcCelebration(
     return;
   const custom = CUSTOM_PROC_CELEBRATIONS[kind];
   const info = CRIT_PROC_INFO[kind];
-  // a featured crit forced before its catalog loads has nothing to show
+  // a badge crit forced before its catalog loads has nothing to show
   if (!custom && !info) return;
   specialCelebrationQueue.push({
     kind,

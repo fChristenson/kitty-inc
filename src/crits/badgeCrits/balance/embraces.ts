@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/embraces.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/embraces.ts's crits, spread into CONFIG.crit
 export const EMBRACES_BALANCE = {
   cheekToCheekChance: 0.00243198229,
   cheekToCheekDiscount: 0.194,

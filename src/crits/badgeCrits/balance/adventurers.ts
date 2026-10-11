@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/adventurers.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/adventurers.ts's crits, spread into CONFIG.crit
 export const ADVENTURERS_BALANCE = {
   alchemyAtDuskChance: 0.0122804288,
   alchemyAtDuskContinueChance: 0.12,

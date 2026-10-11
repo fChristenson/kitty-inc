@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/metalsAndMinerals.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/metalsAndMinerals.ts's crits, spread into CONFIG.crit
 export const METALS_AND_MINERALS_BALANCE = {
   mendeleviumMajestyChance: 0.0116488165,
   mendeleviumMajestyTierSteps: 1,

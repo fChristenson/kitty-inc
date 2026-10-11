@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/chromeGlamour.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/chromeGlamour.ts's crits, spread into CONFIG.crit
 export const CHROME_GLAMOUR_BALANCE = {
   chromeCrushChance: 0.0068922823,
   chromeCrushBoostSeconds: 49,

@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const MYTHIC_CREATURES_CRITS = {
   golem: {
@@ -296,4 +296,4 @@ export const MYTHIC_CREATURES_CRITS = {
     image: "crits/mythicCreatures/purplePoltergeist.webp",
     description: "Spreads 167 free upgrades over the lowest-level floors",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

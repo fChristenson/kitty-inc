@@ -1,4 +1,4 @@
-// every featured crit's odds and reward sizes, one file per featured category;
+// every badge crit's odds and reward sizes, one file per badge category;
 // pure data with no imports beyond these files, so config.ts can spread it safely
 import { CYBERPUNK_BALANCE } from "./cyberpunk";
 import { HEROES_BALANCE } from "./heroes";
@@ -88,7 +88,7 @@ import { FARM_FRESH_BALANCE } from "./farmFresh";
 import { SPA_DAY_BALANCE } from "./spaDay";
 import { FIGHTERS_BALANCE } from "./fighters";
 
-export const FEATURED_CRIT_BALANCE = {
+export const BADGE_CRIT_BALANCE = {
   ...CYBERPUNK_BALANCE,
   ...HEROES_BALANCE,
   ...GAME_QUOTES_BALANCE,

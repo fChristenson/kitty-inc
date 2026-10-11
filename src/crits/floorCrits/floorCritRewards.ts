@@ -4,9 +4,9 @@ import {
   paySaleClick,
   type FloorActionsDeps,
 } from "../../floors/floorInteractions";
-import { createFeaturedCritRewards } from "../badgeCrits/featuredRewards";
+import { createBadgeCritRewards } from "../badgeCrits/bindRewards";
 import { CONFIG } from "../../config";
-import type { FeaturedRewardContext } from "../badgeCrits/featured/types";
+import type { BadgeRewardContext } from "../badgeCrits/rewards/types";
 import { isFloorLocked, liveEffect } from "../../shared/detachedJob";
 import {
   applyBoostAll,
@@ -1211,16 +1211,16 @@ export interface CritRewardContext {
   multiplier: BigNumber;
 }
 
-// featured rewards only see their own narrow context type, but are always
-// handed this full one (see featuredRewards/index.ts)
-function asRewardContext(context: FeaturedRewardContext): CritRewardContext {
+// badge rewards only see their own narrow context type, but are always
+// handed this full one (see bindRewards/index.ts)
+function asRewardContext(context: BadgeRewardContext): CritRewardContext {
   return context as CritRewardContext;
 }
 
 const CELEBRATED_PROMOTIONS = 6;
 
-// every featured crit's reward, paid through one function
-const payFeaturedCrit = createFeaturedCritRewards({
+// every badge crit's reward, paid through one function
+const payBadgeCrit = createBadgeCritRewards({
   upgrade: (floors, count) => {
     for (const floor of floors) {
       if (!floor.unlocked) continue;
@@ -1665,7 +1665,7 @@ export function applyFloorCrit(
     count,
     multiplier: deps.multiplier,
   };
-  applyCritProcs(result, context, CRIT_REWARDS, payFeaturedCrit);
+  applyCritProcs(result, context, CRIT_REWARDS, payBadgeCrit);
   triggerButtonPress(floor);
   const landed = landedProcKinds(result);
   if (incomeCrit && cash) {
@@ -1956,7 +1956,7 @@ function grantFollowUpProc(
   kind: CritProcKind,
   context: CritRewardContext,
 ): void {
-  applyCritProcs(onlyCritProc(kind), context, CRIT_REWARDS, payFeaturedCrit);
+  applyCritProcs(onlyCritProc(kind), context, CRIT_REWARDS, payBadgeCrit);
   recordCritProcLanded(kind);
   revealFoilOf(context.deps, context.floor, kind, context.isGroundFloor);
 }

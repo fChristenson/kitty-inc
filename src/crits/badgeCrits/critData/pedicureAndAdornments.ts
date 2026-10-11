@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const PEDICURE_AND_ADORNMENTS_CRITS = {
   pedicurePayout: {
@@ -164,4 +164,4 @@ export const PEDICURE_AND_ADORNMENTS_CRITS = {
     image: "crits/pedicureAndAdornments/topBunToes.webp",
     description: "Grows this floor's level by 14.5% in free upgrades",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

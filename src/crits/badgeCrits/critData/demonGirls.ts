@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const DEMON_GIRLS_CRITS = {
   hellfireHeartbreaker: {
@@ -270,4 +270,4 @@ export const DEMON_GIRLS_CRITS = {
     image: "crits/demonGirls/infernalToeHold.webp",
     description: "Pays 22 times the highest floor's upgrade price in cash",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

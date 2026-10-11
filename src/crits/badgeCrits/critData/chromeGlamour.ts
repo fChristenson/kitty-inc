@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const CHROME_GLAMOUR_CRITS = {
   chromeCrush: {
@@ -194,4 +194,4 @@ export const CHROME_GLAMOUR_CRITS = {
     image: "crits/chromeGlamour/violetFlex.webp",
     description: "Adds 40.1% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

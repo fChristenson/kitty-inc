@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/kissesAndPinups.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/kissesAndPinups.ts's crits, spread into CONFIG.crit
 export const KISSES_AND_PINUPS_BALANCE = {
   swingAndASmoochChance: 0.0100434614,
   pumpAndPoutChance: 0.00645275974,

@@ -6,7 +6,7 @@
 // counts once. Everything is measured against one reference building, set by
 // the flags below; the model is rough by design, it's for comparing rewards.
 //
-//   node scripts/reward-balance.mjs [--level=60 --floors=6 ...] [--list=events|featured|legacy] [--top=15] [--json]
+//   node scripts/reward-balance.mjs [--level=60 --floors=6 ...] [--list=events|badge|legacy] [--top=15] [--json]
 //
 // --json writes every reward's numbers to tmp/_reward-balance.json.
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
@@ -134,7 +134,7 @@ const workerTier = (steps, k = 1) => {
   return fx("workerTier", steps * k, ((boosted / E - 1) * floorsHit) / F);
 };
 // sure: the hire lands on a floor with room (events pick such floors);
-// promotes: a full floor promotes one worker a perma tier instead (featured)
+// promotes: a full floor promotes one worker a perma tier instead (badge)
 const hire = (n, k = 1, sure = false, promotes = true) => {
   k = clampFloors(k);
   const w = Math.min(3, W + n);
@@ -201,12 +201,12 @@ async function main() {
       (pTier.ultra * 125 + pTier.mega * 25 + pTier.crit * 5) / pCrit;
     const tierLevels = (times, k = 1) => levels(avgTierLevels * times, k);
 
-    // ---------- featured crits: parsed from their reward source ----------
-    const featured = Object.entries(crit.FEATURED_CRITS).map(([kind, def]) => {
-      const source = crit.FEATURED_REWARDS[kind].toString();
-      const effects = featuredEffects(source, c, tierLevels);
+    // ---------- badge crits: parsed from their reward source ----------
+    const badge = Object.entries(crit.BADGE_CRITS).map(([kind, def]) => {
+      const source = crit.BADGE_REWARDS[kind].toString();
+      const effects = badgeEffects(source, c, tierLevels);
       return {
-        source: "featured",
+        source: "badge",
         kind,
         label: def.label,
         chance: crit.getCritProcChance(kind),
@@ -216,9 +216,9 @@ async function main() {
     });
 
     // ---------- legacy procs: hand-modelled from src/crits/floorCrits/balance ----------
-    const featuredKinds = new Set(Object.keys(crit.FEATURED_CRITS));
+    const badgeKinds = new Set(Object.keys(crit.BADGE_CRITS));
     const legacy = crit.CRIT_PROC_KINDS.filter(
-      (k) => !featuredKinds.has(k),
+      (k) => !badgeKinds.has(k),
     ).map((kind) => {
       const model = LEGACY[kind];
       return {
@@ -252,7 +252,7 @@ async function main() {
     const eventsPerHour = 3600 / cycle;
     const procGatewaysPerHour =
       (gatewayPerSec * 3600 * types.badgeCrit.chance) / weights;
-    const procs = [...featured, ...legacy];
+    const procs = [...badge, ...legacy];
     const lambda = procs.reduce((s, p) => s + p.chance, 0);
     for (const p of procs) {
       const mu = Math.max(1e-9, lambda - p.chance);
@@ -288,7 +288,7 @@ async function main() {
       lambda,
       all,
       tiers,
-      featured,
+      badge,
       legacy,
       events,
     });
@@ -302,7 +302,7 @@ const mainType = (effects) =>
     ? "unmodelled"
     : effects.reduce((a, b) => (minutes(b) > minutes(a) ? b : a)).type;
 
-// ---------- featured reward parsing ----------
+// ---------- badge reward parsing ----------
 const ACTION =
   /(actions\.\w+|promoteAndUpgrade|upgradeAndPay|upgradeHereAndPayHighest)\(/g;
 function calls(source) {
@@ -366,7 +366,7 @@ const raiseTarget = (arg) =>
       ? L
       : Number(arg) || 0;
 
-function featuredEffects(source, c, tierLevels) {
+function badgeEffects(source, c, tierLevels) {
   const out = [];
   // an amount worked out in code (e.g. "up to the next multiple of N"):
   // half the first balance number it uses
@@ -664,7 +664,7 @@ const TYPES = [
   "boost",
   "prices",
 ];
-const SOURCES = ["critTier", "legacy", "featured", "event"];
+const SOURCES = ["critTier", "legacy", "badge", "event"];
 const fmt = (n, digits = 1) =>
   !Number.isFinite(n)
     ? "-"
@@ -688,7 +688,7 @@ function table(title, header, rows) {
 }
 
 function report(ctx) {
-  const { all, events, featured, legacy } = ctx;
+  const { all, events, badge, legacy } = ctx;
   console.log(
     "Reward balance (power = minutes of total income; permanent gains count over the horizon)",
   );
@@ -855,7 +855,7 @@ function report(ctx) {
       `\nunmodelled (${unmodelled.length}, not counted): ${unmodelled.map((r) => `${r.kind} [${r.source}]`).join(", ")}`,
     );
 
-  const lists = { events, featured, legacy };
+  const lists = { events, badge, legacy };
   if (lists[args.list])
     table(
       `All ${args.list}, by power per hour`,

@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/spaDay.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/spaDay.ts's crits, spread into CONFIG.crit
 export const SPA_DAY_BALANCE = {
   barrelSoakChance: 0.00161639419,
   barrelSoakShare: 0.42,

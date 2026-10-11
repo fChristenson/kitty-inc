@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/muscleFeet.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/muscleFeet.ts's crits, spread into CONFIG.crit
 export const MUSCLE_FEET_BALANCE = {
   soleMateChance: 0.00884098809,
   soleMateUpgrades: 79,

@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/warcraft.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/warcraft.ts's crits, spread into CONFIG.crit
 export const WARCRAFT_BALANCE = {
   arfthasChance: 0.0115614383,
   guldanMeowChance: 0.00666996159,

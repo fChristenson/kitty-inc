@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const ATOMIC_LAB_CRITS = {
   einsteiniumEpiphany: {
@@ -166,4 +166,4 @@ export const ATOMIC_LAB_CRITS = {
     image: "crits/atomicLab/nucleusDividend.webp",
     description: "Adds 7s of your company's income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

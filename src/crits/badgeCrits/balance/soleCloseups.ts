@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/soleCloseups.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/soleCloseups.ts's crits, spread into CONFIG.crit
 export const SOLE_CLOSEUPS_BALANCE = {
   archEnemyAssetsChance: 0.0076205016,
   archEnemyAssetsBoostSeconds: 38,

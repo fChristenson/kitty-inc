@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/fantasyAndWorship.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/fantasyAndWorship.ts's crits, spread into CONFIG.crit
 export const FANTASY_AND_WORSHIP_BALANCE = {
   hellfireHugChance: 0.00330878013,
   hellfireHugDiscount: 0.173,

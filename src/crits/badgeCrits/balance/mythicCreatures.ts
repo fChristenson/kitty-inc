@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/mythicCreatures.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/mythicCreatures.ts's crits, spread into CONFIG.crit
 export const MYTHIC_CREATURES_BALANCE = {
   golemChance: 0.0110912494,
   golemContinueChance: 0.17,

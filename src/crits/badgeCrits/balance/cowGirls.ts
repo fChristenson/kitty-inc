@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/cowGirls.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/cowGirls.ts's crits, spread into CONFIG.crit
 export const COW_GIRLS_BALANCE = {
   bullRunBelleChance: 0.00605764448,
   cowbellCashoutChance: 0.0127823207,

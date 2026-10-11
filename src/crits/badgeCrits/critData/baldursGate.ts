@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const BALDURS_GATE_CRITS = {
   astapurrion: {
@@ -121,4 +121,4 @@ export const BALDURS_GATE_CRITS = {
     description:
       "Raises the lowest-level floor to half the building's top level",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

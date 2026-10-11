@@ -8,7 +8,7 @@ import {
   forceMergeCrit,
   forceFloorCrit,
   forceIncomeCrit,
-  loadFeaturedRewards,
+  loadBadgeRewards,
   recordCritProcLanded,
   pickCritTierByOdds,
   getUniformCritTier,
@@ -22,7 +22,7 @@ import {
   getCritBadgeOverlay,
   warmTierFlashes,
   createBuildingCrits,
-  withFeaturedCatalog,
+  withBadgeCatalog,
 } from "./crits";
 import { wireCritTestActions } from "./hud";
 import { forceBubbles } from "./spawn/bubbles";
@@ -334,12 +334,12 @@ async function main() {
   warmTierFlashes();
   // creating the AudioContext alone blocked the main thread for tens of ms
   runWhenIdle(preloadSounds);
-  // the events and featured crit rewards are most of the code: kept out of the
+  // the events and badge crit rewards are most of the code: kept out of the
   // startup bundle, they load one chunk at a time while the game is quiet
   // (crits roll without them till then): the starter pile of events, the
-  // featured rewards, then the rest of the events
+  // badge rewards, then the rest of the events
   queueEventParts(1);
-  loadWhenIdle(loadFeaturedRewards);
+  loadWhenIdle(loadBadgeRewards);
   queueEventParts();
 
   // the page's markup (canvas, action bar, dialogs) is in index.html
@@ -668,10 +668,10 @@ async function main() {
 
   // dev/test-only controls; markup is stripped entirely in production builds.
   // Wired once the game is up, so dev and perf builds reach their first frame
-  // as soon as the shipped game does; the crit buttons show the featured labels
+  // as soon as the shipped game does; the crit buttons show the badge labels
   if (import.meta.env.MODE !== "production")
     afterStartup(() =>
-      withFeaturedCatalog(() => {
+      withBadgeCatalog(() => {
         app
           .querySelector(".game")!
           .insertAdjacentHTML("beforeend", createTestButtonMarkup());

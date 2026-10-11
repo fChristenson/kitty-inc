@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/pinups.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/pinups.ts's crits, spread into CONFIG.crit
 export const PINUPS_BALANCE = {
   swimsuitSweetheartChance: 0.00461867439,
   swimsuitSweetheartBoostSeconds: 79,

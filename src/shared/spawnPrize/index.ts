@@ -8,9 +8,9 @@ import {
   CRIT_TIER_CONFIG,
   eventProcContext,
   isVisibleOnFloor,
-  loadFeaturedRewards,
+  loadBadgeRewards,
   pickCritTierByOdds,
-  pickFeaturedBadge,
+  pickBadge,
 } from "../../crits";
 import {
   celebrateWorkerBoost,
@@ -72,7 +72,7 @@ export function rollPrize(
   const roll = Math.random() * (tier + coin + badge);
   if (roll < tier) return { kind: "tier", tier: pickCritTierByOdds() };
   if (roll < tier + coin) return { kind: "coin" };
-  return { kind: "badge", badge: pickFeaturedBadge() };
+  return { kind: "badge", badge: pickBadge() };
 }
 
 // a random unlocked floor whose income bar is in view, the one a spawn's
@@ -193,7 +193,7 @@ export function collectPrize(
     payout.flip = startCoinFlip(from, now, size / 2, 0);
   // the badge rewards are a lazy chunk the idle loader may not have reached
   else if (prize.kind === "badge")
-    void loadFeaturedRewards().then(() =>
+    void loadBadgeRewards().then(() =>
       eventProcContext(deps, deps.floors.indexOf(target) === 0).applyProcCrit?.(
         target,
         "crit",

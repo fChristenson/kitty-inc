@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/warhammerBattles.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/warhammerBattles.ts's crits, spread into CONFIG.crit
 export const WARHAMMER_BATTLES_BALANCE = {
   emperorsFinestChance: 0.00409509682,
   emperorsFinestPayouts: 37,

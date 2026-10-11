@@ -9,7 +9,7 @@ import path from "node:path";
 import { ROOT, WORK } from "./lib/crit-asset-paths.mjs";
 import { writeContactSheet } from "./lib/contact-sheet.mjs";
 
-const FEATURED = path.join(ROOT, "src/crits/badgeCrits/critData");
+const DATA = path.join(ROOT, "src/crits/badgeCrits/critData");
 const args = process.argv.slice(2);
 const perSheet = Number(
   args.find((arg) => arg.startsWith("--per-sheet="))?.split("=")[1] ?? 48,
@@ -19,7 +19,7 @@ const ENTRY =
   /^ {2}(\w+): \{\s*label:\s*"((?:[^"\\]|\\.)*)",[\s\S]*?image:\s*"(crits\/[^"]+)"/gm;
 
 const categories = fs
-  .readdirSync(FEATURED)
+  .readdirSync(DATA)
   .filter((file) => file.endsWith(".ts") && !/^(index|types)\.ts$/.test(file))
   .map((file) => path.basename(file, ".ts"))
   .filter((category) => wanted.length === 0 || wanted.includes(category));
@@ -34,7 +34,7 @@ for (const old of fs.existsSync(path.join(WORK, "_sheets"))
 
 const written = [];
 for (const category of categories) {
-  const source = fs.readFileSync(path.join(FEATURED, `${category}.ts`), "utf8");
+  const source = fs.readFileSync(path.join(DATA, `${category}.ts`), "utf8");
   const entries = [...source.matchAll(ENTRY)]
     .map(([, , label, image]) => [
       JSON.parse(`"${label}"`),

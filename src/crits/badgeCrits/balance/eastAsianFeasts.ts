@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/eastAsianFeasts.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/eastAsianFeasts.ts's crits, spread into CONFIG.crit
 export const EAST_ASIAN_FEASTS_BALANCE = {
   bentoBoxChance: 0.00164695489,
   bentoBoxMultiple: 31,

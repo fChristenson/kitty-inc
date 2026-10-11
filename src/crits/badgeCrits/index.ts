@@ -1,4 +1,4 @@
-// badge crits: the featured crits with their own art (critData, featured,
+// badge crits: the badge crits with their own art (critData, badge,
 // balance), the badges and foils they land, and the badge capsule
 
 export {
@@ -20,7 +20,7 @@ export {
 } from "./badgeCapsule";
 export { getCritBadgeOverlay } from "./critBadgeOverlay";
 export {
-  FEATURED_CRIT_KINDS,
-  loadFeaturedRewards,
-  pickFeaturedBadge,
-} from "./featuredProcs";
+  BADGE_CRIT_KINDS,
+  loadBadgeRewards,
+  pickBadge,
+} from "./badgeProcs";

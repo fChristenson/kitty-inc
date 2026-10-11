@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const VOYAGES_CRITS = {
   anchorInk: {
@@ -176,4 +176,4 @@ export const VOYAGES_CRITS = {
     image: "crits/voyages/steamExpress.webp",
     description: "Adds 63.2% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

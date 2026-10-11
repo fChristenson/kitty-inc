@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/bigAttitude.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/bigAttitude.ts's crits, spread into CONFIG.crit
 export const BIG_ATTITUDE_BALANCE = {
   goldenSkullChance: 0.0103423316,
   goldenSkullShare: 0.034,

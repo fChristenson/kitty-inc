@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/tableGamesAndCards.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/tableGamesAndCards.ts's crits, spread into CONFIG.crit
 export const TABLE_GAMES_AND_CARDS_BALANCE = {
   highRollerChance: 0.0105229112,
   highRollerPayouts: 28,

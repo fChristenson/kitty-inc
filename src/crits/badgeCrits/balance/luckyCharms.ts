@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/luckyCharms.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/luckyCharms.ts's crits, spread into CONFIG.crit
 export const LUCKY_CHARMS_BALANCE = {
   bubbleEconomyChance: 0.0127135146,
   bubbleEconomyPayouts: 7,

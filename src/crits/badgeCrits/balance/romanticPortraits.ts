@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/romanticPortraits.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/romanticPortraits.ts's crits, spread into CONFIG.crit
 export const ROMANTIC_PORTRAITS_BALANCE = {
   baldAndBeautifulChance: 0.00263305859,
   baldAndBeautifulBoostSeconds: 149,

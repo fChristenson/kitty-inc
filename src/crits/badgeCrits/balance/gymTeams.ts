@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/gymTeams.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/gymTeams.ts's crits, spread into CONFIG.crit
 export const GYM_TEAMS_BALANCE = {
   spottersWinkChance: 0.0056222954,
   spottersWinkPayouts: 50,

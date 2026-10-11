@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const GAME_QUOTES_CRITS = {
   wizard: {
@@ -179,4 +179,4 @@ export const GAME_QUOTES_CRITS = {
     description:
       "Raises the lowest-level floor to half the building's top level",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

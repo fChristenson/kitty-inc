@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/comfortFood.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/comfortFood.ts's crits, spread into CONFIG.crit
 export const COMFORT_FOOD_BALANCE = {
   breadyOrNotChance: 0.0128030361,
   breadyOrNotFloors: 1,

@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const MATCHING_OUTFITS_CRITS = {
   ankleWrapDuo: {
@@ -236,4 +236,4 @@ export const MATCHING_OUTFITS_CRITS = {
     image: "crits/matchingOutfits/snowAndSeafoam.webp",
     description: "Promotes 63.5% of this floor's workers two perma tiers",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

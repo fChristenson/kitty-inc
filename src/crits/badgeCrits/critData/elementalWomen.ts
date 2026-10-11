@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const ELEMENTAL_WOMEN_CRITS = {
   flameFlirt: {
@@ -259,4 +259,4 @@ export const ELEMENTAL_WOMEN_CRITS = {
     image: "crits/elementalWomen/nebulaNocturne.webp",
     description: "Repeats the crit on the floor below, 16% chance to keep falling",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

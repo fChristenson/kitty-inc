@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const ROMANTIC_PORTRAITS_CRITS = {
   baldAndBeautiful: {
@@ -236,4 +236,4 @@ export const ROMANTIC_PORTRAITS_CRITS = {
     image: "crits/romanticPortraits/violetWavesKiss.webp",
     description: "Pays 69 times this floor's upgrade price in cash",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const BAKERY_CRITS = {
   butterCroissant: {
@@ -178,4 +178,4 @@ export const BAKERY_CRITS = {
     image: "crits/bakery/turnoverTreasure.webp",
     description: "Adds 67.5% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

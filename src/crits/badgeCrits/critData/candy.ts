@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const CANDY_CRITS = {
   chocolateFountainOfYouth: {
@@ -257,4 +257,4 @@ export const CANDY_CRITS = {
     image: "crits/candy/twistWrapTumble.webp",
     description: "Spreads 163 free upgrades over the lowest-level floors",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

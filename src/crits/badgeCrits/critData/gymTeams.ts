@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const GYM_TEAMS_CRITS = {
   spottersWink: {
@@ -236,4 +236,4 @@ export const GYM_TEAMS_CRITS = {
     image: "crits/gymTeams/synchronizedSquat.webp",
     description: "Adds 45.3% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

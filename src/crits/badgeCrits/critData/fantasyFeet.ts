@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const FANTASY_FEET_CRITS = {
   magentaScaleSoles: {
@@ -188,4 +188,4 @@ export const FANTASY_FEET_CRITS = {
     image: "crits/fantasyFeet/whiskerWalk.webp",
     description: "Cuts every price in this building by 7.8%",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;

@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/atomicLab.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/atomicLab.ts's crits, spread into CONFIG.crit
 export const ATOMIC_LAB_BALANCE = {
   einsteiniumEpiphanyChance: 0.00187559745,
   einsteiniumEpiphanyUpgrades: 99,

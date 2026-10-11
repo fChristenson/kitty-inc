@@ -1,4 +1,4 @@
-// odds and reward sizes for featured/luckyCats.ts's crits, spread into CONFIG.crit
+// odds and reward sizes for rewards/luckyCats.ts's crits, spread into CONFIG.crit
 export const LUCKY_CATS_BALANCE = {
   purrfectUnitChance: 0.0123456913,
   purrfectUnitUpgrades: 17,

@@ -1,5 +1,5 @@
 import { COLOR } from "../../../palette";
-import type { FeaturedCritData } from "./types";
+import type { BadgeCritData } from "./types";
 
 export const GRAFFITI_CRITS = {
   alleyCatPiece: {
@@ -134,4 +134,4 @@ export const GRAFFITI_CRITS = {
     image: "crits/graffiti/firewallFury.webp",
     description: "Adds 11.2% of your total income",
   },
-} as const satisfies Record<string, FeaturedCritData>;
+} as const satisfies Record<string, BadgeCritData>;
