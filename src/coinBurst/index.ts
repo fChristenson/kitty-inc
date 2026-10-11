@@ -391,22 +391,34 @@ function readBatchMatrix(ctx: CanvasRenderingContext2D, base: DOMMatrix): void {
 // is open on ctx (see isCoinBatchOpen), its coin's x, y, radius and alpha
 // written into coinSpot first: fractional numbers passed as arguments get
 // boxed into a fresh heap number each, per coin per frame
-export const coinSpot = new Float64Array(4);
+export const coinSpot = new Float64Array(7);
 export function queueCoinSprite(
   ctx: CanvasRenderingContext2D,
   sprite: CoinBurstSprite,
+  base: DOMMatrix,
+): void {
+  coinSpot[4] = sprite.spinFrame;
+  coinSpot[5] = sprite.axisCos ?? Math.cos(sprite.axisAngle);
+  coinSpot[6] = sprite.axisSin ?? Math.sin(sprite.axisAngle);
+  queueCoinSpot(ctx, sprite.kind === "bill", base);
+}
+
+// queueCoinSprite with the sprite's spin frame and tilt's cos and sin in
+// coinSpot too (4, 5, 6), for coins kept as numbers
+export function queueCoinSpot(
+  ctx: CanvasRenderingContext2D,
+  bill: boolean,
   base: DOMMatrix,
 ): void {
   const x = coinSpot[0];
   const y = coinSpot[1];
   const radius = coinSpot[2];
   const alpha = coinSpot[3];
-  const bill = sprite.kind === "bill";
   const frameCanvases = bill ? billFrameCanvases : coinFrameCanvases;
   if (!frameCanvases || alpha <= 0) return;
   const frameCount = bill ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT;
   const frame =
-    ((Math.floor(sprite.spinFrame) % frameCount) + frameCount) % frameCount;
+    ((Math.floor(coinSpot[4]) % frameCount) + frameCount) % frameCount;
   if (base !== batchBase) readBatchMatrix(ctx, base);
   const a = batchA;
   const b = batchB;
@@ -415,8 +427,8 @@ export function queueCoinSprite(
   const px = a * x + c * y + batchE;
   const py = b * x + d * y + batchF;
   const halfW = radius * (bill ? billAspect : coinAspect);
-  const cos = sprite.axisCos ?? Math.cos(sprite.axisAngle);
-  const sin = sprite.axisSin ?? Math.sin(sprite.axisAngle);
+  const cos = coinSpot[5];
+  const sin = coinSpot[6];
   const ux = (a * cos + c * sin) * halfW;
   const uy = (b * cos + d * sin) * halfW;
   const vx = (c * cos - a * sin) * radius;

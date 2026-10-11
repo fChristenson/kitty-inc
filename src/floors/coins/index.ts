@@ -8,6 +8,7 @@ import {
   endCoinBatch,
   isCoinBatchOpen,
   queueCoinSprite,
+  queueCoinSpot,
   coinSpot,
   getCoinRimPoint,
   getSpriteReach,
@@ -17,7 +18,10 @@ import {
   COIN_BILL_CHANCE,
   type CoinBurstSprite,
 } from "../../coinBurst";
-import { createParticlePool } from "../../shared/particlePool";
+import {
+  createParticlePool,
+  createTypedParticlePool,
+} from "../../shared/particlePool";
 import { drawTwinkle } from "../../shared/twinkle";
 import { registerCoinStream } from "../../shared/eventStream";
 
@@ -127,12 +131,144 @@ const pool = createParticlePool<Particle>(MAX_PARTICLES);
 const SPRAY_MAX_PARTICLES = 3_000;
 const sprayPool = createParticlePool<Particle>(SPRAY_MAX_PARTICLES);
 
+// plain burst coins (a click's, a held button's), the bulk of every coin on
+// screen, kept as numbers: one tight loop moves, culls and queues them
+const B_X = 0;
+const B_Y = 1;
+const B_VX = 2;
+const B_VY = 3;
+const B_LIFE = 4;
+const B_MAX_LIFE = 5;
+const B_SIZE = 6;
+const B_GRAVITY = 7;
+const B_RAMP = 8;
+const B_SPIN = 9;
+// signed: its direction times its rate
+const B_SPIN_RATE = 10;
+const B_COS = 11;
+const B_SIN = 12;
+const B_BILL = 13;
+// index into burstFloors
+const B_FLOOR = 14;
+const B_STRIDE = 15;
+const burstPool = createTypedParticlePool(B_STRIDE, MAX_PARTICLES);
+// the floors live burst coins belong to, emptied with the pool
+const burstFloors: Floor[] = [];
+const burstFloorIndices = new Map<Floor, number>();
+function burstFloorIndex(floor: Floor): number {
+  let index = burstFloorIndices.get(floor);
+  if (index === undefined) {
+    index = burstFloors.length;
+    burstFloors.push(floor);
+    burstFloorIndices.set(floor, index);
+  }
+  return index;
+}
+function clearBurstFloors(): void {
+  burstFloors.length = 0;
+  burstFloorIndices.clear();
+}
+
+function advanceBurstCoin(d: Float32Array, o: number, dt: number): boolean {
+  d[o + B_X] += d[o + B_VX] * dt;
+  d[o + B_Y] += d[o + B_VY] * dt;
+  // gravity ramps up with age so coins pop up, then drop heavily
+  d[o + B_VY] += (d[o + B_GRAVITY] + d[o + B_LIFE] * d[o + B_RAMP]) * dt;
+  if (dt !== dragDt) {
+    dragDt = dt;
+    drag = Math.pow(0.96, dt);
+  }
+  d[o + B_VX] *= drag;
+  d[o + B_LIFE] += dt;
+  d[o + B_SPIN] += d[o + B_SPIN_RATE] * dt;
+  return d[o + B_LIFE] < d[o + B_MAX_LIFE];
+}
+
+// the 2D fallback (no WebGL batch) draws through a sprite object
+const fallbackSprite: CoinBurstSprite = {
+  kind: "coin",
+  spinFrame: 0,
+  axisAngle: 0,
+  axisCos: 1,
+  axisSin: 0,
+};
+
+function drawBurstCoins(
+  ctx: CanvasRenderingContext2D,
+  getFloorRect: (
+    floor: Floor,
+  ) => { left: number; top: number; width: number } | null,
+  base: DOMMatrix,
+  batched: boolean,
+): void {
+  const d = burstPool.data;
+  const end = burstPool.count() * B_STRIDE;
+  // a coin past the canvas's bottom or sides never comes back: gravity only
+  // pulls it further down and drag never turns it round, so it's done
+  const cull = base.b === 0 && base.c === 0;
+  const ba = base.a;
+  const bd = base.d;
+  const be = base.e;
+  const bf = base.f;
+  const canvasW = ctx.canvas.width;
+  const canvasH = ctx.canvas.height;
+  let rectFloor = -1;
+  let rect: { left: number; top: number; width: number } | null = null;
+  for (let o = 0; o < end; o += B_STRIDE) {
+    const floorIndex = d[o + B_FLOOR];
+    if (floorIndex !== rectFloor) {
+      rectFloor = floorIndex;
+      rect = getFloorRect(burstFloors[floorIndex]);
+    }
+    if (!rect) continue;
+    const scale = rect.width / FLOOR_W;
+    const px = rect.left + d[o + B_X] * scale;
+    const py = rect.top + d[o + B_Y] * scale;
+    const t = d[o + B_LIFE] / d[o + B_MAX_LIFE];
+    const radius = d[o + B_SIZE] * (1 - t * 0.3) * scale;
+    if (cull) {
+      const reach = radius * 2 * bd;
+      const dx = ba * px + be;
+      const dy = bd * py + bf;
+      const vx = d[o + B_VX];
+      if (
+        (d[o + B_VY] > 0 && dy - reach > canvasH) ||
+        (vx < 0 && dx + reach < 0) ||
+        (vx > 0 && dx - reach > canvasW)
+      ) {
+        d[o + B_MAX_LIFE] = d[o + B_LIFE];
+        continue;
+      }
+    }
+    const alpha = Math.max(0, 1 - t * t);
+    const bill = d[o + B_BILL] === 1;
+    if (batched) {
+      coinSpot[0] = px;
+      coinSpot[1] = py;
+      coinSpot[2] = radius;
+      coinSpot[3] = alpha;
+      coinSpot[4] = d[o + B_SPIN];
+      coinSpot[5] = d[o + B_COS];
+      coinSpot[6] = d[o + B_SIN];
+      queueCoinSpot(ctx, bill, base);
+    } else {
+      fallbackSprite.kind = bill ? "bill" : "coin";
+      fallbackSprite.spinFrame = d[o + B_SPIN];
+      fallbackSprite.axisCos = d[o + B_COS];
+      fallbackSprite.axisSin = d[o + B_SIN];
+      fallbackSprite.axisAngle = Math.atan2(d[o + B_SIN], d[o + B_COS]);
+      ctx.globalAlpha = alpha;
+      drawCoinBurstFrame(ctx, fallbackSprite, px, py, radius, base);
+    }
+  }
+}
+
 // while a fast hold keeps the pool near its cap, new bursts shrink to the room
 // left (never below a small floor) so earlier coins finish their fall instead
 // of being evicted mid-air
 const CROWDED_BURST_MIN = 10;
 function burstCount(min: number, max: number): number {
-  const room = MAX_PARTICLES - pool.count();
+  const room = MAX_PARTICLES - pool.count() - burstPool.count();
   return Math.max(
     Math.min(CROWDED_BURST_MIN, min),
     Math.min(randomInt(min, max), room),
@@ -140,7 +276,7 @@ function burstCount(min: number, max: number): number {
 }
 
 export function hasActiveCoins(): boolean {
-  return pool.hasActive() || sprayPool.hasActive();
+  return pool.hasActive() || sprayPool.hasActive() || burstPool.hasActive();
 }
 
 // draws every particle onto a full-viewport overlay canvas (so a burst can never be
@@ -164,6 +300,7 @@ export function drawCoins(
   beginCoinBatch(ctx);
   // batched coins carry their alpha themselves; otherwise it goes on ctx
   const batched = isCoinBatchOpen(ctx);
+  if (layer === "world") drawBurstCoins(ctx, getFloorRect, base, batched);
   glints = 0;
   for (const list of [pool.list, sprayPool.list])
     for (const p of list) {
@@ -377,8 +514,10 @@ export function spawnCoinBurst(
   coins?: [number, number],
 ): void {
   spawnBurstParticles(floor, x, y, scale, null, coins);
-  pool.ensureTicking((dt) => {
-    pool.update(dt, advanceCoin, recycleCoin);
+  pool.ensureTicking((dt) => pool.update(dt, advanceCoin, recycleCoin));
+  burstPool.ensureTicking((dt) => {
+    burstPool.update(dt, advanceBurstCoin);
+    if (!burstPool.hasActive()) clearBurstFloors();
     onFrame();
   });
 }
@@ -555,34 +694,66 @@ function spawnBurstParticles(
     const spread = freezeGroup ? FREEZE_SPAWN_SPREAD_PX : 20 * scale;
     const kind: "coin" | "bill" =
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
-    const p = takeCoin(floor);
-    p.x = x + (Math.random() - 0.5) * spread;
-    p.y = y + (Math.random() - 0.5) * spread;
-    p.vx = Math.cos(angle) * speed;
-    p.vy = Math.sin(angle) * speed;
-    p.life = 0;
-    p.maxLife = freezeGroup
+    const px = x + (Math.random() - 0.5) * spread;
+    const py = y + (Math.random() - 0.5) * spread;
+    const maxLife = freezeGroup
       ? Infinity
       : jet
         ? randomIn(PLUME_LIFE)
         : (45 + Math.random() * 75) * (1 + BEAT_LIFE * w);
-    p.size =
+    const size =
       (22 + Math.random() * 46) * scale * 1.15 * 1.25 * (1 + BEAT_SIZE * w);
     // bills are paper — they fall a flat 0.2 slower than coins, and ramp up to
     // full fall speed more gradually
-    p.gravity =
+    const gravity =
       Math.max(0, 0.2 + Math.random() * 0.35 - (kind === "bill" ? 0.2 : 0)) *
       scale *
       (1 + BEAT_GRAVITY * w);
-    p.gravityRamp = (kind === "bill" ? 0.05 : 0.08) * scale;
-    p.kind = kind;
-    p.spinFrame =
+    const gravityRamp = (kind === "bill" ? 0.05 : 0.08) * scale;
+    const spinFrame =
       Math.random() *
       (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT);
-    p.spinRate =
+    const spinRate =
       MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE);
-    p.spinDir = Math.random() < 0.5 ? 1 : -1;
-    tilt(p);
+    const spinDir = Math.random() < 0.5 ? 1 : -1;
+    const axisAngle = (Math.random() * 2 - 1) * (Math.PI / 2);
+    if (!freezeGroup) {
+      const o = burstPool.spawn();
+      const d = burstPool.data;
+      d[o + B_X] = px;
+      d[o + B_Y] = py;
+      d[o + B_VX] = Math.cos(angle) * speed;
+      d[o + B_VY] = Math.sin(angle) * speed;
+      d[o + B_LIFE] = 0;
+      d[o + B_MAX_LIFE] = maxLife;
+      d[o + B_SIZE] = size;
+      d[o + B_GRAVITY] = gravity;
+      d[o + B_RAMP] = gravityRamp;
+      d[o + B_SPIN] = spinFrame;
+      d[o + B_SPIN_RATE] = spinDir * spinRate;
+      d[o + B_COS] = Math.cos(axisAngle);
+      d[o + B_SIN] = Math.sin(axisAngle);
+      d[o + B_BILL] = kind === "bill" ? 1 : 0;
+      d[o + B_FLOOR] = burstFloorIndex(floor);
+      continue;
+    }
+    const p = takeCoin(floor);
+    p.x = px;
+    p.y = py;
+    p.vx = Math.cos(angle) * speed;
+    p.vy = Math.sin(angle) * speed;
+    p.life = 0;
+    p.maxLife = maxLife;
+    p.size = size;
+    p.gravity = gravity;
+    p.gravityRamp = gravityRamp;
+    p.kind = kind;
+    p.spinFrame = spinFrame;
+    p.spinRate = spinRate;
+    p.spinDir = spinDir;
+    p.axisAngle = axisAngle;
+    p.axisCos = Math.cos(axisAngle);
+    p.axisSin = Math.sin(axisAngle);
     p.homing = freezeGroup
       ? {
           burstLife: Infinity,

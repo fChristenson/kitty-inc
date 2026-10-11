@@ -43,8 +43,6 @@ export function createParticlePool<T extends PoolParticle>(
   maxCount: number,
 ): ParticlePool<T> {
   const list: T[] = [];
-  let animationFrameId: number | null = null;
-  let lastTick = 0;
 
   function hasActive(): boolean {
     return list.length > 0;
@@ -88,17 +86,81 @@ export function createParticlePool<T extends PoolParticle>(
       }
       list.length = writeIndex;
     },
-    ensureTicking(step) {
-      if (animationFrameId !== null) return;
-      lastTick = performance.now();
-      const tick = (now: number) => {
-        const dt = Math.max(0, Math.min((now - lastTick) / 16.67, 3));
-        lastTick = now;
-        step(dt);
-        animationFrameId = hasActive() ? requestAnimationFrame(tick) : null;
-      };
-      animationFrameId = requestAnimationFrame(tick);
+    ensureTicking: createTicker(hasActive),
+  };
+}
+
+// ensureTicking's loop: each frame dt clamped to [0,3] ticks, rescheduled
+// while hasActive() holds after the step
+function createTicker(
+  hasActive: () => boolean,
+): (step: (dt: number) => void) => void {
+  let animationFrameId: number | null = null;
+  let lastTick = 0;
+  return (step) => {
+    if (animationFrameId !== null) return;
+    lastTick = performance.now();
+    const tick = (now: number) => {
+      const dt = Math.max(0, Math.min((now - lastTick) / 16.67, 3));
+      lastTick = now;
+      step(dt);
+      animationFrameId = hasActive() ? requestAnimationFrame(tick) : null;
+    };
+    animationFrameId = requestAnimationFrame(tick);
+  };
+}
+
+// the same pool for particles kept as plain numbers, `stride` floats each in
+// one Float32Array in spawn order: a loop over hundreds of them chases no
+// objects and makes no garbage
+export interface TypedParticlePool {
+  readonly stride: number;
+  readonly data: Float32Array;
+  count(): number;
+  hasActive(): boolean;
+  // the offset of a new particle's floats, all stale (set every one); at
+  // 1.5x maxCount the oldest are dropped first
+  spawn(): number;
+  // advance returns false once a particle is done; survivors keep their
+  // order, and past maxCount the oldest go
+  update(
+    dt: number,
+    advance: (data: Float32Array, offset: number, dt: number) => boolean,
+  ): void;
+  ensureTicking(step: (dt: number) => void): void;
+}
+
+export function createTypedParticlePool(
+  stride: number,
+  maxCount: number,
+): TypedParticlePool {
+  const data = new Float32Array(stride * Math.ceil(maxCount * 1.5));
+  let count = 0;
+  const dropOldest = () => {
+    data.copyWithin(0, (count - maxCount) * stride, count * stride);
+    count = maxCount;
+  };
+  return {
+    stride,
+    data,
+    count: () => count,
+    hasActive: () => count > 0,
+    spawn() {
+      if ((count + 1) * stride > data.length) dropOldest();
+      return count++ * stride;
     },
+    update(dt, advance) {
+      let write = 0;
+      for (let read = 0; read < count * stride; read += stride) {
+        if (!advance(data, read, dt)) continue;
+        if (write !== read)
+          for (let k = 0; k < stride; k++) data[write + k] = data[read + k];
+        write += stride;
+      }
+      count = write / stride;
+      if (count > maxCount) dropOldest();
+    },
+    ensureTicking: createTicker(() => count > 0),
   };
 }
 
