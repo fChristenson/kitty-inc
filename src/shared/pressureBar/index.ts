@@ -247,6 +247,13 @@ export function drawPressureBar(
 ): PressurePose {
   if (heat === 0 && fillW >= w)
     return drawHeartbeat(ctx, key, x, y, w, h, r, color, now);
+  // unheld, only a hit's slosh drops the fill: no kettle warp for that
+  if (heat === 0 && warpHeat === 0) {
+    drawChevronBar(ctx, key, x, y, w, h, r, fillW, color, now, 0);
+    sharedPose.textScale = 1;
+    sharedPose.shakeX = 0;
+    return sharedPose;
+  }
   const t = ((now + offsetOf(key)) % CYCLE_MS) / CYCLE_MS;
   const p = Math.min(1, t / BUILD);
   const sinceRelease = t < BUILD ? -1 : ((t - BUILD) * CYCLE_MS) / 1000;

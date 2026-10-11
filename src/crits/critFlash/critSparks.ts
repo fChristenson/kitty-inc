@@ -41,7 +41,8 @@ const GLINT_SIZE = 2.4;
 const TWINKLE_MIN = 0.2;
 const TWINKLE_MS: [number, number] = [90, 260];
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
+const lerp = (range: [number, number], t: number) =>
+  range[0] + (range[1] - range[0]) * t;
 
 let startedAt: number | null = null;
 let level = 0;

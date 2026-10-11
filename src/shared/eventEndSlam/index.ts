@@ -576,8 +576,8 @@ interface RestWord {
   up: number;
 }
 // a label (not a counting number) is baked once it has been drawn this many
-// times, so a changing one doesn't build a canvas per value
-const BAKE_REST_AFTER = 8;
+// times (half a second), so a changing one doesn't build a canvas per value
+const BAKE_REST_AFTER = 30;
 const MAX_REST_WORDS = 32;
 const MAX_REST_PENDING = 256;
 
@@ -794,7 +794,7 @@ const GOLD_CELL = 1;
 const WHITE_CELL = 2;
 const FILL_CELL = 3;
 const SHINE_SLICES = 3;
-const MAX_GLYPH_SETS = 16;
+const MAX_GLYPH_SETS = 32;
 // warmed a few letters a frame (at rest, or while the target is in the air)
 // so the frame a text starts moving doesn't raster them all at once
 const WARM_PER_FRAME = 3;
@@ -851,8 +851,17 @@ function getSlamGlyphSet(
   )
     return known.set;
   const metrics = ctx.measureText(text);
-  const ascent = Math.round(metrics.actualBoundingBoxAscent);
-  const descent = Math.round(metrics.actualBoundingBoxDescent);
+  // coarse, so a counting number's digits (a pixel taller or shorter by
+  // value) share one set instead of rastering a new one mid-count
+  const step = Math.max(
+    2,
+    Math.round(
+      (metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent) *
+        0.15,
+    ),
+  );
+  const ascent = Math.round(metrics.actualBoundingBoxAscent / step) * step;
+  const descent = Math.round(metrics.actualBoundingBoxDescent / step) * step;
   const key = `${font}|${baseline}|${fillColor}|${strokeColor}|${strokeWidth}|${ascent}|${descent}`;
   let set = glyphSets.get(key);
   if (!set) {

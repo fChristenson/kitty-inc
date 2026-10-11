@@ -188,6 +188,10 @@ interface RestingLabel {
 }
 const restingLabels = new WeakMap<Floor, RestingLabel>();
 let fontReady = false;
+// a count changing hit after hit (a crit's barrage) is stamped from glyph
+// sprites until it has held this long, then baked again
+const SETTLE_MS = 500;
+const changes = new WeakMap<Floor, { text: string; at: number }>();
 
 // false when ctx is rotated or skewed: the caller draws it the slow way then
 function drawRestingLabel(
@@ -202,13 +206,25 @@ function drawRestingLabel(
   const text = labelText(floor);
   const fill = isFloorMaxed(floor) ? SLAM_GOLD : COLOR.white;
   let label = restingLabels.get(floor);
-  if (
-    !label ||
-    label.text !== text ||
-    label.fill !== fill ||
-    label.scale !== m.a
-  ) {
-    const canvas = label?.canvas ?? document.createElement("canvas");
+  if (label && (label.text !== text || label.fill !== fill)) {
+    const now = performance.now();
+    const change = changes.get(floor);
+    if (!change || change.text !== text) {
+      changes.set(floor, { text, at: now });
+      stampLabel(ctx, text, fill);
+      return true;
+    }
+    if (now - change.at < SETTLE_MS) {
+      stampLabel(ctx, text, fill);
+      return true;
+    }
+    label = undefined;
+  }
+  // a shake's zoom only stretches the bitmap: re-rastering it every frame of
+  // a shake cost more than the whole rest of the label
+  if (!label || Math.abs(m.a / label.scale - 1) > RESCALE) {
+    const canvas =
+      restingLabels.get(floor)?.canvas ?? document.createElement("canvas");
     canvas.width = Math.ceil((labelWidth(floor) + LABEL_PAD * 2) * m.a);
     canvas.height = Math.ceil((FONT_SIZE + LABEL_PAD * 2) * m.a);
     const c = canvas.getContext("2d")!;
@@ -220,15 +236,34 @@ function drawRestingLabel(
     label = { canvas, text, fill, scale: m.a };
     restingLabels.set(floor, label);
   }
+  const k = m.a / label.scale;
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.drawImage(
     label.canvas,
     Math.round(m.a * (MARGIN_X - LABEL_PAD) + m.e),
     Math.round(m.d * (STAR_Y - LABEL_PAD) + m.f),
+    label.canvas.width * k,
+    label.canvas.height * k,
   );
   ctx.restore();
   return true;
+}
+
+// how far the canvas's scale may drift from a label's bitmap before it's rebuilt
+const RESCALE = 0.25;
+
+function stampLabel(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  fill: string,
+): void {
+  ctx.save();
+  ctx.font = FONT;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  drawSlamText(ctx, null, text, MARGIN_X, STAR_Y, FONT_SIZE, fill);
+  ctx.restore();
 }
 
 // the label's pop on every 10th level

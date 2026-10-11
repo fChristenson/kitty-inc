@@ -10,6 +10,7 @@ import { drawGoldShimmer } from "../goldShimmer";
 import { fadeStops, glowSprite } from "../glowSprite";
 import { hash01, stampGlimmer } from "../twinkle";
 import { beginLightBatch, endLightBatch } from "../lightBatch";
+import { processWhenIdle } from "../idle";
 
 const BEAT_MS = LONG_PRESS_TICK_MS * 4;
 const RING_MS = 420;
@@ -330,6 +331,50 @@ export function createEventFx(
 const FLASH_STOPS = fadeStops(COLOR.white);
 const flashSprite = () => glowSprite(FLASH_STOPS);
 
+// the shockwave ring baked at a few thicknesses (line width over radius), so
+// a burst stamps the nearest instead of stroking an arc every frame
+const RING_SPRITE = 512;
+const RING_RATIOS = [0.008, 0.015, 0.03, 0.06, 0.12, 0.25, 0.5];
+const ringSprites: HTMLCanvasElement[] = [];
+function ringSprite(ratio: number): HTMLCanvasElement {
+  let k = 0;
+  while (
+    k < RING_RATIOS.length - 1 &&
+    ratio > Math.sqrt(RING_RATIOS[k] * RING_RATIOS[k + 1])
+  )
+    k++;
+  let sprite = ringSprites[k];
+  if (sprite) return sprite;
+  sprite = document.createElement("canvas");
+  sprite.width = sprite.height = RING_SPRITE;
+  const c = sprite.getContext("2d")!;
+  const half = RING_SPRITE / 2;
+  // outer edge at the sprite's edge: radius + width / 2 = half
+  const r = half / (1 + RING_RATIOS[k] / 2);
+  c.strokeStyle = COLOR.white;
+  c.lineWidth = r * RING_RATIOS[k];
+  c.beginPath();
+  c.arc(half, half, r, 0, Math.PI * 2);
+  c.stroke();
+  ringSprites[k] = sprite;
+  return sprite;
+}
+processWhenIdle(RING_RATIOS, ringSprite);
+
+// a big soft stamp: drawn straight, never queued, since a light batch's cost
+// grows with the area it covers
+function stampLight(
+  ctx: CanvasRenderingContext2D,
+  sprite: HTMLCanvasElement,
+  x: number,
+  y: number,
+  half: number,
+  alpha: number,
+): void {
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(sprite, x - half, y - half, half * 2, half * 2);
+}
+
 // a white flash and shockwave ring bursting out of (x, y), t 0..1 through it;
 // the stream's climax, and scaled down for smaller impacts
 export function drawWhiteBurst(
@@ -340,19 +385,16 @@ export function drawWhiteBurst(
   scale = 1,
 ): void {
   if (t <= 0 || t >= 1) return;
-  ctx.save();
-  const radius = (60 + 440 * t) * scale;
+  const previous = ctx.globalCompositeOperation;
+  const alpha = ctx.globalAlpha;
   ctx.globalCompositeOperation = "lighter";
-  ctx.globalAlpha = Math.sin(Math.PI * t) * 0.95;
-  ctx.drawImage(flashSprite(), x - radius, y - radius, radius * 2, radius * 2);
+  const radius = (60 + 440 * t) * scale;
+  stampLight(ctx, flashSprite(), x, y, radius, Math.sin(Math.PI * t) * 0.95);
   const ring = (30 + 520 * (1 - (1 - t) ** 3)) * scale;
-  ctx.globalAlpha = 1 - t;
-  ctx.strokeStyle = COLOR.white;
-  ctx.lineWidth = (18 * (1 - t) + 2) * Math.sqrt(scale);
-  ctx.beginPath();
-  ctx.arc(x, y, ring, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
+  const width = (18 * (1 - t) + 2) * Math.sqrt(scale);
+  stampLight(ctx, ringSprite(width / ring), x, y, ring + width / 2, 1 - t);
+  ctx.globalAlpha = alpha;
+  ctx.globalCompositeOperation = previous;
 }
 
 const EXPLOSION_BURST_MS = 500;

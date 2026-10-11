@@ -16,7 +16,8 @@ const STRIPE_SPEED: Range = [1.6, 3.2]; // stage widths a second
 const STRIPE_LENGTH: Range = [0.15, 0.5]; // of the stage's width
 const STRIPE_THICKNESS: Range = [3, 22];
 
-const within = ([a, b]: Range, t: number) => a + (b - a) * t;
+const within = (range: Range, t: number) =>
+  range[0] + (range[1] - range[0]) * t;
 
 let featherCanvas: HTMLCanvasElement | null = null;
 

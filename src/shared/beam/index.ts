@@ -6,6 +6,7 @@ import { COLOR } from "../../palette";
 import { drawGlow, fadeStops } from "../glowSprite";
 import { hash01, stampGlimmer } from "../twinkle";
 import type { Point } from "../wisp";
+import { queueTurnedLight } from "../lightBatch";
 
 // the beam's cross-section: transparent gold edge, gold glow, white core
 const SECTION = 64;
@@ -55,6 +56,25 @@ export function drawBeam(
   const dy = to.y - from.y;
   const length = Math.hypot(dx, dy);
   if (length < 1 || width <= 0 || alpha <= 0) return;
+  const previous = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = "lighter";
+  const queued = queueTurnedLight(
+    ctx,
+    beamSection(),
+    0,
+    0,
+    2,
+    SECTION,
+    (from.x + to.x - length) / 2,
+    (from.y + to.y - width) / 2,
+    length,
+    width,
+    dx / length,
+    dy / length,
+    alpha,
+  );
+  ctx.globalCompositeOperation = previous;
+  if (queued) return;
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
   ctx.globalAlpha = alpha;

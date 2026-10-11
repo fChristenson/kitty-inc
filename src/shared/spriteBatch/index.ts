@@ -238,14 +238,23 @@ export function drawSpriteGroups(
   let count = 0;
   for (let i = 0; i < groups; i++) count += counts[i];
   if (count === 0 || w <= 0 || h <= 0) return true;
+  // soft additive light on a dense screen loses nothing at half the pixels;
+  // drawn into the canvas's bottom-left corner, never resizing it
+  const res = additive && width >= HALF_RES_FROM ? 0.5 : 1;
   if (canvas.width !== width || canvas.height !== height) {
     canvas.width = width;
     canvas.height = height;
   }
-  gl.viewport(0, 0, width, height);
+  const glW = Math.ceil(width * res);
+  const glH = Math.ceil(height * res);
+  const sx = Math.floor(x * res);
+  const sy = Math.floor(y * res);
+  const sw = Math.min(glW, Math.ceil((x + w) * res)) - sx;
+  const sh = Math.min(glH, Math.ceil((y + h) * res)) - sy;
+  gl.viewport(0, 0, glW, glH);
   gl.uniform2f(g.resolution, width, height);
   // GL counts rows from the bottom
-  gl.scissor(x, height - y - h, w, h);
+  gl.scissor(sx, glH - sy - sh, sw, sh);
   gl.clear(gl.COLOR_BUFFER_BIT);
   gl.blendFunc(gl.ONE, additive ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
   gl.bindVertexArray(g.vao);
@@ -268,13 +277,17 @@ export function drawSpriteGroups(
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
+  const top2d = height - glH + sy;
   if (canvas instanceof HTMLCanvasElement)
-    ctx.drawImage(canvas, x, y, w, h, x, y, w, h);
+    ctx.drawImage(canvas, sx, top2d, sw, sh, sx / res, sy / res, sw / res, sh / res);
   else {
     const bitmap = canvas.transferToImageBitmap();
-    ctx.drawImage(bitmap, x, y, w, h, x, y, w, h);
+    ctx.drawImage(bitmap, sx, top2d, sw, sh, sx / res, sy / res, sw / res, sh / res);
     bitmap.close();
   }
   ctx.restore();
   return true;
 }
+
+// a canvas this many device px wide or more draws its light at half resolution
+const HALF_RES_FROM = 960;

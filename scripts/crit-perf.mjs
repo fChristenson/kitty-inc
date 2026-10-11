@@ -33,9 +33,10 @@ const EVENTS = "src/crits/animatedCrits/events";
 const CRIT_DATA = "src/crits/badgeCrits/critData";
 const OUT = path.join(ROOT, "tmp", "_crit-perf");
 
-// budgets per run, at the run's throttle
+// budgets per run, at the run's throttle: 60fps, never less
 const BUDGET = {
-  frameP95: 33.4,
+  minFps: 58,
+  frameP95: 17.5,
   redrawP95: 16,
   hitches: 0,
   longTasks: 0,
@@ -257,6 +258,7 @@ const fixed = (n, digits = 1) => Number(n ?? 0).toFixed(digits);
 
 function overBudget(s) {
   const over = [];
+  if (s.fps < BUDGET.minFps) over.push(`fps ${fixed(s.fps, 0)}`);
   if (s.frame.p95 > BUDGET.frameP95)
     over.push(`frame p95 ${fixed(s.frame.p95)}ms`);
   if (s.redraw.p95 > BUDGET.redrawP95)
@@ -322,6 +324,16 @@ function report(targets, results, errors) {
         lines.push(
           `  ${own && fn.includes(own) ? "*" : " "} ${fixed(ms, 0).padStart(5)}ms ${fn}`,
         );
+      const slow = (warm.profile?.slow ?? []).filter(
+        ([fn]) => !fn.includes(" perf/"),
+      );
+      if (slow.length) {
+        lines.push("inside redraws over 20ms (the spikes):");
+        for (const [fn, ms] of slow.slice(0, 8))
+          lines.push(
+            `  ${own && fn.includes(own) ? "*" : " "} ${fixed(ms, 0).padStart(5)}ms ${fn}`,
+          );
+      }
     } else
       lines.push(
         "(no profile: serve the page with Document-Policy: js-profiling)",

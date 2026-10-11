@@ -79,6 +79,9 @@ const deltas: number[] = [];
 const frameEnds: number[] = [];
 const TIMELINE_MS = 500;
 const redraws: number[] = [];
+// start, end of every redraw over SLOW_REDRAW_MS
+const SLOW_REDRAW_MS = 20;
+const slowSpans: number[] = [];
 const longTasks: number[] = [];
 const sources = new Map<string, number>();
 let canvases = 0;
@@ -199,7 +202,9 @@ export function timeRedraw(redraw: () => void): () => void {
     if (!recording) return redraw();
     const t0 = performance.now();
     redraw();
-    redraws.push(performance.now() - t0);
+    const t1 = performance.now();
+    redraws.push(t1 - t0);
+    if (t1 - t0 > SLOW_REDRAW_MS) slowSpans.push(t0, t1);
   };
 }
 
@@ -210,6 +215,7 @@ export function start(): void {
   deltas.length = 0;
   frameEnds.length = 0;
   redraws.length = 0;
+  slowSpans.length = 0;
   longTasks.length = 0;
   sources.clear();
   canvases = 0;
@@ -263,7 +269,7 @@ function timeline(ms: number): Summary["timeline"] {
 export async function stop(name: string): Promise<Summary> {
   recording = false;
   const ms = performance.now() - startedAt;
-  const profile = await stopProfile();
+  const profile = await stopProfile(slowSpans);
   const frames = deltas.length;
   const perFrame = (n: number) => (frames > 0 ? n / frames : 0);
   let canvasBytes = 0;

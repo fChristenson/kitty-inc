@@ -8,6 +8,8 @@ export interface ProfileSummary {
   // anywhere on it (its work and everything it calls)
   self: [string, number][];
   total: [string, number][];
+  // own time inside the slow redraws only: what the spikes were doing
+  slow: [string, number][];
 }
 
 interface Trace {
@@ -71,7 +73,11 @@ const top = (sums: Map<string, number>): [string, number][] =>
     .slice(0, TOP)
     .map(([label, ms]) => [label, Math.round(ms * 10) / 10]);
 
-function summarize(trace: Trace, sampleMs: number): ProfileSummary {
+function summarize(
+  trace: Trace,
+  sampleMs: number,
+  slowSpans: readonly number[],
+): ProfileSummary {
   const labels = new Map<number, string>();
   const label = (frameId: number) => {
     let text = labels.get(frameId);
@@ -83,6 +89,12 @@ function summarize(trace: Trace, sampleMs: number): ProfileSummary {
   };
   const self = new Map<string, number>();
   const total = new Map<string, number>();
+  const slow = new Map<string, number>();
+  const inSlow = (t: number) => {
+    for (let i = 0; i < slowSpans.length; i += 2)
+      if (t >= slowSpans[i] && t <= slowSpans[i + 1]) return true;
+    return false;
+  };
   const seen = new Set<string>();
   let samples = 0;
   trace.samples.forEach((sample, i) => {
@@ -105,6 +117,7 @@ function summarize(trace: Trace, sampleMs: number): ProfileSummary {
         ? label(stack.frameId)
         : `${label(stack.frameId)} < ${label(caller)}`;
     self.set(own, (self.get(own) ?? 0) + ms);
+    if (inSlow(sample.timestamp)) slow.set(own, (slow.get(own) ?? 0) + ms);
     seen.clear();
     while (stack) {
       const name = label(stack.frameId);
@@ -116,13 +129,22 @@ function summarize(trace: Trace, sampleMs: number): ProfileSummary {
         stack.parentId === undefined ? undefined : trace.stacks[stack.parentId];
     }
   });
-  return { sampleMs, samples, self: top(self), total: top(total) };
+  return {
+    sampleMs,
+    samples,
+    self: top(self),
+    total: top(total),
+    slow: top(slow),
+  };
 }
 
-export async function stopProfile(): Promise<ProfileSummary | undefined> {
+// slowSpans: start, end of each slow redraw (performance.now)
+export async function stopProfile(
+  slowSpans: readonly number[] = [],
+): Promise<ProfileSummary | undefined> {
   const running = profiler;
   profiler = null;
   if (!running) return undefined;
   const trace = await running.stop();
-  return summarize(trace, running.sampleInterval);
+  return summarize(trace, running.sampleInterval, slowSpans);
 }

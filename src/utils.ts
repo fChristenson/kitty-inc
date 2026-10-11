@@ -733,8 +733,9 @@ const MAX_CARTOON_TEXTS_PER_FONT = 160;
 const CARTOON_STROKE = 5;
 // a label changing every click or two (a held button's price, a counting
 // gauge) would build a canvas per value: until a text has been drawn this many
-// times it's stamped glyph by glyph from per-letter sprites instead
-const BAKE_AFTER_DRAWS = 8;
+// times it's stamped glyph by glyph from per-letter sprites instead (half a
+// second: a crit's hits change a bar's rate every few frames)
+const BAKE_AFTER_DRAWS = 30;
 const MAX_PENDING_TEXTS = 400;
 const pendingTexts = new Map<string, Map<string, number>>();
 // each letter's outline (left half) and fill (right half), drawn left-aligned

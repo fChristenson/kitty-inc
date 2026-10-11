@@ -10,6 +10,7 @@ import { drawGlitterLight, drawWispBetween, type Point } from "../wisp";
 import { clamp01, easeIn, easeOut, lerp } from "../easing";
 import { hash01 } from "../twinkle";
 import { drawBeam } from "../beam";
+import { beginLightBatch, endLightBatch } from "../lightBatch";
 
 export interface Drill {
   target: Point;
@@ -153,7 +154,7 @@ export function drawDrillHead(
     size * 1.1,
   );
   ctx.globalAlpha = alpha;
-  ctx.globalCompositeOperation = previous;
+  beginLightBatch(ctx);
   // two strands spiralling down the cone, brighter on the near side
   for (let s = 0; s < 2; s++)
     for (let k = 0; k < HELIX; k++) {
@@ -172,6 +173,8 @@ export function drawDrillHead(
         now,
       );
     }
+  endLightBatch(ctx);
+  ctx.globalCompositeOperation = previous;
   ctx.globalAlpha = 1;
 }
 
@@ -198,7 +201,7 @@ export function drawDrillSparks(
   drawGlow(ctx, GOLD, at.x, at.y, size * 1.3);
   drawGlow(ctx, WHITE, at.x, at.y, size * 0.45);
   ctx.globalAlpha = 1;
-  ctx.globalCompositeOperation = previous;
+  beginLightBatch(ctx);
   const back = angle + Math.PI;
   for (let i = 0; i < SPARKS; i++) {
     const clock = msSince + hash01(i, 11) * SPARK_MS;
@@ -224,6 +227,8 @@ export function drawDrillSparks(
       now,
     );
   }
+  endLightBatch(ctx);
+  ctx.globalCompositeOperation = previous;
 }
 
 // sparks a side, each relit every SPRAY_MS once it lands
@@ -259,7 +264,7 @@ export function drawDrillSpray(
   drawGlow(ctx, GOLD, at.x, at.y, size * 1.6);
   drawGlow(ctx, WHITE, at.x, at.y, size * 0.6);
   ctx.globalAlpha = 1;
-  ctx.globalCompositeOperation = previous;
+  beginLightBatch(ctx);
   for (let side = -1; side <= 1; side += 2)
     for (let i = 0; i < SPRAY_SPARKS; i++) {
       const seed = i + (side > 0 ? 500 : 900);
@@ -300,6 +305,8 @@ export function drawDrillSpray(
         fade,
       );
     }
+  endLightBatch(ctx);
+  ctx.globalCompositeOperation = previous;
 }
 
 const sparkTail: Point = { x: 0, y: 0 };

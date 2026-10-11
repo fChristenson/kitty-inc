@@ -1,5 +1,7 @@
 // soft round glows (pools of light, shadows, flashes): a radial gradient drawn
 // once per look onto a sprite and stamped, never rebuilt every frame
+import { queueLight } from "../lightBatch";
+import { processWhenIdle } from "../idle";
 const HALF = 128;
 const sprites = new Map<string, HTMLCanvasElement>();
 // looked up by the stops array itself first: hoist stops to a constant and
@@ -30,18 +32,22 @@ export function glowSprite(stops: FadeStops): HTMLCanvasElement {
   return sprite;
 }
 
-// a "#rrggbb" color fading out to nothing at the edge, solid out to `solid`
+// a "#rrggbb" color fading out to nothing at the edge, solid out to `solid`;
+// its sprite is baked at idle, before an effect first stamps it
 export function fadeStops(color: string, solid = 0): FadeStops {
-  return solid > 0
-    ? [
-        [0, color],
-        [solid, color],
-        [1, `${color}00`],
-      ]
-    : [
-        [0, color],
-        [1, `${color}00`],
-      ];
+  const stops: FadeStops =
+    solid > 0
+      ? [
+          [0, color],
+          [solid, color],
+          [1, `${color}00`],
+        ]
+      : [
+          [0, color],
+          [1, `${color}00`],
+        ];
+  processWhenIdle([stops], glowSprite);
+  return stops;
 }
 
 // the glow of radius r round (x, y), squashed to `squash` of its height
@@ -54,8 +60,25 @@ export function drawGlow(
   squash = 1,
 ): void {
   if (r <= 0) return;
+  const sprite = glowSprite(stops);
+  if (
+    ctx.globalCompositeOperation === "lighter" &&
+    queueLight(
+      ctx,
+      sprite,
+      0,
+      0,
+      HALF * 2,
+      HALF * 2,
+      x - r,
+      y - r * squash,
+      r * 2,
+      r * 2 * squash,
+    )
+  )
+    return;
   ctx.drawImage(
-    glowSprite(stops),
+    sprite,
     x - r,
     y - r * squash,
     r * 2,

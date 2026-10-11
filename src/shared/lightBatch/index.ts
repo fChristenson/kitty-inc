@@ -21,10 +21,12 @@ const MIN_BATCH = 160;
 const MAX_SOURCES = 16;
 // at most this many transforms (one per batch opened) per pass
 const MAX_MATRICES = 255;
-// stamp fields: sx, sy, sw, sh, dx, dy, dw, dh, alpha
-const FIELDS = 9;
+// stamp fields: sx, sy, sw, sh, dx, dy, dw, dh, alpha, then the cos and sin
+// it's turned by round its middle
+const FIELDS = 11;
 const MAX_QUEUED = 1 << 16;
-// a level held open by deferLights: its own stamps aren't queued
+// a level held open by deferLights: a stamp straight on it is queued under
+// ctx's transform at the time, if ctx is "lighter"
 const DEFERRED = -1;
 
 let batchCtx: CanvasRenderingContext2D | null = null;
@@ -43,6 +45,29 @@ const counts = new Int32Array(MAX_SOURCES);
 const starts = new Int32Array(MAX_SOURCES);
 let data = new Float32Array(SPRITE_FLOATS * 1024);
 const textures = new WeakMap<HTMLCanvasElement, SpriteTexture | null>();
+// the matrix the last stamp straight on a deferred level was queued under
+let loose = -1;
+
+// ctx's transform as a matrix index, reusing the last loose one if unchanged
+function looseMatrix(ctx: CanvasRenderingContext2D): number {
+  const m = ctx.getTransform();
+  if (loose >= 0) {
+    const l = matrices[loose];
+    if (
+      l.a === m.a &&
+      l.b === m.b &&
+      l.c === m.c &&
+      l.d === m.d &&
+      l.e === m.e &&
+      l.f === m.f
+    )
+      return loose;
+  }
+  if (matrices.length === MAX_MATRICES) flush(ctx);
+  matrices.push(m);
+  loose = matrices.length - 1;
+  return loose;
+}
 
 function open(ctx: CanvasRenderingContext2D, level: number): void {
   batchCtx = ctx;
@@ -103,10 +128,53 @@ export function queueLight(
   // the stamp's alpha, if the caller hasn't set it on ctx
   alpha?: number,
 ): boolean {
-  if (batchCtx !== ctx || levels[levels.length - 1] === DEFERRED) return false;
+  return queueTurnedLight(
+    ctx,
+    source,
+    sx,
+    sy,
+    sw,
+    sh,
+    dx,
+    dy,
+    dw,
+    dh,
+    1,
+    0,
+    alpha ?? ctx.globalAlpha,
+  );
+}
+
+// queueLight for a stamp turned round its middle by the angle whose cos and
+// sin are given
+export function queueTurnedLight(
+  ctx: CanvasRenderingContext2D,
+  source: HTMLCanvasElement,
+  sx: number,
+  sy: number,
+  sw: number,
+  sh: number,
+  dx: number,
+  dy: number,
+  dw: number,
+  dh: number,
+  cos: number,
+  sin: number,
+  alpha: number,
+): boolean {
+  if (batchCtx !== ctx) return false;
+  let matrix = levels[levels.length - 1];
+  if (matrix === DEFERRED) {
+    if (ctx.globalCompositeOperation !== "lighter") return false;
+    matrix = looseMatrix(ctx);
+  }
   let s = source === lastSource ? lastIndex : sources.indexOf(source);
   if (s < 0) {
-    if (sources.length === MAX_SOURCES) flush(ctx);
+    if (sources.length === MAX_SOURCES) {
+      flush(ctx);
+      matrix = levels[levels.length - 1];
+      if (matrix === DEFERRED) matrix = looseMatrix(ctx);
+    }
     s = sources.length;
     sources.push(source);
   }
@@ -122,8 +190,10 @@ export function queueLight(
   stamps[o + 5] = dy;
   stamps[o + 6] = dw;
   stamps[o + 7] = dh;
-  stamps[o + 8] = alpha ?? ctx.globalAlpha;
-  stampMatrix[queued] = levels[levels.length - 1];
+  stamps[o + 8] = alpha;
+  stamps[o + 9] = cos;
+  stamps[o + 10] = sin;
+  stampMatrix[queued] = matrix;
   stampSource[queued++] = s;
   if (queued === MAX_QUEUED) flush(ctx);
   return true;
@@ -153,6 +223,7 @@ function flush(ctx: CanvasRenderingContext2D): void {
   queued = 0;
   sources.length = 0;
   lastSource = null;
+  loose = -1;
   let kept = 0;
   for (let i = 0; i < levels.length; i++) {
     if (levels[i] === DEFERRED) continue;
@@ -175,6 +246,26 @@ function stampAll(ctx: CanvasRenderingContext2D): void {
       ctx.setTransform(matrices[current]);
     }
     ctx.globalAlpha = stamps[o + 8];
+    const sin = stamps[o + 10];
+    if (sin !== 0) {
+      const cos = stamps[o + 9];
+      const hw = stamps[o + 6] / 2;
+      const hh = stamps[o + 7] / 2;
+      ctx.transform(cos, sin, -sin, cos, stamps[o + 4] + hw, stamps[o + 5] + hh);
+      ctx.drawImage(
+        sources[stampSource[i]],
+        stamps[o],
+        stamps[o + 1],
+        stamps[o + 2],
+        stamps[o + 3],
+        -hw,
+        -hh,
+        stamps[o + 6],
+        stamps[o + 7],
+      );
+      ctx.setTransform(matrices[current]);
+      continue;
+    }
     ctx.drawImage(
       sources[stampSource[i]],
       stamps[o],
@@ -242,10 +333,12 @@ function drawOnGpu(ctx: CanvasRenderingContext2D): boolean {
     const cy = stamps[o + 5] + hh;
     const x = a * cx + c * cy + e;
     const y = b * cx + d * cy + f;
-    const ax = a * hw;
-    const ay = b * hw;
-    const bx = c * hh;
-    const by = d * hh;
+    const cos = stamps[o + 9];
+    const sin = stamps[o + 10];
+    const ax = (a * cos + c * sin) * hw;
+    const ay = (b * cos + d * sin) * hw;
+    const bx = (c * cos - a * sin) * hh;
+    const by = (d * cos - b * sin) * hh;
     const q = starts[s]++ * SPRITE_FLOATS;
     data[q] = x;
     data[q + 1] = y;

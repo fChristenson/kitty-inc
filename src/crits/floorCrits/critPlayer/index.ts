@@ -10,6 +10,7 @@ import type { Bolt } from "../../../shared/lightning";
 import type { Disk, Orbit } from "../../../shared/galaxy";
 import type { BarLaunch } from "../../../shared/barLaunch";
 import { loadWhenIdle } from "../../../shared/idle";
+import { deferLights, flushLights } from "../../../shared/lightBatch";
 
 export interface Point {
   x: number;
@@ -588,6 +589,12 @@ export function drawFloorCrit(
   }
   ctx.save();
   ctx.translate(centerX, centerY);
-  def.draw(ctx, r, ms, bars);
+  deferLights(ctx);
+  try {
+    def.draw(ctx, r, ms, bars);
+  } finally {
+    // a throw must never leave every later light queued and undrawn
+    flushLights(ctx);
+  }
   ctx.restore();
 }

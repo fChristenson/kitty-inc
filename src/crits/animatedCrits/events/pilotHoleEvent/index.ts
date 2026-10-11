@@ -85,7 +85,8 @@ export const forcePilotHoleEvent = registerWispEvent(
     const last = bits[bits.length - 1];
     const endMs = last.grind.endMs;
     const step = (b: Bit) => b.k / (bits.length - 1);
-    const lerpOf = ([a, z]: [number, number], b: Bit) => a + (z - a) * step(b);
+    const lerpOf = (range: [number, number], b: Bit) =>
+      range[0] + (range[1] - range[0]) * step(b);
     let soundAt = -Infinity;
     const thud = (now: number) => {
       if (now - soundAt < SOUND_GAP_MS) return;

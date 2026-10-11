@@ -41,6 +41,9 @@ const GALAXY_TAIL_MS = 600;
 const galaxyClock = (ms: number) => ms + (ms * ms) / 600;
 const galaxyHits = (i: number) => GALAXY_NOVA_MS + GALAXY_FLY_MS + (i % 3) * 40;
 const galaxyStar: Point = { x: 0, y: 0 };
+// one comet's spot, rewritten per trail sample (the wisp reads each at once)
+const comet: Point = { x: 0, y: 0 };
+const cometFrom: Point = { x: 0, y: 0 };
 
 registerFloorCrit("galaxyCrit", {
   plan(r, bars, hit) {
@@ -129,7 +132,7 @@ registerFloorCrit("galaxyCrit", {
       const hits = galaxyHits(i);
       if (since < 0 || ms > hits + DETONATION_MS) continue;
       const orbit = stars[(i * 37) % stars.length];
-      const from = disk.at(orbit, t, { x: 0, y: 0 });
+      const from = disk.at(orbit, t, cometFrom);
       const h = disk.heading(orbit, t);
       const kick = r.viewportWidth * GALAXY_KICK;
       const to = along(r, bars, i % bars.length, holeHash(i, 51) * 2 - 1);
@@ -137,10 +140,9 @@ registerFloorCrit("galaxyCrit", {
         ctx,
         (at) => {
           const p = clamp01((at - GALAXY_NOVA_MS) / (hits - GALAXY_NOVA_MS));
-          return {
-            x: lerp(from.x + Math.cos(h) * kick * p, to.x, p * p),
-            y: lerp(from.y + Math.sin(h) * kick * p, to.y, p * p),
-          };
+          comet.x = lerp(from.x + Math.cos(h) * kick * p, to.x, p * p);
+          comet.y = lerp(from.y + Math.sin(h) * kick * p, to.y, p * p);
+          return comet;
         },
         ms,
         now,

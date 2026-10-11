@@ -12,7 +12,9 @@ export function smoothstep(t: number): number {
 export const clamp01 = (t: number): number => Math.min(1, Math.max(0, t));
 
 // t (0..1) of the way through range
-export const lerp = ([a, b]: Range, t: number): number => a + (b - a) * t;
+// indexed, not destructured: destructuring walks an iterator (garbage) until optimized
+export const lerp = (range: Range, t: number): number =>
+  range[0] + (range[1] - range[0]) * t;
 
 // a random value within range
 export const between = (range: Range): number => lerp(range, Math.random());

@@ -68,7 +68,8 @@ const SWEEP_ALPHA: [number, number] = [0.3, 1];
 const SWOOSH_GAP_MS = 140;
 const SWEEPS = Array.from({ length: SWEEP_COUNT }, (_, k) => {
   const build = k / (SWEEP_COUNT - 1);
-  const lerp = ([from, to]: [number, number]) => from + (to - from) * build;
+  const lerp = (range: [number, number]) =>
+    range[0] + (range[1] - range[0]) * build;
   return {
     at: 1 - (1 - FIRST_SWEEP) * SWEEP_GAP ** k,
     ms: lerp(SWEEP_MS),

@@ -125,6 +125,17 @@ processWhenIdle(
     if (atlas.painted < SMALL_HALVES.length) paintNextLevel(atlas, color, true);
   },
 );
+// and the plain ones and big sprites every effect color uses, so none is
+// painted mid-crit
+const WARM_COLORS = [COLOR.heavenlyGold, COLOR.white, COLOR.wispGlitter];
+processWhenIdle(WARM_COLORS, getSprite);
+processWhenIdle(
+  WARM_COLORS.flatMap((color) => SMALL_HALVES.map(() => color)),
+  (color) => {
+    const atlas = atlasOf(color, false);
+    if (atlas.painted < SMALL_HALVES.length) paintNextLevel(atlas, color, false);
+  },
+);
 
 // a twinkle stamp in whatever composite ctx is already set to
 export function stampTwinkle(
