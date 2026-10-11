@@ -569,6 +569,10 @@ export function playEventEnded(): void {
   const now = performance.now();
   if (now - lastEventEndedPlayTime < EVENT_ENDED_DEBOUNCE_MS) return;
   lastEventEndedPlayTime = now;
+  playNotification();
+}
+
+export function playNotification(): void {
   playSfx("notification", NOTIFICATION_VOLUME);
 }
 

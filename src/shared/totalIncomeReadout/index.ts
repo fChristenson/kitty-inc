@@ -77,8 +77,6 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
   let measuredFont = "";
   let amountHeight = 0;
   let unitHeight = 0;
-  // where the reel's coins fly into (see shared/unitUp)
-  const amountSpot = { x: 0, y: 0 };
 
   function draw(
     ctx: CanvasRenderingContext2D,
@@ -195,8 +193,6 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         ctx.font = `900 ${unitFontSize}px "Fredoka", system-ui, sans-serif`;
         ctx.textAlign = "center";
         const unitTop = bottom + unitNameGapPx;
-        amountSpot.x = centerX;
-        amountSpot.y = pivotY;
         const reeling = drawUnitUp(
           ctx,
           centerX,
@@ -204,7 +200,6 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
           unitHeight,
           unitStrokeWidth,
           cachedAmountWidth * 1.1,
-          amountSpot,
         );
         if (!reeling)
           drawSlamText(

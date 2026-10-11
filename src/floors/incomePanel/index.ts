@@ -29,6 +29,7 @@ import { getWiggleRotation } from "../../shared/wiggle";
 
 import { drawGlow, fadeStops, type FadeStops } from "../../shared/glowSprite";
 import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
+import { spinFace } from "../../shared/textAnimations";
 import {
   createAbsorbPulse,
   mergeFlashWhite,
@@ -168,7 +169,13 @@ export function triggerIncomeBarPress(floor: Floor): void {
 // in the crit's color for a while after
 const barPunches = new WeakMap<
   Floor,
-  { hitAt: number; label: string | null; labelAt: number; color: string | null }
+  {
+    hitAt: number;
+    label: string | null;
+    labelAt: number;
+    color: string | null;
+    twirl: boolean;
+  }
 >();
 // of the bar's height
 const PUNCH_JOLT = 0.45;
@@ -186,22 +193,27 @@ const PUNCH_SLOSH_PERIOD_MS = 200;
 const PUNCH_LABEL_MS = 1000;
 const PUNCH_LABEL_RISE = 70;
 const PUNCH_LABEL_FONT = 80;
+// a twirling label spins round its upright axis, slowing, as it rises
+const TWIRL_MS = 650;
+const TWIRL_SPINS = 3;
 const AFTERGLOW_MS = 1000;
 const AFTERGLOW_ALPHA = 0.8;
 
 // label: what the first hit gave ("+10 Lvl"); later hits keep it. color:
-// the crit's, which the bar glows in afterwards
+// the crit's, which the bar glows in afterwards. twirl spins the label in
 export function punchIncomeBar(
   floor: Floor,
   label: string | null,
   color: string | null = null,
+  twirl = false,
 ): void {
   const now = Date.now();
   const punch = barPunches.get(floor);
   if (punch && label === null) {
     punch.hitAt = now;
     punch.color = color ?? punch.color;
-  } else barPunches.set(floor, { hitAt: now, label, labelAt: now, color });
+  } else
+    barPunches.set(floor, { hitAt: now, label, labelAt: now, color, twirl });
 }
 
 // a quake crit's bar leaping off its floor and crashing back down, or a
@@ -1124,13 +1136,21 @@ export function drawIncomePanel(
   if (punch?.label) {
     const t = (now - punch.labelAt) / PUNCH_LABEL_MS;
     if (t < 1) {
+      const labelY =
+        barY - PUNCH_LABEL_FONT * 0.6 - PUNCH_LABEL_RISE * (1 - (1 - t) ** 2);
       ctx.save();
       ctx.globalAlpha = t < 0.7 ? 1 : (1 - t) / 0.3;
+      if (punch.twirl) {
+        const u = Math.min(1, (now - punch.labelAt) / TWIRL_MS);
+        ctx.translate(barCenter.x, labelY);
+        ctx.scale(spinFace(TWIRL_SPINS * (1 - (1 - u) ** 3)), 1);
+        ctx.translate(-barCenter.x, -labelY);
+      }
       drawPoppingCritText(
         ctx,
         punch.label,
         barCenter.x,
-        barY - PUNCH_LABEL_FONT * 0.6 - PUNCH_LABEL_RISE * (1 - (1 - t) ** 2),
+        labelY,
         COLOR.heavenlyGold,
         punch.labelAt,
         now,

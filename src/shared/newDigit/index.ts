@@ -1,33 +1,27 @@
 // New digit: the first time ever the total grows a digit (99,999 to 100,000),
-// its new leading digit drops in from above in gold, lands with a pop of
-// coins, then cools back to green. A digit that comes with a new unit leaves
-// it to shared/unitUp. Drawn by shared/totalIncomeReadout over its amount
+// its new leading digit drops in from above in gold (shared/textAnimations'
+// dropIn), lands with a pop of coins, then cools back to green. A digit that
+// comes with a new unit leaves it to shared/unitUp. Drawn by
+// shared/totalIncomeReadout over its amount
 import { COLOR } from "../../palette";
 import { createCoinBurstPool } from "../../coinBurst";
-import { playCoinDrop } from "../../sound";
-import { clamp01 } from "../easing";
-import { drawSlamText, slamTextLetterCenter, SLAM_GOLD } from "../eventEndSlam";
+import { playCoinDrop, playNotification } from "../../sound";
+import { slamTextLetterCenter } from "../eventEndSlam";
 import { drawGlow, fadeStops } from "../glowSprite";
-import { shakeScreen } from "../screenShake";
+import { createLetterPose, drawLetter, dropIn } from "../textAnimations";
 
 // the most digits the total has ever shown, as its power of ten, for good
 const STORAGE_KEY = "cash-clicker:new-digit-top";
 // the leading digit, after the "$"
 const INDEX = 1;
-// it falls DROP of its height from above, START_SIZE times its size, speeding up
-const FALL_MS = 260;
-const DROP = 2.6;
-const START_SIZE = 1.8;
-const SQUASH_MS = 140;
-const GOLD_HOLD_MS = 500;
-const GOLD_FADE_MS = 300;
-const END_MS = FALL_MS + GOLD_HOLD_MS + GOLD_FADE_MS;
-const LAND_SHAKE = 0.3;
+const EFFECT = dropIn;
+const END_MS = EFFECT.ms;
 const GLOW = fadeStops(COLOR.heavenlyGold);
 const GLOW_R = 2.2;
 // the pop: the game's own coin burst, shrunk to the digit
 const POP_SCALE = 0.6;
 const pops = createCoinBurstPool(120);
+const pose = createLetterPose();
 
 let topExponent: number | null = null;
 let startedAt: number | null = null;
@@ -60,6 +54,7 @@ export function noteTotalExponent(exponent: number): void {
   if (exponent <= topExponent) return;
   saveTop(exponent);
   if (startsUnit(exponent)) return;
+  playNotification();
   startedAt = Date.now();
   landed = false;
 }
@@ -110,62 +105,28 @@ function drawDigit(
   }
   const cx = slamTextLetterCenter(ctx, amount, INDEX, x, true);
   const cy = top + height / 2;
-  if (!landed && ms >= FALL_MS) {
+  if (!landed && ms >= EFFECT.landMs) {
     landed = true;
-    shakeScreen(LAND_SHAKE);
     playCoinDrop();
     pops.spawn(cx, cy, POP_SCALE);
   }
-  const fall = clamp01(ms / FALL_MS) ** 2;
-  const since = ms - FALL_MS;
-  const squash = since >= 0 ? Math.exp(-since / SQUASH_MS) : 0;
-  const size = START_SIZE + (1 - START_SIZE) * fall;
-  const y = cy - DROP * height * (1 - fall);
-  const gold = 1 - clamp01((since - GOLD_HOLD_MS) / GOLD_FADE_MS);
-  const char = amount[INDEX];
+  EFFECT.pose(ms, amount[INDEX], pose);
 
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
-  ctx.globalAlpha = 0.5 * gold;
-  drawGlow(ctx, GLOW, cx, y, height * GLOW_R * size);
+  ctx.globalAlpha = 0.5 * pose.gold;
+  drawGlow(ctx, GLOW, cx, cy + pose.dy * height, height * GLOW_R * pose.sy);
   ctx.restore();
 
-  ctx.save();
-  ctx.textAlign = "center";
-  ctx.translate(cx, y);
-  ctx.scale(size * (1 + 0.35 * squash), size * (1 - 0.3 * squash));
-  const letterTop = -height / 2;
-  if (gold < 1)
-    drawSlamText(
-      ctx,
-      null,
-      char,
-      0,
-      letterTop,
-      height,
-      COLOR.moneyGreen,
-      COLOR.white,
-      strokeWidth,
-      true,
-      0,
-      true,
-    );
-  if (gold > 0) {
-    ctx.globalAlpha *= gold;
-    drawSlamText(
-      ctx,
-      null,
-      char,
-      0,
-      letterTop,
-      height,
-      SLAM_GOLD,
-      COLOR.white,
-      strokeWidth,
-      true,
-      0,
-      true,
-    );
-  }
-  ctx.restore();
+  drawLetter(
+    ctx,
+    pose,
+    cx,
+    cy,
+    height,
+    COLOR.moneyGreen,
+    COLOR.white,
+    strokeWidth,
+    true,
+  );
 }

@@ -1,20 +1,13 @@
 // Unit up: the first time ever the total reaches a new unit (Million,
 // Billion, ...), its unit word turns into a slot reel between two gold rims
-// and spins through the units, braking hard, each word clicking past with a
-// jolt, round three times till it stops on the new one in gold; coins swing
-// up into the amount, which pays a share of itself (the game's own payout,
-// set with setUnitUpPayout) and slams like an event's total. Drawn by
-// shared/totalIncomeReadout in place of its unit word
+// and spins through the units, braking hard, each word clicking past, round
+// three times till it stops on the new one in gold; a beat later the total
+// pays a share of itself (the game's own payout, set with setUnitUpPayout) and
+// slams like an event's total. Drawn by shared/totalIncomeReadout in place of
+// its unit word
 import { COLOR } from "../../palette";
 import { illionName } from "../../utils";
-import {
-  beginCoinBatch,
-  createCoinBurstParticles,
-  drawCoinBurstFrame,
-  endCoinBatch,
-  type CoinBurstParticle,
-} from "../../coinBurst";
-import { playCoinDrop } from "../../sound";
+import { playCoinDrop, playNotification } from "../../sound";
 import { drawBeam } from "../beam";
 import { clamp01 } from "../easing";
 import { createBeats, type Beats } from "../eventBeats";
@@ -25,9 +18,7 @@ import {
   triggerEventEndSlam,
 } from "../eventEndSlam";
 import { drawGlow, fadeStops } from "../glowSprite";
-import { kickShake } from "../screenShake";
-import { pulseHudTotalFlash, triggerHudTotalFlash } from "../totalIncomeCoins";
-import { hash01 } from "../twinkle";
+import { triggerHudTotalFlash } from "../totalIncomeCoins";
 import type { Point } from "../wisp";
 
 // the highest unit tier the total has ever shown (0 = none), for good
@@ -63,17 +54,10 @@ const GOLD_FADE_MS = 500;
 const GLOW = fadeStops(COLOR.heavenlyGold);
 const GLOW_R = 7;
 const GLOW_SQUASH = 0.45;
-// coins flung out of the word, swinging round up into the amount
-const COINS = 36;
-const COIN_EVERY_MS = 20;
-const COIN_FLY_MS = 460;
-const PAY_AT = SPIN_MS + 120;
-const PAID_AT = PAY_AT + (COINS - 1) * COIN_EVERY_MS + COIN_FLY_MS;
-// the slam that follows is the readout's own
+// the total pays and slams this long after the reel stops; the slam is the
+// readout's own
+const PAID_AT = SPIN_MS + 100;
 const END_MS = PAID_AT;
-// shakes: a click (growing), and the reel stopping
-const TICK_KICK: [number, number] = [0.1, 0.35];
-const LAND_KICK = 0.5;
 
 const reelAt = (ms: number): number =>
   STOP * (1 - (1 - clamp01(ms / SPIN_MS)) ** 3);
@@ -92,46 +76,18 @@ const TICKS: number[] = [];
 
 interface Beat {
   at: number;
-  kind: "tick" | "land" | "coin" | "paid";
-  index: number;
+  kind: "tick" | "paid";
 }
 const BEATS: Beat[] = [
-  ...TICKS.map((at, index) => ({ at, kind: "tick" as const, index })),
-  { at: SPIN_MS, kind: "land", index: 0 },
-  ...Array.from({ length: COINS }, (_, index) => ({
-    at: PAY_AT + index * COIN_EVERY_MS + COIN_FLY_MS,
-    kind: "coin" as const,
-    index,
-  })),
-  { at: PAID_AT, kind: "paid", index: 0 },
+  ...TICKS.map((at) => ({ at, kind: "tick" as const })),
+  { at: SPIN_MS, kind: "tick" },
+  { at: PAID_AT, kind: "paid" },
 ];
-
-// each coin's swing: out under the word, then back up under the amount
-const COIN_OUT_X = Array.from(
-  { length: COINS },
-  (_, i) => (hash01(i, 1) - 0.5) * 1100,
-);
-const COIN_OUT_Y = Array.from(
-  { length: COINS },
-  (_, i) => 250 + hash01(i, 2) * 500,
-);
-const COIN_BACK_X = Array.from(
-  { length: COINS },
-  (_, i) => (hash01(i, 3) - 0.5) * 600,
-);
-const COIN_BACK_Y = 420;
-// the game's own burst coins, shrunk to the readout
-const COIN_SCALE = 0.6;
-// a burst coin's spin is in ~16.67ms ticks
-const TICK_MS = 1000 / 60;
 
 interface Run {
   startedAt: number;
   words: string[];
   beats: Beats<Beat>;
-  // each flying coin's look (kind, size, tilt, spin) and its first spin frame
-  coins: CoinBurstParticle[];
-  spinFrom: number[];
 }
 let run: Run | null = null;
 let topTier: number | null = null;
@@ -139,7 +95,7 @@ let payout: (() => void) | null = null;
 const spot: Point = { x: 0, y: 0 };
 const rimEnd: Point = { x: 0, y: 0 };
 
-// what the total pays once the coins are in
+// what the total pays as it slams
 export function setUnitUpPayout(pay: () => void): void {
   payout = pay;
 }
@@ -156,39 +112,23 @@ function saveTopTier(tier: number): void {
 }
 
 function fireBeat(beat: Beat): void {
-  const now = Date.now();
-  switch (beat.kind) {
-    case "tick": {
-      const k = TICKS.length > 1 ? beat.index / (TICKS.length - 1) : 1;
-      kickShake(TICK_KICK[0] + (TICK_KICK[1] - TICK_KICK[0]) * k, now);
-      playCoinDrop();
-      break;
-    }
-    case "land":
-      kickShake(LAND_KICK, now);
-      playCoinDrop();
-      break;
-    case "coin":
-      pulseHudTotalFlash();
-      break;
-    case "paid":
-      payout?.();
-      triggerHudTotalFlash();
-      triggerEventEndSlam(GLOBAL_SLAM, "total");
-      break;
+  if (beat.kind === "tick") {
+    playCoinDrop();
+    return;
   }
+  payout?.();
+  triggerHudTotalFlash();
+  triggerEventEndSlam(GLOBAL_SLAM, "total");
 }
 
 function start(from: number, to: number): void {
+  playNotification();
   const words = [from > 0 ? illionName(from) : ""];
   for (let k = 0; k < RING - 1; k++) words.push(illionName(to + k));
-  const coins = createCoinBurstParticles(0, 0).slice(0, COINS);
   run = {
     startedAt: Date.now(),
     words,
     beats: createBeats(BEATS, (beat) => beat.at, fireBeat),
-    coins,
-    spinFrom: coins.map((coin) => coin.spinFrame),
   };
 }
 
@@ -265,54 +205,9 @@ function drawWord(
   ctx.restore();
 }
 
-function drawCoins(
-  ctx: CanvasRenderingContext2D,
-  { coins, spinFrom }: Run,
-  from: Point,
-  to: Point,
-  ms: number,
-): void {
-  if (ms < PAY_AT || ms >= PAID_AT) return;
-  const base = ctx.getTransform();
-  beginCoinBatch(ctx);
-  for (let i = 0; i < coins.length; i++) {
-    const u = (ms - PAY_AT - i * COIN_EVERY_MS) / COIN_FLY_MS;
-    if (u < 0 || u >= 1) continue;
-    // a cubic from the word, out under it, back up under the amount, into it
-    const t = u ** 1.4;
-    const v = 1 - t;
-    const a = v * v * v;
-    const b = 3 * v * v * t;
-    const c = 3 * v * t * t;
-    const d = t * t * t;
-    const x =
-      a * from.x +
-      b * (from.x + COIN_OUT_X[i]) +
-      c * (to.x + COIN_BACK_X[i]) +
-      d * to.x;
-    const y =
-      a * from.y +
-      b * (from.y + COIN_OUT_Y[i]) +
-      c * (to.y + COIN_BACK_Y) +
-      d * to.y;
-    const coin = coins[i];
-    coin.spinFrame =
-      spinFrom[i] + (coin.spinDir * coin.spinRate * ms) / TICK_MS;
-    drawCoinBurstFrame(
-      ctx,
-      coin,
-      x,
-      y,
-      coin.size * COIN_SCALE * (1 - 0.5 * u),
-      base,
-    );
-  }
-  endCoinBatch(ctx);
-}
-
 // the reel in place of the readout's unit word (its top, height and stroke),
-// rims rimWidth across, coins swinging into the amount at amountAt; false
-// once there's nothing to draw, so the readout draws its word itself
+// rims rimWidth across; false once there's nothing to draw, so the readout
+// draws its word itself
 export function drawUnitUp(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -320,7 +215,6 @@ export function drawUnitUp(
   height: number,
   strokeWidth: number,
   rimWidth: number,
-  amountAt: Point,
 ): boolean {
   if (!run) return false;
   const ms = Date.now() - run.startedAt;
@@ -391,11 +285,5 @@ export function drawUnitUp(
     );
   }
   ctx.restore();
-
-  if (landed) {
-    spot.x = x;
-    spot.y = y;
-    drawCoins(ctx, run, spot, amountAt, ms);
-  }
   return true;
 }
