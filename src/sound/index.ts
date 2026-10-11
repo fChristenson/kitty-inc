@@ -204,7 +204,11 @@ function playSfx(
   maxDurationSeconds?: number,
   fadeOutSeconds = 0.4,
 ): void {
-  withSfxBuffer(name, (ctx, buffer) =>
+  withSfxBuffer(name, (ctx, buffer) => {
+    if (maxDurationSeconds === undefined) {
+      startShared(ctx, buffer, volume, offsetSeconds, rate);
+      return;
+    }
     startSfx(
       ctx,
       buffer,
@@ -213,8 +217,32 @@ function playSfx(
       rate,
       maxDurationSeconds,
       fadeOutSeconds,
-    ),
-  );
+    );
+  });
+}
+
+// a held button plays a sound per click: those share one gain node per
+// volume (never ramped, so sharing changes nothing) instead of each making one
+const sharedGains = new Map<number, GainNode>();
+function startShared(
+  ctx: AudioContext,
+  buffer: AudioBuffer,
+  volume: number,
+  offsetSeconds: number,
+  rate: number,
+): void {
+  let gain = sharedGains.get(volume);
+  if (!gain || gain.context !== ctx) {
+    gain = ctx.createGain();
+    gain.gain.value = volume;
+    gain.connect(ctx.destination);
+    sharedGains.set(volume, gain);
+  }
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  if (rate !== 1) source.playbackRate.value = rate;
+  source.connect(gain);
+  source.start(0, Math.min(offsetSeconds, buffer.duration));
 }
 
 function startSfx(

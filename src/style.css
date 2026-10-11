@@ -152,6 +152,29 @@ body {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* shared/spriteBatch's light overlay: the effects' glow, added onto the game
+   canvas under it by the compositor (placed and sized from JS) */
+.game__lights {
+  position: absolute;
+  pointer-events: none;
+  mix-blend-mode: plus-lighter;
+}
+
+/* the world's coins (WebGL), then the HUD, flash and spawns, stacked over
+   the game canvas in that order (placed and sized from JS) */
+.game__coins,
+.game__top {
+  position: absolute;
+  pointer-events: none;
+}
+
+.game__lights[hidden],
+.game__coins[hidden],
+.game__top[hidden] {
+  display: none;
 }
 
 .game__canvas {

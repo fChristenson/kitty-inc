@@ -472,6 +472,7 @@ export function switchActiveCompany(
 // switchActiveCompany — is automatically included without needing to restart this.
 // read the running total via getTotalIncome()
 const COLLECT_INTERVAL_MS = 200;
+const COLLECT_SLICES = 5;
 
 // multiplies every $ collected below — main.ts wires this to
 // hud/corporationBoostMenu's getGlobalIncomeBoostMultiplier (company-value/market
@@ -495,7 +496,8 @@ export function startTotalIncomeTicker(
   if (getIncomeBoostMultiplier)
     incomeBoostMultiplier = getIncomeBoostMultiplier;
   let lastSave = performance.now();
-  function collectAll(): void {
+  let nextBuilding = 0;
+  function collectAll(all = false): void {
     if (isDetachedJobPending()) return;
     // Date.now()-based (not performance.now()) since collectDueIncome now reads/writes
     // floor.lastCollectedAt directly, a persisted Date.now()-based timestamp
@@ -511,8 +513,15 @@ export function startTotalIncomeTicker(
       cachedBoostMultiplierAt = now;
     }
     let collected = ZERO;
-    for (const floors of tickerBuildings) {
-      for (const floor of floors) {
+    // a slice of the buildings a tick, each still collected every
+    // COLLECT_SLICES ticks: every floor of a big company at once took several
+    // ms, stealing a frame five times a second. A floor pays every cycle that
+    // completed since its last collection, so none is lost
+    const count = tickerBuildings.length;
+    const slice = all ? count : Math.ceil(count / COLLECT_SLICES);
+    for (let n = 0; n < slice && count > 0; n++) {
+      nextBuilding %= count;
+      for (const floor of tickerBuildings[nextBuilding++]) {
         if (!floor.unlocked || isFloorLocked(floor)) continue;
         collected = add(collected, collectDueIncome(floor, now));
       }
@@ -529,9 +538,9 @@ export function startTotalIncomeTicker(
     }
   }
 
-  setInterval(collectAll, COLLECT_INTERVAL_MS);
+  setInterval(() => collectAll(), COLLECT_INTERVAL_MS);
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") collectAll();
+    if (document.visibilityState === "visible") collectAll(true);
   });
 }
 

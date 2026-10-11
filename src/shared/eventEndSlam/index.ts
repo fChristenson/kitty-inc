@@ -314,17 +314,12 @@ function restLayout(
   for (let i = 0; i < text.length; i++) {
     const width = measure(ctx, text[i], font);
     const digit = tabular && isDigit(text[i]);
-    // a kerned letter is measured through itself, so the kern before it is kept
-    const end = tabular
-      ? start + (digit ? digitCell : width)
-      : measure(ctx, text.slice(0, i + 1), font);
-    const cellWidth = end - start;
-    offsets[i] =
-      start +
-      (digit ? (cellWidth - width) / 2 : tabular ? 0 : cellWidth - width);
+    // from letter advances: a counting label is a new text every frame
+    const end = start + (digit ? digitCell : width);
+    offsets[i] = start + (digit ? (digitCell - width) / 2 : 0);
     start = end;
   }
-  layout = { width: tabular ? start : measure(ctx, text, font), offsets };
+  layout = { width: start, offsets };
   byText.set(text, layout);
   return layout;
 }
@@ -1146,17 +1141,29 @@ export function drawShineSweep(
   ctx.beginPath();
   ctx.roundRect(x, y, width, height, radius);
   ctx.clip();
-  const gradient = ctx.createLinearGradient(bandX - band, 0, bandX + band, 0);
-  gradient.addColorStop(0, `${COLOR.heavenlyGold}00`);
-  gradient.addColorStop(0.5, COLOR.white);
-  gradient.addColorStop(1, `${COLOR.heavenlyGold}00`);
   ctx.globalCompositeOperation = "lighter";
   ctx.globalAlpha = alpha;
-  ctx.fillStyle = gradient;
   const cy = y + height / 2;
   ctx.translate(0, cy);
   ctx.transform(1, 0, -0.4, 1, 0, 0);
   ctx.translate(0, -cy);
-  ctx.fillRect(x - band * 2, y, width + band * 4, height);
+  ctx.drawImage(shineBand(), bandX - band, y, band * 2, height);
   ctx.restore();
+}
+
+// the shine band's gradient (gold, white in the middle, gold), drawn once
+let shineBandSprite: HTMLCanvasElement | null = null;
+function shineBand(): HTMLCanvasElement {
+  if (shineBandSprite) return shineBandSprite;
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 1;
+  const c = canvas.getContext("2d")!;
+  const gradient = c.createLinearGradient(0, 0, 256, 0);
+  gradient.addColorStop(0, `${COLOR.heavenlyGold}00`);
+  gradient.addColorStop(0.5, COLOR.white);
+  gradient.addColorStop(1, `${COLOR.heavenlyGold}00`);
+  c.fillStyle = gradient;
+  c.fillRect(0, 0, 256, 1);
+  return (shineBandSprite = canvas);
 }

@@ -61,6 +61,9 @@ const json = args.includes("--json");
 const warmOnly = args.includes("--warm");
 // counting canvas calls costs time of its own, so it's opt-in
 const counts = args.includes("--counts");
+// extra rig options; by default the normal busy state: full maxed buildings
+// (late=1) with coin bursts storming (the rig's default). --rig= for the light one
+const rig = flag("rig", "late=1");
 
 const kebab = (name) => name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
 const camel = (id) => id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
@@ -223,7 +226,7 @@ async function measure(runs) {
       deviceScaleFactor: 3,
       mobile: true,
     });
-  const query = `run=${runs.map((r) => `${r}@${mode}`).join(",")}${counts ? "" : "&counts=0"}&stamp=${Date.now()}`;
+  const query = `run=${runs.map((r) => `${r}@${mode}`).join(",")}${counts ? "" : "&counts=0"}${rig ? `&${rig}` : ""}&stamp=${Date.now()}`;
   await cdp.send("Page.navigate", { url: `${url}?${query}` });
   const deadline = Date.now() + 90_000 + runs.length * 60_000;
   let results = null;

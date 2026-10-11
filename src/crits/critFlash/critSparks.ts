@@ -11,7 +11,9 @@ import { drawGlitterLight } from "../../shared/wisp";
 import { prepareSoon } from "../../shared/idle";
 import {
   createSpriteTexture,
+  drawOverlaySprites,
   drawSprites,
+  isOverlayFor,
   SPRITE_FLOATS,
   type SpriteTexture,
 } from "../../shared/spriteBatch";
@@ -93,9 +95,11 @@ function getSheet(): SpriteTexture | null {
     c.fillRect(CELL * k, 0, CELL, CELL);
     paintTwinkleAt(c, x, CELL + half, half - 2, 0, color);
   });
+  sheetCanvas = canvas;
   sheet = createSpriteTexture(canvas);
   return sheet;
 }
+let sheetCanvas: HTMLCanvasElement | null = null;
 
 prepareSoon(getSheet);
 
@@ -189,9 +193,23 @@ function drawBatch(
     if (cy + reach > bottom) bottom = cy + reach;
   }
   if (n === 0) return;
+  if (isOverlayFor(ctx)) {
+    overlaySheet ??= sheetCanvas
+      ? createSpriteTexture(sheetCanvas, true, true)
+      : null;
+    if (overlaySheet) {
+      oneSheet[0] = overlaySheet;
+      oneCount[0] = n;
+      if (drawOverlaySprites(oneSheet, oneCount, 1, data)) return;
+    }
+  }
   if (!drawSprites(ctx, texture, data, n, left, top, right, bottom))
     drawFallback(ctx, x, y, t, scale);
 }
+
+let overlaySheet: SpriteTexture | null = null;
+const oneSheet: SpriteTexture[] = [];
+const oneCount = new Int32Array(1);
 
 function drawFallback(
   ctx: CanvasRenderingContext2D,

@@ -222,18 +222,83 @@ export function drawFloor(
   // reaching behind each side wall/top wall/divider band (drawOuterWall draws on top
   // of this and hides that sliver) instead of the walls masking a big strip of
   // full-width/full-height art
-  ctx.drawImage(
-    bgImage,
-    0,
-    0,
-    FLOOR_W,
-    FLOOR_H,
-    SIDE_WALL_WIDTH - ROOM_WALL_OVERLAP_PX,
-    ROOM_CONTENT_Y_OFFSET,
-    FLOOR_W * ROOM_CONTENT_SCALE_X,
-    FLOOR_H * ROOM_CONTENT_SCALE,
-  );
+  const w = FLOOR_W * ROOM_CONTENT_SCALE_X;
+  const h = FLOOR_H * ROOM_CONTENT_SCALE;
+  const m = ctx.getTransform();
+  const room = roomBitmap(bgImage, Math.hypot(m.a, m.b), w, h);
+  if (room)
+    ctx.drawImage(
+      room,
+      SIDE_WALL_WIDTH - ROOM_WALL_OVERLAP_PX,
+      ROOM_CONTENT_Y_OFFSET,
+      w,
+      h,
+    );
+  else
+    ctx.drawImage(
+      bgImage,
+      0,
+      0,
+      FLOOR_W,
+      FLOOR_H,
+      SIDE_WALL_WIDTH - ROOM_WALL_OVERLAP_PX,
+      ROOM_CONTENT_Y_OFFSET,
+      w,
+      h,
+    );
   void floor; // no per-floor furniture placement left to draw; kept for a stable draw signature
+}
+
+// each room's art decoded once at the size it's drawn, onto a canvas (a GPU
+// texture, not raster pixels the frame has to hand over): the big image
+// scaled down every frame for every floor was re-decoded and resampled
+const RESCALE = 0.15;
+const roomBitmaps = new WeakMap<
+  HTMLImageElement,
+  { bitmap: HTMLCanvasElement | null; scale: number; building: boolean }
+>();
+function roomBitmap(
+  image: HTMLImageElement,
+  scale: number,
+  w: number,
+  h: number,
+): HTMLCanvasElement | null {
+  let entry = roomBitmaps.get(image);
+  if (!entry)
+    roomBitmaps.set(
+      image,
+      (entry = { bitmap: null, scale: 0, building: false }),
+    );
+  // a zooming view rebuilds it at most one at a time; the old one draws,
+  // stretched, meanwhile
+  if (
+    entry.building ||
+    scale <= 0 ||
+    (entry.bitmap && Math.abs(entry.scale / scale - 1) <= RESCALE)
+  )
+    return entry.bitmap;
+  const own = entry;
+  own.building = true;
+  void createImageBitmap(image, 0, 0, FLOOR_W, FLOOR_H, {
+    resizeWidth: Math.max(1, Math.round(w * scale)),
+    resizeHeight: Math.max(1, Math.round(h * scale)),
+    resizeQuality: "high",
+  }).then(
+    (bitmap) => {
+      const canvas = own.bitmap ?? document.createElement("canvas");
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      canvas.getContext("2d")!.drawImage(bitmap, 0, 0);
+      bitmap.close();
+      own.bitmap = canvas;
+      own.scale = scale;
+      own.building = false;
+    },
+    () => {
+      own.building = false;
+    },
+  );
+  return own.bitmap;
 }
 
 let groundImage: HTMLImageElement | null = null;

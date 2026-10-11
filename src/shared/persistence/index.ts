@@ -32,7 +32,11 @@ const IDLE_SAVE_TIMEOUT_MS = 5000;
 // building of the company, so background saves keep at least this far apart
 const MIN_SAVE_GAP_MS = 2000;
 
-export function createSaveScheduler<T>(save: (state: T) => void): {
+export function createSaveScheduler<T>(
+  save: (state: T) => void,
+  // what saveNow runs (leaving the page): it must finish before returning
+  saveSync: (state: T) => void = save,
+): {
   schedule: (state: T) => void;
   saveNow: (state: T) => void;
 } {
@@ -70,7 +74,7 @@ export function createSaveScheduler<T>(save: (state: T) => void): {
     saveNow: (state) => {
       pendingState = null;
       savedAt = performance.now();
-      save(state);
+      saveSync(state);
     },
   };
 }

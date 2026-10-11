@@ -553,6 +553,7 @@ function toSavedFloor(floor: Floor): SavedFloor {
 }
 
 export function saveBuildings(buildings: Floor[][], companyIndex = 0): void {
+  slicedSave++;
   const data: SavedFloor[][] = buildings.map((floors) =>
     floors.map(toSavedFloor),
   );
@@ -570,10 +571,43 @@ export function saveBuildings(buildings: Floor[][], companyIndex = 0): void {
   }
 }
 
+// a background save: a few buildings per task, so a big company's save never
+// holds the main thread for a whole frame; a newer save abandons an older one
+const SAVE_BUILDINGS_PER_TASK = 4;
+let slicedSave = 0;
+function saveBuildingsSliced(buildings: Floor[][], companyIndex: number): void {
+  const token = ++slicedSave;
+  const parts: string[] = [];
+  let next = 0;
+  const step = (): void => {
+    if (token !== slicedSave) return;
+    const end = Math.min(buildings.length, next + SAVE_BUILDINGS_PER_TASK);
+    for (; next < end; next++)
+      parts.push(JSON.stringify(buildings[next].map(toSavedFloor)));
+    if (next < buildings.length) {
+      setTimeout(step, 0);
+      return;
+    }
+    savedVersion++;
+    try {
+      localStorage.setItem(
+        companyStorageKey(STORAGE_KEY, companyIndex),
+        `{"buildings":[${parts.join(",")}]}`,
+      );
+    } catch {
+      // storage unavailable/full: persistence is a nice-to-have, safe to ignore
+    }
+  };
+  step();
+}
+
 const buildingSaveScheduler = createSaveScheduler<{
   buildings: Floor[][];
   companyIndex: number;
-}>(({ buildings, companyIndex }) => saveBuildings(buildings, companyIndex));
+}>(
+  ({ buildings, companyIndex }) => saveBuildingsSliced(buildings, companyIndex),
+  ({ buildings, companyIndex }) => saveBuildings(buildings, companyIndex),
+);
 
 export function schedulePersist(buildings: Floor[][], companyIndex = 0): void {
   // a copy: switching company refills the same array before the save runs

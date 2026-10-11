@@ -24,6 +24,7 @@
 // ?crits=on|tiers|off        crit odds for runs without their own @mode
 // ?seed=1                    the crit dice's seed, so a run lands the same
 //                            crits every time; 0 rolls freely
+// ?storm=0                   no managers' coin-burst storm under every run
 //
 // A run name can carry its crit mode: hold@off (no crits), hold@tiers (crit
 // tiers, no procs or events), hold@on.
@@ -65,6 +66,7 @@ const options = {
   crits: params.get("crits") ?? "on",
   seed: Number(params.get("seed") ?? 1),
   money: Number(params.get("money") ?? 0),
+  storm: params.get("storm") !== "0",
 };
 
 const sleep = (ms: number) =>
@@ -149,7 +151,9 @@ async function boot(): Promise<void> {
     parseRunName,
     prepareRun,
     scaleScenario,
+    setBackgroundStorm,
   } = await import("./scenarios");
+  setBackgroundStorm(options.storm ? bridge : null);
   const defaultMode =
     options.crits in CRIT_MODES
       ? (options.crits as keyof typeof CRIT_MODES)

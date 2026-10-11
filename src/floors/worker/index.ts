@@ -167,15 +167,26 @@ export async function loadWorkerSprite(): Promise<HTMLImageElement> {
   );
   spritesLoaded = true;
   // cropped at idle, one per task: the Upgrades dialog's first open did it mid
-  // slide-in
-  for (const getUrl of [getWorkerIconUrl, getManagerIconUrl]) {
-    runWhenIdle(() => {
-      const url = getUrl();
-      if (!url) return;
-      const image = new Image();
-      image.src = url;
-      void image.decode().catch(() => undefined);
-    });
+  // slide-in. The frame is decoded and shrunk off the main thread first:
+  // reading the full sheet back held the main thread ~40ms
+  for (const [sprite, cache] of [
+    [worker, workerIconUrlBySprite],
+    [manager, managerIconUrlBySprite],
+  ] as const) {
+    const { sourceX, sourceW, sourceH, frameW, frameH } = iconFrame(sprite);
+    void createImageBitmap(sprite, sourceX, 0, sourceW, sourceH, {
+      resizeWidth: frameW,
+      resizeHeight: frameH,
+      resizeQuality: "high",
+    })
+      .then((frame) =>
+        runWhenIdle(() => {
+          if (!cache.has(sprite))
+            cache.set(sprite, cropCameraFacingIconUrl(sprite, frame));
+          frame.close();
+        }),
+      )
+      .catch(() => undefined);
   }
   return worker!;
 }
@@ -203,14 +214,26 @@ const ICON_FRAME_H = 160;
 // icon box (see style.css's .worker-menu__icon) then scales this tighter crop up
 // to fill as much of the icon box as its own aspect ratio allows, with nothing
 // cut off — reused by both getWorkerIconUrl and getManagerIconUrl below
-function cropCameraFacingIconUrl(sprite: HTMLImageElement): string {
+function iconFrame(sprite: HTMLImageElement) {
   const sourceW = sprite.naturalWidth / FRAME_COUNT;
   const sourceH = sprite.naturalHeight;
   // the icon shows at 28px: scanning and encoding the full-size frame cost ~40ms
   const scale = Math.min(1, ICON_FRAME_H / sourceH);
-  const frameW = Math.round(sourceW * scale);
-  const frameH = Math.round(sourceH * scale);
-  const sourceX = TURN_FRAMES[0] * sourceW;
+  return {
+    sourceX: TURN_FRAMES[0] * sourceW,
+    sourceW,
+    sourceH,
+    frameW: Math.round(sourceW * scale),
+    frameH: Math.round(sourceH * scale),
+  };
+}
+
+// frame: the pose already cut out and shrunk to the icon frame's size
+function cropCameraFacingIconUrl(
+  sprite: HTMLImageElement,
+  frame?: ImageBitmap,
+): string {
+  const { sourceX, sourceW, sourceH, frameW, frameH } = iconFrame(sprite);
 
   // isolate just this one frame first so the bounding-box scan below only sees
   // its own content, not the sheet's other frames
@@ -219,17 +242,19 @@ function cropCameraFacingIconUrl(sprite: HTMLImageElement): string {
   frameCanvas.height = frameH;
   const frameCtx = frameCanvas.getContext("2d", { willReadFrequently: true })!;
   frameCtx.imageSmoothingQuality = "high";
-  frameCtx.drawImage(
-    sprite,
-    sourceX,
-    0,
-    sourceW,
-    sourceH,
-    0,
-    0,
-    frameW,
-    frameH,
-  );
+  if (frame) frameCtx.drawImage(frame, 0, 0);
+  else
+    frameCtx.drawImage(
+      sprite,
+      sourceX,
+      0,
+      sourceW,
+      sourceH,
+      0,
+      0,
+      frameW,
+      frameH,
+    );
 
   const { data } = frameCtx.getImageData(0, 0, frameW, frameH);
   let minX = frameW;
@@ -336,6 +361,10 @@ interface WalkerState {
 
 interface FloorWorkers {
   walkers: WalkerState[];
+  // the picks and counts last checked for duplicate colors
+  dedupedTints?: number[];
+  dedupedWalkers?: number;
+  dedupedPicks?: number;
 }
 
 // each floor gets its own independent set of walkers, keyed by the floor itself
@@ -435,7 +464,17 @@ function getFloorWorkers(floor: Floor, now: number): FloorWorkers {
   while (tintIndexes.length < state.walkers.length) {
     tintIndexes.push(pickTintIndex(tintIndexes));
   }
-  dedupeTintIndexes(tintIndexes, state.walkers.length);
+  // read every frame: only re-checked once the workers or their picks change
+  if (
+    state.dedupedTints !== tintIndexes ||
+    state.dedupedWalkers !== state.walkers.length ||
+    state.dedupedPicks !== tintIndexes.length
+  ) {
+    dedupeTintIndexes(tintIndexes, state.walkers.length);
+    state.dedupedTints = tintIndexes;
+    state.dedupedWalkers = state.walkers.length;
+    state.dedupedPicks = tintIndexes.length;
+  }
   return state;
 }
 

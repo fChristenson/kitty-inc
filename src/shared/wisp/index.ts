@@ -4,7 +4,12 @@
 // that sends one flitting about, with the playful swoop it flies along
 import { COLOR } from "../../palette";
 import { fadeStops, glowSprite } from "../glowSprite";
-import { beginLightBatch, endLightBatch, queueLight } from "../lightBatch";
+import {
+  beginLightBatch,
+  endLightBatch,
+  lightArgs,
+  queueLightArgs,
+} from "../lightBatch";
 import { hash01, paintTwinkleAt, stampTwinkle } from "../twinkle";
 
 export type Point = { x: number; y: number };
@@ -146,22 +151,18 @@ function stampCell(
   const sx = cell.x - cell.half;
   const sy = cell.y - cell.half;
   const side = cell.half * 2;
-  if (
-    queueLight(
-      ctx,
-      atlas!,
-      sx,
-      sy,
-      side,
-      side,
-      x - r,
-      y - r,
-      r * 2,
-      r * 2,
-      alpha,
-    )
-  )
-    return;
+  lightArgs[0] = sx;
+  lightArgs[1] = sy;
+  lightArgs[2] = side;
+  lightArgs[3] = side;
+  lightArgs[4] = x - r;
+  lightArgs[5] = y - r;
+  lightArgs[6] = r * 2;
+  lightArgs[7] = r * 2;
+  lightArgs[8] = alpha;
+  lightArgs[9] = 1;
+  lightArgs[10] = 0;
+  if (queueLightArgs(ctx, atlas!)) return;
   ctx.globalAlpha = alpha;
   ctx.drawImage(atlas!, sx, sy, side, side, x - r, y - r, r * 2, r * 2);
 }

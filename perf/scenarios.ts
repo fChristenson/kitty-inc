@@ -151,22 +151,39 @@ function every(ms: number, fn: () => void): () => void {
 }
 
 async function measure(name: string, ms: number): Promise<Summary> {
+  // the normal busy state: managers' coin bursts storming under every run
+  const stopStorm =
+    stormBridge && storms === 0 ? burstStorm(stormBridge) : () => {};
   start();
   await sleep(ms);
-  return stop(name);
+  const summary = await stop(name);
+  stopStorm();
+  return summary;
+}
+
+let stormBridge: PerfBridge | null = null;
+let storms = 0;
+// every measured run gets a coin-burst storm under it (null: none)
+export function setBackgroundStorm(bridge: PerfBridge | null): void {
+  stormBridge = bridge;
 }
 
 // coin bursts at three spots on each of the lowest floors, like every
 // manager boosting at once
 function burstStorm(bridge: PerfBridge): () => void {
   let round = 0;
-  return every(250, () => {
+  storms++;
+  const stop = every(250, () => {
     const floors = bridge.getActiveFloors().filter((f) => f.unlocked);
     for (let i = 0; i < Math.min(4, floors.length); i++)
       for (const x of [350, 650, 950])
         spawnCoinBurst(floors[i], x, 520, () => {});
     if (round++ % 8 === 0) applyBoostAll(floors);
   });
+  return () => {
+    storms--;
+    stop();
+  };
 }
 
 const tiers = ["crit", "mega", "ultra"];

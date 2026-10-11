@@ -75,9 +75,20 @@ function normalize(mantissa: number, exponent: number): BigNumber {
 // a normal number into a BigNumber
 export function fromNumber(value: number): BigNumber {
   if (value === 0 || !Number.isFinite(value)) return ZERO;
-  const sign = value < 0 ? -1 : 1;
-  const [mantissaStr, expStr] = Math.abs(value).toExponential(15).split("e");
-  return normalize(sign * Number(mantissaStr), Number(expStr));
+  const abs = Math.abs(value);
+  let e = Math.floor(Math.log10(abs));
+  // in two steps, so 10 ** e never overflows at float64's ends; no strings,
+  // since this runs for every amount drawn every frame
+  const half = Math.trunc(e / 2);
+  let m = abs / 10 ** half / 10 ** (e - half);
+  if (m >= 10) {
+    m /= 10;
+    e += 1;
+  } else if (m < 1) {
+    m *= 10;
+    e -= 1;
+  }
+  return { mantissa: value < 0 ? -m : m, exponent: e };
 }
 
 // lossy escape hatch back to a plain number — for callers that only need a

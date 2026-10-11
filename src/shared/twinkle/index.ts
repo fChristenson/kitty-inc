@@ -4,7 +4,7 @@
 // Rendered once per color and stamped, since trails and glitter draw hundreds
 import { COLOR } from "../../palette";
 import { processWhenIdle } from "../idle";
-import { queueLight } from "../lightBatch";
+import { lightArgs, queueLightArgs } from "../lightBatch";
 
 const SPRITE_HALF = 128;
 const bigSprites = new Map<string, HTMLCanvasElement>();
@@ -177,7 +177,18 @@ export function stampTwinkle(
   const dx = x - size;
   const dy = y - size;
   const ds = size * 2;
-  if (queueLight(ctx, atlas, sx, sy, side, side, dx, dy, ds, ds)) return;
+  lightArgs[0] = sx;
+  lightArgs[1] = sy;
+  lightArgs[2] = side;
+  lightArgs[3] = side;
+  lightArgs[4] = dx;
+  lightArgs[5] = dy;
+  lightArgs[6] = ds;
+  lightArgs[7] = ds;
+  lightArgs[8] = ctx.globalAlpha;
+  lightArgs[9] = 1;
+  lightArgs[10] = 0;
+  if (queueLightArgs(ctx, atlas)) return;
   ctx.drawImage(atlas, sx, sy, side, side, dx, dy, ds, ds);
 }
 

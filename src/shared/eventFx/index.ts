@@ -218,21 +218,19 @@ export function createEventFx(
     ctx.globalCompositeOperation = "lighter";
 
     while (rings.length > 0 && now - rings[0] >= RING_MS) rings.shift();
-    ctx.strokeStyle = color;
     for (const at of rings) {
       const t = (now - at) / RING_MS;
       const eased = 1 - (1 - t) ** 3;
-      ctx.globalAlpha = (1 - t) * 0.9;
-      ctx.lineWidth = 6 * (1 - t) + 1;
-      ctx.beginPath();
-      ctx.arc(
+      const radius = RING_RADIUS[0] + (RING_RADIUS[1] - RING_RADIUS[0]) * eased;
+      const width = 6 * (1 - t) + 1;
+      stampLight(
+        ctx,
+        ringSprite(width / radius, color),
         x,
         y,
-        RING_RADIUS[0] + (RING_RADIUS[1] - RING_RADIUS[0]) * eased,
-        0,
-        Math.PI * 2,
+        radius + width / 2,
+        (1 - t) * 0.9,
       );
-      ctx.stroke();
     }
     ctx.restore();
   }
@@ -335,15 +333,20 @@ const flashSprite = () => glowSprite(FLASH_STOPS);
 // a burst stamps the nearest instead of stroking an arc every frame
 const RING_SPRITE = 512;
 const RING_RATIOS = [0.008, 0.015, 0.03, 0.06, 0.12, 0.25, 0.5];
-const ringSprites: HTMLCanvasElement[] = [];
-function ringSprite(ratio: number): HTMLCanvasElement {
+const ringSprites = new Map<string, HTMLCanvasElement[]>();
+function ringSprite(
+  ratio: number,
+  color: string = COLOR.white,
+): HTMLCanvasElement {
   let k = 0;
   while (
     k < RING_RATIOS.length - 1 &&
     ratio > Math.sqrt(RING_RATIOS[k] * RING_RATIOS[k + 1])
   )
     k++;
-  let sprite = ringSprites[k];
+  let byRatio = ringSprites.get(color);
+  if (!byRatio) ringSprites.set(color, (byRatio = []));
+  let sprite = byRatio[k];
   if (sprite) return sprite;
   sprite = document.createElement("canvas");
   sprite.width = sprite.height = RING_SPRITE;
@@ -351,15 +354,15 @@ function ringSprite(ratio: number): HTMLCanvasElement {
   const half = RING_SPRITE / 2;
   // outer edge at the sprite's edge: radius + width / 2 = half
   const r = half / (1 + RING_RATIOS[k] / 2);
-  c.strokeStyle = COLOR.white;
+  c.strokeStyle = color;
   c.lineWidth = r * RING_RATIOS[k];
   c.beginPath();
   c.arc(half, half, r, 0, Math.PI * 2);
   c.stroke();
-  ringSprites[k] = sprite;
+  byRatio[k] = sprite;
   return sprite;
 }
-processWhenIdle(RING_RATIOS, ringSprite);
+processWhenIdle(RING_RATIOS, (ratio) => ringSprite(ratio));
 
 // a big soft stamp: drawn straight, never queued, since a light batch's cost
 // grows with the area it covers

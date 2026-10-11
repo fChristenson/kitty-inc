@@ -793,13 +793,22 @@ function glyphLayout(
   let layout = byText.get(text);
   if (layout) return layout;
   if (byText.size >= MAX_PENDING_TEXTS) byText.clear();
-  // measured through each letter, so kerning is kept
+  // from cached letter advances: a counting label is a new text every frame
+  let advances = glyphAdvances.get(font);
+  if (!advances) glyphAdvances.set(font, (advances = new Map()));
   layout = new Float32Array(text.length + 1);
-  for (let i = 1; i <= text.length; i++)
-    layout[i] = ctx.measureText(text.slice(0, i)).width;
+  for (let i = 0; i < text.length; i++) {
+    let advance = advances.get(text[i]);
+    if (advance === undefined) {
+      advance = ctx.measureText(text[i]).width;
+      advances.set(text[i], advance);
+    }
+    layout[i + 1] = layout[i] + advance;
+  }
   byText.set(text, layout);
   return layout;
 }
+const glyphAdvances = new Map<string, Map<string, number>>();
 
 // every outline first, then every fill, so no outline covers a neighbour
 function drawGlyphText(

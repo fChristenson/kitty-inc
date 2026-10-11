@@ -6,12 +6,9 @@ import { drawChevronBar, getFullBar, type BarGauge } from "../glossyWidgets";
 // swells slowly then rushes, vibrating faster and faster like a kettle, then
 // bursts light out from its middle and springs back; a long press swells its
 // middle as if about to burst.
-// That warp stamps the bar back in thin vertical slices, each stretched by the
-// bulge there, after redrawing it onto a spare canvas, so only a held bar costs.
 const CYCLE_MS = 1100;
 const BUILD = 0.62;
 const BURST_SHARE = 0.28;
-const BULGE = 0.2;
 const STRETCH_X = 0.025;
 const VIBRATION_PX = 2.5;
 const TEXT_SWELL = 0.12;
@@ -23,13 +20,10 @@ const BOIL_INFLATION = 1.5;
 const BOIL_THROB_MS = 55;
 const BOIL_SHAKE_PX = 1.5;
 const BOIL_FLASH = 0.06;
-// below this the bulge is under a pixel: draw the bar straight
+// below this the swell is under a pixel: draw the bar straight
 const WARP_EPSILON = 0.02;
-const MAX_RES = 2;
-// room around the bar on the spare canvas for its bulging outline
-const PAD_X = 30;
-const PAD_Y = 40;
-const SLICE = 16;
+// how much taller the swell makes it (its middle used to dome this much more)
+const SWELL_Y = 0.14;
 const BEAT_MS = 700;
 const BEAT_STRETCH_X = 0.015;
 const BEAT_STRETCH_Y = 0.14;
@@ -53,26 +47,6 @@ function offsetOf(key: object): number {
     offsets.set(key, offset);
   }
   return offset;
-}
-
-const flatCanvas = document.createElement("canvas");
-const flat = flatCanvas.getContext("2d")!;
-
-// the dome's shape at each slice, 0 at the ends to 1 in the middle: across
-// the spare canvas's padded width, or across a calm bar's own
-const profiles = new Map<number, Float32Array>();
-function domeProfile(w: number): Float32Array {
-  let profile = profiles.get(w);
-  if (!profile) {
-    const count = Math.ceil((w + PAD_X * 2) / SLICE);
-    profile = new Float32Array(count);
-    for (let i = 0; i < count; i++) {
-      const u = Math.min(1, Math.max(0, (i * SLICE - PAD_X) / w));
-      profile[i] = Math.sin(Math.PI * u) ** 1.4;
-    }
-    profiles.set(w, profile);
-  }
-  return profile;
 }
 
 // the swell's glow inside the rim, and the burst's two bands of light (each
@@ -356,57 +330,16 @@ function renderWarped(
     return pose;
   }
 
-  // rendered at the canvas's own scale (capped) so the slices stay sharp
-  const m = ctx.getTransform();
-  const res = Math.min(MAX_RES, Math.max(1, Math.hypot(m.a, m.b)));
-  const totalW = w + PAD_X * 2;
-  const totalH = h + PAD_Y * 2;
-  const pxW = Math.ceil(totalW * res);
-  const pxH = Math.ceil(totalH * res);
-  if (flatCanvas.width !== pxW || flatCanvas.height !== pxH) {
-    flatCanvas.width = pxW;
-    flatCanvas.height = pxH;
-  } else {
-    flat.setTransform(1, 0, 0, 1, 0, 0);
-    flat.clearRect(0, 0, pxW, pxH);
-  }
-  flat.setTransform(res, 0, 0, res, 0, 0);
-  drawChevronBar(
-    flat,
-    key,
-    PAD_X,
-    PAD_Y,
-    w,
-    h,
-    r,
-    fillW,
-    color,
-    now,
-    heat,
-    gauge,
-  );
-  drawLights(flat, PAD_X, PAD_Y, w, h, r, burst, glow);
-
-  const profile = domeProfile(w);
+  // swelled by a transform: a spare canvas redrawn each frame flushed the
+  // game canvas mid-frame
   const cx = x + w / 2 + shakeX;
   const cy = y + h / 2;
-  const stretch = 1 + STRETCH_X * inflation;
-  const bulge = BULGE * inflation;
-  const slicePx = SLICE * res;
-  for (let i = 0; i < profile.length; i++) {
-    const sx = i * SLICE;
-    const sliceH = totalH * (1 + bulge * profile[i]);
-    ctx.drawImage(
-      flatCanvas,
-      sx * res,
-      0,
-      Math.min(slicePx, pxW - sx * res),
-      pxH,
-      cx + (sx - totalW / 2) * stretch,
-      cy - sliceH / 2,
-      SLICE * stretch + 0.6,
-      sliceH,
-    );
-  }
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(1 + STRETCH_X * inflation, 1 + SWELL_Y * inflation);
+  ctx.translate(-x - w / 2, -cy);
+  drawChevronBar(ctx, key, x, y, w, h, r, fillW, color, now, heat, gauge);
+  drawLights(ctx, x, y, w, h, r, burst, glow);
+  ctx.restore();
   return pose;
 }

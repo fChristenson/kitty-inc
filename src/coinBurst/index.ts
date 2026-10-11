@@ -4,7 +4,9 @@ import { createParticlePool, clampedDtSince } from "../shared/particlePool";
 import { prepareSoon } from "../shared/idle";
 import {
   createSpriteTexture,
+  drawCoinLayerSprites,
   drawSprites,
+  isCoinLayerOpen,
   SPRITE_FLOATS,
   type SpriteTexture,
 } from "../shared/spriteBatch";
@@ -92,6 +94,9 @@ export async function loadCoinBurstImages(): Promise<HTMLImageElement> {
 // beginCoinBatch); each frame's texture rect, coins first, then bills
 const SHEET_PAD = 4;
 let sheet: SpriteTexture | null = null;
+let sheetCanvas: HTMLCanvasElement | null = null;
+// the same sheet on the coin layer's own context, made on first use
+let layerSheet: SpriteTexture | null = null;
 const sheetRects = new Float32Array(
   (COIN_SPIN_FRAME_COUNT + BILL_SPIN_FRAME_COUNT) * 4,
 );
@@ -121,6 +126,7 @@ function buildSheet(
     });
   });
   sheet = createSpriteTexture(canvas);
+  sheetCanvas = canvas;
 }
 
 // every frame at every tilt, pre-rotated onto one atlas per sprite, so a
@@ -334,6 +340,10 @@ export function endCoinBatch(ctx: CanvasRenderingContext2D): void {
   if (batchCtx !== ctx) return;
   batchCtx = null;
   if (queued === 0) return;
+  if (isCoinLayerOpen()) {
+    layerSheet ??= createSpriteTexture(sheetCanvas!, true, "coins");
+    if (layerSheet && drawCoinLayerSprites(layerSheet, queue, queued)) return;
+  }
   if (
     queued >= SMALL_BATCH &&
     drawSprites(ctx, sheet!, queue, queued, box[0], box[1], box[2], box[3])

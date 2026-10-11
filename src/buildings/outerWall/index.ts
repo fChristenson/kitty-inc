@@ -89,7 +89,13 @@ export async function loadWallMaterial(): Promise<void> {
     actx.restore();
   }
   fillRegion(leftWallRect.sy, 0, 0, SIDE_WALL_WIDTH, FLOOR_H);
-  fillRegion(rightWallRect.sy, FLOOR_W - SIDE_WALL_WIDTH, 0, SIDE_WALL_WIDTH, FLOOR_H);
+  fillRegion(
+    rightWallRect.sy,
+    FLOOR_W - SIDE_WALL_WIDTH,
+    0,
+    SIDE_WALL_WIDTH,
+    FLOOR_H,
+  );
   fillRegion(topWallRect.sy, 0, 0, FLOOR_W, TOP_WALL_WIDTH);
   fillRegion(dividerRect.sy, 0, FLOOR_H - DIVIDER_H, FLOOR_W, DIVIDER_H);
 
@@ -101,7 +107,13 @@ export async function loadWallMaterial(): Promise<void> {
 // sized to fit within DIVIDER_H) render mounted on top of the divider band, not
 // hidden underneath it
 export function drawOuterWall(ctx: CanvasRenderingContext2D): void {
-  if (wallAtlas && leftWallRect && rightWallRect && topWallRect && dividerRect) {
+  if (
+    wallAtlas &&
+    leftWallRect &&
+    rightWallRect &&
+    topWallRect &&
+    dividerRect
+  ) {
     ctx.drawImage(
       wallAtlas,
       0,

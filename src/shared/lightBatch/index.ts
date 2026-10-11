@@ -9,8 +9,12 @@
 // sparks and wisps' trails in one go instead of a pass (or 2D stamps) each
 import {
   createSpriteTexture,
+  drawOverlaySprites,
   drawSpriteGroups,
+  isOverlayFor,
   SPRITE_FLOATS,
+  compositeOf,
+  transformVersion,
   type SpriteTexture,
 } from "../spriteBatch";
 
@@ -45,11 +49,17 @@ const counts = new Int32Array(MAX_SOURCES);
 const starts = new Int32Array(MAX_SOURCES);
 let data = new Float32Array(SPRITE_FLOATS * 1024);
 const textures = new WeakMap<HTMLCanvasElement, SpriteTexture | null>();
+const overlayTextures = new WeakMap<HTMLCanvasElement, SpriteTexture | null>();
 // the matrix the last stamp straight on a deferred level was queued under
 let loose = -1;
+// ctx's transformVersion when it was
+let looseVersion = -1;
 
 // ctx's transform as a matrix index, reusing the last loose one if unchanged
 function looseMatrix(ctx: CanvasRenderingContext2D): number {
+  const version = transformVersion(ctx);
+  if (loose >= 0 && version >= 0 && version === looseVersion) return loose;
+  looseVersion = version;
   const m = ctx.getTransform();
   if (loose >= 0) {
     const l = matrices[loose];
@@ -163,9 +173,34 @@ export function queueTurnedLight(
   alpha: number,
 ): boolean {
   if (batchCtx !== ctx) return false;
+  lightArgs[0] = sx;
+  lightArgs[1] = sy;
+  lightArgs[2] = sw;
+  lightArgs[3] = sh;
+  lightArgs[4] = dx;
+  lightArgs[5] = dy;
+  lightArgs[6] = dw;
+  lightArgs[7] = dh;
+  lightArgs[8] = alpha;
+  lightArgs[9] = cos;
+  lightArgs[10] = sin;
+  return queueLightArgs(ctx, source);
+}
+
+// the stamp queueLightArgs takes: sx, sy, sw, sh, dx, dy, dw, dh, alpha, cos,
+// sin. A stamp loop running hundreds a frame fills this and calls
+// queueLightArgs: a dozen numbers passed as arguments are each boxed on the
+// heap, which piled up garbage collections
+export const lightArgs = new Float64Array(FIELDS);
+
+export function queueLightArgs(
+  ctx: CanvasRenderingContext2D,
+  source: HTMLCanvasElement,
+): boolean {
+  if (batchCtx !== ctx) return false;
   let matrix = levels[levels.length - 1];
   if (matrix === DEFERRED) {
-    if (ctx.globalCompositeOperation !== "lighter") return false;
+    if (compositeOf(ctx) !== "lighter") return false;
     matrix = looseMatrix(ctx);
   }
   let s = source === lastSource ? lastIndex : sources.indexOf(source);
@@ -181,18 +216,7 @@ export function queueTurnedLight(
   lastSource = source;
   lastIndex = s;
   if (queued === stampSource.length) grow();
-  const o = queued * FIELDS;
-  stamps[o] = sx;
-  stamps[o + 1] = sy;
-  stamps[o + 2] = sw;
-  stamps[o + 3] = sh;
-  stamps[o + 4] = dx;
-  stamps[o + 5] = dy;
-  stamps[o + 6] = dw;
-  stamps[o + 7] = dh;
-  stamps[o + 8] = alpha;
-  stamps[o + 9] = cos;
-  stamps[o + 10] = sin;
+  stamps.set(lightArgs, queued * FIELDS);
   stampMatrix[queued] = matrix;
   stampSource[queued++] = s;
   if (queued === MAX_QUEUED) flush(ctx);
@@ -217,7 +241,10 @@ function flush(ctx: CanvasRenderingContext2D): void {
   if (queued > 0) {
     const composite = ctx.globalCompositeOperation;
     ctx.globalCompositeOperation = "lighter";
-    if (queued < MIN_BATCH || !drawOnGpu(ctx)) stampAll(ctx);
+    // the overlay draws a batch of any size for free; a 2D composite only
+    // pays off past MIN_BATCH stamps
+    if ((queued < MIN_BATCH && !isOverlayFor(ctx)) || !drawOnGpu(ctx))
+      stampAll(ctx);
     ctx.globalCompositeOperation = composite;
   }
   queued = 0;
@@ -289,20 +316,25 @@ function stampAll(ctx: CanvasRenderingContext2D): void {
   ctx.globalAlpha = alpha;
 }
 
-function textureOf(source: HTMLCanvasElement): SpriteTexture | null {
-  let texture = textures.get(source);
+function textureOf(
+  source: HTMLCanvasElement,
+  onOverlay: boolean,
+): SpriteTexture | null {
+  const cache = onOverlay ? overlayTextures : textures;
+  let texture = cache.get(source);
   if (texture === undefined) {
     // sampled like drawImage samples it: no mipmaps
-    texture = createSpriteTexture(source, false);
-    textures.set(source, texture);
+    texture = createSpriteTexture(source, false, onOverlay);
+    cache.set(source, texture);
   }
   return texture;
 }
 
 function drawOnGpu(ctx: CanvasRenderingContext2D): boolean {
+  const onOverlay = isOverlayFor(ctx);
   const groups = sources.length;
   for (let s = 0; s < groups; s++) {
-    const texture = textureOf(sources[s]);
+    const texture = textureOf(sources[s], onOverlay);
     if (!texture) return false;
     sheets[s] = texture;
     counts[s] = 0;
@@ -365,16 +397,18 @@ function drawOnGpu(ctx: CanvasRenderingContext2D): boolean {
     if (y - ey < top) top = y - ey;
     if (y + ey > bottom) bottom = y + ey;
   }
-  return drawSpriteGroups(
-    ctx,
-    sheets,
-    counts,
-    groups,
-    data,
-    left,
-    top,
-    right,
-    bottom,
-    true,
-  );
+  return isOverlayFor(ctx)
+    ? drawOverlaySprites(sheets, counts, groups, data)
+    : drawSpriteGroups(
+        ctx,
+        sheets,
+        counts,
+        groups,
+        data,
+        left,
+        top,
+        right,
+        bottom,
+        true,
+      );
 }

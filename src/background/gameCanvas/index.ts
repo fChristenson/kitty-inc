@@ -71,6 +71,15 @@ import {
 import { getEffectiveDpr } from "../../shared/devicePixelRatio";
 import { drawRippleWarp } from "../../shared/rippleWarp";
 import {
+  attachCoinLayer,
+  attachLightOverlay,
+  beginLightFrame,
+  endLightFrame,
+  layOver,
+  openCoinLayer,
+  trackLightCanvas,
+} from "../../shared/spriteBatch";
+import {
   isScreenFrozen,
   getFreezeButton,
   isTotalSpotlit,
@@ -208,6 +217,18 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     onOpenCorporationStats,
   } = deps;
   const ctx = canvas.getContext("2d")!;
+  // stacked: the world, its coins (a WebGL layer), then the HUD, flash and
+  // spawns, then additive light; a frozen frame draws it all on the world's
+  attachLightOverlay(canvas);
+  const topCanvas = document.createElement("canvas");
+  topCanvas.className = "game__top";
+  topCanvas.setAttribute("aria-hidden", "true");
+  canvas.after(topCanvas);
+  const topCtx = topCanvas.getContext("2d")!;
+  layOver(canvas, topCanvas);
+  trackLightCanvas(topCtx);
+  attachCoinLayer(canvas);
+  let topDrawn = false;
 
   let scale = 1; // world units -> CSS px
   let cssW = 0;
@@ -355,6 +376,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     const dpr = getEffectiveDpr();
     canvas.width = Math.round(cssW * dpr);
     canvas.height = Math.round(cssH * dpr);
+    topCanvas.width = canvas.width;
+    topCanvas.height = canvas.height;
+    topDrawn = false;
     clampCamera();
   }
 
@@ -580,11 +604,21 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // (derived from cssW), so drawing anything against a zero/invalid size produces
     // non-finite coordinates and throws (e.g. inside createLinearGradient)
     if (cssW <= 0 || cssH <= 0) return;
+    beginLightFrame(true);
+    try {
+      drawFrame();
+    } finally {
+      endLightFrame();
+    }
+  }
+
+  function drawFrame(): void {
     if (!isScreenFrozen()) {
       frozenFrame = null;
-      drawLiveFrame();
+      drawLiveFrame(false, false, true);
       return;
     }
+    clearTop();
     const dpr = getEffectiveDpr();
     if (
       !frozenFrame ||
@@ -738,7 +772,26 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     return result;
   }
 
-  function drawLiveFrame(skipHud = false, skipFlash = false): void {
+  // the sky gradient, rebuilt only when the camera moves
+  let skyGradient: CanvasGradient | null = null;
+  let skyGroundY = NaN;
+  let skySpaceY = NaN;
+  let skyColor = "";
+
+  function clearTop(): void {
+    if (!topDrawn) return;
+    topCtx.setTransform(1, 0, 0, 1, 0, 0);
+    topCtx.clearRect(0, 0, topCanvas.width, topCanvas.height);
+    topDrawn = false;
+  }
+
+  // split: the world's coins on the coin layer, everything after them on the
+  // top canvas; otherwise all of it on the world's canvas (a freeze's capture)
+  function drawLiveFrame(
+    skipHud = false,
+    skipFlash = false,
+    split = false,
+  ): void {
     updateMouse(onScreenFloors, Date.now());
     updateBubbles(performance.now());
     updateWispSpawn(performance.now());
@@ -767,11 +820,21 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     const spaceScreenY = -STAR_START_ALTITUDE - viewportTopY();
     const cityTopFrac = Math.min(CITY_MAX_HEIGHT / STAR_START_ALTITUDE, 1);
     const skyColorGround = getCitySkyGroundColor();
-    const sky = ctx.createLinearGradient(0, groundScreenY, 0, spaceScreenY);
-    sky.addColorStop(0, skyColorGround);
-    sky.addColorStop(cityTopFrac, skyColorGround);
-    sky.addColorStop(1, SKY_COLOR_SPACE);
-    ctx.fillStyle = sky;
+    if (
+      !skyGradient ||
+      skyGroundY !== groundScreenY ||
+      skySpaceY !== spaceScreenY ||
+      skyColor !== skyColorGround
+    ) {
+      skyGradient = ctx.createLinearGradient(0, groundScreenY, 0, spaceScreenY);
+      skyGradient.addColorStop(0, skyColorGround);
+      skyGradient.addColorStop(cityTopFrac, skyColorGround);
+      skyGradient.addColorStop(1, SKY_COLOR_SPACE);
+      skyGroundY = groundScreenY;
+      skySpaceY = spaceScreenY;
+      skyColor = skyColorGround;
+    }
+    ctx.fillStyle = skyGradient;
     ctx.fillRect(0, 0, SLOT_W, contentViewportH());
 
     // everything below is the shared vertical camera transform — ground/clouds/
@@ -788,13 +851,27 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     drawWorldClouds(performance.now());
     drawActiveFloors();
 
-    if (hasActiveCoins())
+    if (hasActiveCoins()) {
+      openCoinLayer(split);
       drawCoins(ctx, getFloorRect, {
         x: SLOT_W / 2,
         y: viewportTopY() + HUD_H / 2,
       });
+      openCoinLayer(false);
+    }
 
     ctx.restore();
+
+    let over = ctx;
+    if (split) {
+      over = topCtx;
+      topCtx.setTransform(1, 0, 0, 1, 0, 0);
+      topCtx.clearRect(0, 0, topCanvas.width, topCanvas.height);
+      topCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      topCtx.translate(shake.x, shake.y);
+      topCtx.scale(scale, scale);
+      topDrawn = true;
+    }
 
     // the total-income text is the absolute top layer: no reserved band, no fill
     // behind it, just floating text drawn last in plain screen space so nothing can
@@ -802,34 +879,34 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // height varies (a unit-name line only appears once the total is big enough),
     // so the actual bottom edge is captured for the HUD tap-zone hit-test below
     // instead of guessing a fixed height
-    if (!skipHud) hudBottomY = drawHud(ctx, SLOT_W, getTotalIncome());
+    if (!skipHud) hudBottomY = drawHud(over, SLOT_W, getTotalIncome());
     // the flash holds still while the world rattles: its huge rays judder otherwise
-    ctx.translate(-shake.x / scale, -shake.y / scale);
+    over.translate(-shake.x / scale, -shake.y / scale);
     if (!skipFlash)
       drawCritFlash(
-        ctx,
+        over,
         SLOT_W / 2,
         contentViewportH() / 2,
         SLOT_W,
         Date.now(),
       );
     // the bubbles float over the crit celebration, rattling with the world
-    ctx.translate(shake.x / scale, shake.y / scale);
+    over.translate(shake.x / scale, shake.y / scale);
     drawWispSpawn(
-      ctx,
+      over,
       SLOT_W,
       contentViewportH(),
       HUD_H / 2,
       performance.now(),
     );
     drawCoinSpawn(
-      ctx,
+      over,
       SLOT_W,
       contentViewportH(),
       HUD_H / 2,
       performance.now(),
     );
-    drawBubbles(ctx, SLOT_W, contentViewportH(), performance.now());
+    drawBubbles(over, SLOT_W, contentViewportH(), performance.now());
     ctx.restore();
   }
 
