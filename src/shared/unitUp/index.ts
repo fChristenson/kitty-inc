@@ -1,9 +1,9 @@
 // Unit up: the first time ever the total reaches a new unit (Million,
 // Billion, ...), its unit word turns into a slot reel between two gold rims
 // and spins through the units, braking hard, each word clicking past with a
-// jolt, round three times till it stops on the new one and slams in gold in a
-// cluster of blasts; coins swing up into the amount, which then pays a share
-// of itself (the game's own payout, set with setUnitUpPayout). Drawn by
+// jolt, round three times till it stops on the new one in gold; coins swing
+// up into the amount, which pays a share of itself (the game's own payout,
+// set with setUnitUpPayout) and slams like an event's total. Drawn by
 // shared/totalIncomeReadout in place of its unit word
 import { COLOR } from "../../palette";
 import { illionName } from "../../utils";
@@ -18,13 +18,16 @@ import { playCoinDrop } from "../../sound";
 import { drawBeam } from "../beam";
 import { clamp01 } from "../easing";
 import { createBeats, type Beats } from "../eventBeats";
-import { drawSlamText, SLAM_GOLD } from "../eventEndSlam";
-import { drawDetonation } from "../explosion";
-import { playBarExplosion, playSlamExplosion } from "../explosionBang";
+import {
+  drawSlamText,
+  GLOBAL_SLAM,
+  SLAM_GOLD,
+  triggerEventEndSlam,
+} from "../eventEndSlam";
 import { drawGlow, fadeStops } from "../glowSprite";
 import { kickShake } from "../screenShake";
 import { pulseHudTotalFlash, triggerHudTotalFlash } from "../totalIncomeCoins";
-import { hash01, stampGlimmer } from "../twinkle";
+import { hash01 } from "../twinkle";
 import type { Point } from "../wisp";
 
 // the highest unit tier the total has ever shown (0 = none), for good
@@ -60,31 +63,17 @@ const GOLD_FADE_MS = 500;
 const GLOW = fadeStops(COLOR.heavenlyGold);
 const GLOW_R = 7;
 const GLOW_SQUASH = 0.45;
-// the landing: one huge blast, then a cluster along the word
-const LAND_BLAST = 420;
-const CLUSTER_GAP_MS = 45;
-const CLUSTER = [
-  { dx: -130, size: 170 },
-  { dx: 130, size: 170 },
-  { dx: -260, size: 170 },
-  { dx: 260, size: 170 },
-];
-const SPLAT = 22;
-const SPLAT_MS = 500;
-const SPLAT_REACH = 520;
-const SPLAT_SIZE = 60;
 // coins flung out of the word, swinging round up into the amount
 const COINS = 36;
 const COIN_EVERY_MS = 20;
 const COIN_FLY_MS = 460;
 const PAY_AT = SPIN_MS + 120;
 const PAID_AT = PAY_AT + (COINS - 1) * COIN_EVERY_MS + COIN_FLY_MS;
-const END_MS = PAID_AT + 400;
-// shakes: a click (growing), the landing, a cluster blast, the payout
+// the slam that follows is the readout's own
+const END_MS = PAID_AT;
+// shakes: a click (growing), and the reel stopping
 const TICK_KICK: [number, number] = [0.1, 0.35];
-const LAND_KICK = 2;
-const BLAST_KICK = 0.5;
-const PAID_KICK = 0.6;
+const LAND_KICK = 0.5;
 
 const reelAt = (ms: number): number =>
   STOP * (1 - (1 - clamp01(ms / SPIN_MS)) ** 3);
@@ -103,17 +92,12 @@ const TICKS: number[] = [];
 
 interface Beat {
   at: number;
-  kind: "tick" | "land" | "blast" | "coin" | "paid";
+  kind: "tick" | "land" | "coin" | "paid";
   index: number;
 }
 const BEATS: Beat[] = [
   ...TICKS.map((at, index) => ({ at, kind: "tick" as const, index })),
   { at: SPIN_MS, kind: "land", index: 0 },
-  ...CLUSTER.map((_, index) => ({
-    at: SPIN_MS + (index + 1) * CLUSTER_GAP_MS,
-    kind: "blast" as const,
-    index,
-  })),
   ...Array.from({ length: COINS }, (_, index) => ({
     at: PAY_AT + index * COIN_EVERY_MS + COIN_FLY_MS,
     kind: "coin" as const,
@@ -140,14 +124,6 @@ const COIN_BACK_Y = 420;
 const COIN_SCALE = 0.6;
 // a burst coin's spin is in ~16.67ms ticks
 const TICK_MS = 1000 / 60;
-const SPLAT_ANGLE = Array.from(
-  { length: SPLAT },
-  (_, i) => hash01(i, 4) * Math.PI * 2,
-);
-const SPLAT_REACHES = Array.from(
-  { length: SPLAT },
-  (_, i) => SPLAT_REACH * (0.4 + 0.6 * hash01(i, 5)),
-);
 
 interface Run {
   startedAt: number;
@@ -190,19 +166,15 @@ function fireBeat(beat: Beat): void {
     }
     case "land":
       kickShake(LAND_KICK, now);
-      playSlamExplosion();
-      break;
-    case "blast":
-      kickShake(BLAST_KICK, now);
-      playBarExplosion(1 + 0.1 * beat.index);
+      playCoinDrop();
       break;
     case "coin":
       pulseHudTotalFlash();
       break;
     case "paid":
-      kickShake(PAID_KICK, now);
-      triggerHudTotalFlash();
       payout?.();
+      triggerHudTotalFlash();
+      triggerEventEndSlam(GLOBAL_SLAM, "total");
       break;
   }
 }
@@ -352,12 +324,12 @@ export function drawUnitUp(
 ): boolean {
   if (!run) return false;
   const ms = Date.now() - run.startedAt;
+  const now = performance.now();
+  run.beats.tick(ms, now);
   if (ms >= END_MS) {
     run = null;
     return false;
   }
-  const now = performance.now();
-  run.beats.tick(ms, now);
   const y = top + height / 2;
   const row = height * ROW;
   const landed = ms >= SPIN_MS;
@@ -421,37 +393,6 @@ export function drawUnitUp(
   ctx.restore();
 
   if (landed) {
-    spot.x = x;
-    spot.y = y;
-    drawDetonation(ctx, spot, since, LAND_BLAST, now);
-    for (let k = 0; k < CLUSTER.length; k++) {
-      spot.x = x + CLUSTER[k].dx;
-      drawDetonation(
-        ctx,
-        spot,
-        since - (k + 1) * CLUSTER_GAP_MS,
-        CLUSTER[k].size,
-        now,
-      );
-    }
-    if (since < SPLAT_MS) {
-      const u = since / SPLAT_MS;
-      const out = 1 - (1 - u) ** 3;
-      ctx.save();
-      ctx.globalCompositeOperation = "lighter";
-      for (let i = 0; i < SPLAT; i++) {
-        const reach = SPLAT_REACHES[i] * out;
-        stampGlimmer(
-          ctx,
-          x + Math.cos(SPLAT_ANGLE[i]) * reach,
-          y + Math.sin(SPLAT_ANGLE[i]) * reach * 0.5,
-          SPLAT_SIZE * (1 - u),
-          i,
-          COLOR.heavenlyGold,
-        );
-      }
-      ctx.restore();
-    }
     spot.x = x;
     spot.y = y;
     drawCoins(ctx, run, spot, amountAt, ms);

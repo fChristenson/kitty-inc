@@ -17,6 +17,7 @@ import { drawTargetStream, getTargetTension } from "../eventFx";
 import { drawUnitUp, noteUnitTier } from "../unitUp";
 import {
   drawNewDigit,
+  drawNewDigitPop,
   newDigitHideIndex,
   noteTotalExponent,
 } from "../newDigit";
@@ -153,6 +154,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       }
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
+      drawNewDigitPop(ctx);
       drawSlamText(
         ctx,
         slam,

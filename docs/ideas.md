@@ -36,4 +36,4 @@ Still small moments in what's on screen, each a little surprise that only pays.
 
 - **Hold tally** (`src/floors/holdTally`, started and ended by gameCanvas's upgrade-button hold): letting go of a long-press buy (held 0.5s+) rattles the floor's bar with a gold flash per hundred levels the hold gave (up to ten), then the bar does the jackpot slam and lands with `+N Lvl` in gold.
 
-- **Unit up** (`src/shared/unitUp`, drawn by `shared/totalIncomeReadout`): the first time ever the total reaches a unit, its unit word spins as a slot reel between gold rims, clicking and braking, three times round onto the new unit, slamming in gold in a cluster of blasts; coins swing up into the total, which pays `CONFIG.unitUp.payShare` of itself. Test: New Effects "Unit Up".
+- **Unit up** (`src/shared/unitUp`, drawn by `shared/totalIncomeReadout`): the first time ever the total reaches a unit, its unit word spins as a slot reel between gold rims, clicking and braking, three times round onto the new unit in gold; coins swing up into the total, which pays `CONFIG.unitUp.payShare` of itself and slams like an event's total. Test: New Effects "Unit Up".

@@ -75,7 +75,7 @@ export function newDigitHideIndex(now: number): number {
 }
 
 // the falling digit over the amount (drawn at x, top, its letters height
-// tall, with ctx's font and textAlign), and its pop of coins
+// tall, with ctx's font and textAlign)
 export function drawNewDigit(
   ctx: CanvasRenderingContext2D,
   amount: string,
@@ -87,6 +87,10 @@ export function drawNewDigit(
 ): void {
   if (startedAt !== null && amount.length > INDEX)
     drawDigit(ctx, amount, x, top, height, strokeWidth, now);
+}
+
+// its pop of coins, drawn before the amount so they never hide it
+export function drawNewDigitPop(ctx: CanvasRenderingContext2D): void {
   pops.draw(ctx, performance.now());
 }
 
