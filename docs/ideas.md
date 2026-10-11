@@ -39,14 +39,12 @@ More little surprises in what's already on screen, each one only paying.
 
 ## Built
 
-- **Matching digits** (`src/shared/matchingDigits`, drawn by `shared/totalIncomeReadout`): any group of three between the total's commas newly showing the same digit (444, 777) jumps out digit by digit in gold, silently (no sound, shake or burst), and pays `CONFIG.matchingDigits.payShare` of the total (then a 4s quiet spell). Test: New Effects "Matching Digits" (the next change plays its last group as 777).
+- **Matching digits** (`src/shared/matchingDigits`, drawn by `shared/totalIncomeReadout`): any group of three between the total's commas newly showing the same digit (444, 777) puts its digits one by one through a text effect picked at random from `shared/textAnimations` in gold, silently (no sound, shake or burst), and pays `CONFIG.matchingDigits.payShare` of the total (then a 4s quiet spell). Test: New Effects "Matching Digits" (the next change plays its last group as 777).
 
-- **New digit** (`src/shared/newDigit`, drawn by `shared/totalIncomeReadout`): the first time ever the total grows a digit, its new leading digit drops in from above in gold, lands with a pop of coins (no shake) and cools back to green (a digit that starts a new unit plays Unit up instead). Test: New Effects "New Digit".
+- **New digit** (`src/shared/newDigit`, drawn by `shared/totalIncomeReadout`): the first time ever the total grows a digit, its new leading digit puts on a text effect picked at random from `shared/textAnimations` in gold, lands with a pop of coins (no shake) and cools back to green (a digit that starts a new unit plays Unit up instead). Test: New Effects "New Digit".
 
 - **Gold standard** (`floors/incomePanel`): a floor at the level cap gets a coin-gold bar with gloss slashes and gold glimmers twinkling calmly over it.
 
-- **Lucky sevens** (`src/floors/luckySevens`, drawn by `floors/star`): a floor's label reaching any level with a 7 in it (by any means) sends each 7 in turn flying up out of the number half as big again, spinning seven times round its upright axis, then slamming back in gold in a burst of glitter before cooling back to its usual colour (no shake, jackpot or total flash); the floor pays out once per 7. Test: New Effects "Lucky Sevens".
-
-- **Hold tally** (`src/floors/holdTally`, started and ended by gameCanvas's upgrade-button hold): letting go of a long-press buy (held 0.5s+) squeezes the floor's bar and bursts `+N Lvl` out of it, twirling up in gold, with no slam, bang or shake.
+- **Lucky sevens** (`src/floors/luckySevens`, drawn by `floors/star`): a floor's label reaching any level with a 7 in it (by any means) sends each 7 in turn through a text effect picked at random from `shared/textAnimations`, landing back in gold in a burst of glitter before cooling back to its usual colour (no shake, jackpot or total flash); the floor pays out once per 7. Test: New Effects "Lucky Sevens".
 
 - **Unit up** (`src/shared/unitUp`, drawn by `shared/totalIncomeReadout`): the first time ever the total reaches a unit, its unit word spins as a slot reel between gold rims, clicking and braking, three times round onto the new unit in gold (no shakes); 0.1s later the total pays `CONFIG.unitUp.payShare` of itself and slams like an event's total. Test: New Effects "Unit Up".

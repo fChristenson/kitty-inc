@@ -176,7 +176,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         matchAt >= 0 ? matchAt : newDigitHideIndex(now),
         matchAt >= 0 ? 3 : 1,
       );
-      drawNewDigit(ctx, amount, centerX, top, amountHeight, strokeWidth, now);
+      drawNewDigit(ctx, amount, centerX, top, amountHeight, strokeWidth);
       drawMatchingDigits(ctx, amount, centerX, top, amountHeight, strokeWidth);
 
       if (remeasure) {

@@ -1,9 +1,9 @@
 // a random spawn's prize and its payout once tapped, shared by every random
 // spawn (src/spawn/bubbles): a coin flips up into the total, a crit
-// number flies up, swells and lands in its floor's income bar (its levels)
-// or one of the floor's workers (a perma tier up), and a badge plays its crit
-// celebration. The spawn keeps the Payout and draws it each frame until it's
-// done
+// number flies on a flight picked at random (shared/floatingText) into its
+// floor's income bar (its levels) or one of the floor's workers (a perma tier
+// up), and a badge plays its crit celebration. The spawn keeps the Payout and
+// draws it each frame until it's done
 import {
   CRIT_TIER_CONFIG,
   eventProcContext,
@@ -27,24 +27,20 @@ import { isFloorMaxed, type Floor } from "../../gameState";
 import { addTotalIncome } from "../../totalIncome";
 import { playBloop, playSold } from "../../sound";
 import { drawCoinFlip, startCoinFlip, type CoinFlip } from "../coinFlip";
-import { bezier } from "../curves";
-import { easeIn, easeOut, lerp, progress } from "../easing";
+import {
+  applyFloatPose,
+  createFloatPose,
+  pickFloatEffect,
+  type FloatEffect,
+} from "../floatingText";
 import { wiggleHudTotal } from "../totalIncomeCoins";
 import { drawWispTrail, WISP_TRAIL_MS, type Point } from "../wisp";
 import { drawMini, type Prize } from "./minis";
 
 export { drawMini, prepareMini, type Prize } from "./minis";
 
-// a crit number flies up off its spot, swelling to SMASH_SIZE, and lands on
-// its floor's bar SMASH_MS after the tap
-const SMASH_MS = 340;
-const SMASH_ARC = 360;
-const SMASH_SIZE = 340;
-// of the flight spent swelling before it lands
-const SMASH_SWELL = 0.55;
 const TRAIL_SIZE = 30;
-// a number is done once its trail has faded
-const SMASH_DONE_MS = SMASH_MS + WISP_TRAIL_MS;
+const pose = createFloatPose();
 
 export interface PrizeOdds {
   tier: number;
@@ -89,9 +85,11 @@ export interface Payout {
   floor: Floor;
   // performance.now() it was tapped, and the spot it was tapped at
   at: number;
-  // a crit number's flight onto its target (screen units, kept up to date
-  // each frame), and whether it has landed
+  // a crit number's flight from where it was tapped onto its target (screen
+  // units, the target kept up to date each frame), and whether it has landed
+  from: Point;
   bar: Point;
+  flight: FloatEffect | null;
   smash: (at: number) => Point | null;
   // the worker a crit number promotes instead of its floor's bar, or -1
   worker: number;
@@ -175,7 +173,9 @@ export function collectPrize(
     prize,
     floor: target,
     at: now,
+    from: { ...from },
     bar: { x: 0, y: 0 },
+    flight: null,
     smash: () => null,
     worker: -1,
     size,
@@ -194,17 +194,18 @@ export function collectPrize(
       ),
     );
   else {
-    const start = { ...from };
-    const bend = { x: 0, y: 0 };
+    const effect = pickFloatEffect();
+    const trail = createFloatPose();
     const at = { x: 0, y: 0 };
-    const { bar } = payout;
+    payout.flight = effect;
     payout.worker = pickWorker(deps, target, height, workerChance);
     targetOnScreen(deps, payout, height);
     payout.smash = (t) => {
-      if (t < now || t > now + SMASH_MS) return null;
-      bend.x = (start.x + bar.x) / 2;
-      bend.y = Math.min(start.y, bar.y) - SMASH_ARC;
-      return bezier(start, bend, bar, progress(t, now, SMASH_MS) ** 1.6, at);
+      if (t < now || t > now + effect.ms) return null;
+      effect.pose(t - now, payout.from, payout.bar, trail);
+      at.x = trail.x;
+      at.y = trail.y;
+      return at;
     };
   }
   return payout;
@@ -250,7 +251,8 @@ function smashIn(deps: FloorActionsDeps, payout: Payout): void {
 // whether a payout has finished playing
 export function isPayoutDone(payout: Payout, now: number): boolean {
   if (payout.flip) return payout.flip.landed;
-  return payout.prize.kind !== "tier" || now >= payout.at + SMASH_DONE_MS;
+  // a number is done once its trail has faded
+  return !payout.flight || now >= payout.at + payout.flight.ms + WISP_TRAIL_MS;
 }
 
 // a coin flipping up into the total, or a crit number flying up, swelling,
@@ -270,21 +272,17 @@ export function drawPayout(
     drawCoinFlip(ctx, flip, t, payout.bar, () => landCoin(deps, floor));
     return;
   }
-  if (payout.prize.kind !== "tier") return;
+  const { flight } = payout;
+  if (payout.prize.kind !== "tier" || !flight) return;
   targetOnScreen(deps, payout, height);
-  const hitAt = payout.at + SMASH_MS;
+  const hitAt = payout.at + flight.ms;
   drawWispTrail(ctx, payout.smash, t, now, TRAIL_SIZE);
   if (t < hitAt) {
-    const at = payout.smash(t);
-    const u = progress(t, payout.at, SMASH_MS);
-    const size =
-      u < SMASH_SWELL
-        ? lerp([payout.size, SMASH_SIZE], easeOut(u / SMASH_SWELL))
-        : lerp(
-            [SMASH_SIZE, payout.size],
-            easeIn((u - SMASH_SWELL) / (1 - SMASH_SWELL)),
-          );
-    if (at) drawMini(ctx, payout.prize, at.x, at.y, size);
+    flight.pose(t - payout.at, payout.from, payout.bar, pose);
+    ctx.save();
+    applyFloatPose(ctx, pose);
+    drawMini(ctx, payout.prize, 0, 0, payout.size);
+    ctx.restore();
     return;
   }
   if (!payout.hit) {

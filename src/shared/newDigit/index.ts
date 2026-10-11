@@ -1,31 +1,38 @@
 // New digit: the first time ever the total grows a digit (99,999 to 100,000),
-// its new leading digit drops in from above in gold (shared/textAnimations'
-// dropIn), lands with a pop of coins, then cools back to green. A digit that
-// comes with a new unit leaves it to shared/unitUp. Drawn by
-// shared/totalIncomeReadout over its amount
+// its new leading digit puts on a text effect picked at random
+// (shared/textAnimations) in gold, lands with a pop of coins, then cools back
+// to green. A digit that comes with a new unit leaves it to shared/unitUp.
+// Drawn by shared/totalIncomeReadout over its amount
 import { COLOR } from "../../palette";
 import { createCoinBurstPool } from "../../coinBurst";
 import { playCoinDrop, playNotification } from "../../sound";
 import { slamTextLetterCenter } from "../eventEndSlam";
-import { drawGlow, fadeStops } from "../glowSprite";
-import { createLetterPose, drawLetter, dropIn } from "../textAnimations";
+import {
+  drawLetterShow,
+  startLetterShow,
+  type LetterShow,
+  type LetterStyle,
+} from "../textAnimations";
 
 // the most digits the total has ever shown, as its power of ten, for good
 const STORAGE_KEY = "cash-clicker:new-digit-top";
 // the leading digit, after the "$"
 const INDEX = 1;
-const EFFECT = dropIn;
-const END_MS = EFFECT.ms;
-const GLOW = fadeStops(COLOR.heavenlyGold);
-const GLOW_R = 2.2;
+const LETTER: readonly number[] = [0];
 // the pop: the game's own coin burst, shrunk to the digit
 const POP_SCALE = 0.6;
 const pops = createCoinBurstPool(120);
-const pose = createLetterPose();
+const style: LetterStyle = {
+  fill: COLOR.moneyGreen,
+  stroke: COLOR.white,
+  strokeWidth: 0,
+  tabular: true,
+};
+// where the digit sits, for its pop
+const spot = { x: 0, y: 0 };
 
 let topExponent: number | null = null;
-let startedAt: number | null = null;
-let landed = false;
+let show: LetterShow | null = null;
 
 function readTop(): number | null {
   const stored = localStorage.getItem(STORAGE_KEY);
@@ -55,8 +62,14 @@ export function noteTotalExponent(exponent: number): void {
   saveTop(exponent);
   if (startsUnit(exponent)) return;
   playNotification();
-  startedAt = Date.now();
-  landed = false;
+  show = startLetterShow(LETTER, {
+    staggerMs: 0,
+    burst: "none",
+    onLand: () => {
+      playCoinDrop();
+      pops.spawn(spot.x, spot.y, POP_SCALE);
+    },
+  });
 }
 
 // the test button: forgets every digit past `exponent`
@@ -64,12 +77,12 @@ export function setNewDigitRecord(exponent: number): void {
   saveTop(exponent);
 }
 
-// the amount's letter the falling digit stands in for, or -1
+// the amount's letter the new digit stands in for, or -1
 export function newDigitHideIndex(now: number): number {
-  return startedAt !== null && now - startedAt < END_MS ? INDEX : -1;
+  return show && now - show.startedAt < show.ms ? INDEX : -1;
 }
 
-// the falling digit over the amount (drawn at x, top, its letters height
+// the new digit's show over the amount (drawn at x, top, its letters height
 // tall, with ctx's font and textAlign)
 export function drawNewDigit(
   ctx: CanvasRenderingContext2D,
@@ -78,55 +91,16 @@ export function drawNewDigit(
   top: number,
   height: number,
   strokeWidth: number,
-  now: number,
 ): void {
-  if (startedAt !== null && amount.length > INDEX)
-    drawDigit(ctx, amount, x, top, height, strokeWidth, now);
+  if (!show || amount.length <= INDEX) return;
+  spot.x = slamTextLetterCenter(ctx, amount, INDEX, x, true);
+  spot.y = top + height / 2;
+  style.strokeWidth = strokeWidth;
+  if (!drawLetterShow(ctx, show, amount, INDEX, x, top, height, style))
+    show = null;
 }
 
 // its pop of coins, drawn before the amount so they never hide it
 export function drawNewDigitPop(ctx: CanvasRenderingContext2D): void {
   pops.draw(ctx, performance.now());
-}
-
-function drawDigit(
-  ctx: CanvasRenderingContext2D,
-  amount: string,
-  x: number,
-  top: number,
-  height: number,
-  strokeWidth: number,
-  now: number,
-): void {
-  const ms = now - startedAt!;
-  if (ms >= END_MS) {
-    startedAt = null;
-    return;
-  }
-  const cx = slamTextLetterCenter(ctx, amount, INDEX, x, true);
-  const cy = top + height / 2;
-  if (!landed && ms >= EFFECT.landMs) {
-    landed = true;
-    playCoinDrop();
-    pops.spawn(cx, cy, POP_SCALE);
-  }
-  EFFECT.pose(ms, amount[INDEX], pose);
-
-  ctx.save();
-  ctx.globalCompositeOperation = "lighter";
-  ctx.globalAlpha = 0.5 * pose.gold;
-  drawGlow(ctx, GLOW, cx, cy + pose.dy * height, height * GLOW_R * pose.sy);
-  ctx.restore();
-
-  drawLetter(
-    ctx,
-    pose,
-    cx,
-    cy,
-    height,
-    COLOR.moneyGreen,
-    COLOR.white,
-    strokeWidth,
-    true,
-  );
 }

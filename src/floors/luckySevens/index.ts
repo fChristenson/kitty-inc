@@ -1,45 +1,44 @@
 // Lucky sevens: a floor's label reaching any level with a 7 in it puts each 7,
-// one after another, through a text effect (shared/textAnimations), slamming
-// back in gold in a burst of glitter before cooling to its usual colour; the
-// floor pays out once for every 7. Drawn by floors/star in place of its label
+// one after another, through a text effect picked at random
+// (shared/textAnimations), landing back in gold in a burst of glitter before
+// cooling to its usual colour; the floor pays out once for every 7. Drawn by
+// floors/star in place of its label
 import type { Floor } from "../../gameState";
 import { COLOR } from "../../palette";
 import { addTotalIncome } from "../../totalIncome";
 import { playCoinDrop, playSwoosh } from "../../sound";
 import { multiply } from "../../shared/bigNumber";
-import { createBeats, type Beats } from "../../shared/eventBeats";
-import { drawSlamText, slamTextLetterCenter } from "../../shared/eventEndSlam";
 import {
-  createLetterPose,
-  drawGlitterBurst,
-  drawLetter,
-  flipSlam,
+  drawLettersExcept,
+  drawLetterShow,
+  startLetterShow,
+  type LetterShow,
+  type LetterStyle,
 } from "../../shared/textAnimations";
 import { rewardPayoutAmount } from "../incomePanel";
 import { isHoldingUpgrade } from "../holdTally";
 
-const EFFECT = flipSlam;
 // each 7 starts STAGGER_MS after the one before
 const STAGGER_MS = 300;
 const STROKE = 5;
-const pose = createLetterPose();
+const style: LetterStyle = {
+  fill: COLOR.white,
+  stroke: COLOR.black,
+  strokeWidth: STROKE,
+  tabular: false,
+};
 
 interface Run {
-  startedAt: number;
   text: string;
-  // the label's letters that are 7s, left to right
-  sevenAt: number[];
-  beats: Beats<number>;
+  show: LetterShow;
   paid: boolean;
 }
 const runs = new WeakMap<Floor, Run>();
 
-const burstAt = (i: number): number => i * STAGGER_MS + EFFECT.landMs;
-
 function pay(floor: Floor, run: Run): void {
   run.paid = true;
   addTotalIncome(
-    multiply(rewardPayoutAmount(floor, Date.now()), run.sevenAt.length),
+    multiply(rewardPayoutAmount(floor, Date.now()), run.show.letters.length),
   );
 }
 
@@ -47,21 +46,17 @@ function start(floor: Floor, level: number): void {
   const text = `Lvl ${level}`;
   const sevenAt: number[] = [];
   for (let i = 0; i < text.length; i++) if (text[i] === "7") sevenAt.push(i);
-  const sevens = sevenAt.length;
   playSwoosh();
   const run: Run = {
-    startedAt: Date.now(),
     text,
-    sevenAt,
     paid: false,
-    beats: createBeats(
-      sevenAt.map((_, i) => i),
-      burstAt,
-      (i) => {
+    show: startLetterShow(sevenAt, {
+      staggerMs: STAGGER_MS,
+      onLand: (_, last) => {
         playCoinDrop();
-        if (i === sevens - 1) pay(floor, run);
+        if (last) pay(floor, run);
       },
-    ),
+    }),
   };
   runs.set(floor, run);
 }
@@ -131,45 +126,13 @@ export function drawLuckySevens(
 ): boolean {
   const run = runs.get(floor);
   if (!run) return false;
-  const { text, sevenAt } = run;
-  const ms = Date.now() - run.startedAt;
-  const end = (sevenAt.length - 1) * STAGGER_MS + EFFECT.ms;
-  if (ms >= end) {
+  style.fill = restFill;
+  if (Date.now() - run.show.startedAt >= run.show.ms) {
     runs.delete(floor);
+    if (!run.paid) pay(floor, run);
     return false;
   }
-  const now = performance.now();
-  run.beats.tick(ms, now);
-  const cy = top + height / 2;
-  // the other letters still, one by one where the whole label puts them
-  let next = 0;
-  for (let k = 0; k < text.length; k++) {
-    if (k === sevenAt[next]) {
-      next++;
-      continue;
-    }
-    if (text[k] === " ") continue;
-    const cx = slamTextLetterCenter(ctx, text, k, x, false);
-    ctx.save();
-    ctx.textAlign = "center";
-    drawSlamText(
-      ctx,
-      null,
-      text[k],
-      cx,
-      top,
-      height,
-      restFill,
-      COLOR.black,
-      STROKE,
-    );
-    ctx.restore();
-  }
-  for (let i = 0; i < sevenAt.length; i++) {
-    const cx = slamTextLetterCenter(ctx, text, sevenAt[i], x, false);
-    EFFECT.pose(ms - i * STAGGER_MS, "7", pose);
-    drawLetter(ctx, pose, cx, cy, height, restFill, COLOR.black, STROKE, false);
-    drawGlitterBurst(ctx, cx, cy, height, ms - burstAt(i));
-  }
+  drawLettersExcept(ctx, run.text, run.show.letters, x, top, height, style);
+  drawLetterShow(ctx, run.show, run.text, 0, x, top, height, style);
   return true;
 }

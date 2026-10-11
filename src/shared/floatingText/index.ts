@@ -1,5 +1,8 @@
 import { drawCartoonText } from "../../utils";
 
+// flights to a target (a multiplier into a bar, "+N Lvl" to a label)
+export * from "./flights";
+
 // a "+X"-style label that fades in, floats up, then fades back out — shared
 // rise/fade math for floors/incomeFloatText's per-Floor "+$X" Sale payout
 // labels (same "generic particle math lives here once, each consumer keeps
