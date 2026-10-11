@@ -37,14 +37,18 @@ More little surprises in what's already on screen, each one only paying.
 3. **Cat nap**: a cat sometimes nods off at its desk without slowing anything, a little z floating up; tap it and it jolts awake and works at double speed for a while.
 4. **Echo**: a crit number sometimes echoes, a smaller copy of it landing on the floor above a beat later with its own levels.
 
+## List 121: game features
+
+Small surprises in the floors, cats and buttons, each one only paying.
+
+1. **Double up**: a buy now and then tosses the button's price up as a coin that flips over and lands; heads gives the level a second time for free.
+2. **Lunch rush**: every cat on a floor sometimes jumps up at once and dashes to the bar, filling it in one go for a payout that slams into the total.
+3. **Coin stack**: a floor's payouts now and then leave a coin on the end of its bar; when five have stacked up they topple into the total as a bonus worth ten payouts.
+4. **Shooting star**: a gold streak sometimes crosses the sky behind the building; tap it before it's gone and the floor it passed gets a free crit.
+5. **Tip jar**: a boosted cat now and then flips a coin into a small jar on its floor; once the jar is full, tapping it empties it into the total.
+
 ## Built
-
-- **Matching digits** (`src/shared/matchingDigits`, drawn by `shared/totalIncomeReadout`): any group of three between the total's commas newly showing the same digit (444, 777) puts its digits one by one through a text effect picked at random from `shared/textAnimations` in gold, silently (no sound, shake or burst), and pays `CONFIG.matchingDigits.payShare` of the total (then a 4s quiet spell). Test: New Effects "Matching Digits" (the next change plays its last group as 777).
-
-- **New digit** (`src/shared/newDigit`, drawn by `shared/totalIncomeReadout`): the first time ever the total grows a digit, its new leading digit puts on a text effect picked at random from `shared/textAnimations` in gold, lands with a pop of coins (no shake) and cools back to green (a digit that starts a new unit plays Unit up instead). Test: New Effects "New Digit".
 
 - **Gold standard** (`floors/incomePanel`): a floor at the level cap gets a coin-gold bar with gloss slashes and gold glimmers twinkling calmly over it.
 
 - **Lucky sevens** (`src/floors/luckySevens`, drawn by `floors/star`): a floor's label reaching any level with a 7 in it (by any means) sends each 7 in turn through a text effect picked at random from `shared/textAnimations`, landing back in gold in a burst of glitter before cooling back to its usual colour (no shake, jackpot or total flash); the floor pays out once per 7. Test: New Effects "Lucky Sevens".
-
-- **Unit up** (`src/shared/unitUp`, drawn by `shared/totalIncomeReadout`): the first time ever the total reaches a unit, its unit word spins as a slot reel between gold rims, clicking and braking, three times round onto the new unit in gold (no shakes); 0.1s later the total pays `CONFIG.unitUp.payShare` of itself and slams like an event's total. Test: New Effects "Unit Up".

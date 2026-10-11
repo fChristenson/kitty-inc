@@ -14,18 +14,6 @@ import {
   GLOBAL_SLAM,
 } from "../eventEndSlam";
 import { drawTargetStream, getTargetTension } from "../eventFx";
-import { drawUnitUp, noteUnitTier } from "../unitUp";
-import {
-  drawNewDigit,
-  drawNewDigitPop,
-  newDigitHideIndex,
-  noteTotalExponent,
-} from "../newDigit";
-import {
-  drawMatchingDigits,
-  matchingDigitsHideIndex,
-  noteMatchingDigits,
-} from "../matchingDigits";
 
 // shared "amount + spelled-out unit name below it" total-income drawing, used by
 // both hud/index.ts's top-of-screen HUD and background/cityMap's map readout —
@@ -93,9 +81,6 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       formatted = formatTotalIncomeParts(displayed);
       formattedMantissa = displayed.mantissa;
       formattedExponent = displayed.exponent;
-      noteUnitTier(formatted.tier);
-      noteTotalExponent(displayed.exponent);
-      noteMatchingDigits(formatted.amount);
     }
     // "special crit crit" bonus-tier coins merging into the total (see
     // shared/totalIncomeCoins) flash this whole readout white and wiggle it briefly —
@@ -158,8 +143,6 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       }
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
-      drawNewDigitPop(ctx);
-      const matchAt = matchingDigitsHideIndex(amount, now);
       drawSlamText(
         ctx,
         slam,
@@ -173,11 +156,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         true,
         whiteMix,
         moving,
-        matchAt >= 0 ? matchAt : newDigitHideIndex(now),
-        matchAt >= 0 ? 3 : 1,
       );
-      drawNewDigit(ctx, amount, centerX, top, amountHeight, strokeWidth);
-      drawMatchingDigits(ctx, amount, centerX, top, amountHeight, strokeWidth);
 
       if (remeasure) {
         const amountMetrics = ctx.measureText(amount);
@@ -193,29 +172,20 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         ctx.font = `900 ${unitFontSize}px "Fredoka", system-ui, sans-serif`;
         ctx.textAlign = "center";
         const unitTop = bottom + unitNameGapPx;
-        const reeling = drawUnitUp(
+        drawSlamText(
           ctx,
+          slam,
+          unitName,
           centerX,
           unitTop,
           unitHeight,
+          COLOR.moneyGreen,
+          COLOR.white,
           unitStrokeWidth,
-          cachedAmountWidth * 1.1,
+          false,
+          whiteMix,
+          moving,
         );
-        if (!reeling)
-          drawSlamText(
-            ctx,
-            slam,
-            unitName,
-            centerX,
-            unitTop,
-            unitHeight,
-            COLOR.moneyGreen,
-            COLOR.white,
-            unitStrokeWidth,
-            false,
-            whiteMix,
-            moving,
-          );
         if (remeasure) {
           const unitMetrics = ctx.measureText(unitName);
           unitHeight =
