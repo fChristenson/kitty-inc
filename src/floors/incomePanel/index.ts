@@ -53,7 +53,12 @@ import {
   formatTime,
   roundRect,
 } from "../../utils";
-import { drawChevronBar, prewarmChevronBar } from "../../shared/glossyWidgets";
+import {
+  drawChevronBar,
+  drawGoldBar,
+  drawGoldGlimmers,
+  prewarmChevronBar,
+} from "../../shared/glossyWidgets";
 import { launchMs, launchOffset, type BarLaunch } from "../../shared/barLaunch";
 import { prepareSoon } from "../../shared/idle";
 import {
@@ -879,12 +884,16 @@ export function drawIncomePanel(
       fillW = Math.min(barW, Math.max(barMinWidth, fillW + barW * slosh));
     }
     // a permanently-crited floor's bar matches its own tier color instead of the
-    // usual green, mirroring the upgrade button's own color choice
+    // usual green, mirroring the upgrade button's own color choice; a floor at
+    // the level cap's is gold
+    const maxed = floor.unlocked && isFloorMaxed(floor);
     const fillColor = afterglowing
       ? punch!.color!
-      : floor.critMultiplierTier
-        ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
-        : COLOR.moneyGreen;
+      : maxed
+        ? COLOR.heavenlyGold
+        : floor.critMultiplierTier
+          ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
+          : COLOR.moneyGreen;
     let pressure: PressurePose | null = null;
     const boilHeat = Math.max(getBoilHeat(floor, now), heat);
     const holdHeat = Math.max(getHoldHeat(floor, now), heat);
@@ -935,6 +944,8 @@ export function drawIncomePanel(
         ctx.fill();
         ctx.globalAlpha = 1;
       }
+    } else if (maxed) {
+      drawGoldBar(ctx, barX, barY, barW, barH, barRadius);
     } else if (overspeed) {
       pressure = drawPressureBar(
         ctx,
@@ -980,6 +991,8 @@ export function drawIncomePanel(
         boilHeat,
       );
     }
+    if (maxed && !overtimeGaugeVisible)
+      drawGoldGlimmers(ctx, barX, barY, barW, barH, now, floor.bgIndex);
     if (eventFlash && eventFlash.whiteAlpha > 0) {
       ctx.globalAlpha = eventFlash.whiteAlpha;
       roundRect(ctx, barX, barY, barW, barH, barRadius);

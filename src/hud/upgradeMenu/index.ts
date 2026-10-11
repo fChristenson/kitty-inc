@@ -306,8 +306,8 @@ export interface UpgradeMenu {
 // called fresh each render so the list always reflects live state (including a new
 // floor unlocked while the menu happens to be open). Per-floor purchases (worker,
 // office chairs/supplies, manager) live in their own dialog now — see
-// hud/floorUpgradeMenu, opened via the green arrow drawn on each floor's own room
-// (floors/upgradeArrow) — this dialog only ever shows the building-wide bulk actions
+// hud/floorUpgradeMenu, opened by tapping a floor's "Lvl N" label (floors/star)
+// — this dialog only ever shows the building-wide bulk actions
 export function wireUpgradeMenu(
   container: HTMLElement,
   getFloors: () => Floor[],

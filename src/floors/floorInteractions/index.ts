@@ -95,7 +95,7 @@ import {
   EVENT_COIN_TIMING,
 } from "../../shared/floorEvents";
 import { triggerLevelPop } from "../star";
-import { hitTestUpgradeArrow } from "../upgradeArrow";
+import { hitTestUpgradeStar } from "../star";
 
 import {
   playSold as soundSold,
@@ -191,7 +191,7 @@ export function hitTestFloorHover(
     (canCancelOvertime(floor, Date.now()) &&
       hitTestIncomeBar(x, y, isGroundFloor)) ||
     hitTestFloorLock(x, y, floor) ||
-    hitTestUpgradeArrow(x, y, floor) ||
+    hitTestUpgradeStar(x, y, floor) ||
     hitTestWorkers(x, y, floor).length > 0
   );
 }

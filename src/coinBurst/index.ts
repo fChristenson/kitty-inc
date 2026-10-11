@@ -636,29 +636,68 @@ export function getCoinRimPoint(
 // below — pruning only happens there, which only runs while whichever screen
 // spawned a burst (the city map, a Floor-anchored one) is actually
 // being redrawn, so the pool's own cap (not just per-particle expiry) is what
-// keeps a burst spawned right as that screen closes from accumulating forever
-const pool = createParticlePool<CoinBurstParticle>(750);
-let lastActiveUpdateAt: number | null = null;
+// keeps a burst spawned right as that screen closes from accumulating forever.
+// createCoinBurstPool makes another, for a screen part that draws its own
+// (the total readout's pops)
+export interface CoinBurstPool {
+  hasActive(): boolean;
+  spawn(x: number, y: number, scale?: number): void;
+  // advances every burst by the time since the last call, then draws them
+  draw(ctx: CanvasRenderingContext2D, now: number): void;
+}
+
+export function createCoinBurstPool(max: number): CoinBurstPool {
+  const pool = createParticlePool<CoinBurstParticle>(max);
+  let lastActiveUpdateAt: number | null = null;
+  return {
+    hasActive: () => pool.hasActive(),
+    spawn(x, y, scale = 1) {
+      for (const p of createCoinBurstParticles(x, y)) {
+        // scales position (relative to the spawn point, so the burst still
+        // starts exactly at x,y), velocity, size, and gravity together, so a
+        // smaller-scale burst is a uniformly shrunk version of the same burst,
+        // not just smaller sprites moving at full-size speed
+        p.x = x + (p.x - x) * scale;
+        p.y = y + (p.y - y) * scale;
+        p.vx *= scale;
+        p.vy *= scale;
+        p.size *= scale;
+        p.gravity *= scale;
+        p.gravityRamp *= scale;
+        pool.spawn(p);
+      }
+    },
+    draw(ctx, now) {
+      if (!pool.hasActive()) {
+        lastActiveUpdateAt = null;
+        return;
+      }
+      const dt = clampedDtSince(lastActiveUpdateAt, now);
+      lastActiveUpdateAt = now;
+      pool.update(dt, advanceCoinBurstParticle);
+      const base = ctx.getTransform();
+      const alpha = ctx.globalAlpha;
+      beginCoinBatch(ctx);
+      for (const p of pool.list) {
+        const t = p.life / p.maxLife;
+        const radius = p.size * (1 - t * 0.3);
+        ctx.globalAlpha = alpha * Math.max(0, 1 - t);
+        drawCoinBurstFrame(ctx, p, p.x, p.y, radius, base);
+      }
+      ctx.globalAlpha = alpha;
+      endCoinBatch(ctx);
+    },
+  };
+}
+
+const sharedPool = createCoinBurstPool(750);
 
 export function hasActiveCoinBursts(): boolean {
-  return pool.hasActive();
+  return sharedPool.hasActive();
 }
 
 export function spawnCoinBurstAt(x: number, y: number, scale = 1): void {
-  for (const p of createCoinBurstParticles(x, y)) {
-    // scales position (relative to the spawn point, so the burst still
-    // starts exactly at x,y), velocity, size, and gravity together, so a
-    // smaller-scale burst is a uniformly shrunk version of the same burst,
-    // not just smaller sprites moving at full-size speed
-    p.x = x + (p.x - x) * scale;
-    p.y = y + (p.y - y) * scale;
-    p.vx *= scale;
-    p.vy *= scale;
-    p.size *= scale;
-    p.gravity *= scale;
-    p.gravityRamp *= scale;
-    pool.spawn(p);
-  }
+  sharedPool.spawn(x, y, scale);
 }
 
 // call once per frame from the caller's own render loop, passing whatever
@@ -669,21 +708,5 @@ export function drawActiveCoinBursts(
   ctx: CanvasRenderingContext2D,
   now: number,
 ): void {
-  if (!pool.hasActive()) {
-    lastActiveUpdateAt = null;
-    return;
-  }
-  const dt = clampedDtSince(lastActiveUpdateAt, now);
-  lastActiveUpdateAt = now;
-  pool.update(dt, advanceCoinBurstParticle);
-  const base = ctx.getTransform();
-  beginCoinBatch(ctx);
-  for (const p of pool.list) {
-    const t = p.life / p.maxLife;
-    const radius = p.size * (1 - t * 0.3);
-    ctx.globalAlpha = Math.max(0, 1 - t);
-    drawCoinBurstFrame(ctx, p, p.x, p.y, radius, base);
-  }
-  ctx.globalAlpha = 1;
-  endCoinBatch(ctx);
+  sharedPool.draw(ctx, now);
 }

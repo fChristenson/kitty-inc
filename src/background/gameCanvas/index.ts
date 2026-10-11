@@ -17,7 +17,7 @@ import {
   hasActiveCoins,
   hitTestFloorHover,
   hitTestUpgradeButton,
-  hitTestUpgradeArrow,
+  hitTestUpgradeStar,
   handleFloorClick,
   type FloorActionsDeps,
   startButtonHoldAnim,
@@ -151,8 +151,8 @@ export interface GameCanvasDeps {
   applyCompanyWideBoost: () => void;
   createMysticBuilding: () => void;
   persist: () => void;
-  // fired by a plain tap on a floor's own green upgrade-arrow button (see
-  // floors/upgradeArrow) — opens that floor's own hire worker/office chairs/
+  // fired by a plain tap on a floor's "Lvl N" label (floors/star) — opens that
+  // floor's own hire worker/office chairs/
   // supplies/manager dialog (hud/floorUpgradeMenu). gameCanvas has no DOM/dialog
   // access itself, so this is threaded in from main.ts same as persist above
   onOpenFloorUpgrades: (floor: Floor, floorNumber: number) => void;
@@ -1145,7 +1145,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     const p = canvasPoint(event);
     const hit = hitTestPoint(p.x, p.y);
     if (!hit) return;
-    if (hitTestUpgradeArrow(hit.localX, hit.localY, hit.floor)) {
+    if (hitTestUpgradeStar(hit.localX, hit.localY, hit.floor)) {
       onOpenFloorUpgrades(hit.floor, hit.floorNumber);
       return;
     }

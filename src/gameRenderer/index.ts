@@ -4,7 +4,6 @@ import {
   drawWorkerBoosts,
   tickWorkerOffscreen,
   drawUpgradeStar,
-  drawUpgradeArrow,
   drawIncomePanel,
   drawUpgradeButton,
   drawFloorLock,
@@ -13,7 +12,6 @@ import {
 import { drawOuterWall } from "../buildings";
 import { drawMouse } from "../spawn/mouse";
 import { getTotalIncome } from "../totalIncome";
-import { hasAffordableFloorUpgrade } from "../hud";
 import { gte } from "../shared/bigNumber";
 import type { Floor } from "../gameState";
 
@@ -40,7 +38,6 @@ export function drawFloorContent(
   drawMouse(ctx, floor, now);
   drawWorkerBoosts(ctx, floor, now);
   drawUpgradeStar(ctx, floor);
-  drawUpgradeArrow(ctx, floor, hasAffordableFloorUpgrade(floor));
   drawIncomePanel(ctx, floor, isGroundFloor);
   drawUpgradeButton(
     ctx,

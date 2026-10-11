@@ -195,10 +195,7 @@ export {
   MANAGER_MIN_UPGRADE_COUNT,
 } from "./upgradeMenu";
 export type { UpgradeMenu } from "./upgradeMenu";
-export {
-  wireFloorUpgradeMenu,
-  hasAffordableFloorUpgrade,
-} from "./floorUpgradeMenu";
+export { wireFloorUpgradeMenu } from "./floorUpgradeMenu";
 export type { FloorUpgradeMenu } from "./floorUpgradeMenu";
 export { wireCorporationUpgradeMenu } from "./corporationUpgradeMenu";
 export type { CorporationUpgradeMenu } from "./corporationUpgradeMenu";

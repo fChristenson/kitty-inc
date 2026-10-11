@@ -8,6 +8,7 @@ import {
   getSlamPose,
 } from "../../shared/eventEndSlam";
 import { applyLevelPop, LEVEL_POP_MS } from "../../shared/levelPop";
+import { fingerReach } from "../../shared/tapTarget";
 
 // mirrors buildings/outerWall's own SIDE_WALL_WIDTH (WALL_WIDTH*2) — duplicated
 // locally instead of imported to avoid a floors<->buildings circular import
@@ -27,7 +28,7 @@ function labelText(floor: Floor): string {
 
 // throwaway canvas just for measureText — floorInteractions.ts needs the label's
 // real width to aim a coin burst at its center, but has no live ctx of its own.
-// Asked every frame per floor (see floors/upgradeArrow), so cached per count
+// Asked every frame per floor, so cached per count
 let measureCtx: CanvasRenderingContext2D | null = null;
 const widths = new Map<number, number>();
 function labelWidth(floor: Floor): number {
@@ -53,10 +54,25 @@ export function getUpgradeIndicatorCenter(floor: Floor): {
 }
 
 // the label's own right edge, floor-local — grows/shrinks as floor.upgradeCount
-// gains digits, so anything anchored past it (see floors/upgradeArrow) tracks
-// the text's real width instead of a fixed guess
+// gains digits, so anything anchored past it tracks the text's real width
 export function getStarRightX(floor: Floor): number {
   return MARGIN_X + labelWidth(floor);
+}
+
+// a tap on an unlocked floor's label opens its upgrades (hud/floorUpgradeMenu)
+export function hitTestUpgradeStar(
+  x: number,
+  y: number,
+  floor: Floor,
+): boolean {
+  if (!floor.unlocked) return false;
+  const reach = fingerReach();
+  return (
+    x >= MARGIN_X - reach &&
+    x <= MARGIN_X + labelWidth(floor) + reach &&
+    y >= STAR_Y - reach &&
+    y <= STAR_BOTTOM_Y + reach
+  );
 }
 
 // where something parked after the label sits: past the widest 3-digit "Lvl N",

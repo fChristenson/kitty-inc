@@ -190,18 +190,22 @@ function renderUpgradeButton(
     const wiggle =
       (crit || activeEvent ? getWiggleRotation(now) : 0) + holdAnim.rotation;
     // a wiggling button (a crit, an event, a Sale) only rocks, like the Sale:
-    // squashing it while it's rotated warps it
+    // squashing it while it's rotated warps it; a greyed-out MAX keeps still
     const jelly =
-      crit || activeEvent
+      crit || activeEvent || maxed
         ? null
         : getJellyPose(own, now, getBoilHeat(floor, now), wiggle);
     ctx.save();
-    ctx.translate(cx + holdAnim.shakeX, cy + holdAnim.shakeY);
-    if (crit || activeEvent) {
-      ctx.rotate(getWiggleRotation(now));
+    if (maxed) {
+      ctx.translate(cx, cy);
+    } else {
+      ctx.translate(cx + holdAnim.shakeX, cy + holdAnim.shakeY);
+      if (crit || activeEvent) {
+        ctx.rotate(getWiggleRotation(now));
+      }
+      ctx.rotate(holdAnim.rotation);
+      ctx.scale(scale * holdAnim.scale, scale * holdAnim.scale);
     }
-    ctx.rotate(holdAnim.rotation);
-    ctx.scale(scale * holdAnim.scale, scale * holdAnim.scale);
     if (jelly) ctx.scale(jelly.sx, jelly.sy);
     ctx.translate(-cx, -cy);
     let dim = false;

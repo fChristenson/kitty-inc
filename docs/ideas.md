@@ -20,8 +20,20 @@ More small moments in the bars, buttons, scrolling and total, each a surprise th
 4. **Rebound**: one gold coin in a stream flying into the total sometimes bounces off it and drops back onto a floor's bar, filling it at once.
 5. **Hundreds**: a floor reaching a round hundred levels (Lvl 100, 200, ...) has its label slam gold and its bar pay out once for every hundred it's reached.
 
+## List 119: game features
+
+Still small moments in what's on screen, each a little surprise that only pays.
+
+1. **Keep the change**: a buy now and then clinks, and part of its price (a tenth to a half) rattles back out of the button as coins into the total.
+2. **Conga**: boosting every cat on a floor at once sometimes sets them dancing in a conga line across the floor, a coin popping off each one as it passes the bar.
+3. **Change of tier**: a floor climbing a crit tier has its bar's new colour pour in from the left like paint, a coin popping out at the end.
+
 ## Built
 
-- **Hold tally** (`src/floors/holdTally`, started and ended by gameCanvas's upgrade-button hold): letting go of a long-press buy (held 0.5s+) rattles the floor's bar with a gold flash per hundred levels the hold gave (up to ten), then slams `+N Lvl` onto it in gold.
+- **New digit** (`src/shared/newDigit`, drawn by `shared/totalIncomeReadout`): the first time ever the total grows a digit, its new leading digit drops in from above in gold, lands with a pop of coins and cools back to green (a digit that starts a new unit plays Unit up instead). Test: New Effects "New Digit".
+
+- **Gold standard** (`floors/incomePanel`): a floor at the level cap gets a coin-gold bar with gloss slashes and gold glimmers twinkling calmly over it.
+
+- **Hold tally** (`src/floors/holdTally`, started and ended by gameCanvas's upgrade-button hold): letting go of a long-press buy (held 0.5s+) rattles the floor's bar with a gold flash per hundred levels the hold gave (up to ten), then the bar does the jackpot slam and lands with `+N Lvl` in gold.
 
 - **Unit up** (`src/shared/unitUp`, drawn by `shared/totalIncomeReadout`): the first time ever the total reaches a unit, its unit word spins as a slot reel between gold rims, clicking and braking, three times round onto the new unit, slamming in gold in a cluster of blasts; coins swing up into the total, which pays `CONFIG.unitUp.payShare` of itself. Test: New Effects "Unit Up".

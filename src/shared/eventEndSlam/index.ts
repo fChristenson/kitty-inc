@@ -326,6 +326,27 @@ function restLayout(
   return layout;
 }
 
+// the middle of text's index-th letter as drawSlamText lays text out at x
+// (ctx's font and textAlign)
+export function slamTextLetterCenter(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  index: number,
+  x: number,
+  tabular: boolean,
+): number {
+  const font = ctx.font;
+  const layout = restLayout(ctx, text, font, tabular);
+  const align = ctx.textAlign;
+  const left =
+    align === "center"
+      ? x - layout.width / 2
+      : align === "right" || align === "end"
+        ? x - layout.width
+        : x;
+  return left + layout.offsets[index] + measure(ctx, text[index], font) / 2;
+}
+
 // text at rest, every frame: tabular for counting numbers, otherwise kerned.
 // Stamped from sprites at the canvas's own scale when it can be, else drawn
 // as text letter by letter (tabular) or whole (kerned)
@@ -338,6 +359,7 @@ function drawRestText(
   strokeColor: string,
   strokeWidth: number,
   tabular: boolean,
+  hideIndex: number,
 ): void {
   const font = ctx.font;
   const m = ctx.getTransform();
@@ -372,7 +394,7 @@ function drawRestText(
     for (let pass = 0; pass < 2; pass++) {
       for (let i = 0; i < text.length; i++) {
         const char = text[i];
-        if (char === " ") continue;
+        if (char === " " || i === hideIndex) continue;
         const lx = left + layout.offsets[i];
         const glyph = getRestGlyph(ctx, set, char);
         ctx.drawImage(
@@ -405,8 +427,10 @@ function drawRestText(
       const width = measure(ctx, char, font);
       const cell = isDigit(char) ? digitCell : width;
       const lx = at + (isDigit(char) ? (cell - width) / 2 : 0);
-      if (pass === 0) ctx.strokeText(char, lx, y);
-      else ctx.fillText(char, lx, y);
+      if (i !== hideIndex) {
+        if (pass === 0) ctx.strokeText(char, lx, y);
+        else ctx.fillText(char, lx, y);
+      }
       at += cell;
     }
   }
@@ -524,7 +548,8 @@ function getRestGlyph(
 // counting number never shifts sideways. whiteMix 0..1 blends the fill toward
 // white; moving says the text is swelling, wiggling or flashing this frame, so
 // it's stamped from sprites like a landed slam (see SlamGlyph). A caller that
-// passes moving gets its sprites warmed while the text rests
+// passes moving gets its sprites warmed while the text rests. hideIndex
+// leaves that letter out, its place kept
 export function drawSlamText(
   ctx: CanvasRenderingContext2D,
   pose: SlamPose | null,
@@ -538,6 +563,7 @@ export function drawSlamText(
   tabular = false,
   whiteMix = 0,
   moving?: boolean,
+  hideIndex = -1,
 ): void {
   // past TEXT_FX_MS no letter hops, shines or glows: it's the text at rest
   const landed =
@@ -551,7 +577,17 @@ export function drawSlamText(
       whiteMix > 0 && fillColor !== SLAM_GOLD
         ? shadeColor(fillColor, whiteMix)
         : fillColor;
-    drawRestText(ctx, text, x, y, fill, strokeColor, strokeWidth, tabular);
+    drawRestText(
+      ctx,
+      text,
+      x,
+      y,
+      fill,
+      strokeColor,
+      strokeWidth,
+      tabular,
+      hideIndex,
+    );
     return;
   }
   const digitCell = tabular ? maxDigitWidth(ctx, font) : 0;
@@ -597,7 +633,7 @@ export function drawSlamText(
       const lx = left + layout.offsets[i];
       const centerX = left + (start + end) / 2;
       start = end;
-      if (char === " ") continue;
+      if (char === " " || i === hideIndex) continue;
       const glyph = getSlamGlyph(ctx, glyphs, char);
       const hop = landed ? hopAt(landed, (centerX - left + band) / path) : 0;
       if (hop !== 0) {
@@ -987,7 +1023,8 @@ function drawSlamShine(
   if (strength > 0) drawShineSweep(ctx, box, radius, 1 - strength);
 }
 
-// the slanted shine band t (0..1) of the way across a rounded rect, left to right
+// the slanted shine band t (0..1) of the way across a rounded rect, left to
+// right
 export function drawShineSweep(
   ctx: CanvasRenderingContext2D,
   { x, y, width, height }: SlamBox,

@@ -1,6 +1,7 @@
 import { COLOR } from "../../palette";
 import { createGlossyGradient, drawPillBorder, shadeColor } from "../../utils";
 import { processWhenIdle } from "../idle";
+import { hash01, stampGlimmer } from "../twinkle";
 
 // the upgrade button and income bar. Drawn every frame for every floor on
 // screen, so each is a few blits of layers baked once per color:
@@ -337,6 +338,94 @@ export function drawChevronBar(
     ctx.drawImage(L.chevrons, f * cw, 0, fill, h, x, y, fill, h);
   }
   ctx.drawImage(L.over, x, y);
+}
+
+// ---------- the gold bar ----------
+// a floor at the level cap: smooth coin gold with gloss slashes and the usual
+// border, glimmers twinkling over it
+const GOLD_STOPS: readonly (readonly [number, string])[] = [
+  [0, "#FFF6C0"],
+  [0.35, "#F8C818"],
+  [0.75, "#E9A90C"],
+  [1, "#A86A00"],
+];
+// [x, width] of each slash along its bottom edge
+const GOLD_SLASHES: readonly (readonly [number, number])[] = [
+  [40, 34],
+  [92, 12],
+];
+const GOLD_SLASH = "rgba(255,255,255,0.55)";
+const GOLD_SLASH_LEAN = 0.45; // of the bar's height
+let goldBar: { w: number; h: number; r: number; bar: Layer } | null = null;
+export function drawGoldBar(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
+  if (!goldBar || goldBar.w !== w || goldBar.h !== h || goldBar.r !== r) {
+    const c = layer(w, h);
+    roundedPath(c, 0, 0, w, h, r);
+    const gradient = c.createLinearGradient(0, 0, 0, h);
+    for (const [at, color] of GOLD_STOPS) gradient.addColorStop(at, color);
+    c.fillStyle = gradient;
+    c.fill();
+    c.save();
+    c.clip();
+    c.fillStyle = GOLD_SLASH;
+    const lean = h * GOLD_SLASH_LEAN;
+    for (const [sx, sw] of GOLD_SLASHES) {
+      c.beginPath();
+      c.moveTo(sx + lean, 0);
+      c.lineTo(sx + lean + sw, 0);
+      c.lineTo(sx + sw, h);
+      c.lineTo(sx, h);
+      c.closePath();
+      c.fill();
+    }
+    c.restore();
+    c.drawImage(barOver(w, h, r, COLOR.heavenlyGold), 0, 0);
+    goldBar = { w, h, r, bar: c.canvas as Layer };
+    toBitmap(goldBar, "bar");
+  }
+  ctx.drawImage(goldBar.bar, x, y);
+}
+
+// glimmers twinkling calmly over it, each at a fresh spot every life
+const GLIMMERS = 6;
+const GLIMMER_MS = 1600;
+const GLIMMER_SIZE = 24;
+const GLIMMER_SPIN = 1.5;
+export function drawGoldGlimmers(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  now: number,
+  seed: number,
+): void {
+  const previous = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = "lighter";
+  // clear of the border
+  const marginX = h * 0.5;
+  const marginY = h * 0.35;
+  for (let i = 0; i < GLIMMERS; i++) {
+    const life = now / GLIMMER_MS + i / GLIMMERS + seed * 0.37;
+    const t = life - Math.floor(life);
+    const n = Math.floor(life) * 31 + seed;
+    stampGlimmer(
+      ctx,
+      x + marginX + hash01(n, i) * (w - marginX * 2),
+      y + marginY + hash01(n, i + 50) * (h - marginY * 2),
+      GLIMMER_SIZE * Math.sin(Math.PI * t),
+      t * GLIMMER_SPIN,
+      COLOR.heavenlyGold,
+    );
+  }
+  ctx.globalCompositeOperation = previous;
 }
 
 // ---------- the full bar ----------

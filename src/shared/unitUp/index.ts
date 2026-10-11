@@ -9,9 +9,10 @@ import { COLOR } from "../../palette";
 import { illionName } from "../../utils";
 import {
   beginCoinBatch,
+  createCoinBurstParticles,
   drawCoinBurstFrame,
   endCoinBatch,
-  type CoinBurstSprite,
+  type CoinBurstParticle,
 } from "../../coinBurst";
 import { playCoinDrop } from "../../sound";
 import { drawBeam } from "../beam";
@@ -76,7 +77,6 @@ const SPLAT_SIZE = 60;
 const COINS = 36;
 const COIN_EVERY_MS = 20;
 const COIN_FLY_MS = 460;
-const COIN_SIZE = 34;
 const PAY_AT = SPIN_MS + 120;
 const PAID_AT = PAY_AT + (COINS - 1) * COIN_EVERY_MS + COIN_FLY_MS;
 const END_MS = PAID_AT + 400;
@@ -136,13 +136,10 @@ const COIN_BACK_X = Array.from(
   (_, i) => (hash01(i, 3) - 0.5) * 600,
 );
 const COIN_BACK_Y = 420;
-const COIN_SPRITES: CoinBurstSprite[] = Array.from({ length: COINS }, () => ({
-  kind: "coin",
-  spinFrame: 0,
-  axisAngle: 0,
-  axisCos: 1,
-  axisSin: 0,
-}));
+// the game's own burst coins, shrunk to the readout
+const COIN_SCALE = 0.6;
+// a burst coin's spin is in ~16.67ms ticks
+const TICK_MS = 1000 / 60;
 const SPLAT_ANGLE = Array.from(
   { length: SPLAT },
   (_, i) => hash01(i, 4) * Math.PI * 2,
@@ -156,6 +153,9 @@ interface Run {
   startedAt: number;
   words: string[];
   beats: Beats<Beat>;
+  // each flying coin's look (kind, size, tilt, spin) and its first spin frame
+  coins: CoinBurstParticle[];
+  spinFrom: number[];
 }
 let run: Run | null = null;
 let topTier: number | null = null;
@@ -210,10 +210,13 @@ function fireBeat(beat: Beat): void {
 function start(from: number, to: number): void {
   const words = [from > 0 ? illionName(from) : ""];
   for (let k = 0; k < RING - 1; k++) words.push(illionName(to + k));
+  const coins = createCoinBurstParticles(0, 0).slice(0, COINS);
   run = {
     startedAt: Date.now(),
     words,
     beats: createBeats(BEATS, (beat) => beat.at, fireBeat),
+    coins,
+    spinFrom: coins.map((coin) => coin.spinFrame),
   };
 }
 
@@ -292,6 +295,7 @@ function drawWord(
 
 function drawCoins(
   ctx: CanvasRenderingContext2D,
+  { coins, spinFrom }: Run,
   from: Point,
   to: Point,
   ms: number,
@@ -299,7 +303,7 @@ function drawCoins(
   if (ms < PAY_AT || ms >= PAID_AT) return;
   const base = ctx.getTransform();
   beginCoinBatch(ctx);
-  for (let i = 0; i < COINS; i++) {
+  for (let i = 0; i < coins.length; i++) {
     const u = (ms - PAY_AT - i * COIN_EVERY_MS) / COIN_FLY_MS;
     if (u < 0 || u >= 1) continue;
     // a cubic from the word, out under it, back up under the amount, into it
@@ -319,9 +323,17 @@ function drawCoins(
       b * (from.y + COIN_OUT_Y[i]) +
       c * (to.y + COIN_BACK_Y) +
       d * to.y;
-    const sprite = COIN_SPRITES[i];
-    sprite.spinFrame = ms * 0.03 + i;
-    drawCoinBurstFrame(ctx, sprite, x, y, COIN_SIZE * (1 - 0.5 * u), base);
+    const coin = coins[i];
+    coin.spinFrame =
+      spinFrom[i] + (coin.spinDir * coin.spinRate * ms) / TICK_MS;
+    drawCoinBurstFrame(
+      ctx,
+      coin,
+      x,
+      y,
+      coin.size * COIN_SCALE * (1 - 0.5 * u),
+      base,
+    );
   }
   endCoinBatch(ctx);
 }
@@ -442,7 +454,7 @@ export function drawUnitUp(
     }
     spot.x = x;
     spot.y = y;
-    drawCoins(ctx, spot, amountAt, ms);
+    drawCoins(ctx, run, spot, amountAt, ms);
   }
   return true;
 }

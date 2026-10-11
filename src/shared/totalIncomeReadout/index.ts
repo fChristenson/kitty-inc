@@ -15,6 +15,11 @@ import {
 } from "../eventEndSlam";
 import { drawTargetStream, getTargetTension } from "../eventFx";
 import { drawUnitUp, noteUnitTier } from "../unitUp";
+import {
+  drawNewDigit,
+  newDigitHideIndex,
+  noteTotalExponent,
+} from "../newDigit";
 
 // shared "amount + spelled-out unit name below it" total-income drawing, used by
 // both hud/index.ts's top-of-screen HUD and background/cityMap's map readout —
@@ -85,6 +90,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       formattedMantissa = displayed.mantissa;
       formattedExponent = displayed.exponent;
       noteUnitTier(formatted.tier);
+      noteTotalExponent(displayed.exponent);
     }
     // "special crit crit" bonus-tier coins merging into the total (see
     // shared/totalIncomeCoins) flash this whole readout white and wiggle it briefly —
@@ -160,7 +166,9 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         true,
         whiteMix,
         moving,
+        newDigitHideIndex(now),
       );
+      drawNewDigit(ctx, amount, centerX, top, amountHeight, strokeWidth, now);
 
       if (remeasure) {
         const amountMetrics = ctx.measureText(amount);

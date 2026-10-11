@@ -28,6 +28,7 @@ import { wireCritTestActions } from "./hud";
 import { forceBubbles } from "./spawn/bubbles";
 import { forceWispSpawn } from "./spawn/wisp";
 import { setUnitUpPayout, setUnitUpRecord } from "./shared/unitUp";
+import { setNewDigitRecord } from "./shared/newDigit";
 import { CONFIG } from "./config";
 import { forceCoinSpawn } from "./spawn/coin";
 import {
@@ -2297,6 +2298,7 @@ async function main() {
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "unit-up": procUnitUp,
+          "new-digit": procNewDigit,
           "coin-spawn": forceCoinSpawn,
           "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
           "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
@@ -3591,4 +3593,15 @@ function procUnitUp(): void {
   const target = fromLog10((next === 1 ? 12 : 3 * next + 12) + 0.02);
   setUnitUpRecord(tier);
   addTotalIncome(subtract(target, total));
+}
+
+// the New Digit test button: lifts the total just past its next power of ten
+// (skipping one that starts a new unit, which plays Unit Up instead), with the
+// record set back so the digit drops in
+function procNewDigit(): void {
+  const total = getTotalIncome();
+  let next = total.exponent + 1;
+  if (next === 12 || (next >= 18 && next % 3 === 0)) next++;
+  setNewDigitRecord(next - 1);
+  addTotalIncome(subtract(fromLog10(next + 0.02), total));
 }

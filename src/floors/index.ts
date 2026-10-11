@@ -344,13 +344,12 @@ export {
   WORKER_FEET_Y,
   WORKER_FEET_Y_NUDGE_PX,
 } from "./worker";
-export { drawUpgradeStar, getUpgradeIndicatorCenter } from "./star";
-export { startHoldTally, endHoldTally } from "./holdTally";
 export {
-  drawUpgradeArrow,
-  hitTestUpgradeArrow,
-  getUpgradeArrowCenter,
-} from "./upgradeArrow";
+  drawUpgradeStar,
+  getUpgradeIndicatorCenter,
+  hitTestUpgradeStar,
+} from "./star";
+export { startHoldTally, endHoldTally } from "./holdTally";
 export {
   drawUpgradeButton,
   hitTestUpgradeButton,

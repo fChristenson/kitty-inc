@@ -33,30 +33,9 @@ import {
 const officeChairsIconUrl = getImageUrl("officeChairsIcon");
 const officeSuppliesIconUrl = getImageUrl("officeSuppliesIcon");
 
-// whether this floor has at least one of its own per-floor purchases (worker,
-// office chairs/supplies, manager) both unlocked/not-yet-bought AND actually
-// affordable right now — read by floors/upgradeArrow (via gameRenderer, since
-// floors/ can't import hud/) to decide whether its own arrow button should
-// wiggle to draw attention, or sit still and gray
-export function hasAffordableFloorUpgrade(floor: Floor): boolean {
-  const totalIncome = getTotalIncome();
-  const workerBuyable =
-    floor.workerCount < MAX_RENDERED_WORKERS &&
-    gte(totalIncome, getWorkerCost(floor));
-  const chairsBuyable =
-    !floor.hasOfficeChairs && gte(totalIncome, getOfficeChairsCost(floor));
-  const suppliesBuyable =
-    !floor.hasOfficeSupplies && gte(totalIncome, getOfficeSuppliesCost(floor));
-  const managerBuyable =
-    !floor.hasManager &&
-    isManagerUnlocked(floor) &&
-    gte(totalIncome, getManagerCost(floor));
-  return workerBuyable || chairsBuyable || suppliesBuyable || managerBuyable;
-}
-
 // reuses .worker-menu's styling (same generic "dialog with a list of buyable
-// items" shape every other hud dialog uses) — opened via the green arrow drawn
-// on each floor's own room (floors/upgradeArrow), scoped to that one floor only
+// items" shape every other hud dialog uses) — opened by tapping a floor's
+// "Lvl N" label (floors/star), scoped to that one floor only
 export interface FloorUpgradeMenu {
   // floorNumber is 1-indexed, matching what floors/floorNumber.ts already shows
   open: (floor: Floor, floorNumber: number) => void;
