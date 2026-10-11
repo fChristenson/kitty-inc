@@ -449,6 +449,25 @@ function overtimeFlashStrength(floor: Floor, now: number): number {
   return 1 - elapsed / OVERTIME_FLASH_MS;
 }
 
+// the same white wiggle on any bar, with nothing else: a light landing on it
+const barWiggledAt = new WeakMap<Floor, number>();
+const BAR_WIGGLE_MS = 700;
+
+export function wiggleIncomeBar(floor: Floor): void {
+  barWiggledAt.set(floor, Date.now());
+}
+
+function barWiggle(floor: Floor, now: number): number {
+  const at = barWiggledAt.get(floor);
+  if (at === undefined) return 0;
+  const elapsed = now - at;
+  if (elapsed >= BAR_WIGGLE_MS) {
+    barWiggledAt.delete(floor);
+    return 0;
+  }
+  return 1 - elapsed / BAR_WIGGLE_MS;
+}
+
 // when each floor's current fill cycle started is floor.lastCollectedAt itself (a
 // persisted, Date.now()-based timestamp) — no separate in-memory clock, so a page
 // reload never resets/loses how far into its current cycle a floor already was
@@ -782,6 +801,7 @@ export function drawIncomePanel(
   const heat = heatOf(floor, now);
   const dark = isShorted(floor, now);
   const rattle = heat * HEAT_RATTLE_PX;
+  const wiggle = barWiggle(floor, now);
   const slam = getSlamPose(floor, "bar", now);
   const drawBar = (): void =>
     drawSlamTarget(
@@ -803,6 +823,7 @@ export function drawIncomePanel(
     else if (tension) ctx.rotate(tension.rotation);
     else if (flashStrength > 0)
       ctx.rotate(getWiggleRotation(now) * flashStrength);
+    else if (wiggle > 0) ctx.rotate(getWiggleRotation(now) * wiggle);
     if (eventFlash) ctx.rotate(eventFlash.rotation);
     // a stream's fx swells and shakes the bar itself (see drawTargetStream)
     const pressScale =
@@ -961,6 +982,13 @@ export function drawIncomePanel(
     }
     if (eventFlash && eventFlash.whiteAlpha > 0) {
       ctx.globalAlpha = eventFlash.whiteAlpha;
+      roundRect(ctx, barX, barY, barW, barH, barRadius);
+      ctx.fillStyle = COLOR.white;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    if (wiggle > 0) {
+      ctx.globalAlpha = mergeFlashWhite(wiggle, now);
       roundRect(ctx, barX, barY, barW, barH, barRadius);
       ctx.fillStyle = COLOR.white;
       ctx.fill();

@@ -294,6 +294,7 @@ export {
   increaseIncomeRate,
   increaseIncomeRateBy,
   punchIncomeBar,
+  wiggleIncomeBar,
   rewardPayoutAmount,
 } from "./incomePanel";
 export {
@@ -334,6 +335,7 @@ export {
   getRenderedWorkerCount,
   applyBoostAll,
   celebrateWorkerBoost,
+  wiggleWorkerBoost,
   getBoostEventCandidates,
   getWorkerCenter,
   promoteWorkerPermaTier,
@@ -343,6 +345,7 @@ export {
   WORKER_FEET_Y_NUDGE_PX,
 } from "./worker";
 export { drawUpgradeStar, getUpgradeIndicatorCenter } from "./star";
+export { startHoldTally, endHoldTally } from "./holdTally";
 export {
   drawUpgradeArrow,
   hitTestUpgradeArrow,

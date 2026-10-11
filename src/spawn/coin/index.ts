@@ -39,11 +39,10 @@ import {
 import { clamp01, easeIn, easeOutBack, lerp } from "../../shared/easing";
 import { drawGlow, fadeStops } from "../../shared/glowSprite";
 import { isScreenFrozen } from "../../shared/screenFreeze";
-import { shakeScreen } from "../../shared/screenShake";
 import { createSpawnRoll } from "../../shared/spawnRoll";
 import { isSpawnGone, spawnFade } from "../../shared/spawnFade";
 import { tapHits } from "../../shared/tapTarget";
-import { pulseHudTotalFlash } from "../../shared/totalIncomeCoins";
+import { wiggleHudTotal } from "../../shared/totalIncomeCoins";
 import type { Point } from "../../shared/wisp";
 
 // a hole, lying flat on the floor (squashed to HOLE_SQUASH of its width);
@@ -67,8 +66,6 @@ const BOB = 8;
 const BOB_RATE = 0.004;
 const GLOW = fadeStops(COLOR.heavenlyGold);
 const GLOW_ALPHA = 0.35;
-// a tapped one shakes the screen as it lands in the total
-const LAND_SHAKE = 0.4;
 
 interface Coin {
   floor: Floor;
@@ -221,9 +218,8 @@ export function tapCoinSpawn(x: number, y: number): boolean {
 
 function pay(): void {
   if (share) addTotalIncome(share);
-  pulseHudTotalFlash();
+  wiggleHudTotal();
   playSold();
-  shakeScreen(LAND_SHAKE);
 }
 
 // the hole, open by `open` (0..1), lying flat on the floor

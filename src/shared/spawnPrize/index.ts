@@ -1,6 +1,6 @@
 // a random spawn's prize and its payout once tapped, shared by every random
 // spawn (src/spawn/bubbles): a coin flips up into the total, a crit
-// number flies up, swells and slams into its floor's income bar (its levels)
+// number flies up, swells and lands in its floor's income bar (its levels)
 // or one of the floor's workers (a perma tier up), and a badge plays its crit
 // celebration. The spawn keeps the Payout and draws it each frame until it's
 // done
@@ -13,45 +13,38 @@ import {
   pickBadge,
 } from "../../crits";
 import {
-  celebrateWorkerBoost,
   getBoostEventCandidates,
   getIncomeBarCenter,
   getWorkerCenter,
   increaseIncomeRateBy,
   promoteWorkerPermaTier,
-  punchIncomeBar,
   rewardPayoutAmount,
+  wiggleIncomeBar,
+  wiggleWorkerBoost,
   type FloorActionsDeps,
 } from "../../floors";
 import { isFloorMaxed, type Floor } from "../../gameState";
 import { addTotalIncome } from "../../totalIncome";
-import { playSold } from "../../sound";
+import { playBloop, playSold } from "../../sound";
 import { drawCoinFlip, startCoinFlip, type CoinFlip } from "../coinFlip";
 import { bezier } from "../curves";
 import { easeIn, easeOut, lerp, progress } from "../easing";
-import { DETONATION_MS, drawDetonation } from "../explosion";
-import { playBarExplosion } from "../explosionBang";
-import { shakeScreen } from "../screenShake";
-import { pulseHudTotalFlash } from "../totalIncomeCoins";
+import { wiggleHudTotal } from "../totalIncomeCoins";
 import { drawWispTrail, WISP_TRAIL_MS, type Point } from "../wisp";
 import { drawMini, type Prize } from "./minis";
 
 export { drawMini, prepareMini, type Prize } from "./minis";
 
-// a coin landing in the total, or a crit number on its bar, shakes the screen
-const PAY_SHAKE = 0.4;
-// a crit number flies up off its spot, swelling to SMASH_SIZE, and slams
-// down onto its floor's bar SMASH_MS after the tap
+// a crit number flies up off its spot, swelling to SMASH_SIZE, and lands on
+// its floor's bar SMASH_MS after the tap
 const SMASH_MS = 340;
 const SMASH_ARC = 360;
 const SMASH_SIZE = 340;
-// of the flight spent swelling before the slam
+// of the flight spent swelling before it lands
 const SMASH_SWELL = 0.55;
-const SMASH_BLAST = 260;
-const SQUASH_MS = 250;
 const TRAIL_SIZE = 30;
-// a number is done once its blast and trail have faded
-const SMASH_DONE_MS = SMASH_MS + Math.max(DETONATION_MS, WISP_TRAIL_MS);
+// a number is done once its trail has faded
+const SMASH_DONE_MS = SMASH_MS + WISP_TRAIL_MS;
 
 export interface PrizeOdds {
   tier: number;
@@ -76,7 +69,7 @@ export function rollPrize(
 }
 
 // a random unlocked floor whose income bar is in view, the one a spawn's
-// prizes pay (a crit number slams into that bar)
+// prizes pay (a crit number lands in that bar)
 export function pickSpawnFloor(deps: FloorActionsDeps): Floor | null {
   const floors = (deps.getOnScreenFloors?.() ?? []).filter(
     (entry) =>
@@ -221,9 +214,8 @@ export function collectPrize(
 function landCoin(deps: FloorActionsDeps, floor: Floor): void {
   addTotalIncome(rewardPayoutAmount(floor, Date.now()));
   deps.persist();
-  pulseHudTotalFlash();
+  wiggleHudTotal();
   playSold();
-  shakeScreen(PAY_SHAKE);
 }
 
 // where the total readout is on screen, from floor's space
@@ -239,22 +231,20 @@ function totalOnScreen(
   into.y = total.y - area.top;
 }
 
-// a crit number slamming onto its target: its worker climbs a perma tier, or
-// its floor's bar takes its levels
+// a crit number landing on its target: its worker climbs a perma tier, or
+// its floor's bar takes its levels; the target just wiggles white
 function smashIn(deps: FloorActionsDeps, payout: Payout): void {
   if (payout.prize.kind !== "tier") return;
   const { floor, worker } = payout;
   if (worker >= 0) {
     promoteWorkerPermaTier(floor, worker);
-    celebrateWorkerBoost(floor, worker, Date.now());
+    wiggleWorkerBoost(floor, worker, Date.now());
   } else {
-    const { multiplier, color } = CRIT_TIER_CONFIG[payout.prize.tier];
-    increaseIncomeRateBy(floor, multiplier);
-    punchIncomeBar(floor, `+${multiplier} Lvl`, color);
+    increaseIncomeRateBy(floor, CRIT_TIER_CONFIG[payout.prize.tier].multiplier);
+    wiggleIncomeBar(floor);
   }
   deps.persist();
-  shakeScreen(PAY_SHAKE);
-  playBarExplosion(1 + 0.1 * Math.random());
+  playBloop();
 }
 
 // whether a payout has finished playing
@@ -264,7 +254,7 @@ export function isPayoutDone(payout: Payout, now: number): boolean {
 }
 
 // a coin flipping up into the total, or a crit number flying up, swelling,
-// and slamming onto its bar or worker; nothing for badges, which paid on the tap
+// and landing on its bar or worker; nothing for badges, which paid on the tap
 export function drawPayout(
   ctx: CanvasRenderingContext2D,
   deps: FloorActionsDeps,
@@ -301,14 +291,4 @@ export function drawPayout(
     payout.hit = true;
     smashIn(deps, payout);
   }
-  drawDetonation(ctx, payout.bar, t - hitAt, SMASH_BLAST, now);
-  // squashed flat into the bar as it fades
-  const out = progress(t, hitAt, SQUASH_MS);
-  if (out >= 1) return;
-  ctx.save();
-  ctx.globalAlpha = 1 - out;
-  ctx.translate(payout.bar.x, payout.bar.y);
-  ctx.scale(1 + 0.6 * out, 1 - 0.5 * out);
-  drawMini(ctx, payout.prize, 0, 0, payout.size);
-  ctx.restore();
 }

@@ -32,6 +32,11 @@ export function pulseHudTotalFlash(): void {
   hitTargetStream(GLOBAL_SLAM, "total");
 }
 
+// just the white wiggle, no swell: a light landing in the total
+export function wiggleHudTotal(): void {
+  hudPulseAt = Date.now();
+}
+
 // the readout's size bump as coins are absorbed into it
 export function getHudTotalAbsorbScale(now: number): number {
   return hudAbsorb.scale(now);
