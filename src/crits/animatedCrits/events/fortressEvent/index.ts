@@ -36,14 +36,10 @@ import {
 } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawScreenPart } from "../../../../shared/screenCopy";
-import {
-  drawShipFlames,
-  drawShmupShip,
-  drawStarfield,
-  SHMUP_SHIP,
-} from "../../../../shared/shmup";
+import { drawStarfield } from "../../../../shared/shmup";
 import { pulseHudTotalFlash } from "../../../../shared/totalIncomeCoins";
 import {
+  drawWisp,
   drawWispBetween,
   drawWispHead,
   WISP_SIZE,
@@ -68,16 +64,14 @@ import {
 
 const KEY = "fortress";
 
-// the ship: its half span (of the view's width), its height down the view,
-// its weave (of the view's width, two sines), how far it banks, the ms it
-// starts climbing off the top, its flames and how fast they stream back
+// the racer: its half span (of the view's width, where its guns sit), its
+// height down the view, its weave (of the view's width, two sines), its
+// wisp's size, its guns' gap (of its half span)
 const SHIP_SIZE = 0.06;
 const SHIP_Y = 0.8;
 const WEAVE: [number, number] = [0.22, 0.06];
 const WEAVE_HZ: [number, number] = [0.45, 1.1];
-const BANK = 4;
-const FLAME = WISP_SIZE * 0.35;
-const TRAIL = 0.0012;
+const RACER = WISP_SIZE * 1.6;
 const TWIN = 0.35;
 // the core's spot (shares of the view) and size; the rings' radii (of the
 // view's width), wisps, turn (rad a ms) and how flat they're seen
@@ -333,8 +327,8 @@ function startFortress(floor: Floor, context: EventProcContext): void {
   let planned: Plan | null = null;
   let beats: Beats<Blast> | null = null;
   let soundAt = -Infinity;
+  let shipPath: ((ms: number) => Point) | null = null;
   const ship: Point = { x: 0, y: 0 };
-  const ahead: Point = { x: 0, y: 0 };
   const coreAt = (): Point => planned!.core;
 
   const drawScene = (
@@ -345,6 +339,7 @@ function startFortress(floor: Floor, context: EventProcContext): void {
   ): void => {
     if (!planned) {
       planned = plan(view);
+      shipPath = (t) => shipAt(view, t, { x: 0, y: 0 });
       beats = createBeats(
         planned.blasts,
         (b) => b.ms,
@@ -386,13 +381,8 @@ function startFortress(floor: Floor, context: EventProcContext): void {
       boomAt,
     );
     shipAt(view, ms, ship);
-    const size = SHIP_SIZE * view.w;
-    if (ship.y > view.y - size * 2) {
-      const lean = (shipAt(view, ms + 50, ahead).x - ship.x) / size;
-      const bank = Math.max(-1, Math.min(1, lean * BANK));
-      const exhausts = drawShmupShip(ctx, SHMUP_SHIP, ship, size, bank);
-      drawShipFlames(ctx, exhausts, ms, now, FLAME, TRAIL * view.h);
-    }
+    if (shipPath && ship.y > view.y - RACER * 2)
+      drawWisp(ctx, shipPath, ms, now, RACER, 1);
     for (const b of blasts) drawDetonation(ctx, b.at, ms - b.ms, b.size, now);
   };
 

@@ -3,6 +3,7 @@
 // down its spine with exhausts in its thick tail, with its shadow on the
 // road; returns where its exhausts are, for the flames
 import { fillFpsQuad, fpsSight, type Fps, type FpsPoint } from "../fps";
+import { drawWisp } from "../wisp";
 
 export interface RaceShipLook {
   wing: string;
@@ -98,4 +99,37 @@ export function drawRaceShip(
     ctx.fill();
   }
   return engines;
+}
+
+export interface RaceSpot {
+  x: number;
+  // height over the road
+  y: number;
+  z: number;
+}
+
+// the racer as a wisp (events fly a wisp, never the ship above): its path
+// through the world seen through each frame's view, its trail streaming back
+// through where it just was, `size` world units across. Make once at arm,
+// call every frame
+export function createRaceWisp(
+  at: (ms: number) => RaceSpot | null,
+): (
+  ctx: CanvasRenderingContext2D,
+  fps: Fps,
+  ms: number,
+  now: number,
+  size: number,
+  heat?: number,
+) => void {
+  let seen: Fps | null = null;
+  const path = (ms: number): FpsPoint | null => {
+    const spot = at(ms);
+    return spot && seen ? fpsSight(seen, spot.x, spot.y, spot.z) : null;
+  };
+  return (ctx, fps, ms, now, size, heat = 1) => {
+    seen = fps;
+    const head = path(ms);
+    if (head) drawWisp(ctx, path, ms, now, size * head.s, heat);
+  };
 }

@@ -1,7 +1,7 @@
 // the "Road Race" event (road race; cash), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn with shared/race's street and
-// ship in shared/fps's world: its crit's click zooms the floors away into a
-// race already flat out, a small ship skimming the street between the
+// racer wisp in shared/fps's world: its crit's click zooms the floors away into a
+// race already flat out, a racing wisp skimming the street between the
 // buildings, weaving through a snake of coins, each paying into the live
 // total, round a bend and faster and faster down the straight to the finish
 // gate, where the floors fill its window and the view rushes through onto them
@@ -20,19 +20,17 @@ import {
   type FpsScreen,
 } from "../../../../shared/fps";
 import {
+  createRaceWisp,
   drawFinishGate,
-  drawRaceShip,
   drawRoadStreet,
   roadBend,
   ROAD_STREET,
-  type RaceShipLook,
   type RoadCurve,
 } from "../../../../shared/race";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { drawScreenPart, type ScreenCopy } from "../../../../shared/screenCopy";
 import { pulseHudTotalFlash } from "../../../../shared/totalIncomeCoins";
-import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {
   beginCoinBatch,
   drawCoinBurstFrame,
@@ -67,10 +65,8 @@ const FOLLOW = 0.6;
 // the finish gate at the road's end and its window, as wide as the road
 const GATE_Z = 40;
 const OPEN_W = ROAD_STREET.half * 2;
-// the bend to the right, done before the straight to the gate, and how hard
-// the ship leans into it
+// the bend to the right, done before the straight to the gate
 const CURVE: RoadCurve = { from: 10, to: 20, turn: 0.05 };
-const CURVE_LEAN = 0.4;
 // coins: the first and last along the road, the gap between them, their
 // height, size and the snake they weave in across the road
 const COIN_FROM = 2;
@@ -86,19 +82,13 @@ const COIN_SPIN = 0.012;
 const FLYING_START = 0.55;
 const LAND_FROM = 0.75;
 const PULL_AHEAD = 3;
-// the ship: its hover over the road and bob, its bank into the snake's
-// turns, its engine flames
+// the racer's wisp: its hover over the road and bob, its size
 const HOVER = 0.18;
 const BOB = 0.012;
 const BOB_RATE = 0.012;
-const BANK = 1.5;
-const FLAME = 0.5;
+const RACER = 0.07;
 const ZOOM = 1.2;
 const START_SHAKE = 1.2;
-const SHIP: RaceShipLook = {
-  wing: COLOR.silverTicketGray,
-  shadow: COLOR.black,
-};
 const SKY = COLOR.revealSky;
 const GRASS = COLOR.shareholdersGreen;
 
@@ -126,14 +116,8 @@ export function forceRoadRaceEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-// where the snake of coins crosses the road at z, and which way it's turning
+// where the snake of coins crosses the road at z
 const laneX = (z: number) => SNAKE * Math.sin((z - COIN_FROM) * SNAKE_RATE);
-const laneTurn = (z: number) =>
-  SNAKE * SNAKE_RATE * Math.cos((z - COIN_FROM) * SNAKE_RATE);
-// 0 on the straights, 1 through the bend
-const inCurve = (z: number) =>
-  smoothstep(clamp01((z - CURVE.from) / 2)) *
-  smoothstep(clamp01((CURVE.to - z) / 2));
 
 // the window's height, so it has the screen's shape and fills it on landing
 const openHigh = (view: FpsScreen) => (OPEN_W * view.h) / view.w;
@@ -160,6 +144,10 @@ function startRoadRace(floor: Floor, context: EventProcContext): void {
     smoothstep(clamp01((u(ms) - LAND_FROM) / (1 - LAND_FROM)));
   const shipZ = (ms: number) =>
     camZ(ms) + BEHIND + PULL_AHEAD * landing(ms) ** 2;
+  const racer = createRaceWisp((ms) => {
+    const z = shipZ(ms);
+    return { x: laneX(z), y: HOVER + Math.sin(ms * BOB_RATE) * BOB, z };
+  });
   let picked = 0;
   const pickUpTo = (ms: number) => {
     while (picked < coins.length && shipZ(ms) >= coins[picked].z) {
@@ -223,26 +211,7 @@ function startRoadRace(floor: Floor, context: EventProcContext): void {
       drawCoinBurstFrame(ctx, coin.sprite, at.x, at.y, COIN_R * at.s, base);
     }
     endCoinBatch(ctx);
-    if (z < GATE_Z) {
-      const engines = drawRaceShip(ctx, fps, SHIP, {
-        x: shipX,
-        z,
-        hover: HOVER + Math.sin(now * BOB_RATE) * BOB,
-        bank: Math.max(
-          -1,
-          Math.min(1, (laneTurn(z) + CURVE_LEAN * inCurve(z)) * BANK),
-        ),
-      });
-      for (const engine of engines)
-        drawWisp(
-          ctx,
-          () => engine,
-          ms,
-          now,
-          WISP_SIZE * FLAME * (0.6 + u(ms)),
-          1,
-        );
-    }
+    if (z < GATE_Z) racer(ctx, fps, ms, now, RACER, 0.4 + u(ms));
   };
 
   const beat = startFlightStage(

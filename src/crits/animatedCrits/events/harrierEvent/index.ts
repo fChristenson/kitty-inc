@@ -1,6 +1,6 @@
 // the "Harrier" event (rail shooter; cash), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn with shared/railShooter's
-// plain and pillars and shared/race's ship in shared/fps's world: its crit's
+// plain and pillars and shared/race's racer wisp in shared/fps's world: its crit's
 // click splits the floors' screen into strips that slide apart onto a
 // checkerboard plain racing at the view, the ship weaving low between
 // towering pillars. Waves of wisps swirl in from the horizon and the ship's
@@ -33,7 +33,7 @@ import {
   type FpsCoin,
   type FpsLens,
 } from "../../../../shared/fps";
-import { drawRaceShip, type RaceShipLook } from "../../../../shared/race";
+import { createRaceWisp } from "../../../../shared/race";
 import {
   drawCheckerPlain,
   drawRailPillar,
@@ -75,22 +75,16 @@ const BEHIND = 1.6;
 const RIDE = 0.45;
 const FOLLOW = 0.5;
 const SPEED = 6;
-// the ship: its weave across and up and down, its bank into the weave, its
-// engine flames, where its shots leave from
+// the racer: its weave across and up and down, its wisp's size, where its
+// shots leave from
 const WEAVE_X = 0.45;
 const WEAVE_X_RATE = 0.0021;
 const HOVER = 0.5;
 const WEAVE_Y = 0.15;
 const WEAVE_Y_RATE = 0.0033;
-const BANK = 40;
-const BANK_LOOK_MS = 40;
-const FLAME = 0.6;
+const RACER = 0.08;
 const NOSE = 0.6;
 const NOSE_UP = 0.05;
-const SHIP: RaceShipLook = {
-  wing: COLOR.silverTicketGray,
-  shadow: COLOR.black,
-};
 // the plain and its pillars, one every PILLAR_EVERY along, alternating sides
 const SKY = COLOR.revealSky;
 const PLAIN = COLOR.shareholdersGreen;
@@ -306,6 +300,10 @@ function startHarrier(floor: Floor, context: EventProcContext): void {
 
   // the frame of view the wisps' paths are seen through, set every frame
   const seen: { fps: Fps | null } = { fps: null };
+  const racer = createRaceWisp((ms) => {
+    const ship = shipAt(ms);
+    return { x: ship.x, y: ship.hover, z: ship.z };
+  });
   const onScreen = (x: number, y: number, z: number): Point | null =>
     seen.fps && fpsSight(seen.fps, x, y, z);
   // a foe's spot, read at once by every path
@@ -377,20 +375,7 @@ function startHarrier(floor: Floor, context: EventProcContext): void {
         f.serpent ? SERPENT_HEAT : FOE_HEAT,
       );
     }
-    if (ship.z < screenZ) {
-      const bank = Math.max(
-        -1,
-        Math.min(1, (shipAt(ms + BANK_LOOK_MS).x - ship.x) * BANK),
-      );
-      const engines = drawRaceShip(ctx, fps, SHIP, {
-        x: ship.x,
-        z: ship.z,
-        hover: ship.hover,
-        bank,
-      });
-      for (const engine of engines)
-        drawWisp(ctx, () => engine, ms, now, WISP_SIZE * FLAME, 1);
-    }
+    if (ship.z < screenZ) racer(ctx, fps, ms, now, RACER);
     for (let i = 0; i < shots.length; i++)
       drawWispBetween(
         ctx,

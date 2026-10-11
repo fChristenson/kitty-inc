@@ -1,7 +1,7 @@
 // the "Overtake" event (road race; crit tiers), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn with shared/race's street and
-// ships in shared/fps's world: its crit's click zooms the floors away into a
-// street race already flat out, three rival ships strung out ahead. The ship
+// racer wisps in shared/fps's world: its crit's click zooms the floors away into a
+// street race already flat out, three rival wisps strung out ahead. The racer
 // tucks in behind each one, white slipstream streaming off its tail, then
 // slingshots out and past with a jolt, the rival dropping back, quicker each
 // time, round a bend and down the straight; leading at last, it shoots
@@ -27,19 +27,17 @@ import {
   type FpsScreen,
 } from "../../../../shared/fps";
 import {
+  createRaceWisp,
   drawFinishGate,
-  drawRaceShip,
   drawRoadStreet,
   roadBend,
   ROAD_STREET,
-  type RaceShipLook,
   type RoadCurve,
 } from "../../../../shared/race";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { hash01, stampGlimmer } from "../../../../shared/twinkle";
 import { drawScreenPart, type ScreenCopy } from "../../../../shared/screenCopy";
-import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { findRewardBars } from "../../eventRewards";
@@ -67,45 +65,27 @@ const FOLLOW = 0.5;
 // the finish gate at the road's end and its window, as wide as the road
 const GATE_Z = 40;
 const OPEN_W = ROAD_STREET.half * 2;
-// the bend to the right and how hard the ships lean into it
+// the bend to the right
 const CURVE: RoadCurve = { from: 10, to: 20, turn: 0.05 };
-const CURVE_LEAN = 0.4;
 // the race: already this share of top speed at the start, the share of it
-// spent turning to the gate's window, how far the ship pulls ahead into it
+// spent turning to the gate's window, how far the racer pulls ahead into it
 const FLYING_START = 0.5;
 const LAND_FROM = 0.86;
 const PULL_AHEAD = 0.8;
-// the ships: hover, bob, bank, engine flames
+// the racers' wisps: hover, bob, size and heat (the rivals smaller, dimmer)
 const HOVER = 0.18;
 const BOB = 0.012;
 const BOB_RATE = 0.012;
-const BANK = 30;
-const BANK_LOOK_MS = 40;
-const FLAME = 0.5;
-const RIVAL_FLAME = 0.45;
-const SHIP: RaceShipLook = {
-  wing: COLOR.silverTicketGray,
-  shadow: COLOR.black,
-};
-// the rivals: their lanes, looks and when the ship passes each (shares of
-// the race), how fast it closes on them (world units a ms); seen from
-// SEEN_FROM ahead to SEEN_TO behind the ship
-const RIVALS: { x: number; pass: number; look: RaceShipLook }[] = [
-  {
-    x: 0.35,
-    pass: 0.24,
-    look: { wing: COLOR.fullHouseCrimson, shadow: COLOR.black },
-  },
-  {
-    x: -0.35,
-    pass: 0.46,
-    look: { wing: COLOR.nightShiftIndigo, shadow: COLOR.black },
-  },
-  {
-    x: 0.35,
-    pass: 0.64,
-    look: { wing: COLOR.heavenlyGold, shadow: COLOR.black },
-  },
+const RACER = 0.07;
+const RIVAL = 0.055;
+const RIVAL_HEAT = 0.2;
+// the rivals: their lanes and when the racer passes each (shares of the
+// race), how fast it closes on them (world units a ms); seen from
+// SEEN_FROM ahead to SEEN_TO behind the racer
+const RIVALS: { x: number; pass: number }[] = [
+  { x: 0.35, pass: 0.24 },
+  { x: -0.35, pass: 0.46 },
+  { x: 0.35, pass: 0.64 },
 ];
 const CLOSING = 0.0032;
 const SEEN_FROM = 18;
@@ -169,11 +149,6 @@ export function forceOvertakeEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-// 0 on the straights, 1 through the bend
-const inCurve = (z: number) =>
-  smoothstep(clamp01((z - CURVE.from) / 2)) *
-  smoothstep(clamp01((CURVE.to - z) / 2));
-
 // the window's height, so it has the screen's shape and fills it on landing
 const openHigh = (view: FpsScreen) => (OPEN_W * view.h) / view.w;
 
@@ -221,6 +196,20 @@ function startOvertake(floor: Floor, context: EventProcContext): void {
     ms: gateMs + k * FINISH_GAP,
   }));
   const bigMs = gateMs + FINISH_SPOTS.length * FINISH_GAP;
+  const bob = (ms: number, k: number) =>
+    HOVER + Math.sin(ms * BOB_RATE + k) * BOB;
+  const racer = createRaceWisp((ms) => ({
+    x: shipX(ms),
+    y: bob(ms, 0),
+    z: shipZ(ms),
+  }));
+  const rivals = RIVALS.map((r, k) =>
+    createRaceWisp((ms) => {
+      const rel = ahead(k, ms);
+      if (rel > SEEN_FROM || rel < SEEN_TO) return null;
+      return { x: r.x, y: bob(ms, k + 1), z: shipZ(ms) + rel };
+    }),
+  );
 
   const drawRival = (
     ctx: CanvasRenderingContext2D,
@@ -234,15 +223,8 @@ function startOvertake(floor: Floor, context: EventProcContext): void {
     const rel = ahead(k, ms);
     if (rel > SEEN_FROM || rel < SEEN_TO) return;
     const z = shipAt + rel;
-    const engines = drawRaceShip(ctx, fps, r.look, {
-      x: r.x,
-      z,
-      hover: HOVER + Math.sin(now * BOB_RATE + k) * BOB,
-      bank: Math.max(-1, Math.min(1, CURVE_LEAN * inCurve(z) * 2)),
-    });
-    for (const engine of engines)
-      drawWisp(ctx, () => engine, ms, now, WISP_SIZE * RIVAL_FLAME, 1);
-    // its slipstream while the ship is tucked in behind it
+    rivals[k](ctx, fps, ms, now, RIVAL, RIVAL_HEAT);
+    // its slipstream while the racer is tucked in behind it
     const tucked = clamp01(TUCK_FROM - rel) * clamp01((rel - 0.5) / 0.3);
     if (tucked > 0)
       for (let j = 0; j < STREAKS; j++) {
@@ -319,27 +301,10 @@ function startOvertake(floor: Floor, context: EventProcContext): void {
       ),
     );
     drawRoadStreet(ctx, fps, ROAD_STREET, GATE_Z);
-    // rivals still ahead far to near, the ship, then any it's just passed
+    // rivals still ahead far to near, the racer, then any it's just passed
     for (let k = RIVALS.length - 1; k >= 0; k--)
       if (ahead(k, ms) >= 0) drawRival(ctx, fps, k, z, ms, now);
-    if (z < GATE_Z) {
-      const bank = (shipX(ms + BANK_LOOK_MS) - x) * BANK;
-      const engines = drawRaceShip(ctx, fps, SHIP, {
-        x,
-        z,
-        hover: HOVER + Math.sin(now * BOB_RATE) * BOB,
-        bank: Math.max(-1, Math.min(1, bank + CURVE_LEAN * inCurve(z))),
-      });
-      for (const engine of engines)
-        drawWisp(
-          ctx,
-          () => engine,
-          ms,
-          now,
-          WISP_SIZE * FLAME * (0.6 + u(ms)),
-          1,
-        );
-    }
+    if (z < GATE_Z) racer(ctx, fps, ms, now, RACER, 0.4 + u(ms));
     for (let k = RIVALS.length - 1; k >= 0; k--)
       if (ahead(k, ms) < 0) drawRival(ctx, fps, k, z, ms, now);
     // the finish's blasts round the window

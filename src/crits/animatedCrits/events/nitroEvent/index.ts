@@ -1,6 +1,6 @@
 // the "Nitro" event (road race; crit tiers), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn with shared/race's street and
-// ship in shared/fps's world: its crit's click zooms the floors away into a
+// racer wisp in shared/fps's world: its crit's click zooms the floors away into a
 // street race already flat out, a run of gold boost pads down the street.
 // The ship hits them one after another, each a surge: the view punching
 // wide, speed lines tearing past, its flames roaring; through a tunnel under
@@ -31,17 +31,15 @@ import {
   type FpsScreen,
 } from "../../../../shared/fps";
 import {
+  createRaceWisp,
   drawFinishGate,
-  drawRaceShip,
   drawRoadStreet,
   ROAD_STREET,
-  type RaceShipLook,
 } from "../../../../shared/race";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { hash01, stampGlimmer } from "../../../../shared/twinkle";
 import { drawScreenPart, type ScreenCopy } from "../../../../shared/screenCopy";
-import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { findRewardBars } from "../../eventRewards";
@@ -100,20 +98,14 @@ const BUILDING_HIGH = 2.6;
 const LIGHT_EVERY = 0.8;
 const LIGHT_LONG = 0.3;
 const LIGHT_HALF = 0.35;
-// the ship: weave, hover, bob, bank, flames growing in a surge
+// the racer: weave, hover, bob, its wisp swelling in a surge
 const WEAVE = 0.3;
 const WEAVE_RATE = 0.0019;
 const HOVER = 0.18;
 const BOB = 0.012;
 const BOB_RATE = 0.012;
-const BANK = 30;
-const BANK_LOOK_MS = 40;
-const FLAME = 0.5;
-const FLAME_SURGE = 0.7;
-const SHIP: RaceShipLook = {
-  wing: COLOR.silverTicketGray,
-  shadow: COLOR.black,
-};
+const RACER = 0.07;
+const RACER_SURGE = 0.4;
 // speed lines tearing out from the horizon in a surge (of the view's width)
 const LINES = 22;
 const LINE_FROM = 0.24;
@@ -211,6 +203,11 @@ function startNitro(floor: Floor, context: EventProcContext): void {
   const shipX = (ms: number) =>
     WEAVE * Math.sin(ms * WEAVE_RATE) * (1 - landing(ms));
   const pads = padMs.map((ms) => ({ ms, x: shipX(ms), z: shipZ(ms) }));
+  const racer = createRaceWisp((ms) => ({
+    x: shipX(ms),
+    y: HOVER + Math.sin(ms * BOB_RATE) * BOB,
+    z: shipZ(ms),
+  }));
   const tunnel: [number, number] = [
     pads[2].z + TUNNEL_FROM,
     pads[3].z + TUNNEL_TO,
@@ -379,16 +376,8 @@ function startNitro(floor: Floor, context: EventProcContext): void {
       ctx.restore();
     }
     if (sz < GATE_Z) {
-      const bank = (shipX(ms + BANK_LOOK_MS) - x) * BANK;
-      const engines = drawRaceShip(ctx, fps, SHIP, {
-        x,
-        z: sz,
-        hover: HOVER + Math.sin(now * BOB_RATE) * BOB,
-        bank: Math.max(-1, Math.min(1, bank)),
-      });
-      const flame = WISP_SIZE * (FLAME + FLAME_SURGE * Math.min(1, surge));
-      for (const engine of engines)
-        drawWisp(ctx, () => engine, ms, now, flame, 1);
+      const boost = Math.min(1, surge);
+      racer(ctx, fps, ms, now, RACER * (1 + RACER_SURGE * boost), 0.5 + boost);
     }
     // speed lines tearing out from the horizon in a surge
     if (wide > 0.05) {

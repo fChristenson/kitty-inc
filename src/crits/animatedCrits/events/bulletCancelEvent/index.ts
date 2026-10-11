@@ -41,12 +41,7 @@ import {
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawScreenPart } from "../../../../shared/screenCopy";
-import {
-  drawShipFlames,
-  drawShmupShip,
-  drawStarfield,
-  SHMUP_SHIP,
-} from "../../../../shared/shmup";
+import { drawStarfield } from "../../../../shared/shmup";
 import { pulseHudTotalFlash } from "../../../../shared/totalIncomeCoins";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -69,18 +64,14 @@ import {
 
 const KEY = "bulletCancel";
 
-// the ship: its half span (of the view's width), its height down the view and
-// bob (of its height), its weave (of the view's width) and rate, how far it
-// banks, its flames
-const SHIP_SIZE = 0.06;
+// the racer: its height down the view and bob (of its height), its weave (of
+// the view's width) and rate, its wisp's size, hotter as the storm thickens
 const SHIP_Y = 0.82;
 const SHIP_BOB = 0.02;
 const SHIP_BOB_RATE = 0.0031;
 const WEAVE = 0.3;
 const WEAVE_RATE = 0.0016;
-const BANK = 0.8;
-const FLAME = WISP_SIZE * 0.35;
-const TRAIL = 0.0012;
+const RACER = WISP_SIZE * 1.6;
 // its glow as the storm thickens (of the view's width)
 const HEAT = fadeStops(COLOR.heavenlyGold);
 const HEAT_SIZE: [number, number] = [0.07, 0.18];
@@ -286,8 +277,8 @@ function startBulletCancel(floor: Floor, context: EventProcContext): void {
 
   let planned: Plan | null = null;
   let beats: Beats<Blast> | null = null;
+  let shipPath: ((ms: number) => Point) | null = null;
   const ship: Point = { x: 0, y: 0 };
-  const ahead: Point = { x: 0, y: 0 };
   const boss: Point = { x: 0, y: 0 };
   const bossPath = () => boss;
 
@@ -299,6 +290,7 @@ function startBulletCancel(floor: Floor, context: EventProcContext): void {
   ): void => {
     if (!planned) {
       planned = plan(view);
+      shipPath = (t) => shipAt(view, t, { x: 0, y: 0 });
       beats = createBeats(
         planned.blasts,
         (b) => b.ms,
@@ -370,23 +362,14 @@ function startBulletCancel(floor: Floor, context: EventProcContext): void {
       ctx.stroke();
       ctx.restore();
     }
-    // the ship, glowing hotter as the storm thickens
-    const size = SHIP_SIZE * view.w;
+    // the racer, glowing hotter as the storm thickens
     const heat = clamp01((ms - FIRE_FROM) / (BOMB - FIRE_FROM));
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
     ctx.globalAlpha = lerp(HEAT_ALPHA, heat);
     drawGlow(ctx, HEAT, ship.x, ship.y, lerp(HEAT_SIZE, heat) * view.w);
     ctx.restore();
-    const lean = (shipAt(view, ms + 50, ahead).x - ship.x) / size;
-    const exhausts = drawShmupShip(
-      ctx,
-      SHMUP_SHIP,
-      ship,
-      size,
-      Math.max(-1, Math.min(1, lean * BANK * 5)),
-    );
-    drawShipFlames(ctx, exhausts, ms, now, FLAME, TRAIL * view.h);
+    if (shipPath) drawWisp(ctx, shipPath, ms, now, RACER, 0.4 + 0.6 * heat);
     drawDetonation(ctx, bomb, ms - BOMB, BOMB_BLAST * view.w, now);
     for (const b of blasts) drawDetonation(ctx, b.at, ms - b.ms, b.size, now);
   };

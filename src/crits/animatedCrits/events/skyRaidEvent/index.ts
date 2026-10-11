@@ -35,12 +35,9 @@ import {
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawScreenPart } from "../../../../shared/screenCopy";
 import {
-  drawShipFlames,
-  drawShmupShip,
   drawStarfield,
   enemySpot,
   planShipGuns,
-  SHMUP_SHIP,
   shmupEnemy,
   shotHeat,
   type ShipShot,
@@ -48,6 +45,7 @@ import {
 } from "../../../../shared/shmup";
 import { pulseHudTotalFlash } from "../../../../shared/totalIncomeCoins";
 import {
+  drawWisp,
   drawWispBetween,
   WISP_SIZE,
   type Point,
@@ -71,18 +69,15 @@ import {
 
 const KEY = "skyRaid";
 
-// the ship: its half span (of the view's width), its height down the view,
-// its weave (of the view's width, two sines), how far it banks, the ms it
-// starts climbing off the top, its flames and how fast they stream back (of
-// the view's height a ms)
+// the racer: its half span (of the view's width, where its guns sit), its
+// height down the view, its weave (of the view's width, two sines), the ms it
+// starts climbing off the top, its wisp's size
 const SHIP_SIZE = 0.06;
 const SHIP_Y = 0.8;
 const WEAVE: [number, number] = [0.2, 0.08];
 const WEAVE_HZ: [number, number] = [0.33, 0.85];
-const BANK = 4;
 const LEAVE_AT = 3700;
-const FLAME = WISP_SIZE * 0.35;
-const TRAIL = 0.0012;
+const RACER = WISP_SIZE * 1.6;
 // its guns: twin shots every SHOT_EVERY ms at SHOT_SPEED (of the view's width
 // a ms), the twins' gap (of its half span), how far ahead they aim
 const SHOOT: [number, number] = [250, 3550];
@@ -317,8 +312,8 @@ function startSkyRaid(floor: Floor, context: EventProcContext): void {
 
   let planned: Plan | null = null;
   let beats: Beats<Blast> | null = null;
+  let shipPath: ((ms: number) => Point) | null = null;
   const ship: Point = { x: 0, y: 0 };
-  const ahead: Point = { x: 0, y: 0 };
 
   const drawScene = (
     ctx: CanvasRenderingContext2D,
@@ -328,6 +323,7 @@ function startSkyRaid(floor: Floor, context: EventProcContext): void {
   ): void => {
     if (!planned) {
       planned = plan(view);
+      shipPath = (t) => shipAt(view, t, { x: 0, y: 0 });
       beats = createBeats(
         planned.blasts,
         (b) => b.ms,
@@ -355,13 +351,8 @@ function startSkyRaid(floor: Floor, context: EventProcContext): void {
       drawWispBetween(ctx, e.at, ms, now, e.size, heat[i], e.enterAt, e.killAt);
     }
     shipAt(view, ms, ship);
-    const size = SHIP_SIZE * view.w;
-    if (ship.y > view.y - size * 2) {
-      const lean = (shipAt(view, ms + 50, ahead).x - ship.x) / size;
-      const bank = Math.max(-1, Math.min(1, lean * BANK));
-      const exhausts = drawShmupShip(ctx, SHMUP_SHIP, ship, size, bank);
-      drawShipFlames(ctx, exhausts, ms, now, FLAME, TRAIL * view.h);
-    }
+    if (shipPath && ship.y > view.y - RACER * 2)
+      drawWisp(ctx, shipPath, ms, now, RACER, 1);
     for (const b of blasts) drawDetonation(ctx, b.at, ms - b.ms, b.size, now);
   };
 
