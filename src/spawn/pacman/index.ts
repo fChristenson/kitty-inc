@@ -16,7 +16,7 @@ import {
 } from "../../sound";
 import { clamp01, lerp } from "../../shared/easing";
 import { drawDetonation } from "../../shared/explosion";
-import { drawBadgeLights } from "../../shared/badgeLights";
+import { drawLightRays } from "../../shared/lightRays";
 import { beginLightBatch, endLightBatch } from "../../shared/lightBatch";
 import { shakeScreen } from "../../shared/screenShake";
 import { isScreenFrozen } from "../../shared/screenFreeze";
@@ -411,7 +411,7 @@ function draw(
       (1 + BADGE_PULSE * Math.sin(now * BADGE_PULSE_RATE));
     ctx.save();
     ctx.globalAlpha = fade.alpha;
-    drawBadgeLights(ctx, at.x, at.y, size * BADGE_LIGHTS, pop, now);
+    drawLightRays(ctx, at.x, at.y, size * BADGE_LIGHTS, 1, now);
     drawMini(ctx, r.prize, at.x, at.y, size);
     ctx.restore();
     drawDetonation(ctx, at, pop, POP, now);

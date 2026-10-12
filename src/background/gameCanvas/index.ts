@@ -88,6 +88,7 @@ import {
   openCoinLayer,
   trackLightCanvas,
 } from "../../shared/spriteBatch";
+import { setLightRaysBase } from "../../shared/lightRays";
 import {
   isScreenFrozen,
   getFreezeButton,
@@ -236,6 +237,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   const topCtx = topCanvas.getContext("2d")!;
   layOver(canvas, topCanvas);
   trackLightCanvas(topCtx);
+  setLightRaysBase(topCtx, ctx);
   attachCoinLayer(canvas);
   let topDrawn = false;
 
@@ -890,6 +892,15 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // so the actual bottom edge is captured for the HUD tap-zone hit-test below
     // instead of guessing a fixed height
     if (!skipHud) hudBottomY = drawHud(over, SLOT_W, getTotalIncome());
+    // the gesture spawns sit on the floors' bars and buttons: under the crit
+    // celebration, like the floors themselves
+    drawSpawnGames(
+      over,
+      SLOT_W,
+      contentViewportH(),
+      HUD_H / 2,
+      performance.now(),
+    );
     // the flash holds still while the world rattles: its huge rays judder otherwise
     over.translate(-shake.x / scale, -shake.y / scale);
     if (!skipFlash)
@@ -910,13 +921,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       performance.now(),
     );
     drawCoinSpawn(
-      over,
-      SLOT_W,
-      contentViewportH(),
-      HUD_H / 2,
-      performance.now(),
-    );
-    drawSpawnGames(
       over,
       SLOT_W,
       contentViewportH(),

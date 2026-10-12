@@ -13,7 +13,7 @@ import {
   drawEventStreams,
   streamGlimmers,
 } from "../../../../shared/eventStream";
-import { drawGoldShimmer } from "../../../../shared/goldShimmer";
+import { drawLightRays } from "../../../../shared/lightRays";
 import {
   freezeScreen,
   getScreenFreezeDim,
@@ -132,32 +132,20 @@ function drawOverlay(
 
   const mentorRect = getFloorRect(event.mentor.floor);
   if (mentorRect)
-    drawGoldShimmer(
+    drawLightRays(
       ctx,
       mentorRect.left + event.mentor.center.x,
       mentorRect.top + event.mentor.center.y,
       MENTOR_GLOW,
       streaming,
-      2,
       now,
-      COLOR.heavenlyGold,
     );
   const studentRect = getFloorRect(event.student.floor);
   if (studentRect) {
     const x = studentRect.left + event.student.center.x;
     const y = studentRect.top + event.student.center.y;
     const pulse = Math.max(0, 1 - (now - event.lastLandedAt) / PULSE_MS);
-    if (pulse > 0)
-      drawGoldShimmer(
-        ctx,
-        x,
-        y,
-        STUDENT_GLOW,
-        pulse,
-        3,
-        now,
-        COLOR.heavenlyGold,
-      );
+    if (pulse > 0) drawLightRays(ctx, x, y, STUDENT_GLOW, pulse, now);
     if (event.promotedAt !== null)
       drawWhiteBurst(ctx, x, y, (now - event.promotedAt) / BURST_MS, 0.4);
   }

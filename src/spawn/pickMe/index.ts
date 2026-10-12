@@ -17,7 +17,7 @@ import { getIncomeBarBox } from "../../floors";
 import type { Floor } from "../../gameState";
 import { playSpawnNotice, playJackpot, playSpinTick } from "../../sound";
 import { clamp01, lerp } from "../../shared/easing";
-import { drawBadgeLights } from "../../shared/badgeLights";
+import { drawLightRays } from "../../shared/lightRays";
 import { drawDetonation } from "../../shared/explosion";
 import { playExplosion } from "../../shared/explosionBang";
 import { isScreenFrozen } from "../../shared/screenFreeze";
@@ -244,14 +244,22 @@ function canTap(p: Pick, now: number): boolean {
   );
 }
 
-// the tier whose wisp (x, y) is on, -1 if none
+// the tier whose wisp (x, y) is on, -1 if none; the nearest where the
+// fingertip reaches overlap
 function tierAt(p: Pick, x: number, y: number, now: number): number {
   const age = now - p.bornAt;
+  let best = -1;
+  let bestDistance = Infinity;
   for (let t = 0; t < TIERS.length; t++) {
     const at = wispAt(p, t, age);
-    if (at && tapHits(x, y, at, barH * REACH)) return t;
+    if (!at || !tapHits(x, y, at, barH * REACH)) continue;
+    const distance = (x - at.x) ** 2 + (y - at.y) ** 2;
+    if (distance < bestDistance) {
+      best = t;
+      bestDistance = distance;
+    }
   }
-  return -1;
+  return best;
 }
 
 function hitTest(x: number, y: number, now: number): boolean {
@@ -412,7 +420,7 @@ function draw(
           spot.x = from.x;
           spot.y = lerp([from.y, bar.y], u);
           if (since < HOLD_MS)
-            drawBadgeLights(ctx, spot.x, spot.y, barH * LIGHTS, since, now);
+            drawLightRays(ctx, spot.x, spot.y, barH * LIGHTS, 1, now);
           drawNumber(ctx, t, spot, 1, true);
         }
         spot.x = from.x;

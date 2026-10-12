@@ -33,6 +33,8 @@ export interface FloorCritPlay {
     spill: number,
     share?: number,
   ) => void;
+  // after the last of its hits
+  onLastHit?: () => void;
   // bars()[bar] leaping off its floor for ms, landing back down (or hauled
   // up, held and dropped)
   onLift?: (bar: number, ms: number, haul: boolean) => void;
@@ -588,6 +590,7 @@ export function drawFloorCrit(
     const { bar, step } = r.hits[r.fired++];
     r.shake(def.shake?.(step) ?? HIT_SHAKE);
     r.play.onHit(bar, step, r.glyphs.color, spill, 1 / r.hits.length);
+    if (r.fired === r.hits.length) r.play.onLastHit?.();
   }
   if (ms >= r.endsAt) {
     running = null;

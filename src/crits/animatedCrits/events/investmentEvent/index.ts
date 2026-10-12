@@ -208,7 +208,7 @@ function startInvestment(floor: Floor, context: EventProcContext): void {
     floor.lastCollectedAt = now;
     triggerHudTotalFlash();
     playSold();
-    const buttonFx = createEventFx(liftMs, COLOR.heavenlyGold);
+    const buttonFx = createEventFx(liftMs);
     event.buttonFx = buttonFx;
     streamGlimmers(
       [{ floor, x: bar.x, y: bar.y, spreadX: BAR_W * 0.8, spreadY: 20 }],

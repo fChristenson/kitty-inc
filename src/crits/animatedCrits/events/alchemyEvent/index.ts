@@ -19,7 +19,7 @@ import {
   streamCoins,
   streamGlimmers,
 } from "../../../../shared/eventStream";
-import { drawGoldShimmer } from "../../../../shared/goldShimmer";
+import { drawLightRays } from "../../../../shared/lightRays";
 import { triggerHudTotalFlash } from "../../../../shared/totalIncomeCoins";
 import {
   freezeScreen,
@@ -152,15 +152,13 @@ function drawOverlay(
       event.boiledAt === null ? 0 : clamp01((now - event.boiledAt) / shootMs);
     const pulse = Math.max(0, 1 - (now - event.lastLandedAt) / PULSE_MS);
     if (pulse > 0)
-      drawGoldShimmer(
+      drawLightRays(
         ctx,
         event.worker.x,
         event.worker.y,
         WORKER_GLOW,
         pulse,
-        3,
         now,
-        COLOR.potionGreen,
       );
     const dim = getScreenFreezeDim() * (1 - shot);
     drawWorkerSpotlight(ctx, event.floor, event.workerIndex, 0, 0, dim);
@@ -205,7 +203,7 @@ function startAlchemy(floor: Floor, context: EventProcContext): void {
   const event: RunningAlchemy = {
     ...target,
     floor,
-    fx: createEventFx(brewMs, COLOR.potionGreen),
+    fx: createEventFx(brewMs),
     startedAt: performance.now(),
     boiledAt: null,
     lastLandedAt: 0,

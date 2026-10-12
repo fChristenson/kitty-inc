@@ -1,7 +1,7 @@
 // the Alchemy event's cartoon cauldron: an iron pot on stubby feet, its brew
 // glowing and bubbling harder the higher `brew` (0..1) climbs
 import { COLOR } from "../../../../palette";
-import { drawGoldShimmer } from "../../../../shared/goldShimmer";
+import { drawLightRays } from "../../../../shared/lightRays";
 import { hash01 } from "../../../../shared/twinkle";
 import { fillOutlined as outlined } from "../../../../utils";
 
@@ -48,16 +48,7 @@ export function drawCauldron(
   const { bodyY, rimY } = layout(baseY);
   ctx.save();
   ctx.lineJoin = "round";
-  drawGoldShimmer(
-    ctx,
-    x,
-    rimY,
-    W * 0.7 * brew,
-    brew,
-    1,
-    now,
-    COLOR.potionGreen,
-  );
+  drawLightRays(ctx, x, rimY, W * 0.7 * brew, brew, now);
 
   for (const side of [-1, 1]) {
     ctx.beginPath();

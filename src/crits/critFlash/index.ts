@@ -12,7 +12,7 @@ import {
 } from "../critTypes";
 import { critFont, drawCritText } from "./critText";
 import { prepareEachSoon, prepareSoon, runWhenIdle } from "../../shared/idle";
-import { drawBadgeLights } from "../../shared/badgeLights";
+import { drawLightRays } from "../../shared/lightRays";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { clamp01, lerp } from "../../shared/easing";
 import { kickShake } from "../../shared/screenShake";
@@ -1321,12 +1321,12 @@ function drawFlashLayer(
   const icon = config ? getCritIcon(config.name) : null;
   if (icon) {
     const { w, h } = fitIconSize(icon, measureLabel(scratch, label) * 0.85);
-    drawBadgeLights(
+    drawLightRays(
       ctx,
       0,
       0,
       Math.max(w, h) * 0.75 * targetScale * raysScale,
-      motionMs,
+      1,
       performance.now(),
     );
   }

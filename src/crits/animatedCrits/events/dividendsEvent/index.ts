@@ -25,7 +25,7 @@ import {
   streamCoins,
   streamGlimmers,
 } from "../../../../shared/eventStream";
-import { drawGoldShimmer } from "../../../../shared/goldShimmer";
+import { drawLightRays } from "../../../../shared/lightRays";
 import {
   pulseHudTotalFlash,
   triggerHudTotalFlash,
@@ -126,16 +126,7 @@ function drawOverlay(
     ctx.save();
     ctx.translate(rect.left, rect.top);
     if (pulse > 0)
-      drawGoldShimmer(
-        ctx,
-        center.x,
-        center.y,
-        WORKER_GLOW,
-        pulse,
-        3,
-        now,
-        COLOR.heavenlyGold,
-      );
+      drawLightRays(ctx, center.x, center.y, WORKER_GLOW, pulse, now);
     // the worker brightens out of the dimmed frame as the lights land
     const dim = getScreenFreezeDim() * (1 - lift);
     drawWorkerSpotlight(ctx, floor, workerIndex, 0, 0, dim);

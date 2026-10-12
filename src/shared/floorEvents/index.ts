@@ -27,7 +27,7 @@ export function startPressedStream(
   buildUp?: () => number,
 ): EventFx | null {
   if (isDetachedJobRunning()) return null;
-  const fx = createEventFx(CONFIG.sale.durationMs, undefined, true, buildUp);
+  const fx = createEventFx(CONFIG.sale.durationMs, true, buildUp);
   addTargetStream(owner, part, fx, true);
   return fx;
 }

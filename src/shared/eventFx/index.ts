@@ -6,7 +6,7 @@
 import { COLOR } from "../../palette";
 import { createAbsorbPulse } from "../mergeFlash";
 import { LONG_PRESS_TICK_MS } from "../pressAndHold";
-import { drawGoldShimmer } from "../goldShimmer";
+import { drawLightRays } from "../lightRays";
 import { fadeStops, glowSprite } from "../glowSprite";
 import { hash01, stampGlimmer } from "../twinkle";
 import { beginLightBatch, endLightBatch } from "../lightBatch";
@@ -177,7 +177,6 @@ export function drawTargetStream(
 // a timed one after durationMs of pressing, and holds its level in between
 export function createEventFx(
   durationMs: number,
-  color: string = COLOR.coinGold,
   pressed = false,
   // a pressed event that ends on a goal rather than a clock builds with it (0..1)
   buildUp?: () => number,
@@ -203,17 +202,7 @@ export function createEventFx(
   ): void {
     const glowRadius =
       GLOW_RADIUS[0] + (GLOW_RADIUS[1] - GLOW_RADIUS[0]) * progress;
-    // rays spin faster and reach further as the stream builds
-    drawGoldShimmer(
-      ctx,
-      x,
-      y,
-      glowRadius,
-      progress,
-      0.6 + 2.4 * progress,
-      now,
-      color,
-    );
+    drawLightRays(ctx, x, y, glowRadius, progress, now);
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
 
@@ -225,7 +214,7 @@ export function createEventFx(
       const width = 6 * (1 - t) + 1;
       stampLight(
         ctx,
-        ringSprite(width / radius, color),
+        ringSprite(width / radius, COLOR.coinGold),
         x,
         y,
         radius + width / 2,

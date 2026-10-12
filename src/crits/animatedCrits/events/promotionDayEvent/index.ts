@@ -20,7 +20,7 @@ import {
   drawEventStreams,
   streamGlimmers,
 } from "../../../../shared/eventStream";
-import { drawGoldShimmer } from "../../../../shared/goldShimmer";
+import { drawLightRays } from "../../../../shared/lightRays";
 import {
   freezeScreen,
   isScreenFrozen,
@@ -113,16 +113,7 @@ function drawOverlay(
     ctx.save();
     ctx.translate(rect.left, rect.top);
     for (const worker of event.workers) {
-      drawGoldShimmer(
-        ctx,
-        worker.x,
-        worker.y,
-        WORKER_GLOW,
-        rising,
-        2,
-        now,
-        COLOR.heavenlyGold,
-      );
+      drawLightRays(ctx, worker.x, worker.y, WORKER_GLOW, rising, now);
       drawWorkerSpotlight(ctx, event.floor, worker.index, 0, 0);
     }
     const { x, y } = event.bar;
@@ -165,7 +156,7 @@ function startPromotion(floor: Floor, context: EventProcContext): void {
     isGroundFloor: context.isGroundFloor,
     workers,
     bar,
-    fx: createEventFx(streamMs, COLOR.heavenlyGold),
+    fx: createEventFx(streamMs),
     startedAt: performance.now(),
     promotedAt: null,
   };

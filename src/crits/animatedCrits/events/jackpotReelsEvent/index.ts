@@ -13,7 +13,7 @@ import { shakeScreen } from "../../../../shared/screenShake";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { drawCachedCritText } from "../../../critFlash/critText";
 import { drawWhiteBurst } from "../../../../shared/eventFx";
-import { drawGoldShimmer } from "../../../../shared/goldShimmer";
+import { drawLightRays } from "../../../../shared/lightRays";
 import { drawGlimmerAura } from "../../../../shared/twinkle";
 import {
   drawSlamTarget,
@@ -238,7 +238,7 @@ registerEventProc(
             }
             if (ctx.globalAlpha > 0) {
               const cy = frame.y + frame.height / 2;
-              drawGoldShimmer(ctx, cx, cy, frame.width * 0.7, 1, 1.5, now);
+              drawLightRays(ctx, cx, cy, frame.width * 0.7, 1, now);
               reels.forEach((reel, i) =>
                 drawReel(ctx, reelBox(i), reelPosition(reel, startedAt, now), [
                   slamOwner,

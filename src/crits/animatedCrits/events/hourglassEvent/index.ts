@@ -204,7 +204,7 @@ function startHourglass(floor: Floor, context: EventProcContext): void {
     startedAt: performance.now(),
     // the spotlight fills in with the gold, holds through the flip, then
     // shrinks away as it drains
-    fx: createEventFx(fillMs + flipMs + drainMs, undefined, true, () => {
+    fx: createEventFx(fillMs + flipMs + drainMs, true, () => {
       const { filled, flipped, drained } = progressAt(event, performance.now());
       return flipped < 1 ? filled : 1 - drained;
     }),

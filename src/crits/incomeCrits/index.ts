@@ -16,6 +16,7 @@ import {
 import { getActiveCompanyIndex } from "../../company";
 import { pulseHudTotalFlash } from "../../shared/totalIncomeCoins";
 import { playBarExplosion } from "../../shared/explosionBang";
+import { playSold } from "../../sound";
 import { spawnCoinBurst as animateCoinBurst } from "../../floors/coins";
 
 const spawnCoinBurst = liveEffect(animateCoinBurst);
@@ -70,5 +71,7 @@ export function incomeCritPlayFor(
         ],
       );
     },
+    // the amount's all in: it lands with the buy sound, like the cash crit did
+    onLastHit: playSold,
   };
 }

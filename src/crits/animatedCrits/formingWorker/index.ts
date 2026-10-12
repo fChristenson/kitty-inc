@@ -2,9 +2,8 @@
 // center): it grows in, washed white, then lands at formedAt with a white
 // burst as the white fades (Recruit, Fireflies)
 import type { Floor } from "../../../gameState";
-import { COLOR } from "../../../palette";
 import { drawWhiteBurst } from "../../../shared/eventFx";
-import { drawGoldShimmer } from "../../../shared/goldShimmer";
+import { drawLightRays } from "../../../shared/lightRays";
 import { drawWorkerSpotlight, WORKER_HEIGHT } from "../../../floors/worker";
 
 // it grows from this share of its size up to full
@@ -33,15 +32,13 @@ export function drawFormingWorker(
   // nothing shows at the spot until the glow starts
   ctx.save();
   if (formedAt === null) ctx.globalAlpha *= clamp01(glow);
-  drawGoldShimmer(
+  drawLightRays(
     ctx,
     x,
     y,
     GLOW * (0.5 + 0.5 * form),
     formedAt === null ? glow : 0,
-    2,
     now,
-    COLOR.heavenlyGold,
   );
   ctx.restore();
   ctx.save();

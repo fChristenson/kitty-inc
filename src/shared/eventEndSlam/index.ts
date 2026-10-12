@@ -6,7 +6,7 @@
 // plus a part name
 import { COLOR } from "../../palette";
 import { drawTwinkle } from "../twinkle";
-import { drawGoldShimmer } from "../goldShimmer";
+import { drawLightRays } from "../lightRays";
 import { glowSprite, type FadeStops } from "../glowSprite";
 import {
   createTextGlossyGradient,
@@ -236,9 +236,8 @@ function drawSlamLights(
     Math.max(width * 0.75, height * 1.5) * (1 + 0.3 * (1 - strength));
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.scale(1, Math.min(1, (height * 2.2) / reach));
   ctx.globalAlpha *= strength;
-  drawGoldShimmer(ctx, 0, 0, reach, strength, 2.5, now, COLOR.coinSpriteGold);
+  drawLightRays(ctx, 0, 0, reach, strength, now);
   ctx.restore();
 }
 

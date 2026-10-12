@@ -15,7 +15,7 @@ import {
   SLAM_LAND_MS,
   triggerEventEndSlam,
 } from "../../../../shared/eventEndSlam";
-import { drawGoldShimmer } from "../../../../shared/goldShimmer";
+import { drawLightRays } from "../../../../shared/lightRays";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {
   freezeScreen,
@@ -152,16 +152,7 @@ function drawOverlay(
   ctx.save();
   ctx.translate(rect.left, rect.top);
 
-  drawGoldShimmer(
-    ctx,
-    cx,
-    cy,
-    GLOW * buffed,
-    buffed,
-    1,
-    now,
-    COLOR.heavenlyGold,
-  );
+  drawLightRays(ctx, cx, cy, GLOW * buffed, buffed, now);
   drawIncomePanel(ctx, event.floor, event.isGroundFloor, {
     whiteAlpha: event.shinedAt === null ? WHITE_MAX * buffed : 0,
     rotation: 0,
