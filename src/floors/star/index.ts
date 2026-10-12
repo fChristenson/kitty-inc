@@ -9,11 +9,6 @@ import {
 } from "../../shared/eventEndSlam";
 import { applyLevelPop, LEVEL_POP_MS } from "../../shared/levelPop";
 import { fingerReach } from "../../shared/tapTarget";
-import {
-  drawLuckySevens,
-  hasLuckySevens,
-  noteLuckyLevel,
-} from "../luckySevens";
 
 // mirrors buildings/outerWall's own SIDE_WALL_WIDTH (WALL_WIDTH*2) — duplicated
 // locally instead of imported to avoid a floors<->buildings circular import
@@ -114,23 +109,6 @@ export function drawUpgradeStarSpotlight(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
 ): void {
-  noteLuckyLevel(floor);
-  if (hasLuckySevens(floor)) {
-    ctx.save();
-    ctx.font = FONT;
-    ctx.textAlign = "left";
-    ctx.textBaseline = "top";
-    const spinning = drawLuckySevens(
-      ctx,
-      floor,
-      MARGIN_X,
-      STAR_Y,
-      FONT_SIZE,
-      isFloorMaxed(floor) ? SLAM_GOLD : COLOR.white,
-    );
-    ctx.restore();
-    if (spinning) return;
-  }
   const slam = getSlamPose(floor, "star", Date.now());
   const box = {
     x: MARGIN_X,

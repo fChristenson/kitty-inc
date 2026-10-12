@@ -1,7 +1,8 @@
-// Runs non-urgent work (asset warm-ups, audio setup, the lazily loaded code
-// chunks) only in the browser's idle time and never while the player is
-// touching or scrolling the game, so it can't stutter a press or a scroll.
-// Light tasks run while a frame has time left; chunks load one at a time.
+// Runs non-urgent work (asset warm-ups, audio setup) only in the browser's
+// idle time and never while the player is touching or scrolling the game, so
+// it can't stutter a press or a scroll. The lazily loaded code chunks hold
+// gameplay (spawns, crits, events, badges), so they never wait on the player
+// or the frame rate: they load one after another whatever is going on.
 
 import { afterStartup } from "../startupGate";
 import { isScreenFrozen } from "../screenFreeze";
@@ -10,13 +11,11 @@ type IdleDeadlineLike = { timeRemaining: () => number; didTimeout?: boolean };
 
 // a light task runs only while at least this much of the frame is left
 const LIGHT_SLACK_MS = 4;
-// a chunk evaluates in one go, so it waits for a mostly free frame
-const HEAVY_SLACK_MS = 12;
-// how long after the last touch, click, scroll or key nothing runs
+// how long after the last touch, click, scroll or key no light task runs
 const INPUT_QUIET_MS = 1000;
 // between one chunk landing and the next one starting
 const HEAVY_GAP_MS = 500;
-// a game that never goes idle still gets one task in this often, if untouched
+// a game that never goes idle still gets one light task in this often
 const STARVE_MS = 5000;
 // how often a frozen screen (an event playing) is checked again
 const FROZEN_RECHECK_MS = 200;
@@ -29,6 +28,7 @@ const heavy: (() => Promise<unknown>)[] = [];
 let started = false;
 let scheduled = false;
 let heavyRunning = false;
+let heavyTimer = false;
 let heavyDoneAt = -Infinity;
 // chunks wait for the player's first purchase (see allowIdleLoads), so none
 // lands on the first presses of a session
@@ -61,6 +61,7 @@ window.addEventListener("wheel", touched, listen);
 window.addEventListener("keydown", touched, listen);
 // a release outside the page never reports its pointerup
 window.addEventListener("blur", () => pointersDown.clear());
+document.addEventListener("visibilitychange", () => pointersDown.clear());
 
 // ms until the player has left the game alone long enough, 0 once they have
 function inputWait(now: number): number {
@@ -71,13 +72,13 @@ function inputWait(now: number): number {
 function pump(deadline: IdleDeadlineLike): void {
   scheduled = false;
   const now = performance.now();
+  // starved: the browser never went idle, so just one task this time
+  const starved = deadline.didTimeout === true;
   const wait = isScreenFrozen() ? FROZEN_RECHECK_MS : inputWait(now);
-  if (wait > 0) {
+  if (wait > 0 && !starved) {
     scheduleAfter(wait);
     return;
   }
-  // starved: the browser never went idle, so just one task this time
-  const starved = deadline.didTimeout === true;
   let ran = false;
   while (
     light.length > 0 &&
@@ -86,19 +87,29 @@ function pump(deadline: IdleDeadlineLike): void {
     light.shift()!();
     ran = true;
   }
-  if (light.length === 0 && canStartHeavy() && !ran) {
-    const gap = heavyDoneAt + HEAVY_GAP_MS - now;
-    if (gap > 0) {
-      scheduleAfter(gap);
-      return;
-    }
-    if (starved || deadline.timeRemaining() > HEAVY_SLACK_MS) startHeavy();
-  }
   schedule();
 }
 
 function canStartHeavy(): boolean {
   return loadsAllowed && heavy.length > 0 && !heavyRunning;
+}
+
+// the next chunk, HEAVY_GAP_MS after the last landed; an event playing only
+// puts it off till it ends
+function scheduleHeavy(): void {
+  if (!started || heavyTimer || !canStartHeavy()) return;
+  heavyTimer = true;
+  const gap = Math.max(0, heavyDoneAt + HEAVY_GAP_MS - performance.now());
+  window.setTimeout(() => {
+    heavyTimer = false;
+    if (!canStartHeavy()) return;
+    if (isScreenFrozen()) {
+      heavyDoneAt = performance.now() - HEAVY_GAP_MS + FROZEN_RECHECK_MS;
+      scheduleHeavy();
+      return;
+    }
+    startHeavy();
+  }, gap);
 }
 
 function startHeavy(): void {
@@ -108,13 +119,12 @@ function startHeavy(): void {
     .finally(() => {
       heavyRunning = false;
       heavyDoneAt = performance.now();
-      schedule();
+      scheduleHeavy();
     });
 }
 
 function schedule(): void {
-  if (!started || scheduled) return;
-  if (light.length === 0 && !canStartHeavy()) return;
+  if (!started || scheduled || light.length === 0) return;
   scheduled = true;
   if (typeof requestIdleCallback === "function") {
     requestIdleCallback(pump, { timeout: STARVE_MS });
@@ -137,6 +147,7 @@ function scheduleAfter(ms: number): void {
 afterStartup(() => {
   started = true;
   schedule();
+  scheduleHeavy();
   scheduleSoon();
 });
 
@@ -191,18 +202,22 @@ export function processWhenIdle<T>(
   schedule();
 }
 
-// a lazily loaded chunk: queued behind the others, each starting only once
-// the last has landed and the game is quiet
-export function loadWhenIdle(load: () => Promise<unknown>): void {
-  heavy.push(load);
-  schedule();
+// a lazily loaded chunk: queued behind the others (in front of them if
+// urgent), each starting once the last has landed
+export function loadWhenIdle(
+  load: () => Promise<unknown>,
+  urgent = false,
+): void {
+  if (urgent) heavy.unshift(load);
+  else heavy.push(load);
+  scheduleHeavy();
 }
 
 // the player has bought something: queued chunks may start loading
 export function allowIdleLoads(): void {
   if (loadsAllowed) return;
   loadsAllowed = true;
-  schedule();
+  scheduleHeavy();
 }
 
 // work that can't wait for the player to stop (saves): at idle, or after

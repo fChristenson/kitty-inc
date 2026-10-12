@@ -53,7 +53,6 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Animated Crits</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-lucky-sevens-event" class="game__button">Lucky Sevens</button>
           <button id="test-gold-switch-event" class="game__button">Gold Standard</button>
           <button id="test-nitro-event" class="game__button">Nitro</button>
           <button id="test-bullet-cancel-event" class="game__button">Bullet Cancel</button>

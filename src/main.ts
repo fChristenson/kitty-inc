@@ -58,7 +58,6 @@ import {
   performAutomatedUpgradeAfterPayment,
   performAutomatedFloorUnlock,
   getUpgradeCost,
-  forceLuckySevens,
   forceGoldSwitch,
   type FloorActionsDeps,
 } from "./floors";
@@ -2301,12 +2300,6 @@ async function main() {
           "third-scatter": forceOnActive((e) => e.forceThirdScatterEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
-          "lucky-sevens": later(() => {
-            const floor = buildings[activeBuildingIndex]?.[0];
-            if (!floor) return;
-            gameCanvas.scrollActiveToFloor(floor);
-            forceLuckySevens(floor);
-          }),
           "gold-switch": later(() => {
             const floor = buildings[activeBuildingIndex]?.[0];
             if (!floor) return;

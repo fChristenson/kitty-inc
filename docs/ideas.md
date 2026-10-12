@@ -56,4 +56,3 @@ More little surprises in what's already on screen, each one only paying.
 
 - **Gold standard** (`floors/incomePanel`): a floor at the level cap gets a coin-gold bar with gloss slashes and gold glimmers twinkling calmly over it. The moment it reaches the cap, the bar pops and wobbles back like its "Lvl" label (`shared/levelPop`), its old colour fading into the gold as it goes (`shared/glossyWidgets` `drawGoldSwitch`). Test: New Effects "Gold Standard".
 
-- **Lucky sevens** (`src/floors/luckySevens`, drawn by `floors/star`): a floor's label reaching any level with a 7 in it (by any means) sends each 7 in turn through a text effect picked at random from `shared/textAnimations`, landing back in gold in a burst of glitter before cooling back to its usual colour (no shake, jackpot or total flash); the floor pays out once per 7. Test: New Effects "Lucky Sevens".

@@ -323,12 +323,13 @@ export function triggerCritCelebration(
     const now = Date.now();
     // a floor crit (a crit up, crit down or merge crit's numbers, or one
     // playing its number onto the bars) waits its turn like a badge crit
-    // rather than being skipped with a plain crit; the procs riding it flash
-    // after
+    // rather than being skipped with a plain crit, however long that takes;
+    // the procs riding it flash after
     if (stacked || floorCrit)
       specialCelebrationQueue.push({
         kind: "floorCrit",
         queuedAt: now,
+        maxAgeMs: Infinity,
         run: () =>
           stacked
             ? celebrateUpDownMerge(steps, tier, upDownMerge, floorCrit)

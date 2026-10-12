@@ -419,7 +419,8 @@ function preloadFloorCrit(kind: CritPlayKind): Promise<unknown> {
   return promise;
 }
 
-// preloadFloorCrit at idle, queued once per kind
+// preloadFloorCrit at idle, queued once per kind, ahead of the event chunks:
+// its crit is already armed
 const queuedKinds = new Set<CritPlayKind>();
 export function preloadFloorCritWhenIdle(kind: CritPlayKind): void {
   if (loading.has(kind) || queuedKinds.has(kind)) return;
@@ -427,7 +428,7 @@ export function preloadFloorCritWhenIdle(kind: CritPlayKind): void {
   loadWhenIdle(() => {
     queuedKinds.delete(kind);
     return preloadFloorCrit(kind);
-  });
+  }, true);
 }
 
 interface PendingLaunch {
@@ -532,9 +533,13 @@ export function launchFloorCrit(
     return;
   }
   pending = launch;
-  preloadFloorCrit(play.kind).then(() => {
-    if (pending === launch && !DEFS[play.kind]) pending = null;
-  });
+  // a failed load (a flaky phone connection) tries again till it lands
+  const load = (): void => {
+    preloadFloorCrit(play.kind).then(() => {
+      if (pending === launch && !DEFS[play.kind]) setTimeout(load, 1000);
+    });
+  };
+  load();
 }
 
 export function drawFloorCrit(

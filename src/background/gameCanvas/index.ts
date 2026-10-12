@@ -22,8 +22,6 @@ import {
   type FloorActionsDeps,
   startButtonHoldAnim,
   stopButtonHoldAnim,
-  startHoldTally,
-  endHoldTally,
   isUpgradeButtonEnabled,
   getButtonCenter,
 } from "../../floors";
@@ -1068,10 +1066,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   function stopHoldRepeat(): void {
     holdController?.stop();
     holdController = null;
-    if (heldUpgradeFloor) {
-      stopButtonHoldAnim(heldUpgradeFloor);
-      endHoldTally(heldUpgradeFloor);
-    }
+    if (heldUpgradeFloor) stopButtonHoldAnim(heldUpgradeFloor);
     heldUpgradeFloor = null;
   }
 
@@ -1126,7 +1121,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       if (isUpgradeButtonEnabled(hit.floor)) {
         heldUpgradeFloor = hit.floor;
         startButtonHoldAnim(hit.floor);
-        startHoldTally(hit.floor);
       }
       fireUpgradeOnce(hit);
       // a press that starts a playable freeze on this button keeps playing it
