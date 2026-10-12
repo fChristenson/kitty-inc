@@ -39,7 +39,11 @@ More little surprises in what's already on screen, each one only paying.
 
 ## Built
 
-- **Prize wheel** (`animatedCrits/events/prizeWheelEvent`): animated crit; a ring of wisps spins into a huge wheel past a ticking pointer wisp, slows, crawls and tips onto the winner; the wheel blows apart, every wisp slamming onto a bar with levels, the winner diving onto the clicked one a crit tier up. Test: New Effects "Prize Wheel".
+- **Lotto drum** (`animatedCrits/events/lottoDrumEvent`): animated crit; wisps pour from the clicked button into a glitter drum and tumble; one by one, quicker each, the drum rattles and a wisp is drawn out of its top onto a bar with levels; then the drum bursts and the rest pour onto the clicked bar, a crit tier up. Test: New Effects "Lotto Drum".
+
+- **Bill counter** (`incomeCrits/crits/billCounterCrit`): income crit; the number bursts into a stack of bills that riffle up into the total one by one like a money counter, faster and faster, the last handful together into the finale. Test: New Effects "Bill Counter Crit".
+
+- **Prize wheel** (`animatedCrits/events/prizeWheelEvent`): animated crit; a ring of wisps spins into a huge wheel past a ticking pointer wisp, slows, crawls and tips onto the winner; the wheel blows apart, every wisp slamming onto a bar with levels, the winner diving onto the clicked one a crit tier up. Test: Animated Crits "Prize Wheel".
 
 - **Mystery stacks** (`animatedCrits/events/mysteryStacksEvent`): animated crit; every bar in view flips into a gold bar with a ?, the ?s flip round onto the crit's number one by one, beams join them, every bar blows into its levels, the clicked one a crit tier up. Test: Animated Crits "Mystery Stacks".
 

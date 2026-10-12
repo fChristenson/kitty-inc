@@ -321,6 +321,7 @@ const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
   dronesCrit: () => import("../../incomeCrits/crits/dronesCrit"),
   stickyDartsCrit: () => import("../../incomeCrits/crits/stickyDartsCrit"),
   stormBallCrit: () => import("../../incomeCrits/crits/stormBallCrit"),
+  billCounterCrit: () => import("../../incomeCrits/crits/billCounterCrit"),
   rapidFireCrit: () => import("../crits/rapidFireCrit"),
   pinballCrit: () => import("../crits/pinballCrit"),
   snowballCrit: () => import("../crits/snowballCrit"),

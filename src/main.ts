@@ -2300,6 +2300,7 @@ async function main() {
           "third-scatter": forceOnActive((e) => e.forceThirdScatterEvent),
           "mystery-stacks": forceOnActive((e) => e.forceMysteryStacksEvent),
           "prize-wheel": forceOnActive((e) => e.forcePrizeWheelEvent),
+          "lotto-drum": forceOnActive((e) => e.forceLottoDrumEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {

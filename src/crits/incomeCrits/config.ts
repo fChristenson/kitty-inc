@@ -110,5 +110,9 @@ export const INCOME_CRIT_CONFIG = {
     stormBallCrit: {
       chance: 0.03,
     },
+    // a stack of bills riffled up into the total like a money counter
+    billCounterCrit: {
+      chance: 0.03,
+    },
   },
 };
