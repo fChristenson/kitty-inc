@@ -20,6 +20,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOutBack, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 import { drawCachedCritText } from "../../../critFlash/critText";
 import { ringTargets } from "../../../../shared/coinTargets";
 
@@ -32,6 +33,9 @@ const MINES = 0.12;
 const PACE = 0.8;
 const DIGITS = ["1", "2", "3"];
 const DIGIT_FONT = 22;
+const DIGIT_STYLE = { fontSize: DIGIT_FONT, strokeWidth: 4 };
+// room round the board for the digits at its edge
+const BOARD_PAD = 30;
 const HIDDEN = 10;
 const OPEN = 18;
 const MINE = 0.35;
@@ -96,6 +100,16 @@ export const forceSweeperEvent = registerWispEvent(
         });
       }
     const mines = cells.filter((c) => c.mine);
+    const digitCells = cells
+      .filter((c) => c.digit)
+      .sort((a, b) => a.opens - b.opens);
+    const boardW = area.right - area.left;
+    const boardH = area.bottom - area.top;
+    let board: {
+      canvas: HTMLCanvasElement;
+      ctx: CanvasRenderingContext2D;
+      next: number;
+    } | null = null;
     const endAt = ringAt(rings) + 200;
     const ringBeats = Array.from({ length: rings + 1 }, (_, d) => ringAt(d));
     const center: Point = {
@@ -142,6 +156,7 @@ export const forceSweeperEvent = registerWispEvent(
           if (ms > endAt + 400) return;
           const fade = ms > endAt ? 1 - (ms - endAt) / 400 : 1;
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (const c of cells) {
             if (ms < c.shown) continue;
             const open = clamp01((ms - c.opens) / 120);
@@ -158,21 +173,48 @@ export const forceSweeperEvent = registerWispEvent(
               );
             }
           }
+          endLightBatch(ctx);
           ctx.globalAlpha = fade;
           ctx.globalCompositeOperation = "source-over";
-          for (const c of cells)
-            if (c.digit && ms >= c.opens)
-              drawCachedCritText(
-                ctx,
-                c.digit,
-                c.at.x,
-                c.at.y,
-                COLOR.heavenlyGold,
-                {
-                  fontSize: DIGIT_FONT,
-                  strokeWidth: 4,
-                },
-              );
+          // each digit drawn onto the board once, as it opens
+          if (!board) {
+            const m = ctx.getTransform();
+            const scale = Math.min(3, Math.hypot(m.a, m.b));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.ceil((boardW + BOARD_PAD * 2) * scale);
+            canvas.height = Math.ceil((boardH + BOARD_PAD * 2) * scale);
+            const c = canvas.getContext("2d")!;
+            c.setTransform(
+              scale,
+              0,
+              0,
+              scale,
+              -(area.left - BOARD_PAD) * scale,
+              -(area.top - BOARD_PAD) * scale,
+            );
+            board = { canvas, ctx: c, next: 0 };
+          }
+          while (
+            board.next < digitCells.length &&
+            ms >= digitCells[board.next].opens
+          ) {
+            const c = digitCells[board.next++];
+            drawCachedCritText(
+              board.ctx,
+              c.digit!,
+              c.at.x,
+              c.at.y,
+              COLOR.heavenlyGold,
+              DIGIT_STYLE,
+            );
+          }
+          ctx.drawImage(
+            board.canvas,
+            area.left - BOARD_PAD,
+            area.top - BOARD_PAD,
+            boardW + BOARD_PAD * 2,
+            boardH + BOARD_PAD * 2,
+          );
           ctx.globalAlpha = 1;
           for (const m of mines)
             drawWispBetween(

@@ -224,6 +224,26 @@ function drawSpeedLines(
   }
 }
 
+// whether the rect (in ctx's space, unrotated) covers the whole canvas
+function coversCanvas(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): boolean {
+  const m = ctx.getTransform();
+  if (m.b !== 0 || m.c !== 0) return false;
+  const left = m.a * x + m.e;
+  const top = m.d * y + m.f;
+  return (
+    left <= 0 &&
+    top <= 0 &&
+    left + m.a * w >= ctx.canvas.width &&
+    top + m.d * h >= ctx.canvas.height
+  );
+}
+
 function drawOverlay(
   ctx: CanvasRenderingContext2D,
   getFloorRect: FloorRectResolver,
@@ -249,9 +269,13 @@ function drawOverlay(
   const view: FlightView = { x, y, w, h, cx: x + w / 2, cy: y + h / 2 };
 
   ctx.save();
-  ctx.beginPath();
-  ctx.rect(x, y, w, h);
-  ctx.clip();
+  // a clip covering the whole canvas changes nothing but keeps every light
+  // off the overlay and stamped one by one, so it's only set when it cuts
+  if (!coversCanvas(ctx, x, y, w, h)) {
+    ctx.beginPath();
+    ctx.rect(x, y, w, h);
+    ctx.clip();
+  }
   if (ms < crashAt && (content.enter || ms >= windUpMs)) {
     ctx.globalAlpha = content.enter
       ? 1

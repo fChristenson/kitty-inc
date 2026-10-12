@@ -390,14 +390,11 @@ export function transformVersion(ctx: CanvasRenderingContext2D): number {
   return clipStates.get(ctx.canvas)?.transform ?? -1;
 }
 
-const TRANSFORMS = [
-  "setTransform",
-  "resetTransform",
-  "transform",
-  "translate",
-  "scale",
-  "rotate",
-] as const;
+// whether ctx has a clip set (true when it isn't tracked, to be safe)
+export function isClipped(ctx: CanvasRenderingContext2D): boolean {
+  const state = clipStates.get(ctx.canvas);
+  return !state || state.clip !== Infinity;
+}
 
 // the overlays ignore clips, so a batch drawn under one stays on the 2D path:
 // the canvas's own save/restore/clip are wrapped once to know when
@@ -441,16 +438,64 @@ function trackClips(ctx: CanvasRenderingContext2D): void {
     if (state.clip === Infinity) state.clip = state.save;
     clip.apply(this, args);
   } as typeof ctx.clip;
-  for (const name of TRANSFORMS) {
-    const original = ctx[name] as (...args: unknown[]) => void;
-    (ctx as unknown as Record<string, unknown>)[name] = function (
-      this: CanvasRenderingContext2D,
-      ...args: unknown[]
-    ) {
-      state.transform++;
-      original.apply(this, args);
-    };
-  }
+  // fixed arities, no rest arguments: these run hundreds of times a frame
+  const { setTransform, resetTransform, transform, translate, scale, rotate } =
+    ctx;
+  ctx.setTransform = function (
+    this: CanvasRenderingContext2D,
+    a?: number | DOMMatrix2DInit,
+    b?: number,
+    c?: number,
+    d?: number,
+    e?: number,
+    f?: number,
+  ) {
+    state.transform++;
+    if (typeof a === "number")
+      (
+        setTransform as (
+          a: number,
+          b: number,
+          c: number,
+          d: number,
+          e: number,
+          f: number,
+        ) => void
+      ).call(this, a, b!, c!, d!, e!, f!);
+    else setTransform.call(this, a);
+  } as typeof ctx.setTransform;
+  ctx.resetTransform = function (this: CanvasRenderingContext2D) {
+    state.transform++;
+    resetTransform.call(this);
+  };
+  ctx.transform = function (
+    this: CanvasRenderingContext2D,
+    a: number,
+    b: number,
+    c: number,
+    d: number,
+    e: number,
+    f: number,
+  ) {
+    state.transform++;
+    transform.call(this, a, b, c, d, e, f);
+  };
+  ctx.translate = function (
+    this: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+  ) {
+    state.transform++;
+    translate.call(this, x, y);
+  };
+  ctx.scale = function (this: CanvasRenderingContext2D, x: number, y: number) {
+    state.transform++;
+    scale.call(this, x, y);
+  };
+  ctx.rotate = function (this: CanvasRenderingContext2D, angle: number) {
+    state.transform++;
+    rotate.call(this, angle);
+  };
 }
 
 // keeps element laid exactly over target, hidden while target is

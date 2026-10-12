@@ -68,6 +68,13 @@ const textSprites = new Map<
 >();
 // document.fonts.check is slow: once a font is in, it stays in
 const readyFonts = new Set<string>();
+const spriteIndex = new Map<
+  string,
+  Map<
+    string,
+    Map<number, { canvas: HTMLCanvasElement; width: number; height: number }>
+  >
+>();
 
 function critTextSprite(
   label: string,
@@ -75,6 +82,14 @@ function critTextSprite(
   style: CritTextStyle,
   scale: number,
 ): { canvas: HTMLCanvasElement; width: number; height: number } | null {
+  // looked up without building a key: a board of labels draws every frame
+  let byColor = spriteIndex.get(label);
+  if (!byColor) spriteIndex.set(label, (byColor = new Map()));
+  let byLook = byColor.get(color);
+  if (!byLook) byColor.set(color, (byLook = new Map()));
+  const look = (style.fontSize * 1024 + style.strokeWidth) * 64 + scale * 4;
+  const known = byLook.get(look);
+  if (known) return known;
   const font = critFont(style.fontSize);
   // never bake in the fallback font while Fredoka is still loading
   if (!readyFonts.has(font)) {
@@ -83,8 +98,14 @@ function critTextSprite(
   }
   const key = `${label}|${color}|${style.fontSize}|${style.strokeWidth}|${scale}`;
   let sprite = textSprites.get(key);
-  if (sprite) return sprite;
-  if (textSprites.size >= MAX_TEXT_SPRITES) textSprites.clear();
+  if (sprite) {
+    byLook.set(look, sprite);
+    return sprite;
+  }
+  if (textSprites.size >= MAX_TEXT_SPRITES) {
+    textSprites.clear();
+    spriteIndex.clear();
+  }
   const canvas = document.createElement("canvas");
   const c = canvas.getContext("2d")!;
   c.font = font;
@@ -96,6 +117,7 @@ function critTextSprite(
   drawCritText(c, label, width / 2, height / 2, color, style);
   sprite = { canvas, width, height };
   textSprites.set(key, sprite);
+  byLook.set(look, sprite);
   return sprite;
 }
 

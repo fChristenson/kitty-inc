@@ -1,6 +1,7 @@
 // soft round glows (pools of light, shadows, flashes): a radial gradient drawn
 // once per look onto a sprite and stamped, never rebuilt every frame
-import { queueLight } from "../lightBatch";
+import { lightArgs, queueLightArgs } from "../lightBatch";
+import { compositeOf } from "../spriteBatch";
 import { processWhenIdle } from "../idle";
 const HALF = 128;
 const sprites = new Map<string, HTMLCanvasElement>();
@@ -61,21 +62,19 @@ export function drawGlow(
 ): void {
   if (r <= 0) return;
   const sprite = glowSprite(stops);
-  if (
-    ctx.globalCompositeOperation === "lighter" &&
-    queueLight(
-      ctx,
-      sprite,
-      0,
-      0,
-      HALF * 2,
-      HALF * 2,
-      x - r,
-      y - r * squash,
-      r * 2,
-      r * 2 * squash,
-    )
-  )
-    return;
+  if (compositeOf(ctx) === "lighter") {
+    lightArgs[0] = 0;
+    lightArgs[1] = 0;
+    lightArgs[2] = HALF * 2;
+    lightArgs[3] = HALF * 2;
+    lightArgs[4] = x - r;
+    lightArgs[5] = y - r * squash;
+    lightArgs[6] = r * 2;
+    lightArgs[7] = r * 2 * squash;
+    lightArgs[8] = ctx.globalAlpha;
+    lightArgs[9] = 1;
+    lightArgs[10] = 0;
+    if (queueLightArgs(ctx, sprite)) return;
+  }
   ctx.drawImage(sprite, x - r, y - r * squash, r * 2, r * 2 * squash);
 }

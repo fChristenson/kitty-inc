@@ -14,6 +14,7 @@ import {
   isOverlayFor,
   SPRITE_FLOATS,
   compositeOf,
+  isClipped,
   transformVersion,
   type SpriteTexture,
 } from "../spriteBatch";
@@ -200,7 +201,9 @@ export function queueLightArgs(
   if (batchCtx !== ctx) return false;
   let matrix = levels[levels.length - 1];
   if (matrix === DEFERRED) {
-    if (compositeOf(ctx) !== "lighter") return false;
+    // a deferred stamp draws at the end, outside any clip: one under a clip
+    // is drawn now instead
+    if (compositeOf(ctx) !== "lighter" || isClipped(ctx)) return false;
     matrix = looseMatrix(ctx);
   }
   let s = source === lastSource ? lastIndex : sources.indexOf(source);

@@ -3,6 +3,7 @@
 // freeze's own overlay keeps animating on top of it. Gameplay input on the
 // canvas is ignored until unfreezeScreen
 import type { Floor } from "../../gameState";
+import { deferLights, flushLights } from "../lightBatch";
 
 export type FloorRectResolver = (
   floor: Floor,
@@ -204,5 +205,12 @@ export function drawScreenFreezeOverlay(
   getFloorRect: FloorRectResolver,
   totalTarget: { x: number; y: number },
 ): void {
-  overlay?.(ctx, getFloorRect, totalTarget);
+  if (!overlay) return;
+  // an event's loose glows, beams and sparks in one light pass at its end
+  deferLights(ctx);
+  try {
+    overlay(ctx, getFloorRect, totalTarget);
+  } finally {
+    flushLights(ctx);
+  }
 }
