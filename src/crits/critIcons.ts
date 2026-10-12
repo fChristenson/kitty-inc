@@ -82,7 +82,6 @@ export const CRIT_IMAGE_FILES = {
   coffeeRun: "crits/office/coffeeRun.webp", // Coffee Run crit flash's own backdrop icon
   teamBuilding: "crits/office/teamBuilding.webp", // Team Building crit flash's own backdrop icon
   teamLunch: "crits/office/teamLunch.webp", // Team Lunch crit flash's own backdrop icon
-  springCleaning: "crits/office/springCleaning.webp", // Spring Cleaning crit flash's own backdrop icon
   nightOwl: "crits/seasons/nightOwl.webp", // Night Owl crit flash's own backdrop icon
   headhunter: "crits/office/headhunter.webp", // Headhunter crit flash's own backdrop icon
   dressCode: "crits/office/dressCode.webp", // Dress Code crit flash's own backdrop icon

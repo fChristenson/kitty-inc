@@ -137,9 +137,8 @@ export interface BuildFloorOptions {
 }
 
 // the level-0 (freshly-built, un-upgraded) income/cost/interval stats for a given
-// floorLevel/multiplier — buildFloor's own formula, factored out so a future
-// caller needing the same level-0 baseline can reuse it instead of redriving it
-// (see floorInteractions.ts's Spring Cleaning crit, which resets a floor to it)
+// floorLevel/multiplier — buildFloor's own formula, factored out so other
+// callers can reuse it instead of redriving it
 export function computeBaseFloorStats(
   floorLevel: number,
   multiplier: BigNumber,

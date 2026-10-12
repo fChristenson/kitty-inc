@@ -46,13 +46,14 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-third-scatter-event" class="game__button">Third Scatter</button>
-          <button class="game__button" data-floor-crit="collectCrit">Collect Crit</button>
+          <button id="test-mystery-stacks-event" class="game__button">Mystery Stacks</button>
+          <button id="test-pick-me-spawn-event" class="game__button">Spawn Pick Me</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Animated Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-third-scatter-event" class="game__button">Third Scatter</button>
           <button id="test-gold-switch-event" class="game__button">Gold Standard</button>
           <button id="test-nitro-event" class="game__button">Nitro</button>
           <button id="test-bullet-cancel-event" class="game__button">Bullet Cancel</button>
@@ -1357,6 +1358,7 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Floor Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-floor-crit="collectCrit">Collect Crit</button>
           <button class="game__button" data-floor-crit="blockBonkCrit">Block Bonk Crit</button>
           <button class="game__button" data-floor-crit="moneyWeatherCrit">Money Weather Crit</button>
           <button class="game__button" data-floor-crit="yoYoCrit">Yo-yo Crit</button>

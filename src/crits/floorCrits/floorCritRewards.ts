@@ -1018,35 +1018,6 @@ function applyTeamLunchCrit(floor: Floor): void {
   }
 }
 
-// "Spring Cleaning" crit (see crits/critTypes's isSpringCleaningCrit): wipes
-// each unlocked floor back to its own level-0 economy (rate/interval/cost, no
-// banked upgrades) but one permanent tier higher — a fresh floor that earns
-// more per upgrade from here on. A floor already at the top tier has nothing
-// to trade its upgrades for, so it's skipped entirely, and a floor at the
-// level cap keeps its levels and just goes up the tier. Workers/manager/office
-// upgrades and the building's accumulated price discount all survive
-function applySpringCleaningCrit(floors: Floor[], multiplier: BigNumber): void {
-  for (const [index, floor] of floors.entries()) {
-    if (!floor.unlocked) continue;
-    const promoted = nextCritTier(floor.critMultiplierTier);
-    if (promoted === floor.critMultiplierTier) continue;
-    if (isFloorMaxed(floor)) {
-      promoteTierKeepingLevel(floor, index + 1, multiplier, promoted);
-      continue;
-    }
-    const base = computeBaseFloorStats(index + 1, multiplier);
-    floor.incomeAmount = base.incomeAmount;
-    floor.incomeIntervalSeconds = base.incomeIntervalSeconds;
-    floor.rateStep = base.rateStep;
-    floor.upgradeCost = multiply(
-      base.upgradeCost,
-      floor.priceDiscountMultiplier,
-    );
-    floor.upgradeCount = 0;
-    floor.critMultiplierTier = promoted;
-  }
-}
-
 // promotes floor (the building's floorNumber-th) to tier with every upgrade it
 // has kept: its upgrades' share of the income re-earned at the new tier's
 // multiplier, on top of its base and any bonus it had
@@ -1486,7 +1457,6 @@ const CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   shareholders: (c) => applyShareholdersCrit(c.floors),
   teamBuilding: (c) => applyTeamBuildingCrit(c.floors),
   teamLunch: (c) => applyTeamLunchCrit(c.floor),
-  springCleaning: (c) => applySpringCleaningCrit(c.floors, c.multiplier),
   nightOwl: (c) => applyNightOwlCrit(c.floors),
   headhunter: (c) => applyHeadhunterCrit(c.floor, c.floors),
   blueprint: (c) => applyBlueprintCrit(c.deps, c.floors.indexOf(c.floor)),

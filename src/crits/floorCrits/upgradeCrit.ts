@@ -98,7 +98,6 @@ import {
   forceCoffeeRunCritProc,
   forceTeamBuildingCritProc,
   forceTeamLunchCritProc,
-  forceSpringCleaningCritProc,
   forceNightOwlCritProc,
   forceHeadhunterCritProc,
   forceDressCodeCritProc,
@@ -323,7 +322,6 @@ export function rollCritUpgrade(
       if (result.coffeeRun) forceCoffeeRunCritProc(floor);
       if (result.teamBuilding) forceTeamBuildingCritProc(floor);
       if (result.teamLunch) forceTeamLunchCritProc(floor);
-      if (result.springCleaning) forceSpringCleaningCritProc(floor);
       if (result.nightOwl) forceNightOwlCritProc(floor);
       if (result.headhunter) forceHeadhunterCritProc(floor);
       if (result.dressCode) forceDressCodeCritProc(floor);
@@ -524,7 +522,6 @@ export function forceFloorBuyCrit(
     coffeeRun: false,
     teamBuilding: false,
     teamLunch,
-    springCleaning: false,
     nightOwl: false,
     headhunter: false,
     dressCode: false,
@@ -655,11 +652,6 @@ export function forceTeamBuildingFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceTeamLunchFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.teamLunch = true;
-}
-
-export function forceSpringCleaningFloorBuyCrit(tier: CritTier = "crit"): void {
-  forceFloorBuyCrit(tier);
-  if (forcedFloorBuyCrit) forcedFloorBuyCrit.springCleaning = true;
 }
 
 export function forceNightOwlFloorBuyCrit(tier: CritTier = "crit"): void {
@@ -1351,11 +1343,6 @@ export function forceTeamBuildingCritUpgrade(floor: Floor): void {
 export function forceTeamLunchCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceTeamLunchCritProc(floor);
-}
-
-export function forceSpringCleaningCritUpgrade(floor: Floor): void {
-  critTiers.set(floor, "crit");
-  forceSpringCleaningCritProc(floor);
 }
 
 export function forceNightOwlCritUpgrade(floor: Floor): void {

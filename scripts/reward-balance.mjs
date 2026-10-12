@@ -217,19 +217,19 @@ async function main() {
 
     // ---------- legacy procs: hand-modelled from src/crits/floorCrits/balance ----------
     const badgeKinds = new Set(Object.keys(crit.BADGE_CRITS));
-    const legacy = crit.CRIT_PROC_KINDS.filter(
-      (k) => !badgeKinds.has(k),
-    ).map((kind) => {
-      const model = LEGACY[kind];
-      return {
-        source: "legacy",
-        kind,
-        label: crit.CRIT_PROC_INFO[kind]?.label ?? kind,
-        chance: c[`${kind}Chance`] ?? 0,
-        effects: model ? model({ tierLevels, c }) : [],
-        modelled: !!model,
-      };
-    });
+    const legacy = crit.CRIT_PROC_KINDS.filter((k) => !badgeKinds.has(k)).map(
+      (kind) => {
+        const model = LEGACY[kind];
+        return {
+          source: "legacy",
+          kind,
+          label: crit.CRIT_PROC_INFO[kind]?.label ?? kind,
+          chance: c[`${kind}Chance`] ?? 0,
+          effects: model ? model({ tierLevels, c }) : [],
+          modelled: !!model,
+        };
+      },
+    );
 
     // ---------- events: classified from their source ----------
     const events = readdirSync("src/crits/animatedCrits/events")
@@ -545,7 +545,6 @@ const LEGACY = {
   goldenTicket: () => [levels(125, 1)],
   silverTicket: () => [levels(25, 1)],
   executiveOrder: () => [floorTier(1, F)],
-  springCleaning: () => [floorTier(1, F), levels(-L, F)],
 };
 
 // ---------- events ----------

@@ -162,6 +162,18 @@ export const CONFIG = {
       // each crit tier's weight as the result (x3, x7, x10)
       odds: { crit: 0.6, mega: 0.3, ultra: 0.1 },
     },
+    // src/spawn/pickMe — x3, x7 and x10 pop up over a floor's bar, wisps
+    // cover them and shuffle like cups: the tapped one's number is that many
+    // levels for the floor
+    pickMe: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      // from the numbers popping up, the shuffle included, pulsing over its
+      // last pulseMs
+      durationMs: 8_000,
+      pulseMs: 2_000,
+    },
     // src/spawn/pacman — a wisp darts in leaving a path of lights ending on a
     // badge: tracing the path onto the badge wins it
     pacman: {

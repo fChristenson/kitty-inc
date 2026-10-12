@@ -39,6 +39,10 @@ More little surprises in what's already on screen, each one only paying.
 
 ## Built
 
+- **Mystery stacks** (`animatedCrits/events/mysteryStacksEvent`): animated crit; every bar in view flips into a gold bar with a ?, the ?s flip round onto the crit's number one by one, beams join them, every bar blows into its levels, the clicked one a crit tier up. Test: New Effects "Mystery Stacks".
+
+- **Pick me** (`spawn/pickMe`): gesture spawn; x3, x7 and x10 pop up over a bar, wisps fly in and cover them, then shuffle like cups, quicker and quicker; the tapped wisp bursts on its number, which drops onto the bar as that many levels, the other two showing theirs. Test: New Effects "Spawn Pick Me".
+
 - **Slots heartbeat** (`spawn/slots`): once two reels match, the world goes dark but the bar while the last crawls past, the screen thumping like a heartbeat, quicker and harder (gold rings, bulbs flashing, a low thump and buzz each beat); it drops in and the lights slam back on in a white flash, a payline, a huge blast and a geyser of coins with the levels.
 
 - **Badge lights** (`shared/badgeLights` `drawBadgeLights`): the lights behind the badge crit flash and the pacman badge; the gold shimmer rays in a light gold, swaying.

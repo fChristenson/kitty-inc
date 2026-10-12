@@ -712,13 +712,6 @@ export const TEAM_LUNCH_CRIT_CHANCE = CONFIG.crit.teamLunchChance;
 export const TEAM_LUNCH_CRIT_COLOR = COLOR.teamBuildingCoral;
 export const TEAM_LUNCH_CRIT_LABEL = "Team Lunch";
 
-// "Spring Cleaning" crit — promotes every unlocked floor one tier and wipes it
-// back to a brand new floor at that tier; a floor already at the top tier is
-// skipped entirely, since there's nothing left to trade the upgrades for
-export const SPRING_CLEANING_CRIT_CHANCE = CONFIG.crit.springCleaningChance;
-export const SPRING_CLEANING_CRIT_COLOR = COLOR.springCleaningMint;
-export const SPRING_CLEANING_CRIT_LABEL = "Spring Cleaning";
-
 // "Night Owl" crit — Night Shift's exact reward, but worth +2 virtual boosted
 // workers instead of +1
 export const NIGHT_OWL_CRIT_CHANCE = CONFIG.crit.nightOwlChance;
@@ -932,7 +925,6 @@ const doubleDownCrits = snapshotSet<Floor>();
 const coffeeRunCrits = snapshotSet<Floor>();
 const teamBuildingCrits = snapshotSet<Floor>();
 const teamLunchCrits = snapshotSet<Floor>();
-const springCleaningCrits = snapshotSet<Floor>();
 const nightOwlCrits = snapshotSet<Floor>();
 const headhunterCrits = snapshotSet<Floor>();
 const dressCodeCrits = snapshotSet<Floor>();
@@ -1074,7 +1066,6 @@ export interface CritRollResult extends Record<BadgeCritKind, boolean> {
   coffeeRun: boolean;
   teamBuilding: boolean;
   teamLunch: boolean;
-  springCleaning: boolean;
   nightOwl: boolean;
   headhunter: boolean;
   dressCode: boolean;
@@ -1181,7 +1172,6 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "coffeeRun",
   "teamBuilding",
   "teamLunch",
-  "springCleaning",
   "nightOwl",
   "headhunter",
   "dressCode",
@@ -1285,7 +1275,6 @@ const CRIT_PROC_SETS: Record<
   coffeeRun: coffeeRunCrits,
   teamBuilding: teamBuildingCrits,
   teamLunch: teamLunchCrits,
-  springCleaning: springCleaningCrits,
   nightOwl: nightOwlCrits,
   headhunter: headhunterCrits,
   dressCode: dressCodeCrits,
@@ -1994,13 +1983,6 @@ export const CRIT_PROC_INFO: Record<
     icon: "teamLunch",
     description: "Doubles every worker's boost duration",
   },
-  springCleaning: {
-    label: SPRING_CLEANING_CRIT_LABEL,
-
-    color: SPRING_CLEANING_CRIT_COLOR,
-    icon: "springCleaning",
-    description: "Rebuilds every floor fresh, one tier higher",
-  },
   nightOwl: {
     label: NIGHT_OWL_CRIT_LABEL,
 
@@ -2706,10 +2688,6 @@ export function isTeamLunchCrit(floor: Floor): boolean {
   return teamLunchCrits.has(floor);
 }
 
-export function isSpringCleaningCrit(floor: Floor): boolean {
-  return springCleaningCrits.has(floor);
-}
-
 export function isNightOwlCrit(floor: Floor): boolean {
   return nightOwlCrits.has(floor);
 }
@@ -3057,10 +3035,6 @@ export function forceTeamBuildingCritProc(floor: Floor): void {
 
 export function forceTeamLunchCritProc(floor: Floor): void {
   teamLunchCrits.add(floor);
-}
-
-export function forceSpringCleaningCritProc(floor: Floor): void {
-  springCleaningCrits.add(floor);
 }
 
 export function forceNightOwlCritProc(floor: Floor): void {

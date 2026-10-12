@@ -45,9 +45,4 @@ export const TIERS_BALANCE = {
   // "Executive Order" crit — promotes every floor in the building one
   // permanent crit tier step at once
   executiveOrderChance: 0.006,
-  // "Spring Cleaning" crit — promotes every unlocked floor one permanent tier
-  // AND resets it to a fresh, un-upgraded floor at that higher tier; a floor
-  // already at the top tier is left alone. Trades banked upgrades for a
-  // permanently better multiplier, so priced with the other tier promotions
-  springCleaningChance: 0.006,
 } as const;

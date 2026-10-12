@@ -347,6 +347,7 @@ async function main() {
   loadWhenIdle(() => import("./spawn/blackHole"));
   loadWhenIdle(() => import("./spawn/simonSays"));
   loadWhenIdle(() => import("./spawn/lightningStorm"));
+  loadWhenIdle(() => import("./spawn/pickMe"));
   queueEventParts();
 
   // the page's markup (canvas, action bar, dialogs) is in index.html
@@ -2298,6 +2299,7 @@ async function main() {
           nitro: forceOnActive((e) => e.forceNitroEvent),
           "bullet-cancel": forceOnActive((e) => e.forceBulletCancelEvent),
           "third-scatter": forceOnActive((e) => e.forceThirdScatterEvent),
+          "mystery-stacks": forceOnActive((e) => e.forceMysteryStacksEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {
@@ -2323,6 +2325,8 @@ async function main() {
             void import("./spawn/lightningStorm").then((m) =>
               m.forceLightningStormSpawn(),
             ),
+          "pick-me-spawn": () =>
+            void import("./spawn/pickMe").then((m) => m.forcePickMeSpawn()),
           "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
           "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
           "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),
