@@ -42,6 +42,7 @@ import {
   BTN_W,
   BTN_H,
   BTN_X,
+  buttonFlip,
   getBtnY,
   getHoldHeat,
   peekHoldAnim,
@@ -209,6 +210,8 @@ function renderUpgradeButton(
       ctx.scale(scale * holdAnim.scale, scale * holdAnim.scale);
     }
     if (jelly) ctx.scale(jelly.sx, jelly.sy);
+    const flip = buttonFlip(floor, now);
+    if (flip !== 1) ctx.scale(flip, 1);
     ctx.translate(-cx, -cy);
     let dim = false;
     if (!crit && !activeEvent?.freeClick) {

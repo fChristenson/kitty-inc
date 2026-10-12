@@ -334,6 +334,11 @@ export const FLOOR_CRIT_CONFIG = {
     blockBonkCrit: {
       chance: 0.03,
     },
+    // coins raining over the building, thicker and thicker, heavy ones
+    // slamming the bars, then a huge one onto its own
+    moneyWeatherCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

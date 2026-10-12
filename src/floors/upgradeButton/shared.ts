@@ -76,6 +76,22 @@ export function triggerButtonPress(floor: Floor): void {
   pressedAt.set(resolveButtonFloor(floor), Date.now());
 }
 
+// a button flipping over on its upright axis like a tossed coin
+const flippedAt = new WeakMap<Floor, number>();
+const FLIP_MS = 500;
+const FLIP_TURNS = 2;
+export function flipUpgradeButton(floor: Floor): void {
+  flippedAt.set(resolveButtonFloor(floor), Date.now());
+}
+// its width share mid-flip (1 when still)
+export function buttonFlip(floor: Floor, now: number): number {
+  const at = flippedAt.get(floor);
+  if (at === undefined) return 1;
+  const u = (now - at) / FLIP_MS;
+  if (u < 0 || u >= 1) return 1;
+  return Math.max(0.06, Math.abs(Math.cos(Math.PI * FLIP_TURNS * u)));
+}
+
 // buttons that are a live clone of another floor's button (see
 // crits/animatedCrits/events/swarmEvent): drawn from, animated by and clicked through that source
 // button's own state for as long as isLinked holds

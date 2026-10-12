@@ -51,6 +51,7 @@ export function createTestButtonMarkup(): string {
           <button id="test-nitro-event" class="game__button">Nitro</button>
           <button id="test-bullet-cancel-event" class="game__button">Bullet Cancel</button>
           <button class="game__button" data-floor-crit="blockBonkCrit">Block Bonk Crit</button>
+          <button class="game__button" data-floor-crit="moneyWeatherCrit">Money Weather Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -1303,6 +1304,11 @@ export function createTestButtonMarkup(): string {
           <button id="test-bubbles-event" class="game__button">Spawn Bubbles</button>
           <button id="test-wisp-spawn-event" class="game__button">Spawn Wisp</button>
           <button id="test-coin-spawn-event" class="game__button">Spawn Coin</button>
+          <button id="test-slots-spawn-event" class="game__button">Spawn Slots</button>
+          <button id="test-pacman-spawn-event" class="game__button">Spawn Pacman</button>
+          <button id="test-black-hole-spawn-event" class="game__button">Spawn Black Hole</button>
+          <button id="test-simon-says-spawn-event" class="game__button">Spawn Simon Says</button>
+          <button id="test-lightning-storm-spawn-event" class="game__button">Spawn Lightning Storm</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

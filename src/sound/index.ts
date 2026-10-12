@@ -578,6 +578,15 @@ export function playBubbleAppear(): void {
   playBubble(0.8 + Math.random() * 0.3, SFX_VOLUME * 0.6);
 }
 
+// the black hole's bubbling while it's held: deep and soft at first, higher
+// and louder as it charges (0..1) (src/spawn/blackHole)
+export function playBlackHoleBubble(charge: number): void {
+  playBubble(
+    0.6 + charge + Math.random() * 0.2,
+    SFX_VOLUME * (0.4 + 0.8 * charge),
+  );
+}
+
 // one-shot sound effect for the rare mega-crit "JACKPOT!" moment (see
 // floorInteractions.ts). Debounced (see JACKPOT_DEBOUNCE_MS) so back-to-back mega
 // crits during a fast held click can't stack overlapping plays
@@ -602,6 +611,18 @@ export function playEventEnded(): void {
 
 export function playNotification(): void {
   playSfx("notification", NOTIFICATION_VOLUME);
+}
+
+// Simon says' tone for a bar: the notification pitched to its note
+// (src/spawn/simonSays)
+const SIMON_NOTES = [1, 1.26, 1.5, 1.68, 2];
+export function playSimonNote(note: number): void {
+  playSfx(
+    "notification",
+    NOTIFICATION_VOLUME,
+    0,
+    SIMON_NOTES[note % SIMON_NOTES.length],
+  );
 }
 
 // the coin spawn's coins rising out of their holes (src/spawn/coin)

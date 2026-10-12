@@ -43,6 +43,7 @@ import {
   drawBubbles,
   hitTestBubbles,
   popBubbleAt,
+  sweepBubbles,
   updateBubbles,
   wireBubbles,
 } from "../../spawn/bubbles";
@@ -56,9 +57,19 @@ import {
   drawCoinSpawn,
   hitTestCoinSpawn,
   tapCoinSpawn,
+  sweepCoinSpawn,
   updateCoinSpawn,
   wireCoinSpawn,
 } from "../../spawn/coin";
+import {
+  drawSpawnGames,
+  hitTestSpawnGames,
+  moveSpawnGame,
+  pressSpawnGames,
+  releaseSpawnGame,
+  updateSpawnGames,
+  wireSpawnGames,
+} from "../../shared/spawnGames";
 import { getTotalIncome } from "../../totalIncome";
 
 import { COLOR } from "../../palette";
@@ -796,6 +807,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     updateBubbles(performance.now());
     updateWispSpawn(performance.now());
     updateCoinSpawn(performance.now());
+    updateSpawnGames(performance.now());
     const dpr = getEffectiveDpr();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -906,6 +918,13 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       HUD_H / 2,
       performance.now(),
     );
+    drawSpawnGames(
+      over,
+      SLOT_W,
+      contentViewportH(),
+      HUD_H / 2,
+      performance.now(),
+    );
     drawBubbles(over, SLOT_W, contentViewportH(), performance.now());
     ctx.restore();
   }
@@ -932,6 +951,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   // true for the whole gesture if it started on the wisp's glitter: it
   // sweeps instead of scrolling or tapping; every drag sweeps from the last spot
   let wispSwipe = false;
+  // true for the whole gesture if a gesture spawn took it (shared/spawnGames)
+  let spawnGameDown = false;
   let sweepX = 0;
   let sweepY = 0;
 
@@ -1022,6 +1043,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
   wireBubbles(floorActionsDeps);
   wireCoinSpawn(floorActionsDeps);
+  wireSpawnGames(floorActionsDeps);
 
   // fires the upgrade button's click logic once (same overlapping-mouse-critter
   // courtesy a normal tap gets); called once on pointerdown, then again every
@@ -1075,11 +1097,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     upgradeFiredOnDown = false;
     const p = canvasPoint(event);
     wispSwipe = false;
+    spawnGameDown = false;
     sweepX = p.x;
     sweepY = p.y;
     // bubbles float over everything, the HUD too
     bubbleTapDown = popBubbleAt(p.x, p.y) || tapCoinSpawn(p.x, p.y);
     if (bubbleTapDown) return;
+    spawnGameDown = pressSpawnGames(p.x, p.y, performance.now());
+    if (spawnGameDown) return;
     wispSwipe = hitTestWispGlitter(p.x, p.y);
     if (wispSwipe) {
       sweepWispGlitter(p.x, p.y, p.x, p.y);
@@ -1134,6 +1159,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     hudTapDown = false;
     bubbleTapDown = false;
     wispSwipe = false;
+    spawnGameDown = false;
     upgradeFiredOnDown = true;
     canvas.setPointerCapture(event.pointerId);
     button.fire();
@@ -1147,6 +1173,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         p.y < hudBottomY ||
         hitTestBubbles(p.x, p.y) ||
         hitTestCoinSpawn(p.x, p.y) ||
+        hitTestSpawnGames(p.x, p.y, performance.now()) ||
         hitTestWispGlitter(p.x, p.y)
       ) {
         canvas.style.cursor = "pointer";
@@ -1178,10 +1205,17 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     if (isScreenFrozen()) return;
 
     const swipe = canvasPoint(event);
+    if (spawnGameDown) {
+      moveSpawnGame(swipe.x, swipe.y, performance.now());
+      return;
+    }
     sweepWispGlitter(sweepX, sweepY, swipe.x, swipe.y);
+    sweepBubbles(sweepX, sweepY, swipe.x, swipe.y);
+    sweepCoinSpawn(sweepX, sweepY, swipe.x, swipe.y);
     sweepX = swipe.x;
     sweepY = swipe.y;
-    if (wispSwipe) return;
+    // a swipe that started on glitter, a bubble or a coin sweeps, never scrolls
+    if (wispSwipe || bubbleTapDown) return;
 
     const dy = event.clientY - lastY;
     const now = performance.now();
@@ -1207,6 +1241,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     canvas.releasePointerCapture(event.pointerId);
     dragPointerId = null;
     stopHoldRepeat();
+    if (spawnGameDown) {
+      spawnGameDown = false;
+      releaseSpawnGame(performance.now());
+      return;
+    }
     if (didDrag) {
       if (Math.abs(velocityY) > MOMENTUM_MIN_SPEED) {
         runMomentum();

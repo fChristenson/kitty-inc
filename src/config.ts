@@ -92,8 +92,9 @@ export const CONFIG = {
   // every rollEveryMs and spawns with procChance, but not until cooldownMs
   // after the last one left
   randomSpawns: {
-    // across every kind: at most `count` spawn within any windowMs
-    gate: { count: 2, windowMs: 15_000 },
+    // the gateway across every kind: at most `count` spawn in a round (never
+    // more out at once), then none roll until cooldownMs after the last is gone
+    gate: { count: 2, cooldownMs: 5_000 },
     // src/spawn/mouse — a mouse running about a random unlocked floor
     mouse: {
       rollEveryMs: 5_000,
@@ -149,6 +150,73 @@ export const CONFIG = {
       count: [3, 7] as [number, number],
       // all of them tapped pay this many seconds of the company's income
       rewardSeconds: 20,
+    },
+    // src/spawn/slots — a floor's income bar flips over into three reels: a
+    // tap spins them onto x3, x7 or x10, that many levels for the floor
+    slots: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      durationMs: 5_000,
+      pulseMs: 2_000,
+      // each crit tier's weight as the result (x3, x7, x10)
+      odds: { crit: 0.6, mega: 0.3, ultra: 0.1 },
+    },
+    // src/spawn/pacman — a wisp darts in leaving a path of lights ending on a
+    // badge: tracing the path onto the badge wins it
+    pacman: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      // how long the path waits to be traced, pulsing over its last pulseMs
+      durationMs: 7_000,
+      pulseMs: 2_000,
+      // the wisp's dash laying the path
+      dashMs: 1_200,
+    },
+    // src/spawn/blackHole — a little nebula: hold it down and it collapses
+    // into a black hole sucking in the screen, then goes supernova
+    blackHole: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      durationMs: 6_000,
+      pulseMs: 2_000,
+      // how long it must be held
+      holdMs: 3_000,
+      // the levels it gives each floor in view, and the seconds of the
+      // company's income it pays
+      levels: 5,
+      rewardSeconds: 30,
+    },
+    // src/spawn/simonSays — the buttons in view flip and show numbers: tapped
+    // in order, each tap plays its part of an effect
+    simonSays: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      durationMs: 8_000,
+      pulseMs: 2_000,
+      // how many taps past one per button in view, so a button repeats
+      extraTaps: 1,
+      // the levels each tap gives its floor, and the seconds of the
+      // company's income the last one pays
+      levels: 3,
+      rewardSeconds: 30,
+    },
+    // src/spawn/lightningStorm — a ball of lightning on the end of a floor's
+    // bar: held and dragged along the bar, it strikes it behind the finger,
+    // money spilling out of every strike into the total
+    lightningStorm: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      durationMs: 6_000,
+      pulseMs: 2_000,
+      // strikes along the bar's length, and the seconds of the company's
+      // income they pay between them
+      strikes: 12,
+      rewardSeconds: 30,
     },
   },
 

@@ -13,6 +13,12 @@ import {
 } from "../src/crits";
 import { shakeScreen } from "../src/shared/screenShake";
 import {
+  hitTestSpawnGames,
+  moveSpawnGame,
+  pressSpawnGames,
+  releaseSpawnGame,
+} from "../src/shared/spawnGames";
+import {
   applyBoostAll,
   getButtonCenter,
   spawnCoinBurst,
@@ -684,6 +690,61 @@ export function spawnScenario(id: string, hold = true): Scenario {
       const summary = await measure(name, 6000);
       release();
       return summary;
+    },
+  };
+}
+
+// the middle of whatever a gesture spawn (shared/spawnGames) would take a
+// press on, in the canvas's screen units
+function spawnTarget(): { x: number; y: number } | null {
+  const canvas = document.querySelector<HTMLCanvasElement>("#game-canvas");
+  if (!canvas) return null;
+  const rect = canvas.getBoundingClientRect();
+  const w = 1448;
+  const h = (rect.height * w) / rect.width;
+  const now = performance.now();
+  let n = 0;
+  let x = 0;
+  let y = 0;
+  for (let sy = 0; sy < h; sy += 20)
+    for (let sx = 0; sx < w; sx += 20)
+      if (hitTestSpawnGames(sx, sy, now)) {
+        n++;
+        x += sx;
+        y += sy;
+      }
+  return n ? { x: x / n, y: y / n } : null;
+}
+
+// a gesture spawn played as it's meant to be: held (black-hole), dragged
+// along its bar (lightning-storm) or tapped (the rest)
+export function spawnPlayScenario(id: string): Scenario {
+  const name = `spawn-play:${id}`;
+  return {
+    name,
+    about: `the ${id} spawn played`,
+    run: async (bridge) => {
+      click("#add-money");
+      bridge.scrollToFloor(second(bridge), 0.6);
+      await sleep(300);
+      click(`#test-${id}-spawn-event`);
+      let at: { x: number; y: number } | null = null;
+      for (let k = 0; k < 40 && !at; k++) {
+        await sleep(100);
+        at = spawnTarget();
+      }
+      const done = measure(name, 6000);
+      if (at) {
+        pressSpawnGames(at.x, at.y, performance.now());
+        if (id === "black-hole") await sleep(3500);
+        else if (id === "lightning-storm")
+          for (let k = 1; k <= 30; k++) {
+            await sleep(30);
+            moveSpawnGame(at.x + k * 25, at.y, performance.now());
+          }
+        releaseSpawnGame(performance.now());
+      }
+      return done;
     },
   };
 }

@@ -1,4 +1,8 @@
-export { getUpgradeCost, getButtonCenter } from "./upgradeButton";
+export {
+  getUpgradeCost,
+  getButtonCenter,
+  flipUpgradeButton,
+} from "./upgradeButton";
 import { randomInt } from "../utils";
 import type { Floor } from "../gameState";
 import type { CritTier } from "../crits";
@@ -360,6 +364,8 @@ export {
   increaseIncomeRate,
   increaseIncomeRateBy,
   punchIncomeBar,
+  setIncomePanelSpawnHidden,
+  setIncomePanelsSpawnHidden,
   wiggleIncomeBar,
   rewardPayoutAmount,
 } from "./incomePanel";

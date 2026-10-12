@@ -41,7 +41,7 @@ import { drawGlow, fadeStops } from "../../shared/glowSprite";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { createSpawnRoll } from "../../shared/spawnRoll";
 import { isSpawnGone, spawnFade } from "../../shared/spawnFade";
-import { tapHits } from "../../shared/tapTarget";
+import { swipeHits, tapHits } from "../../shared/tapTarget";
 import { wiggleHudTotal } from "../../shared/totalIncomeCoins";
 import type { Point } from "../../shared/wisp";
 
@@ -204,16 +204,37 @@ export function hitTestCoinSpawn(x: number, y: number): boolean {
   return !!coinAt(x, y, performance.now());
 }
 
+function flip(c: Coin, now: number): void {
+  const turn = (now - c.bornAt) * COIN_SPIN;
+  c.flip = startCoinFlip(spot, now, COIN_RADIUS, turn);
+  playBloop();
+}
+
 // flips the coin at (x, y) up; true if there was one, so the press goes no
 // further
 export function tapCoinSpawn(x: number, y: number): boolean {
   const now = performance.now();
   const c = coinAt(x, y, now);
   if (!c) return false;
-  const turn = (now - c.bornAt) * COIN_SPIN;
-  c.flip = startCoinFlip(spot, now, COIN_RADIUS, turn);
-  playBloop();
+  flip(c, now);
   return true;
+}
+
+// flips up every coin a swipe from (x0, y0) to (x1, y1) passes through
+export function sweepCoinSpawn(
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+): void {
+  if (coins.length === 0) return;
+  const now = performance.now();
+  for (let i = coins.length - 1; i >= 0; i--) {
+    const c = coins[i];
+    if (!canTap(c, now) || !holeAt(c)) continue;
+    hoverAt(c, now);
+    if (swipeHits(x0, y0, x1, y1, spot, COIN_RADIUS)) flip(c, now);
+  }
 }
 
 function pay(): void {

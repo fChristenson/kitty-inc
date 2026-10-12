@@ -11,7 +11,7 @@ import {
   type CritProcKind,
 } from "../critTypes";
 import { critFont, drawCritText } from "./critText";
-import { runWhenIdle } from "../../shared/idle";
+import { processWhenIdle, runWhenIdle } from "../../shared/idle";
 import { drawGoldShimmer } from "../../shared/goldShimmer";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { clamp01, lerp } from "../../shared/easing";
@@ -760,10 +760,15 @@ export function warmLetterFlash(
       runWhenIdle(warm);
       return;
     }
-    // a longer amount shows smaller, so at a lower res: every res is ready
+    // a longer amount shows smaller, so at a lower res: every res is ready,
+    // a glyph an idle slot (all at once was a ~90ms task)
     const res = lettersRes(sample, color, strokeWidth);
+    const glyphs: [number, string][] = [];
     for (let r = Math.max(1, res - 1); r <= Math.min(3, res + 1); r++)
-      warmLetters(chars, color, strokeWidth, r, false);
+      for (const c of chars) glyphs.push([r, c]);
+    processWhenIdle(glyphs, ([r, c]) =>
+      warmLetters(c, color, strokeWidth, r, false),
+    );
   };
   runWhenIdle(warm);
 }

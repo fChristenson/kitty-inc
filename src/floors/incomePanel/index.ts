@@ -145,6 +145,14 @@ export function setIncomePanelHidden(floor: Floor | null): void {
 export function setIncomePanelsHidden(floors: Floor[]): void {
   hiddenFloors = new Set(floors);
 }
+// random spawns draw these floors' bars themselves, apart from any event's
+let spawnHiddenFloors: ReadonlySet<Floor> = new Set();
+export function setIncomePanelSpawnHidden(floor: Floor | null): void {
+  setIncomePanelsSpawnHidden(floor ? [floor] : []);
+}
+export function setIncomePanelsSpawnHidden(floors: Floor[]): void {
+  spawnHiddenFloors = new Set(floors);
+}
 
 // Hit testing for the active overtime bar's two-tap cancellation control.
 export function hitTestIncomeBar(
@@ -942,7 +950,8 @@ export function drawIncomePanel(
   // optionally filled to `fill` (0..1) instead of the live cycle
   eventFlash?: { whiteAlpha: number; rotation: number; fill?: number },
 ): void {
-  if (hiddenFloors.has(floor) && !eventFlash) return;
+  if ((hiddenFloors.has(floor) || spawnHiddenFloors.has(floor)) && !eventFlash)
+    return;
   const x = PANEL_X;
   const y = getPanelY(isGroundFloor);
 

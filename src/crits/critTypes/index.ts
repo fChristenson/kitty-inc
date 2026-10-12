@@ -1199,9 +1199,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
 // at load were a measurable slice of startup
 const badgeProcSets = new Map<BadgeCritKind, WeakSet<Floor>>();
 function procSet(kind: CritProcKind): WeakSet<Floor> | undefined {
-  return isBadgeCritKind(kind)
-    ? badgeProcSets.get(kind)
-    : CRIT_PROC_SETS[kind];
+  return isBadgeCritKind(kind) ? badgeProcSets.get(kind) : CRIT_PROC_SETS[kind];
 }
 const CRIT_PROC_SETS: Record<
   Exclude<CritProcKind, BadgeCritKind>,
@@ -1342,10 +1340,7 @@ function notifyCritProcsArmed(kinds: readonly CritProcKind[]): void {
 export function forceCritProc(kind: CritProcKind, floor: Floor): void {
   let set = procSet(kind);
   if (!set)
-    badgeProcSets.set(
-      kind as BadgeCritKind,
-      (set = snapshotSet<Floor>()),
-    );
+    badgeProcSets.set(kind as BadgeCritKind, (set = snapshotSet<Floor>()));
   set.add(floor);
   notifyCritProcsArmed([kind]);
 }
@@ -2175,6 +2170,7 @@ export const FLOOR_CRIT_KINDS = [
   "windmillCrit",
   "saturnCrit",
   "beatmapCrit",
+  "moneyWeatherCrit",
 ] as const satisfies readonly FloorCritType[];
 export type FloorCritKind = (typeof FLOOR_CRIT_KINDS)[number];
 
@@ -2314,8 +2310,7 @@ export function rollLandedProcs(): CritProcKind[] {
     )
       landed.push(kinds[i]);
   }
-  if (getBadgeRewards() !== null)
-    landed.push(...rollBadgeCrit(critRandom));
+  if (getBadgeRewards() !== null) landed.push(...rollBadgeCrit(critRandom));
   return landed;
 }
 

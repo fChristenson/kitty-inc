@@ -342,6 +342,12 @@ async function main() {
   // badge rewards, then the rest of the events
   queueEventParts(1);
   loadWhenIdle(loadBadgeRewards);
+  // the gesture spawns (shared/spawnGames) roll once their chunks land
+  loadWhenIdle(() => import("./spawn/slots"));
+  loadWhenIdle(() => import("./spawn/pacman"));
+  loadWhenIdle(() => import("./spawn/blackHole"));
+  loadWhenIdle(() => import("./spawn/simonSays"));
+  loadWhenIdle(() => import("./spawn/lightningStorm"));
   queueEventParts();
 
   // the page's markup (canvas, action bar, dialogs) is in index.html
@@ -2307,6 +2313,22 @@ async function main() {
             forceGoldSwitch(floor);
           }),
           "coin-spawn": forceCoinSpawn,
+          "slots-spawn": () =>
+            void import("./spawn/slots").then((m) => m.forceSlotsSpawn()),
+          "pacman-spawn": () =>
+            void import("./spawn/pacman").then((m) => m.forcePacmanSpawn()),
+          "black-hole-spawn": () =>
+            void import("./spawn/blackHole").then((m) =>
+              m.forceBlackHoleSpawn(),
+            ),
+          "simon-says-spawn": () =>
+            void import("./spawn/simonSays").then((m) =>
+              m.forceSimonSaysSpawn(),
+            ),
+          "lightning-storm-spawn": () =>
+            void import("./spawn/lightningStorm").then((m) =>
+              m.forceLightningStormSpawn(),
+            ),
           "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
           "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
           "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

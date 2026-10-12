@@ -192,6 +192,7 @@ async function launch() {
       `--user-data-dir=${profile}`,
       "--window-size=480,1000",
       "--no-first-run",
+      "--mute-audio",
       "--no-default-browser-check",
       "--autoplay-policy=no-user-gesture-required",
       "about:blank",

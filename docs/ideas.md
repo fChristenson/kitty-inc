@@ -39,6 +39,15 @@ More little surprises in what's already on screen, each one only paying.
 
 ## Built
 
+- **Money weather** (`floorCrits/crits/moneyWeatherCrit`): floor crit; coins rain over the bars, a drizzle thickening to a slanting downpour, heavy coins slamming the bars quicker and quicker, then a huge one onto its own bar. Test: New Effects "Money Weather Crit".
+
+- **Gesture spawns** (`shared/spawnGames` registry: gameCanvas ticks, draws and hands them its pointer; `CONFIG.randomSpawns.*`; tests in Random Spawns):
+  - **Simon says** (`spawn/simonSays`, effects in `effects.ts`): the buttons in view flip and show numbers, a button can carry a later number too; tapped in order, each tap plays its part of the effect and levels its floor, the last pays the total.
+  - **Pacman** (`spawn/pacman`): a wisp lays a path of lights ending on a badge; tracing it without straying eats the lights and wins the badge.
+  - **Slots** (`spawn/slots`): a bar flips into a slot window ringed by chasing casino bulbs; a tap sends a wisp sweeping across, kicking each reel into a blurred spin, the last teasing before it drops in onto x3, x7 or x10; the bulbs flash, a payline beams across and the floor takes that many levels (List 129's "Lever and lights", a wisp in place of the lever).
+  - **Black hole** (`spawn/blackHole`): a nebula; held for 3s it becomes a black hole sucking in coins, crit numbers and struggling wisps, then goes supernova: levels on every bar in view and cash into the total.
+  - **Lightning storm** (`spawn/lightningStorm`): a ball of lightning on a bar's left end; dragged along the bar, bolts strike behind the finger, money spilling into the total, a huge bolt at the end.
+
 - **Gold standard** (`floors/incomePanel`): a floor at the level cap gets a coin-gold bar with gloss slashes and gold glimmers twinkling calmly over it. The moment it reaches the cap, the bar pops and wobbles back like its "Lvl" label (`shared/levelPop`), its old colour fading into the gold as it goes (`shared/glossyWidgets` `drawGoldSwitch`). Test: New Effects "Gold Standard".
 
 - **Lucky sevens** (`src/floors/luckySevens`, drawn by `floors/star`): a floor's label reaching any level with a 7 in it (by any means) sends each 7 in turn through a text effect picked at random from `shared/textAnimations`, landing back in gold in a burst of glitter before cooling back to its usual colour (no shake, jackpot or total flash); the floor pays out once per 7. Test: New Effects "Lucky Sevens".

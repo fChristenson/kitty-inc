@@ -30,7 +30,7 @@ import {
   type Payout,
   type Prize,
 } from "../../shared/spawnPrize";
-import { tapHits } from "../../shared/tapTarget";
+import { swipeHits } from "../../shared/tapTarget";
 import type { Point } from "../../shared/wisp";
 
 const RADIUS = 130;
@@ -179,14 +179,22 @@ function bubbleGrow(bubble: Bubble, now: number): number {
   return grow >= 1 ? 1 : easeOutBack(grow);
 }
 
-function hitBubble(x: number, y: number, now: number): Bubble | null {
+// the bubble under (x, y), or under a swipe from (x0, y0) to it
+function hitBubble(
+  x: number,
+  y: number,
+  now: number,
+  x0 = x,
+  y0 = y,
+): Bubble | null {
   for (let i = bubbles.length - 1; i >= 0; i--) {
     const bubble = bubbles[i];
+    if (now >= bubble.poppedAt) continue;
     if (now >= bubble.bornAt + CONFIG.randomSpawns.bubbles.durationMs) continue;
     const scale = bubbleGrow(bubble, now);
     if (scale <= 0.3) continue;
     bubbleAt(bubble, now, spot);
-    if (tapHits(x, y, spot, RADIUS * scale)) return bubble;
+    if (swipeHits(x0, y0, x, y, spot, RADIUS * scale)) return bubble;
   }
   return null;
 }
@@ -196,13 +204,8 @@ export function hitTestBubbles(x: number, y: number): boolean {
   return !!hitBubble(x, y, performance.now());
 }
 
-// pops the bubble under (x, y) and pays what's inside; true if one popped,
-// so the press goes no further
-export function popBubbleAt(x: number, y: number): boolean {
-  if (!getDeps) return false;
-  const now = performance.now();
-  const bubble = hitBubble(x, y, now);
-  if (!bubble) return false;
+function pop(bubble: Bubble, now: number): void {
+  if (!getDeps) return;
   bubble.poppedAt = now;
   bubbleAt(bubble, now, bubble.from);
   playBubblePop();
@@ -216,7 +219,34 @@ export function popBubbleAt(x: number, y: number): boolean {
     now,
     CONFIG.randomSpawns.bubbles.workerChance,
   );
+}
+
+// pops the bubble under (x, y) and pays what's inside; true if one popped,
+// so the press goes no further
+export function popBubbleAt(x: number, y: number): boolean {
+  if (!getDeps) return false;
+  const now = performance.now();
+  const bubble = hitBubble(x, y, now);
+  if (!bubble) return false;
+  pop(bubble, now);
   return true;
+}
+
+// pops every bubble a swipe from (x0, y0) to (x1, y1) passes through
+export function sweepBubbles(
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+): void {
+  if (!getDeps || bubbles.length === 0) return;
+  const now = performance.now();
+  for (
+    let bubble = hitBubble(x1, y1, now, x0, y0);
+    bubble;
+    bubble = hitBubble(x1, y1, now, x0, y0)
+  )
+    pop(bubble, now);
 }
 
 // whether a bubble is gone for good: vanished, or popped and paid out

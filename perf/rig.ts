@@ -147,6 +147,7 @@ async function boot(): Promise<void> {
     floorCritScenario,
     critScenario,
     spawnScenario,
+    spawnPlayScenario,
     warmScenario,
     parseRunName,
     prepareRun,
@@ -182,9 +183,11 @@ async function boot(): Promise<void> {
                 ? spawnScenario(name.slice(6))
                 : name.startsWith("spawn-idle:")
                   ? spawnScenario(name.slice(11), false)
-                  : fixtureOf(name)
-                    ? scaleScenario(name)
-                    : null)
+                  : name.startsWith("spawn-play:")
+                    ? spawnPlayScenario(name.slice(11))
+                    : fixtureOf(name)
+                      ? scaleScenario(name)
+                      : null)
     );
   };
   // "events" and "events-all" stand for a sample of events, or every one,
