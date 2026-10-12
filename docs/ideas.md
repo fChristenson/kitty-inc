@@ -39,6 +39,8 @@ More little surprises in what's already on screen, each one only paying.
 
 ## Built
 
+- **Slots heartbeat** (`spawn/slots`): once two reels match, the world goes dark but the bar while the last crawls past, the screen thumping like a heartbeat, quicker and harder (gold rings, bulbs flashing, a low thump and buzz each beat); it drops in and the lights slam back on in a white flash, a payline, a huge blast and a geyser of coins with the levels.
+
 - **Badge lights** (`shared/badgeLights` `drawBadgeLights`): the lights behind the badge crit flash and the pacman badge; the gold shimmer rays in a light gold, swaying.
 
 - **Collect** (`floorCrits/crits/collectCrit`): floor crit; a hail of gold orbs onto every bar, then a collector wisp snakes up the bars bottom to top taking them all (levels per pickup) and dives onto its own bar. Test: New Effects "Collect Crit".

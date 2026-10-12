@@ -2,12 +2,17 @@
 // comes back as a slot window, three cells of numbers ringed by casino bulbs
 // chasing round it and a wisp flying in to wait by its top right corner,
 // wiggling for a tap. A tap has the wisp grab and haul down like a hand on a
-// lever, kicking the reels into a blurred spin, the bulbs racing;
-// they stop one by one with a slam, the last teasing past before it drops
-// in, all three on x3, x7 or x10 (CONFIG odds); then every bulb flashes, a
-// payline beams across and the floor takes that many levels in a blast
-// before the bar flips back. Untapped, it blinks and vanishes like every
-// spawn
+// lever, kicking the reels into a blurred spin that charges up: a bloop
+// for every number rolling past, rising in pitch, the bulbs racing, a gold
+// glow swelling behind the rattling window and sparks spraying off it; they
+// stop one by one with a slam, each linked to the one before by a crackling
+// arc; once two match the world goes dark but the bar and the last crawls
+// past, the screen thumping like a heartbeat, quicker and harder, gold rings
+// pulsing off the window and the bulbs flashing on each beat, all three on
+// x3, x7 or x10 (CONFIG odds); as it drops in the lights slam back on in a
+// white flash, a payline beams across and a huge blast and a geyser of coins
+// give the floor that many levels before the bar flips back. Untapped, it
+// blinks and vanishes like every spawn
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import {
@@ -21,9 +26,17 @@ import {
   drawIncomePanel,
   getIncomeBarBox,
   setIncomePanelSpawnHidden,
+  spawnCoinBurst,
 } from "../../floors";
 import type { Floor } from "../../gameState";
-import { playCoinDrop, playJackpot, playSwoosh } from "../../sound";
+import {
+  playCoinDrop,
+  playHeartbeat,
+  playJackpot,
+  playSpinTick,
+  playSwoosh,
+} from "../../sound";
+import { buzz } from "../../shared/vibration";
 import { drawBeam } from "../../shared/beam";
 import { clamp01, lerp } from "../../shared/easing";
 import { drawDetonation } from "../../shared/explosion";
@@ -42,7 +55,9 @@ import {
 import { createSpawnRoll } from "../../shared/spawnRoll";
 import { drawChevronBarFrame } from "../../shared/glossyWidgets";
 import { tapHitsMoving } from "../../shared/tapTarget";
-import { stampGlimmer } from "../../shared/twinkle";
+import { stampGlimmer, hash01 } from "../../shared/twinkle";
+import { drawGlow, fadeStops } from "../../shared/glowSprite";
+import { drawLightningArc } from "../../shared/lightningArc";
 import {
   drawWisp,
   drawWispBetween,
@@ -93,21 +108,67 @@ const WISP = WISP_SIZE * 1.3;
 // reels roll at least SPIN symbols a ms (at most about twice it): past half a
 // symbol a frame the numbers seem to roll up instead of in from above
 const SPIN = 0.012;
-const SETTLES_MS = [220, 220, 700];
-const STOPS_MS = [800, 1050, 1700];
+const SETTLES_MS = [220, 220, 1300];
+const STOPS_MS = [660, 910, 2360];
 const BLUR_GHOSTS = 2;
 const BLUR_ALPHA = 0.35;
 const BLUR_GAP = 0.22;
-const LAND_MS = STOPS_MS[REELS - 1] + 80;
-const BACK_MS = LAND_MS + 1000;
-const STOP_SHAKE = 0.6;
-const STOP_BLAST = 60;
-const TEASE_BLAST = 90;
-const LAND_SHAKE = 2.6;
-const LAND_BLAST = 170;
-const LAND_CLUSTER = [-0.35, 0.35, -0.7, 0.7];
-const LAND_CLUSTER_MS = 45;
-const LAND_CLUSTER_BLAST = 90;
+const LAND_MS = STOPS_MS[REELS - 1];
+const STOP_SHAKE = 1;
+const STOP_BLAST = 90;
+const STOP_FLASH_MS = 160;
+const STOP_FLASH = 0.8;
+// each reel landing on the one before's number links them with a crackling
+// arc, firing across over LINK_FIRE_MS, LINK_ARC as thick as usual
+const LINK_FIRE_MS = 80;
+const LINK_ARC = 0.7;
+// the heartbeat: once two reels match, the world goes DARK but the bar while
+// the last crawls past, the screen thumping on beats coming quicker (each gap
+// BEAT_QUICKEN of the last, from BEAT_GAP_MS down to BEAT_MIN_MS) and
+// harder, each a gold ring pulsing off the window; the locked reels pulse gold
+const DARK = 0.75;
+const DARK_IN_MS = 250;
+const DARK_OUT_MS = 150;
+const BEAT_FROM_MS = 220;
+const BEAT_GAP_MS = 420;
+const BEAT_QUICKEN = 0.78;
+const BEAT_MIN_MS = 110;
+const BEAT_SHAKE: [number, number] = [0.4, 1.6];
+const BEAT_BUZZ_MS = 40;
+const BEAT_GLOW_MS = 220;
+const BEAT_RING_MS = 380;
+const BEAT_FLASH_MS = 110;
+const TEASE_GOLD = 0.2;
+const TEASE_PULSE = 0.03;
+const BEATS: number[] = [];
+for (
+  let at = STOPS_MS[1] + BEAT_FROM_MS, gap = BEAT_GAP_MS;
+  at < LAND_MS - 60;
+  at += gap, gap = Math.max(BEAT_MIN_MS, gap * BEAT_QUICKEN)
+)
+  BEATS.push(at);
+// the win: the lights slam back on in a white flash, a huge blast and a
+// geyser of coins as the floor takes its levels
+const WHITE_MS = 300;
+const BOOM_BLAST = 320;
+const BOOM_SHAKE = 3.2;
+const GEYSER_SCALE = 2.2;
+const GEYSER_COINS: [number, number] = [90, 120];
+const BACK_MS = LAND_MS + 1500;
+// the charge while it spins (0..1 from the yank to the landing): the bloop
+// ticks rising in pitch, a gold glow swelling behind the window (radius of
+// its width), the window rattling (px) and sparks spraying off its edges
+const SPIN_RATE: [number, number] = [0.8, 1.7];
+const CHARGE_GLOW: [number, number] = [0.55, 1];
+const CHARGE_GLOW_ALPHA: [number, number] = [0.3, 0.95];
+const CHARGE_GLOW_SQUASH = 0.45;
+const CHARGE_GLOW_STOPS = fadeStops(COLOR.heavenlyGold);
+const RATTLE = 4;
+const SPARKS = 18;
+const SPARK_MS = 380;
+const SPARK_SIZE = 34;
+// how far a spark flies off the window, of the bar's height
+const SPARK_FLY = 1.6;
 // the win: a gold flash over the cells and a payline beamed across
 const WIN_FLASH_MS = 400;
 const WIN_FLASH = 0.5;
@@ -138,8 +199,11 @@ interface Slot {
   brakes: number[];
   stops: number[];
   landed: number;
+  beaten: number;
   paid: boolean;
   yanked: boolean;
+  // the last number the last reel ticked a bloop for
+  ticked: number;
 }
 
 let slot: Slot | null = null;
@@ -148,6 +212,10 @@ const bar: Point = { x: 0, y: 0 };
 const left: Point = { x: 0, y: 0 };
 const right: Point = { x: 0, y: 0 };
 const blast: Point = { x: 0, y: 0 };
+// the window's rattle this frame
+const rattle: Point = { x: 0, y: 0 };
+const linkFrom: Point = { x: 0, y: 0 };
+const linkTo: Point = { x: 0, y: 0 };
 const sprites = new Map<CritTier, CritTextSprite>();
 // the bar's window, white, and its shade over the numbers so each cell reads
 // as a turning drum, both built once
@@ -223,8 +291,10 @@ function start(now: number): void {
     brakes: [],
     stops: [],
     landed: 0,
+    beaten: 0,
     paid: false,
     yanked: false,
+    ticked: REEL_FROM[REELS - 1],
   };
   setIncomePanelSpawnHidden(floor);
 }
@@ -425,12 +495,21 @@ function drawReels(
   const tier = s.floor.critMultiplierTier;
   ctx.save();
   ctx.globalAlpha = alpha;
-  ctx.translate(bar.x, bar.y);
+  ctx.translate(bar.x + rattle.x, bar.y + rattle.y);
   ctx.scale(scale, sy * scale);
   if (wiggle) ctx.rotate(wiggle * Math.sin(now * WIGGLE_RATE));
   ctx.translate(-bar.x, -bar.y);
   bakeWindow(s.isGround);
   ctx.drawImage(windowBack!, left, top);
+  const t = s.tappedAt >= 0 ? now - s.tappedAt : -1;
+  // the locked reels pulse gold while the last one crawls
+  if (t >= STOPS_MS[1] && t < LAND_MS) {
+    ctx.fillStyle = COLOR.heavenlyGold;
+    ctx.globalAlpha =
+      alpha * (TEASE_GOLD + TEASE_GOLD * Math.sin(now * TEASE_PULSE));
+    ctx.fillRect(left, top, cell * (REELS - 1), box.height);
+    ctx.globalAlpha = alpha;
+  }
   for (let i = 0; i < REELS; i++) {
     const cx = left + cell * (i + 0.5);
     ctx.save();
@@ -457,6 +536,15 @@ function drawReels(
     }
     ctx.restore();
   }
+  // each reel flashes white as it slams to a stop
+  ctx.fillStyle = COLOR.white;
+  for (let i = 0; i < REELS; i++) {
+    const since = t - STOPS_MS[i];
+    if (t < 0 || since < 0 || since >= STOP_FLASH_MS) continue;
+    ctx.globalAlpha = alpha * STOP_FLASH * (1 - since / STOP_FLASH_MS);
+    ctx.fillRect(left + cell * i, top, cell, box.height);
+  }
+  ctx.globalAlpha = alpha;
   const won = s.tappedAt >= 0 ? now - s.tappedAt - LAND_MS : -1;
   if (won >= 0 && won < WIN_FLASH_MS) {
     ctx.globalAlpha = alpha * WIN_FLASH * (1 - won / WIN_FLASH_MS);
@@ -484,10 +572,179 @@ function drawReels(
 function land(s: Slot): void {
   const deps = spawnGameDeps();
   const { multiplier, color } = CRIT_TIER_CONFIG[s.result];
-  if (deps) giveLevels(deps, s.floor, multiplier, color);
-  shakeScreen(LAND_SHAKE);
+  if (deps) {
+    giveLevels(deps, s.floor, multiplier, color);
+    const area = deps.getScreenAreaLocal?.(s.floor);
+    if (area)
+      spawnCoinBurst(
+        s.floor,
+        bar.x + area.left,
+        bar.y + area.top,
+        () => {},
+        GEYSER_SCALE,
+        GEYSER_COINS,
+      );
+  }
+  shakeScreen(BOOM_SHAKE);
   playExplosion();
   playJackpot();
+}
+
+// how built up the spin is, 0 at the yank to 1 as the last reel lands
+const chargeAt = (t: number): number =>
+  t >= LAND_MS ? 0 : clamp01((t - YANK_MS) / (LAND_MS - YANK_MS));
+
+// how dark the world round the bar is: falling once two reels match, the
+// lights slamming back on as the last lands
+const darkAt = (t: number): number =>
+  t < STOPS_MS[1]
+    ? 0
+    : t < LAND_MS
+      ? DARK * clamp01((t - STOPS_MS[1]) / DARK_IN_MS)
+      : DARK * (1 - clamp01((t - LAND_MS) / DARK_OUT_MS));
+
+// ms since the latest heartbeat, Infinity before the first and after the win
+function sinceBeat(t: number): number {
+  if (t >= LAND_MS) return Infinity;
+  let since = Infinity;
+  for (let k = 0; k < BEATS.length && BEATS[k] <= t; k++) since = t - BEATS[k];
+  return since;
+}
+
+// the heartbeat's gold rings pulsing off the window and the glow it throbs
+function drawBeats(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  t: number,
+): void {
+  const since = sinceBeat(t);
+  if (since >= BEAT_RING_MS) return;
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  if (since < BEAT_GLOW_MS) {
+    ctx.globalAlpha = 0.9 * (1 - since / BEAT_GLOW_MS);
+    drawGlow(
+      ctx,
+      CHARGE_GLOW_STOPS,
+      bar.x,
+      bar.y,
+      width * 1.1,
+      CHARGE_GLOW_SQUASH,
+    );
+  }
+  const u = since / BEAT_RING_MS;
+  ctx.globalAlpha = 1 - u;
+  ctx.strokeStyle = COLOR.heavenlyGold;
+  ctx.lineWidth = 20 * (1 - u) + 2;
+  ctx.beginPath();
+  ctx.ellipse(
+    bar.x,
+    bar.y,
+    width * 0.55 + width * 0.5 * u,
+    height * 0.6 + height * 2 * u,
+    0,
+    0,
+    Math.PI * 2,
+  );
+  ctx.stroke();
+  ctx.restore();
+}
+
+// the crackling arcs linking each landed reel to the one before it
+function drawLinks(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  t: number,
+  now: number,
+): void {
+  if (t >= LAND_MS) return;
+  const cell = width / REELS;
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
+  for (let i = 1; i < REELS; i++) {
+    const since = t - STOPS_MS[i];
+    if (since < 0) break;
+    linkFrom.x = bar.x - width / 2 + cell * (i - 0.5);
+    linkTo.x = linkFrom.x + cell;
+    linkFrom.y = linkTo.y = bar.y;
+    drawLightningArc(
+      ctx,
+      linkFrom,
+      linkTo,
+      1,
+      LINK_ARC,
+      now,
+      i,
+      clamp01(since / LINK_FIRE_MS),
+    );
+  }
+  endLightBatch(ctx);
+  ctx.restore();
+}
+
+// the gold glow swelling behind the window as the spin builds
+function drawChargeGlow(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  charge: number,
+  now: number,
+): void {
+  if (charge <= 0) return;
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.globalAlpha =
+    lerp(CHARGE_GLOW_ALPHA, charge) *
+    (0.85 + 0.15 * Math.sin(now * (0.02 + 0.04 * charge)));
+  drawGlow(
+    ctx,
+    CHARGE_GLOW_STOPS,
+    bar.x,
+    bar.y,
+    width * lerp(CHARGE_GLOW, charge),
+    CHARGE_GLOW_SQUASH,
+  );
+  ctx.restore();
+}
+
+// sparks spraying off the window's top and bottom edges, more and bigger as
+// the spin builds
+function drawSparks(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  t: number,
+  charge: number,
+): void {
+  if (charge <= 0) return;
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
+  for (let k = 0; k < SPARKS; k++) {
+    const clock = t + (k * SPARK_MS) / SPARKS;
+    const round = Math.floor(clock / SPARK_MS);
+    const u = (clock % SPARK_MS) / SPARK_MS;
+    const up = k % 2 === 0;
+    const x =
+      bar.x -
+      width / 2 +
+      width * hash01(k, round) +
+      (hash01(round, k) - 0.5) * 60 * u;
+    const y =
+      bar.y +
+      (up ? -1 : 1) * (height / 2 + height * SPARK_FLY * (1 - (1 - u) ** 2));
+    stampGlimmer(
+      ctx,
+      x,
+      y,
+      SPARK_SIZE * charge * (1 - u),
+      k + round,
+      k % 3 ? COLOR.heavenlyGold : COLOR.white,
+    );
+  }
+  endLightBatch(ctx);
+  ctx.restore();
 }
 
 // the casino bulbs above and below the window, `sy` of their spread and
@@ -503,6 +760,9 @@ function drawBulbs(
   const box = getIncomeBarBox(s.isGround);
   const t = s.tappedAt >= 0 ? now - s.tappedAt : -1;
   const won = t >= LAND_MS;
+  // in the dark they die, all flashing on each heartbeat
+  const dark = !won && t >= STOPS_MS[1];
+  const beat = sinceBeat(t) < BEAT_FLASH_MS;
   const chase = Math.floor(now / (t >= 0 && !won ? RACE_MS : CHASE_MS));
   const flash = Math.floor(now / FLASH_MS);
   const half = (box.width / 2) * scale;
@@ -515,7 +775,11 @@ function drawBulbs(
   for (let k = 0; k <= count; k++) {
     const x = bar.x - half - 20 * scale + k * BULB_GAP * scale;
     for (let side = 0; side < 2; side++) {
-      const lit = won ? (flash + k + side) % 2 === 0 : (k + chase) % 3 === 0;
+      const lit = dark
+        ? beat
+        : won
+          ? (flash + k + side) % 2 === 0
+          : (k + chase) % 3 === 0;
       stampGlimmer(
         ctx,
         x,
@@ -533,7 +797,7 @@ function drawBulbs(
 function draw(
   ctx: CanvasRenderingContext2D,
   w: number,
-  _h: number,
+  h: number,
   _totalAtY: number,
   now: number,
 ): void {
@@ -578,10 +842,26 @@ function draw(
     s.yanked = true;
     shakeScreen(YANK_SHAKE);
   }
+  const charge = chargeAt(t);
+  // a bloop for every number the last reel rolls past, rising in pitch as
+  // the spin builds and slowing with it as it brakes
+  if (t < STOPS_MS[REELS - 1]) {
+    const passed = Math.floor(reelAt(s, REELS - 1, now));
+    if (passed > s.ticked) {
+      s.ticked = passed;
+      playSpinTick(lerp(SPIN_RATE, charge));
+    }
+  }
   while (s.landed < REELS && t >= STOPS_MS[s.landed]) {
     shakeScreen(STOP_SHAKE);
     playCoinDrop();
     s.landed++;
+  }
+  while (s.beaten < BEATS.length && t >= BEATS[s.beaten]) {
+    shakeScreen(lerp(BEAT_SHAKE, s.beaten / Math.max(1, BEATS.length - 1)));
+    playHeartbeat();
+    buzz(BEAT_BUZZ_MS);
+    s.beaten++;
   }
   if (!s.paid && t >= LAND_MS) {
     s.paid = true;
@@ -591,6 +871,17 @@ function draw(
     end();
     return;
   }
+  // the world round the bar goes dark while the last reel crawls
+  const dark = darkAt(t);
+  if (dark > 0) {
+    ctx.fillStyle = COLOR.black;
+    ctx.globalAlpha = dark;
+    ctx.fillRect(-w, -h, w * 3, h * 3);
+    ctx.globalAlpha = 1;
+  }
+  // the window rattles harder as the spin builds
+  rattle.x = charge * RATTLE * Math.sin(now * 0.9);
+  rattle.y = charge * RATTLE * Math.cos(now * 1.3);
   if (t >= BACK_MS) {
     const flip = Math.cos(Math.PI * ((t - BACK_MS) / FLIP_MS));
     if (flip > 0) {
@@ -598,9 +889,14 @@ function draw(
       drawBulbs(ctx, s, flip, 1, 1, now);
     } else drawRealBar(ctx, s, Math.max(0.04, -flip));
   } else {
+    drawChargeGlow(ctx, box.width, charge, now);
+    drawBeats(ctx, box.width, box.height, t);
     drawReels(ctx, s, 1, 0, 1, 1, now);
     drawBulbs(ctx, s, 1, 1, 1, now);
+    drawSparks(ctx, box.width, box.height, t, charge);
+    drawLinks(ctx, box.width, t, now);
   }
+  rattle.x = rattle.y = 0;
 
   const cell = box.width / REELS;
   // the wisp hauling down and back, waiting till the bar flips back, and
@@ -625,25 +921,16 @@ function draw(
   for (let i = 0; i < REELS; i++) {
     blast.x = bar.x - box.width / 2 + cell * (i + 0.5);
     blast.y = bar.y;
-    drawDetonation(
-      ctx,
-      blast,
-      t - STOPS_MS[i],
-      i === REELS - 1 ? TEASE_BLAST : STOP_BLAST,
-      now,
-    );
+    drawDetonation(ctx, blast, t - STOPS_MS[i], STOP_BLAST, now);
   }
-  drawDetonation(ctx, bar, t - LAND_MS, LAND_BLAST, now);
-  for (let k = 0; k < LAND_CLUSTER.length; k++) {
-    blast.x = bar.x + LAND_CLUSTER[k] * box.width;
-    blast.y = bar.y;
-    drawDetonation(
-      ctx,
-      blast,
-      t - LAND_MS - (k + 1) * LAND_CLUSTER_MS,
-      LAND_CLUSTER_BLAST,
-      now,
-    );
+  drawDetonation(ctx, bar, t - LAND_MS, BOOM_BLAST, now);
+  // the lights slamming back on in a white flash
+  const white = t - LAND_MS;
+  if (white >= 0 && white < WHITE_MS) {
+    ctx.fillStyle = COLOR.white;
+    ctx.globalAlpha = 1 - white / WHITE_MS;
+    ctx.fillRect(-w, -h, w * 3, h * 3);
+    ctx.globalAlpha = 1;
   }
 }
 

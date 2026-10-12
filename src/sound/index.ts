@@ -706,3 +706,70 @@ export function startBoostEventStreamLoop(): (fadeOutSeconds?: number) => void {
 export function startWaterLoop(): (fadeOutSeconds?: number) => void {
   return startSfxSustained("liquidBubble", SFX_VOLUME);
 }
+
+const SPIN_TICK_VOLUME = SFX_VOLUME;
+// how fast a tick cuts the one before it, s
+const SPIN_TICK_CHOKE = 0.02;
+const SPIN_TICK_SECONDS = 0.4;
+// how far before the bloop's peak a tick starts, s
+const SPIN_TICK_LEAD = 0.03;
+let spinTick: { source: AudioBufferSourceNode; gain: GainNode } | null = null;
+
+// when a buffer is loudest, s
+const peaks = new WeakMap<AudioBuffer, number>();
+function peakAt(buffer: AudioBuffer): number {
+  let at = peaks.get(buffer);
+  if (at !== undefined) return at;
+  const data = buffer.getChannelData(0);
+  let loudest = 0;
+  let index = 0;
+  for (let i = 0; i < data.length; i++) {
+    const v = Math.abs(data[i]);
+    if (v > loudest) {
+      loudest = v;
+      index = i;
+    }
+  }
+  at = index / buffer.sampleRate;
+  peaks.set(buffer, at);
+  return at;
+}
+
+// a bloop once per number a slot reel spins past: each cuts the last, so
+// they land with the numbers however fast they roll
+export function playSpinTick(rate = 1): void {
+  withSfxBuffer("bloop", (ctx, buffer) => {
+    if (spinTick) {
+      const t = ctx.currentTime;
+      spinTick.gain.gain.cancelScheduledValues(t);
+      spinTick.gain.gain.setValueAtTime(spinTick.gain.gain.value, t);
+      spinTick.gain.gain.linearRampToValueAtTime(0, t + SPIN_TICK_CHOKE);
+      spinTick.source.stop(t + SPIN_TICK_CHOKE);
+    }
+    // from just before its peak: the bloop swells for ~0.3s, longer than the
+    // gap between ticks, so from its start each was cut before it sounded
+    spinTick = startSfx(
+      ctx,
+      buffer,
+      SPIN_TICK_VOLUME,
+      Math.max(0, peakAt(buffer) - SPIN_TICK_LEAD),
+      rate,
+      SPIN_TICK_SECONDS,
+      SPIN_TICK_SECONDS / 2,
+    );
+  });
+}
+
+// a heartbeat's thump: the explosion pitched way down and cut short
+const HEARTBEAT_RATE = 0.45;
+const HEARTBEAT_SECONDS = 0.3;
+export function playHeartbeat(): void {
+  playSfx(
+    "explosion",
+    SFX_VOLUME,
+    0.04,
+    HEARTBEAT_RATE,
+    HEARTBEAT_SECONDS,
+    HEARTBEAT_SECONDS / 2,
+  );
+}
