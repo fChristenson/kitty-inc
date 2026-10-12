@@ -8267,6 +8267,17 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 92
+  // explosion, levels + crit tier: src/crits/animatedCrits/events/thirdScatterEvent ("Third Scatter"): scatter wisps fly out of the clicked button one by one onto bars; the third hovers high over its bar, flaring, the screen rumbling, then drops: beams link all three and every bar blows in a rolling chain, the clicked one last a crit tier up
+  thirdScatterEvent: {
+    chance: 0.01,
+    landsMs: [450, 750, 1650], // each scatter landing
+    hoverMs: 500, // the third hovering over its bar before it drops
+    linkMs: 120, // from the third landing to the beams linking them
+    levelShare: 0.006, // levels per bar as its chain blows
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 91
   // road race, crit tiers: src/crits/animatedCrits/events/nitroEvent ("Nitro"): the floors zoom away into the race; the ship hits a run of gold boost pads, each a surge (the view punching wide, speed lines, flames roaring), through a tunnel under a building, the last pad cracking a sonic boom, and through the finish gate's window onto the floors, every bar in view a crit tier up
   nitroEvent: {

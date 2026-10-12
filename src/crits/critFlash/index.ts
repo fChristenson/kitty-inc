@@ -12,7 +12,7 @@ import {
 } from "../critTypes";
 import { critFont, drawCritText } from "./critText";
 import { processWhenIdle, runWhenIdle } from "../../shared/idle";
-import { drawGoldShimmer } from "../../shared/goldShimmer";
+import { drawBadgeLights } from "../../shared/badgeLights";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { clamp01, lerp } from "../../shared/easing";
 import { kickShake } from "../../shared/screenShake";
@@ -1251,10 +1251,6 @@ function drawFlashLayers(
   );
 }
 
-// one full sway of the rays behind a crit image, a few to a reveal, and how
-// far they turn each way
-const RAY_SWAY_MS = 900;
-const RAY_SWAY_RAD = 0.12;
 // one full sway of the badge over its rays, and how far it turns each way
 const BADGE_SWAY_MS = 1100;
 const BADGE_SWAY_RAD = 0.05;
@@ -1318,22 +1314,16 @@ function drawFlashLayer(
   ctx.translate(centerX, centerY);
   const config = CRIT_ICON_BY_LABEL[label];
   const icon = config ? getCritIcon(config.name) : null;
-  const now = performance.now();
   if (icon) {
     const { w, h } = fitIconSize(icon, measureLabel(scratch, label) * 0.85);
-    // the rays sway gently back and forth, like searchlights at a gala
-    const sway = RAY_SWAY_RAD * wave(motionMs, RAY_SWAY_MS);
-    ctx.rotate(sway);
-    drawGoldShimmer(
+    drawBadgeLights(
       ctx,
       0,
       0,
       Math.max(w, h) * 0.75 * targetScale * raysScale,
-      1,
-      0,
-      now,
+      motionMs,
+      performance.now(),
     );
-    ctx.rotate(-sway);
   }
   ctx.rotate(rotation);
   // the badge sways a little back and forth

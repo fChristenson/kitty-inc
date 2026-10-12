@@ -39,6 +39,12 @@ More little surprises in what's already on screen, each one only paying.
 
 ## Built
 
+- **Badge lights** (`shared/badgeLights` `drawBadgeLights`): the lights behind the badge crit flash and the pacman badge; the gold shimmer rays in a light gold, swaying.
+
+- **Collect** (`floorCrits/crits/collectCrit`): floor crit; a hail of gold orbs onto every bar, then a collector wisp snakes up the bars bottom to top taking them all (levels per pickup) and dives onto its own bar. Test: New Effects "Collect Crit".
+
+- **Third scatter** (`animatedCrits/events/thirdScatterEvent`): animated crit; scatter wisps land on bars one by one, the third hovers and teases while the screen rumbles, then beams link them and every bar blows in a rolling chain (levels), the clicked one last a crit tier up. Test: New Effects "Third Scatter".
+
 - **Money weather** (`floorCrits/crits/moneyWeatherCrit`): floor crit; coins rain over the bars, a drizzle thickening to a slanting downpour, heavy coins slamming the bars quicker and quicker, then a huge one onto its own bar. Test: New Effects "Money Weather Crit".
 
 - **Gesture spawns** (`shared/spawnGames` registry: gameCanvas ticks, draws and hands them its pointer; `CONFIG.randomSpawns.*`; tests in Random Spawns):

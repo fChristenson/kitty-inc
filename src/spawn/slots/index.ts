@@ -1,7 +1,8 @@
 // the slots: every so often a floor's income bar in view flips over and
 // comes back as a slot window, three cells of numbers ringed by casino bulbs
-// chasing round it, wiggling for a tap. A tap sends a wisp sweeping across
-// it, kicking each reel into a blurred spin as it passes, the bulbs racing;
+// chasing round it and a wisp flying in to wait by its top right corner,
+// wiggling for a tap. A tap has the wisp grab and haul down like a hand on a
+// lever, kicking the reels into a blurred spin, the bulbs racing;
 // they stop one by one with a slam, the last teasing past before it drops
 // in, all three on x3, x7 or x10 (CONFIG odds); then every bulb flashes, a
 // payline beams across and the floor takes that many levels in a blast
@@ -24,7 +25,7 @@ import {
 import type { Floor } from "../../gameState";
 import { playCoinDrop, playJackpot, playSwoosh } from "../../sound";
 import { drawBeam } from "../../shared/beam";
-import { clamp01, easeOutBack, lerp } from "../../shared/easing";
+import { clamp01, lerp } from "../../shared/easing";
 import { drawDetonation } from "../../shared/explosion";
 import { playExplosion } from "../../shared/explosionBang";
 import { beginLightBatch, endLightBatch } from "../../shared/lightBatch";
@@ -42,7 +43,12 @@ import { createSpawnRoll } from "../../shared/spawnRoll";
 import { drawChevronBarFrame } from "../../shared/glossyWidgets";
 import { tapHitsMoving } from "../../shared/tapTarget";
 import { stampGlimmer } from "../../shared/twinkle";
-import { drawWispBetween, WISP_SIZE, type Point } from "../../shared/wisp";
+import {
+  drawWisp,
+  drawWispBetween,
+  WISP_SIZE,
+  type Point,
+} from "../../shared/wisp";
 
 // the bar flipping over into its cells, and back
 const FLIP_MS = 320;
@@ -59,17 +65,36 @@ const STRIP: CritTier[] = ["crit", "mega", "crit", "ultra", "crit", "mega"];
 // the wiggle asking for a tap
 const WIGGLE = 0.04;
 const WIGGLE_RATE = 0.018;
-// a tap: a wisp sweeps across the window over WISP_MS, dipping into each
-// cell, and each reel spins as it passes, at SPIN symbols a ms, blurring;
-// each brakes over its SETTLES_MS into its stop, STOPS_MS after the tap
-// (the last slow, teasing past before it drops in)
-const WISP_MS = 300;
-const WISP_OUT = 120;
-const WISP_LIFT = 80;
+// a wisp flies in over ARRIVE_MS to wait by the window's top right corner,
+// bobbing; a tap has it pull like a hand on a lever: it hitches up over
+// WIND_MS, hauls down the window's right side over PULL_MS, gathering speed,
+// bumps at the bottom, holds and lets go back up. The haul's end starts every
+// reel spinning at SPIN symbols a ms, blurring. Each reel brakes over its
+// SETTLES_MS into its stop, STOPS_MS after the tap (the last slow, teasing
+// past before it drops in). Distances are of the bar's height
+const ARRIVE_MS = 300;
+const ARRIVE_UP = 3;
+const ARRIVE_OUT = 80;
+const REST_OUT = 0.45;
+const BOB = 0.06;
+const BOB_RATE = 0.006;
+const WIND_MS = 110;
+const WIND_UP = 0.3;
+const PULL_MS = 150;
+const PULL_BELOW = 0.5;
+const PULL_BOW = 0.2;
+const BUMP_MS = 70;
+const BUMP = 0.12;
+const HOLD_MS = 140;
+const LET_GO_MS = 320;
+const YANK_MS = WIND_MS + PULL_MS;
+const YANK_SHAKE = 1.2;
 const WISP = WISP_SIZE * 1.3;
-const SPIN = 0.03;
+// reels roll at least SPIN symbols a ms (at most about twice it): past half a
+// symbol a frame the numbers seem to roll up instead of in from above
+const SPIN = 0.012;
 const SETTLES_MS = [220, 220, 700];
-const STOPS_MS = [650, 900, 1550];
+const STOPS_MS = [800, 1050, 1700];
 const BLUR_GHOSTS = 2;
 const BLUR_ALPHA = 0.35;
 const BLUR_GAP = 0.22;
@@ -105,16 +130,16 @@ interface Slot {
   floor: Floor;
   isGround: boolean;
   bornAt: number;
-  // performance.now() it was tapped, its result, and each reel's start (ms
-  // after the tap, as the wisp passes it), brake (symbol it brakes from)
-  // and stop (symbol it lands on)
+  // performance.now() it was tapped, its result, and each reel's speed
+  // (symbols a ms), brake (symbol it brakes from) and stop (symbol it lands on)
   tappedAt: number;
   result: CritTier;
-  starts: number[];
+  speeds: number[];
   brakes: number[];
   stops: number[];
   landed: number;
   paid: boolean;
+  yanked: boolean;
 }
 
 let slot: Slot | null = null;
@@ -194,11 +219,12 @@ function start(now: number): void {
     bornAt: now,
     tappedAt: -1,
     result: "crit",
-    starts: [],
+    speeds: [],
     brakes: [],
     stops: [],
     landed: 0,
     paid: false,
+    yanked: false,
   };
   setIncomePanelSpawnHidden(floor);
 }
@@ -225,29 +251,29 @@ function nextOn(from: number, tier: CritTier): number {
 function spinUp(s: Slot, now: number): void {
   s.tappedAt = now;
   s.result = pickResult();
-  const width = getIncomeBarBox(s.isGround).width;
   for (let i = 0; i < REELS; i++) {
-    // when the wisp passes the reel's middle
-    s.starts[i] =
-      (WISP_MS * (WISP_OUT + (width * (i + 0.5)) / REELS)) /
-      (width + 2 * WISP_OUT);
+    // each reel's speed is set so that braking evenly from it lands on the
+    // result: the strip runs (spin + half the settle) at that speed
     const brakeAt = STOPS_MS[i] - SETTLES_MS[i];
-    const brake = REEL_FROM[i] + SPIN * (brakeAt - s.starts[i]);
-    s.brakes[i] = brake;
-    s.stops[i] = nextOn(brake + SPIN * SETTLES_MS[i] * 0.5, s.result);
+    const run = brakeAt - YANK_MS + SETTLES_MS[i] / 2;
+    const stop = nextOn(REEL_FROM[i] + SPIN * run, s.result);
+    s.speeds[i] = (stop - REEL_FROM[i]) / run;
+    s.brakes[i] = REEL_FROM[i] + s.speeds[i] * (brakeAt - YANK_MS);
+    s.stops[i] = stop;
   }
   playSwoosh();
 }
 
-// where reel i's strip is, in symbols
+// where reel i's strip is, in symbols: rolling down from the yank, braking
+// evenly into its stop
 function reelAt(s: Slot, i: number, now: number): number {
   if (s.tappedAt < 0) return REEL_FROM[i];
   const t = now - s.tappedAt;
-  if (t < s.starts[i]) return REEL_FROM[i];
+  if (t < YANK_MS) return REEL_FROM[i];
   const brakeAt = STOPS_MS[i] - SETTLES_MS[i];
-  if (t < brakeAt) return REEL_FROM[i] + SPIN * (t - s.starts[i]);
+  if (t < brakeAt) return REEL_FROM[i] + s.speeds[i] * (t - YANK_MS);
   const u = clamp01((t - brakeAt) / SETTLES_MS[i]);
-  return lerp([s.brakes[i], s.stops[i]], easeOutBack(u));
+  return lerp([s.brakes[i], s.stops[i]], 1 - (1 - u) ** 2);
 }
 
 // how blurred reel i is (0..1): spinning flat out, clearing as it brakes
@@ -255,23 +281,61 @@ function blurAt(s: Slot, i: number, now: number): number {
   if (s.tappedAt < 0) return 0;
   const t = now - s.tappedAt;
   const brakeAt = STOPS_MS[i] - SETTLES_MS[i];
-  if (t < s.starts[i] || t >= STOPS_MS[i]) return 0;
-  if (t < brakeAt) return Math.min(1, (t - s.starts[i]) / 120);
+  if (t < YANK_MS || t >= STOPS_MS[i]) return 0;
+  if (t < brakeAt) return Math.min(1, (t - YANK_MS) / 120);
   return 1 - (t - brakeAt) / SETTLES_MS[i];
 }
 
-// the wisp sweeping across the window ms after the tap, dipping into each
-// cell; the bar's place this frame
+// the wisp's spots, kept as the bar's place this frame: resting by the
+// window's top right corner, flying in there ms after the bar appears, and
+// hauling down ms after the tap
 const wispSpot: Point = { x: 0, y: 0 };
 let wispWidth = 0;
-const wispAt = (ms: number): Point | null => {
-  if (ms < 0 || ms > WISP_MS) return null;
-  const u = ms / WISP_MS;
-  const x = -WISP_OUT + (wispWidth + 2 * WISP_OUT) * u;
-  wispSpot.x = bar.x - wispWidth / 2 + x;
-  wispSpot.y =
-    bar.y -
-    WISP_LIFT * (1 - Math.abs(Math.sin((Math.PI * REELS * x) / wispWidth)));
+let wispHeight = 0;
+let screenW = 0;
+const restX = () => bar.x + wispWidth / 2 + wispHeight * REST_OUT;
+const restY = () => bar.y - wispHeight / 2;
+
+const arrivingAt = (ms: number): Point => {
+  const u = clamp01(ms / ARRIVE_MS);
+  const k = 1 - (1 - u) ** 3;
+  const x = restX();
+  const y = restY();
+  const fromX = screenW + ARRIVE_OUT;
+  const fromY = y - wispHeight * ARRIVE_UP;
+  // curving in from off the right edge, dropping onto the corner
+  wispSpot.x = (1 - k) ** 2 * fromX + 2 * (1 - k) * k * x + k * k * x;
+  wispSpot.y = (1 - k) ** 2 * fromY + 2 * (1 - k) * k * fromY + k * k * y;
+  if (u >= 1) wispSpot.y += wispHeight * BOB * Math.sin(ms * BOB_RATE);
+  return wispSpot;
+};
+
+const pullingAt = (ms: number): Point => {
+  const h = wispHeight;
+  const top = restY();
+  const bottom = bar.y + h / 2 + h * PULL_BELOW;
+  wispSpot.x = restX();
+  wispSpot.y = top;
+  if (ms <= 0) return wispSpot;
+  if (ms < WIND_MS) {
+    wispSpot.y = top - h * WIND_UP * Math.sin((Math.PI / 2) * (ms / WIND_MS));
+    return wispSpot;
+  }
+  const hauled = ms - WIND_MS;
+  if (hauled < PULL_MS) {
+    const u = hauled / PULL_MS;
+    wispSpot.x += h * PULL_BOW * Math.sin(Math.PI * u);
+    wispSpot.y = lerp([top - h * WIND_UP, bottom], u * u);
+    return wispSpot;
+  }
+  const held = hauled - PULL_MS;
+  if (held < BUMP_MS) {
+    wispSpot.y = bottom + h * BUMP * Math.sin(Math.PI * (held / BUMP_MS));
+    return wispSpot;
+  }
+  const back = held - BUMP_MS - HOLD_MS;
+  const u = 1 - (1 - clamp01(back / LET_GO_MS)) ** 3;
+  wispSpot.y = lerp([bottom, top], back > 0 ? u : 0);
   return wispSpot;
 };
 
@@ -468,7 +532,7 @@ function drawBulbs(
 
 function draw(
   ctx: CanvasRenderingContext2D,
-  _w: number,
+  w: number,
   _h: number,
   _totalAtY: number,
   now: number,
@@ -479,6 +543,10 @@ function draw(
     end();
     return;
   }
+  const box = getIncomeBarBox(s.isGround);
+  wispWidth = box.width;
+  wispHeight = box.height;
+  screenW = w;
   const age = now - s.bornAt;
   if (s.tappedAt < 0) {
     const { durationMs, pulseMs } = CONFIG.randomSpawns.slots;
@@ -494,16 +562,22 @@ function draw(
         drawReels(ctx, s, Math.max(0.04, -flip), 0, 1, 1, now);
         drawBulbs(ctx, s, -flip, 1, 1, now);
       }
+      drawWisp(ctx, arrivingAt, age, now, WISP);
       return;
     }
     const fade = spawnFade(msLeft, pulseMs, now);
     if (msLeft < 0) drawRealBar(ctx, s, 1);
     drawReels(ctx, s, 1, WIGGLE, fade.scale, fade.alpha, now);
     drawBulbs(ctx, s, 1, fade.scale, fade.alpha, now);
+    drawWisp(ctx, arrivingAt, age, now, WISP * fade.scale, 0, fade.alpha);
     return;
   }
 
   const t = now - s.tappedAt;
+  if (!s.yanked && t >= YANK_MS) {
+    s.yanked = true;
+    shakeScreen(YANK_SHAKE);
+  }
   while (s.landed < REELS && t >= STOPS_MS[s.landed]) {
     shakeScreen(STOP_SHAKE);
     playCoinDrop();
@@ -528,11 +602,10 @@ function draw(
     drawBulbs(ctx, s, 1, 1, 1, now);
   }
 
-  const box = getIncomeBarBox(s.isGround);
   const cell = box.width / REELS;
-  // the wisp sweeping across, and the payline on a win
-  wispWidth = box.width;
-  drawWispBetween(ctx, wispAt, t, now, WISP, 1, 0, WISP_MS);
+  // the wisp hauling down and back, waiting till the bar flips back, and
+  // the payline on a win
+  drawWispBetween(ctx, pullingAt, t, now, WISP, 1, 0, BACK_MS);
   const line = t - LAND_MS;
   if (line >= 0 && line < PAYLINE_MS) {
     left.x = bar.x - box.width / 2 - PAYLINE_OUT;

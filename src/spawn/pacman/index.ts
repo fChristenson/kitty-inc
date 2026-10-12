@@ -16,6 +16,7 @@ import {
 } from "../../sound";
 import { clamp01, lerp } from "../../shared/easing";
 import { drawDetonation } from "../../shared/explosion";
+import { drawBadgeLights } from "../../shared/badgeLights";
 import { beginLightBatch, endLightBatch } from "../../shared/lightBatch";
 import { shakeScreen } from "../../shared/screenShake";
 import { isScreenFrozen } from "../../shared/screenFreeze";
@@ -65,7 +66,8 @@ const EATEN_SIZE = 70;
 const BADGE = 120;
 const BADGE_PULSE = 0.06;
 const BADGE_PULSE_RATE = 0.008;
-const BADGE_GLOW = 26;
+// the badge lights' radius, of the badge's size
+const BADGE_LIGHTS = 1.65;
 const WISP = WISP_SIZE * 1.3;
 const POP = 160;
 const WIN_BLAST = 320;
@@ -409,16 +411,7 @@ function draw(
       (1 + BADGE_PULSE * Math.sin(now * BADGE_PULSE_RATE));
     ctx.save();
     ctx.globalAlpha = fade.alpha;
-    ctx.globalCompositeOperation = "lighter";
-    stampGlimmer(
-      ctx,
-      at.x,
-      at.y,
-      size + BADGE_GLOW,
-      now * 0.001,
-      COLOR.heavenlyGold,
-    );
-    ctx.globalCompositeOperation = "source-over";
+    drawBadgeLights(ctx, at.x, at.y, size * BADGE_LIGHTS, pop, now);
     drawMini(ctx, r.prize, at.x, at.y, size);
     ctx.restore();
     drawDetonation(ctx, at, pop, POP, now);

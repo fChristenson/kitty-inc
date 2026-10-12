@@ -2298,6 +2298,7 @@ async function main() {
           harrier: forceOnActive((e) => e.forceHarrierEvent),
           nitro: forceOnActive((e) => e.forceNitroEvent),
           "bullet-cancel": forceOnActive((e) => e.forceBulletCancelEvent),
+          "third-scatter": forceOnActive((e) => e.forceThirdScatterEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "lucky-sevens": later(() => {

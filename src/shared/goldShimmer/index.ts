@@ -70,6 +70,7 @@ const shimmerCache = new Map<string, HTMLCanvasElement>();
 prepareSoon(() => {
   getShimmer(COLOR.coinGold);
   getShimmer(COLOR.coinSpriteGold);
+  getShimmer(COLOR.coinSpriteHighlight);
 });
 
 function getShimmer(color: string): HTMLCanvasElement {

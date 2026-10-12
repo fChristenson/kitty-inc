@@ -405,6 +405,7 @@ const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
   bolasCrit: () => import("../crits/bolasCrit"),
   blockBonkCrit: () => import("../crits/blockBonkCrit"),
   moneyWeatherCrit: () => import("../crits/moneyWeatherCrit"),
+  collectCrit: () => import("../crits/collectCrit"),
 };
 const loading = new Map<CritPlayKind, Promise<unknown>>();
 

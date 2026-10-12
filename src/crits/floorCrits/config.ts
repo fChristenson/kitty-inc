@@ -339,6 +339,11 @@ export const FLOOR_CRIT_CONFIG = {
     moneyWeatherCrit: {
       chance: 0.03,
     },
+    // a hail of gold orbs onto every bar, then a collector wisp snaking up
+    // the bars taking them all, diving onto its own
+    collectCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {
