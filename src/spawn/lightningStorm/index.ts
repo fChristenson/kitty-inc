@@ -9,7 +9,7 @@
 import { CONFIG } from "../../config";
 import { getIncomeBarBox } from "../../floors";
 import type { Floor } from "../../gameState";
-import { playCoinAppear, playJackpot, playSwoosh } from "../../sound";
+import { playSpawnNotice, playJackpot, playSwoosh } from "../../sound";
 import { clamp01 } from "../../shared/easing";
 import { drawDetonation } from "../../shared/explosion";
 import { playBarExplosion, playExplosion } from "../../shared/explosionBang";
@@ -113,7 +113,7 @@ function start(now: number): void {
     ),
     doneAt: -1,
   };
-  playCoinAppear();
+  playSpawnNotice();
 }
 
 // crackles a ball onto a bar (test button)

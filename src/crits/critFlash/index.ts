@@ -11,7 +11,7 @@ import {
   type CritProcKind,
 } from "../critTypes";
 import { critFont, drawCritText } from "./critText";
-import { processWhenIdle, runWhenIdle } from "../../shared/idle";
+import { prepareEachSoon, prepareSoon, runWhenIdle } from "../../shared/idle";
 import { drawBadgeLights } from "../../shared/badgeLights";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { clamp01, lerp } from "../../shared/easing";
@@ -743,8 +743,9 @@ function lettersRes(label: string, color: string, strokeWidth: number): number {
   return Math.min(3, Math.max(1, Math.ceil(onScreen / FLASH_FONT_SIZE)));
 }
 
-// builds a letters flash's glyphs at idle, once the canvas has a size and the
-// font has loaded (sample sets the size they're built for)
+// builds a letters flash's glyphs on startup slices, held button or not,
+// once the canvas has a size and the font has loaded (sample sets the size
+// they're built for)
 export function warmLetterFlash(
   chars: string,
   sample: string,
@@ -752,26 +753,31 @@ export function warmLetterFlash(
   strokeWidth: number,
 ): void {
   const warm = (): void => {
-    if (
-      lastViewportWidth === 0 ||
-      !document.fonts.check(FLASH_FONT) ||
-      isCritFlashActive(Date.now())
-    ) {
-      runWhenIdle(warm);
+    if (!canWarmFlashes()) {
+      retryWarm(warm);
       return;
     }
     // a longer amount shows smaller, so at a lower res: every res is ready,
-    // a glyph an idle slot (all at once was a ~90ms task)
+    // a glyph a task (all at once was a ~90ms task)
     const res = lettersRes(sample, color, strokeWidth);
     const glyphs: [number, string][] = [];
     for (let r = Math.max(1, res - 1); r <= Math.min(3, res + 1); r++)
       for (const c of chars) glyphs.push([r, c]);
-    processWhenIdle(glyphs, ([r, c]) =>
+    prepareEachSoon(glyphs, ([r, c]) =>
       warmLetters(c, color, strokeWidth, r, false),
     );
   };
-  runWhenIdle(warm);
+  prepareSoon(warm);
 }
+
+const WARM_RETRY_MS = 200;
+const canWarmFlashes = (): boolean =>
+  lastViewportWidth > 0 &&
+  document.fonts.check(FLASH_FONT) &&
+  !isCritFlashActive(Date.now());
+const retryWarm = (warm: () => void): void => {
+  setTimeout(() => prepareSoon(warm), WARM_RETRY_MS);
+};
 
 function warmFlashBitmap(
   label: string,
@@ -788,32 +794,31 @@ function warmSlamSoon(label: string, color: string, strokeWidth: number): void {
   setTimeout(() => warmFlashBitmap(label, color, strokeWidth), 20);
 }
 
-// builds these flashes' bitmaps at idle, once the canvas has a size and the
-// font has loaded, and keeps them for the session
+// builds these flashes' bitmaps and their floor crit glyphs on startup
+// slices, held button or not (a session's first crits land mid-press), and
+// keeps them for the session
 export function warmCritFlashes(
   flashes: { label: string; color: string; strokeWidth: number }[],
 ): void {
   for (const { label } of flashes) pinnedFlashLabels.add(label);
   const warm = (): void => {
-    if (
-      lastViewportWidth === 0 ||
-      !document.fonts.check(FLASH_FONT) ||
-      isCritFlashActive(Date.now())
-    ) {
-      runWhenIdle(warm);
+    if (!canWarmFlashes()) {
+      retryWarm(warm);
       return;
     }
-    for (const { label, color, strokeWidth } of flashes) {
-      warmFlashBitmap(label, color, strokeWidth);
-      // the number a floor crit riding this flash plays out onto the bars
+    prepareEachSoon(flashes, ({ label, color, strokeWidth }) =>
+      warmFlashBitmap(label, color, strokeWidth),
+    );
+    // the number a floor crit riding this flash plays out onto the bars
+    prepareEachSoon(flashes, ({ label, color, strokeWidth }) =>
       getSpinGlyphs(
         color,
         strokeWidth,
         spinGlyphRes(floorCritSizeShare(label)),
-      );
-    }
+      ),
+    );
   };
-  runWhenIdle(warm);
+  prepareSoon(warm);
 }
 
 export function drawCritFlash(

@@ -10,7 +10,7 @@ import { COLOR } from "../../palette";
 import { pickBadge } from "../../crits";
 import {
   playBloop,
-  playCoinAppear,
+  playSpawnNotice,
   playJackpot,
   playSwoosh,
 } from "../../sound";
@@ -402,7 +402,7 @@ function draw(
     const pop = age - dashMs;
     if (!r.chimed) {
       r.chimed = true;
-      playCoinAppear();
+      playSpawnNotice();
     }
     const size =
       BADGE *

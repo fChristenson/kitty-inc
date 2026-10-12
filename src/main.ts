@@ -342,7 +342,6 @@ async function main() {
   queueEventParts(1);
   loadWhenIdle(loadBadgeRewards);
   // the gesture spawns (shared/spawnGames) roll once their chunks land
-  loadWhenIdle(() => import("./spawn/slots"));
   loadWhenIdle(() => import("./spawn/pacman"));
   loadWhenIdle(() => import("./spawn/blackHole"));
   loadWhenIdle(() => import("./spawn/simonSays"));
@@ -2300,6 +2299,7 @@ async function main() {
           "bullet-cancel": forceOnActive((e) => e.forceBulletCancelEvent),
           "third-scatter": forceOnActive((e) => e.forceThirdScatterEvent),
           "mystery-stacks": forceOnActive((e) => e.forceMysteryStacksEvent),
+          "prize-wheel": forceOnActive((e) => e.forcePrizeWheelEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {
@@ -2309,8 +2309,6 @@ async function main() {
             forceGoldSwitch(floor);
           }),
           "coin-spawn": forceCoinSpawn,
-          "slots-spawn": () =>
-            void import("./spawn/slots").then((m) => m.forceSlotsSpawn()),
           "pacman-spawn": () =>
             void import("./spawn/pacman").then((m) => m.forcePacmanSpawn()),
           "black-hole-spawn": () =>

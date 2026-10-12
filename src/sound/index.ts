@@ -625,8 +625,8 @@ export function playSimonNote(note: number): void {
   );
 }
 
-// the coin spawn's coins rising out of their holes (src/spawn/coin)
-export function playCoinAppear(): void {
+// a spawn's notice as it appears, so the player knows to look
+export function playSpawnNotice(): void {
   playSfx("notification", NOTIFICATION_VOLUME * 0.8);
 }
 
@@ -758,18 +758,4 @@ export function playSpinTick(rate = 1): void {
       SPIN_TICK_SECONDS / 2,
     );
   });
-}
-
-// a heartbeat's thump: the explosion pitched way down and cut short
-const HEARTBEAT_RATE = 0.45;
-const HEARTBEAT_SECONDS = 0.3;
-export function playHeartbeat(): void {
-  playSfx(
-    "explosion",
-    SFX_VOLUME,
-    0.04,
-    HEARTBEAT_RATE,
-    HEARTBEAT_SECONDS,
-    HEARTBEAT_SECONDS / 2,
-  );
 }

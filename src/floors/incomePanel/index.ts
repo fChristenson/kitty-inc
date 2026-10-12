@@ -147,9 +147,6 @@ export function setIncomePanelsHidden(floors: Floor[]): void {
 }
 // random spawns draw these floors' bars themselves, apart from any event's
 let spawnHiddenFloors: ReadonlySet<Floor> = new Set();
-export function setIncomePanelSpawnHidden(floor: Floor | null): void {
-  setIncomePanelsSpawnHidden(floor ? [floor] : []);
-}
 export function setIncomePanelsSpawnHidden(floors: Floor[]): void {
   spawnHiddenFloors = new Set(floors);
 }

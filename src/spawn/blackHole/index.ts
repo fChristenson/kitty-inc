@@ -25,7 +25,7 @@ import type { Floor } from "../../gameState";
 import {
   playBlackHoleBubble,
   playBloop,
-  playCoinAppear,
+  playSpawnNotice,
   playJackpot,
   playSwoosh,
 } from "../../sound";
@@ -262,7 +262,7 @@ function start(now: number): void {
     targets: [],
     landed: 0,
   };
-  playCoinAppear();
+  playSpawnNotice();
 }
 
 // drifts a nebula in (test button)

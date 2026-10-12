@@ -12,7 +12,7 @@ import { CONFIG } from "../../config";
 import { isSpawnGone, spawnFade } from "../../shared/spawnFade";
 import { createSpawnRoll } from "../../shared/spawnRoll";
 import { applyBoostAll } from "../../hud";
-import { playBloop } from "../../sound";
+import { playBloop, playSpawnNotice } from "../../sound";
 import type { Floor } from "../../gameState";
 import { loadImageByName } from "../../loadAssets";
 import { COLOR } from "../../palette";
@@ -171,6 +171,7 @@ function spawnOn(now: number): void {
     huntedAt: null,
   };
   rollNextDart(active, now);
+  playSpawnNotice();
 }
 
 // advances the current run cycle — darting toward a random point, occasionally

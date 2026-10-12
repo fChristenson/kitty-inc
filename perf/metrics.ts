@@ -226,6 +226,8 @@ export function start(): void {
   startedAt = performance.now();
   lastFrame = 0;
   recording = true;
+  // a trace (tmp/_frametrace.mjs) finds the measured window by these
+  performance.mark("perf:start");
   startProfile();
 }
 
@@ -268,6 +270,7 @@ function timeline(ms: number): Summary["timeline"] {
 
 export async function stop(name: string): Promise<Summary> {
   recording = false;
+  performance.mark("perf:stop");
   const ms = performance.now() - startedAt;
   const profile = await stopProfile(slowSpans);
   const frames = deltas.length;

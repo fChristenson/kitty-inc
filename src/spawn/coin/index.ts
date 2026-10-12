@@ -12,7 +12,7 @@
 // space over the HUD (drawCoinSpawn)
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
-import { playBloop, playCoinAppear, playSold } from "../../sound";
+import { playBloop, playSpawnNotice, playSold } from "../../sound";
 import { getActiveCompanyIndex } from "../../company";
 import {
   addTotalIncome,
@@ -264,7 +264,7 @@ function drawHovering(
   if (age < 0) return;
   if (!c.chimed) {
     c.chimed = true;
-    playCoinAppear();
+    playSpawnNotice();
   }
   const { durationMs, pulseMs } = CONFIG.randomSpawns.coin;
   const msLeft = durationMs - age;

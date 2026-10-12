@@ -151,17 +151,6 @@ export const CONFIG = {
       // all of them tapped pay this many seconds of the company's income
       rewardSeconds: 20,
     },
-    // src/spawn/slots — a floor's income bar flips over into three reels: a
-    // tap spins them onto x3, x7 or x10, that many levels for the floor
-    slots: {
-      rollEveryMs: 5_000,
-      procChance: 0.1,
-      cooldownMs: 5_000,
-      durationMs: 5_000,
-      pulseMs: 2_000,
-      // each crit tier's weight as the result (x3, x7, x10)
-      odds: { crit: 0.6, mega: 0.3, ultra: 0.1 },
-    },
     // src/spawn/pickMe — x3, x7 and x10 pop up over a floor's bar, wisps
     // cover them and shuffle like cups: the tapped one's number is that many
     // levels for the floor

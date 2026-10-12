@@ -12,7 +12,7 @@
 import { CONFIG } from "../../config";
 import type { FloorActionsDeps } from "../../floors";
 import type { Floor } from "../../gameState";
-import { playBubbleAppear, playBubblePop } from "../../sound";
+import { playBubbleAppear, playBubblePop, playSpawnNotice } from "../../sound";
 import { randomInt } from "../../utils";
 import { createSpawnRoll } from "../../shared/spawnRoll";
 import { isSpawnGone, spawnFade } from "../../shared/spawnFade";
@@ -134,6 +134,7 @@ function spawnBubbles(floor: Floor, now: number): void {
       payout: null,
     });
   });
+  playSpawnNotice();
 }
 
 function bubbleAt(bubble: Bubble, now: number, into: Point): Point {

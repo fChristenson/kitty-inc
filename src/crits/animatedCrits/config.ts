@@ -8267,6 +8267,18 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 94
+  // wisp, levels + crit tier: src/crits/animatedCrits/events/prizeWheelEvent ("Prize Wheel"): a ring of wisps flies out into a huge wheel and spins past a pointer wisp, ticking; it slows, crawls and tips onto the winner; the wheel blows apart, every wisp slamming onto a bar with levels, the winner diving last onto the clicked one, a crit tier up
+  prizeWheelEvent: {
+    chance: 0.01,
+    spinMs: 2200, // from the click till the wheel stops
+    turns: 5, // whole turns it spins through
+    flyMs: 260, // each wisp's flight off the wheel onto its bar
+    levelShare: 0.002, // levels a wisp lands on its bar
+    winnerShare: 0.008, // levels the winner lands on the clicked bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 93
   // explosion, levels + crit tier: src/crits/animatedCrits/events/mysteryStacksEvent ("Mystery Stacks"): every bar in view flips over into a gold mystery bar with a ? on it; one by one, quick-fire, the ?s flip round onto the crit's number; beams join them all and every bar blows into its levels, the clicked one a crit tier up
   mysteryStacksEvent: {

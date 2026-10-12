@@ -15,12 +15,7 @@ import {
 } from "../../crits";
 import { getIncomeBarBox } from "../../floors";
 import type { Floor } from "../../gameState";
-import {
-  playCoinDrop,
-  playJackpot,
-  playSpinTick,
-  playSwoosh,
-} from "../../sound";
+import { playSpawnNotice, playJackpot, playSpinTick } from "../../sound";
 import { clamp01, lerp } from "../../shared/easing";
 import { drawBadgeLights } from "../../shared/badgeLights";
 import { drawDetonation } from "../../shared/explosion";
@@ -80,6 +75,7 @@ const DROP_MS = 220;
 const LAND_BLAST = 170;
 const LAND_SHAKE = 2.4;
 const OTHERS_MS = [HOLD_MS + DROP_MS + 250, HOLD_MS + DROP_MS + 370];
+const OTHER_TICK = [1.3, 1.5];
 const OTHER_BLAST = 60;
 const OTHER_ALPHA = 0.7;
 const OTHER_FADE_MS = 700;
@@ -104,6 +100,8 @@ interface Pick {
   pickedAt: number;
   picked: number;
   swapped: number;
+  // how many of the other two have popped open
+  opened: number;
   landed: boolean;
 }
 
@@ -166,9 +164,10 @@ function start(now: number): void {
     pickedAt: -1,
     picked: -1,
     swapped: 0,
+    opened: 0,
     landed: false,
   };
-  playSwoosh();
+  playSpawnNotice();
 }
 
 // shuffles a row of numbers (test button)
@@ -269,7 +268,8 @@ function press(x: number, y: number, now: number): boolean {
   p.picked = t;
   p.pickedAt = now;
   shakeScreen(BURST_SHAKE);
-  playCoinDrop();
+  playExplosion();
+  playSpawnNotice();
   return true;
 }
 
@@ -348,6 +348,8 @@ function draw(
     p.landed = true;
     land(p);
   }
+  while (picked && p.opened < OTHERS_MS.length && since >= OTHERS_MS[p.opened])
+    playSpinTick(OTHER_TICK[p.opened++]);
 
   // the numbers popping up, until their wisps cover them
   for (let t = 0; t < TIERS.length; t++) {

@@ -347,19 +347,6 @@ export function drawChevronBar(
   ctx.drawImage(L.over, x, y);
 }
 
-// the chevron bar's shine and border alone, over whatever is drawn inside it
-export function drawChevronBarFrame(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-  color: string,
-): void {
-  ctx.drawImage(getBarLayers(w, h, r, color).over, x, y);
-}
-
 // ---------- the gold bar ----------
 // a floor at the level cap: smooth coin gold with gloss slashes and the usual
 // border, glimmers twinkling over it

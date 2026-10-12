@@ -39,11 +39,11 @@ More little surprises in what's already on screen, each one only paying.
 
 ## Built
 
-- **Mystery stacks** (`animatedCrits/events/mysteryStacksEvent`): animated crit; every bar in view flips into a gold bar with a ?, the ?s flip round onto the crit's number one by one, beams join them, every bar blows into its levels, the clicked one a crit tier up. Test: New Effects "Mystery Stacks".
+- **Prize wheel** (`animatedCrits/events/prizeWheelEvent`): animated crit; a ring of wisps spins into a huge wheel past a ticking pointer wisp, slows, crawls and tips onto the winner; the wheel blows apart, every wisp slamming onto a bar with levels, the winner diving onto the clicked one a crit tier up. Test: New Effects "Prize Wheel".
 
-- **Pick me** (`spawn/pickMe`): gesture spawn; x3, x7 and x10 pop up over a bar, wisps fly in and cover them, then shuffle like cups, quicker and quicker; the tapped wisp bursts on its number, which drops onto the bar as that many levels, the other two showing theirs. Test: New Effects "Spawn Pick Me".
+- **Mystery stacks** (`animatedCrits/events/mysteryStacksEvent`): animated crit; every bar in view flips into a gold bar with a ?, the ?s flip round onto the crit's number one by one, beams join them, every bar blows into its levels, the clicked one a crit tier up. Test: Animated Crits "Mystery Stacks".
 
-- **Slots heartbeat** (`spawn/slots`): once two reels match, the world goes dark but the bar while the last crawls past, the screen thumping like a heartbeat, quicker and harder (gold rings, bulbs flashing, a low thump and buzz each beat); it drops in and the lights slam back on in a white flash, a payline, a huge blast and a geyser of coins with the levels.
+- **Pick me** (`spawn/pickMe`): gesture spawn; x3, x7 and x10 pop up over a bar, wisps fly in and cover them, then shuffle like cups, quicker and quicker; the tapped wisp bursts on its number, which drops onto the bar as that many levels, the other two showing theirs. Test: Random Spawns "Spawn Pick Me".
 
 - **Badge lights** (`shared/badgeLights` `drawBadgeLights`): the lights behind the badge crit flash and the pacman badge; the gold shimmer rays in a light gold, swaying.
 
@@ -56,7 +56,6 @@ More little surprises in what's already on screen, each one only paying.
 - **Gesture spawns** (`shared/spawnGames` registry: gameCanvas ticks, draws and hands them its pointer; `CONFIG.randomSpawns.*`; tests in Random Spawns):
   - **Simon says** (`spawn/simonSays`, effects in `effects.ts`): the buttons in view flip and show numbers, a button can carry a later number too; tapped in order, each tap plays its part of the effect and levels its floor, the last pays the total.
   - **Pacman** (`spawn/pacman`): a wisp lays a path of lights ending on a badge; tracing it without straying eats the lights and wins the badge.
-  - **Slots** (`spawn/slots`): a bar flips into a slot window ringed by chasing casino bulbs; a tap sends a wisp sweeping across, kicking each reel into a blurred spin, the last teasing before it drops in onto x3, x7 or x10; the bulbs flash, a payline beams across and the floor takes that many levels (List 129's "Lever and lights", a wisp in place of the lever).
   - **Black hole** (`spawn/blackHole`): a nebula; held for 3s it becomes a black hole sucking in coins, crit numbers and struggling wisps, then goes supernova: levels on every bar in view and cash into the total.
   - **Lightning storm** (`spawn/lightningStorm`): a ball of lightning on a bar's left end; dragged along the bar, bolts strike behind the finger, money spilling into the total, a huge bolt at the end.
 

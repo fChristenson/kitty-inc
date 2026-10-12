@@ -11,7 +11,7 @@
 // (drawWispSpawn)
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
-import { playCoinDrop, playSwoosh } from "../../sound";
+import { playSpawnNotice, playCoinDrop, playSwoosh } from "../../sound";
 import { getActiveCompanyIndex } from "../../company";
 import {
   addTotalIncome,
@@ -379,6 +379,7 @@ function startRun(now: number): void {
     share: multiply(rate, rewardSeconds / Math.max(1, specks.length)),
     left: specks.length,
   };
+  playSpawnNotice();
 }
 
 // a speck lying on the screen at now, ready to be swept

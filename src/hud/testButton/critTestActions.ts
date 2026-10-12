@@ -46,13 +46,13 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-mystery-stacks-event" class="game__button">Mystery Stacks</button>
-          <button id="test-pick-me-spawn-event" class="game__button">Spawn Pick Me</button>
+          <button id="test-prize-wheel-event" class="game__button">Prize Wheel</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Animated Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-mystery-stacks-event" class="game__button">Mystery Stacks</button>
           <button id="test-third-scatter-event" class="game__button">Third Scatter</button>
           <button id="test-gold-switch-event" class="game__button">Gold Standard</button>
           <button id="test-nitro-event" class="game__button">Nitro</button>
@@ -1304,11 +1304,11 @@ export function createTestButtonMarkup(): string {
           <button id="test-bubbles-event" class="game__button">Spawn Bubbles</button>
           <button id="test-wisp-spawn-event" class="game__button">Spawn Wisp</button>
           <button id="test-coin-spawn-event" class="game__button">Spawn Coin</button>
-          <button id="test-slots-spawn-event" class="game__button">Spawn Slots</button>
           <button id="test-pacman-spawn-event" class="game__button">Spawn Pacman</button>
           <button id="test-black-hole-spawn-event" class="game__button">Spawn Black Hole</button>
           <button id="test-simon-says-spawn-event" class="game__button">Spawn Simon Says</button>
           <button id="test-lightning-storm-spawn-event" class="game__button">Spawn Lightning Storm</button>
+          <button id="test-pick-me-spawn-event" class="game__button">Spawn Pick Me</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

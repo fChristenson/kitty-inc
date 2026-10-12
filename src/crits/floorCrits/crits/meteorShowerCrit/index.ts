@@ -26,7 +26,7 @@ const SHOWER_METEORS = 20;
 const SHOWER_EVERY_MS = 50;
 const SHOWER_FALL_MS = 700;
 const SHOWER_LAST_DELAY_MS = 120;
-// big glowing balls trailing their tails, like the volcano's blobs
+// big glowing balls trailing their tails
 const SHOWER_SIZE = 1.6;
 const SHOWER_HEAT = 0.8;
 const SHOWER_BIG_SIZE = 3;
@@ -119,5 +119,5 @@ registerFloorCrit("meteorShowerCrit", {
     }
   },
   tailMs: SHOWER_TAIL_MS,
-  shake: (step) => step ? METEOR_SHAKE : SHOWER_SHAKE,
+  shake: (step) => (step ? METEOR_SHAKE : SHOWER_SHAKE),
 });

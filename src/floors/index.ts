@@ -363,7 +363,6 @@ export {
   increaseIncomeRate,
   increaseIncomeRateBy,
   punchIncomeBar,
-  setIncomePanelSpawnHidden,
   setIncomePanelsSpawnHidden,
   wiggleIncomeBar,
   rewardPayoutAmount,
