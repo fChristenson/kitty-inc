@@ -32,6 +32,7 @@ import {
   TIER_FLASH_STROKE_WIDTH,
 } from "../critFlash/presets";
 import type { FloorCritPlay } from "./critPlayer";
+import { isFloorCritRunning } from "./critPlayer";
 import {
   playCritMerge,
   type FlashStack,
@@ -245,13 +246,14 @@ interface QueuedCelebration {
   run: () => void;
 }
 const specialCelebrationQueue: QueuedCelebration[] = [];
+let drainingSpecialQueue = false;
+// only special crits count: a plain tier crit flashes on nearly every tap
 setCritsPlaying(
   () =>
     isScreenFrozen() ||
     specialCelebrationQueue.length > 0 ||
-    isCritFlashActive(Date.now()),
+    isFloorCritRunning(),
 );
-let drainingSpecialQueue = false;
 const DEJA_VU_REPEAT_COUNT = 2;
 const DEJA_VU_FOLLOW_UP_MAX_AGE_MS = 5000;
 
