@@ -162,7 +162,8 @@ function drawLights(
   }
 }
 
-// a calm, full bar's racing heartbeat: two quick swells a beat, with its halo
+// a calm, full bar's racing heartbeat: two quick swells a beat, with its halo,
+// `pace` times as quick
 function drawHeartbeat(
   ctx: CanvasRenderingContext2D,
   key: object,
@@ -173,8 +174,9 @@ function drawHeartbeat(
   r: number,
   color: string,
   now: number,
+  pace: number,
 ): PressurePose {
-  const t = (now + offsetOf(key)) % BEAT_MS;
+  const t = ((now + offsetOf(key)) * pace) % BEAT_MS;
   const beat =
     Math.exp(-(((t - 60) / 50) ** 2)) +
     0.6 * Math.exp(-(((t - 260) / 50) ** 2));
@@ -218,9 +220,11 @@ export function drawPressureBar(
   heat = 0,
   // how far a long press swells it (the boil alone doesn't warp it)
   warpHeat = heat,
+  // how many times as quick a full bar beats
+  pace = 1,
 ): PressurePose {
   if (heat === 0 && fillW >= w)
-    return drawHeartbeat(ctx, key, x, y, w, h, r, color, now);
+    return drawHeartbeat(ctx, key, x, y, w, h, r, color, now, pace);
   // unheld, only a hit's slosh drops the fill: no kettle warp for that
   if (heat === 0 && warpHeat === 0) {
     drawChevronBar(ctx, key, x, y, w, h, r, fillW, color, now, 0);

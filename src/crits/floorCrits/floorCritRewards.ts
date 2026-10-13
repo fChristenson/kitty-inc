@@ -74,6 +74,7 @@ import type { FloorCritPlay } from "./critPlayer";
 import { incomeCritBonus, incomeCritPlayFor } from "../incomeCrits";
 import { buttonCritPlayFor } from "../buttonCrits";
 import { lockCritPlayFor } from "../lockCrits";
+import { rateCritPlayFor } from "../rateCrits";
 import { otherFloorsInView, spotsFromFlash } from "./playTargets";
 
 import {
@@ -1702,6 +1703,7 @@ function playFor(
       count,
       (locked) => unlockFloorFree(deps, locked),
     );
+  if (result.rateCrit) return rateCritPlayFor(deps, floor, result.rateCrit);
   return null;
 }
 

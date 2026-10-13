@@ -24,6 +24,8 @@ import {
   RATE_LOCK_SPEED_MULTIPLIER,
   getPriceMatchCost,
   drawPoppingCritText,
+  noteRatePayout,
+  rateCritSpeed,
 } from "../../crits";
 import { getWiggleRotation } from "../../shared/wiggle";
 
@@ -46,7 +48,7 @@ import {
   peekDueIncome as sharedPeekDueIncome,
   currentIncomeRatePerSecond as sharedCurrentIncomeRatePerSecond,
 } from "../../shared/income";
-import { type BigNumber, add, multiply } from "../../shared/bigNumber";
+import { type BigNumber, add, isZero, multiply } from "../../shared/bigNumber";
 import {
   createTextGlossyGradient,
   drawCachedCartoonText,
@@ -595,7 +597,8 @@ function currentSpeedMultiplier(floor: Floor, now: number): number {
   const speedMultiplier =
     2 ** boostExponent *
     officeUpgradeSpeedMultiplier(floor) *
-    permaBoostSpeedMultiplier(floor, now);
+    permaBoostSpeedMultiplier(floor, now) *
+    rateCritSpeed(floor, now);
   let effectiveSpeedMultiplier = speedMultiplier;
   if (isRateLockActive(floor, now)) {
     effectiveSpeedMultiplier = Math.max(
@@ -643,7 +646,13 @@ function effectiveIncomeCycle(
 // from, so a payout always lines up with the bar visually completing instead of money
 // trickling in continuously underneath a stepped bar
 export function collectDueIncome(floor: Floor, now: number): BigNumber {
-  return sharedCollectDueIncome(floor, now, currentSpeedMultiplier(floor, now));
+  const due = sharedCollectDueIncome(
+    floor,
+    now,
+    currentSpeedMultiplier(floor, now),
+  );
+  if (!isZero(due)) noteRatePayout(floor, now);
+  return due;
 }
 
 // same math as collectDueIncome, but read-only — doesn't advance
@@ -816,6 +825,22 @@ function cachedIncomeRate(
     entry.at = now;
   } else rateTexts.set(floor, (entry = { text, at: now }));
   return text;
+}
+
+// a rate crit's reward turning the bar's readout over once, like a coin,
+// from what it read onto its new value
+const RATE_FLIP_MS = 240;
+const rateFlips = new WeakMap<Floor, { at: number; from: string }>();
+export function flipIncomeRate(floor: Floor): void {
+  const now = Date.now();
+  if (!floor.unlocked || isOvertimeGaugeVisible(floor, now)) return;
+  // still on its old side: the side it turns onto is already the latest
+  const flip = rateFlips.get(floor);
+  if (flip && now - flip.at < RATE_FLIP_MS / 2) return;
+  rateFlips.set(floor, {
+    at: now,
+    from: formatIncomeRate(floor, now, effectiveIncomeCycle(floor, now)),
+  });
 }
 
 // the bar's text during the switch: the text in white and in gold, rastered
@@ -1167,6 +1192,7 @@ export function drawIncomePanel(
         now,
         boilHeat,
         holdHeat,
+        rateCritSpeed(floor, now),
       );
     } else if (holdHeat > 0) {
       pressure = drawBoilingBar(
@@ -1259,11 +1285,21 @@ export function drawIncomePanel(
         : formatStaticIncomeRate(floor, now);
     const textX = barX + barW / 2;
     const textY = barY + barH / 2 + 1;
+    const flip = rateFlips.get(floor);
+    const sinceFlip = flip ? now - flip.at : Infinity;
+    let shown = text;
+    if (flip && sinceFlip < RATE_FLIP_MS) {
+      const turn = Math.abs(Math.cos((Math.PI * sinceFlip) / RATE_FLIP_MS));
+      ctx.translate(textX, textY);
+      ctx.scale(1, Math.max(0.05, turn));
+      ctx.translate(-textX, -textY);
+      if (sinceFlip < RATE_FLIP_MS / 2) shown = flip.from;
+    }
     if (goldAge < GOLD_BAR_SWITCH_MS) {
       // popping with the bar, each letter riding the bar's wave under it
       applyLevelPop(ctx, goldAge, barX + barW / 2, barY + barH / 2);
-      drawSwitchText(ctx, text, textX, textY, barX, barW, barH, goldAge);
-    } else drawCachedCartoonText(ctx, text, textX, textY, BAR_TEXT_SIZE);
+      drawSwitchText(ctx, shown, textX, textY, barX, barW, barH, goldAge);
+    } else drawCachedCartoonText(ctx, shown, textX, textY, BAR_TEXT_SIZE);
     ctx.restore();
   };
   // overtime's coin stream powers the bar up like every other stream target

@@ -46,8 +46,9 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-lock-crit="luckyStarCrit">Lucky Star</button>
-          <button class="game__button" data-lock-crit="skeletonKeyCrit">Skeleton Key</button>
+          <button class="game__button" data-rate-crit="overclockCrit">Overclock</button>
+          <button class="game__button" data-rate-crit="shiftUpCrit">Shift Up</button>
+          <button class="game__button" data-rate-crit="quickstepCrit">Quickstep</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -67,6 +68,8 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Lock Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-lock-crit="luckyStarCrit">Lucky Star</button>
+          <button class="game__button" data-lock-crit="skeletonKeyCrit">Skeleton Key</button>
           <button class="game__button" data-lock-crit="carbonCopyCrit">Carbon Copy</button>
           <button class="game__button" data-lock-crit="freshPaintCrit">Fresh Paint</button>
           <button class="game__button" data-lock-crit="hotLapCrit">Hot Lap</button>

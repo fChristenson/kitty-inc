@@ -32,6 +32,7 @@ export type {
   FloorCritKind,
   IncomeCritKind,
   LockCritKind,
+  RateCritKind,
   CritProcKind,
   CritRollResult,
   CritTier,
@@ -61,6 +62,7 @@ export {
   forceFloorCrit,
   forceIncomeCrit,
   forceLockCrit,
+  forceRateCrit,
   forceCritUpDown,
   forceMergeCrit,
   forceTestCrit,
@@ -68,6 +70,7 @@ export {
   getFloorCrit,
   getIncomeCrit,
   getLockCrit,
+  getRateCrit,
   getCritTier,
   getMergeCrit,
   isCashCrit,
@@ -92,6 +95,7 @@ export {
   takePayoutTap,
   stickSpentCrit,
 } from "./buttonCrits/buttonBonus";
+export { noteRatePayout, rateCritSpeed } from "./rateCrits/rateBonus";
 export {
   BADGE_GLITTER_AT,
   BADGE_SHIMMER_AT,

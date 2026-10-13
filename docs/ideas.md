@@ -73,6 +73,11 @@ Three more triggers that roll nothing today.
 
 ## Built
 
+- **Rate crits**, a new group (`src/crits/rateCrits`, `CONFIG.specialCrits.rateCrit`), with **Overclock**, **Shift Up**, **Quickstep** from List 153 (Fill Up removed). Test: New Effects. Every open bar in view (maxed too), own last; each reward turns its readout over (`flipIncomeRate`), a full bar's beat follows the speed (`drawPressureBar` pace).
+  - **Overclock** (Lightning): a bolt cracks onto each bar's left end and crawls along it; at the far end the bar runs `CONFIG.crit.overclockSpeed` times as fast for `overclockMs`.
+  - **Shift Up** (Race): a racer and its chaser lap each bar (two laps round its own); crossing the line halves the bar's interval for good (`shiftUpSpeed`, saved with the floor). Rarer (0.01).
+  - **Quickstep** (Bounce): a wisp hops along each bar, every landing a step faster (`quickstepStep`), and for `quickstepMs` every payout another step, up to `quickstepMaxSpeed`.
+
 - **Lucky Star**, **Skeleton Key** (lock crits), from List 152. Test: New Effects.
   - **Lucky Star** (Galaxy): a disk of stars spirals into the locked floor's core until it collapses and opens it; a star leaps onto its button, arming a crit at the crit's tier.
   - **Skeleton Key** (Drawing, new `key` shape in `shared/drawing`): dots build a giant key over the locked floor that blazes and snaps in; it opens with free taps on its button (twice the crit's multiple).

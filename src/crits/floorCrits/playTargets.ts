@@ -9,12 +9,13 @@ import {
 } from "../animatedCrits/eventProcs";
 import type { Point } from "./critPlayer";
 
-// every open, not yet maxed floor in view but floor whose target (at its
-// floor-local y) is in view
+// every open floor in view but floor whose target (at its floor-local y) is
+// in view, maxed ones only if `maxed`
 export function otherFloorsInView(
   deps: FloorActionsDeps,
   floor: Floor,
   targetY: (target: Floor) => number,
+  maxed = false,
 ): Floor[] {
   return (deps.getOnScreenFloors?.() ?? [])
     .filter(
@@ -22,7 +23,7 @@ export function otherFloorsInView(
         entry.floor !== floor &&
         entry.floor.unlocked &&
         !isFloorLocked(entry.floor) &&
-        !isFloorMaxed(entry.floor) &&
+        (maxed || !isFloorMaxed(entry.floor)) &&
         isVisibleOnFloor(entry, targetY(entry.floor)),
     )
     .map((entry) => entry.floor);

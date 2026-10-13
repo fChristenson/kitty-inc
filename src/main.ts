@@ -10,6 +10,7 @@ import {
   forceIncomeCrit,
   forceButtonCrit,
   forceLockCrit,
+  forceRateCrit,
   loadBadgeRewards,
   recordCritProcLanded,
   pickCritTierByOdds,
@@ -203,6 +204,7 @@ import {
   wireIncomeCritTestButtons,
   wireButtonCritTestButtons,
   wireLockCritTestButtons,
+  wireRateCritTestButtons,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
   wireTwisterEventTestButton,
@@ -758,6 +760,10 @@ async function main() {
           let top = floors[0];
           for (const floor of floors) if (floor.unlocked) top = floor;
           if (top) forceLockCrit(top, kind);
+        });
+        wireRateCritTestButtons(app, (kind) => {
+          const floor = buildings[activeBuildingIndex]?.[0];
+          if (floor) forceRateCrit(floor, kind);
         });
         // the event modules load in their own chunk (crits/animatedCrits/eventLoader): each
         // event test button loads it first, then runs with it as `ev`

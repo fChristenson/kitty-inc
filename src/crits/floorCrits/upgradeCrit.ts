@@ -17,6 +17,7 @@ import {
   type IncomeCritKind,
   type ButtonCritKind,
   type LockCritKind,
+  type RateCritKind,
   type CritRollResult,
   pickHigherCritTier as higherCritTier,
   rollCrit,
@@ -249,6 +250,7 @@ export function rollCritUpgrade(
       if (result.incomeCrit) armIncomeCrit(floor, result.incomeCrit);
       if (result.buttonCrit) armButtonCrit(floor, result.buttonCrit);
       if (result.lockCrit) armLockCrit(floor, result.lockCrit);
+      if (result.rateCrit) armRateCrit(floor, result.rateCrit);
       if (result.critUp) critUpCrits.add(floor);
       if (result.critDown) critDownCrits.add(floor);
       for (const kind of landedProcs) {
@@ -859,6 +861,25 @@ export function forceLockCrit(floor: Floor, kind: LockCritKind): void {
   armLockCrit(floor, kind);
 }
 
+// armed crits' rate crits: their number playing out onto the bars' rates
+const armedRateCrits = snapshotMap<Floor, RateCritKind>();
+
+function armRateCrit(floor: Floor, kind: RateCritKind): void {
+  armedRateCrits.set(floor, kind);
+  preloadFloorCritWhenIdle(kind);
+}
+
+export function getRateCrit(floor: Floor): RateCritKind | undefined {
+  return armedRateCrits.get(floor);
+}
+
+// dev/test-only: arms a multiplier crit of a random tier carrying a rate crit
+export function forceRateCrit(floor: Floor, kind: RateCritKind): void {
+  const tiers: CritTier[] = ["crit", "mega", "ultra"];
+  forceTestCrit(floor, null, tiers[Math.floor(Math.random() * 3)], "upgrade");
+  armRateCrit(floor, kind);
+}
+
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
@@ -870,6 +891,7 @@ export function consumeCritUpgrade(floor: Floor): void {
   armedIncomeCrits.delete(floor);
   armedButtonCrits.delete(floor);
   armedLockCrits.delete(floor);
+  armedRateCrits.delete(floor);
   consumeCritProcs(floor);
   dropClaimedEventProc(floor);
 }

@@ -11,6 +11,7 @@ import {
   type FloorCritKind,
   type IncomeCritKind,
   type LockCritKind,
+  type RateCritKind,
   type CritProcKind,
   type CritTier,
 } from "../../crits";
@@ -331,6 +332,18 @@ export function wireLockCritTestButtons(
   ))
     button.addEventListener("click", () =>
       onClick(button.dataset.lockCrit as LockCritKind),
+    );
+}
+
+export function wireRateCritTestButtons(
+  container: HTMLElement,
+  onClick: (kind: RateCritKind) => void,
+): void {
+  for (const button of container.querySelectorAll<HTMLButtonElement>(
+    "[data-rate-crit]",
+  ))
+    button.addEventListener("click", () =>
+      onClick(button.dataset.rateCrit as RateCritKind),
     );
 }
 

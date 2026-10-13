@@ -12,6 +12,7 @@ import {
   getIncomeCrit,
   getButtonCrit,
   getLockCrit,
+  getRateCrit,
   takeButtonCharge,
   takeDoubleTap,
   takeFreeTap,
@@ -647,6 +648,7 @@ export function handleFloorClick(
       const incomeCrit = getIncomeCrit(floor);
       const buttonCrit = getButtonCrit(floor);
       const lockCrit = getLockCrit(floor);
+      const rateCrit = getRateCrit(floor);
       const cash = isCashCrit(floor);
       const eventContext = eventProcContext(deps, isGroundFloor);
       const cover = getClaimedEventCover(floor);
@@ -676,6 +678,7 @@ export function handleFloorClick(
             incomeCrit,
             buttonCrit,
             lockCrit,
+            rateCrit,
           }),
         );
         // the special event this crit carried instead of a special crit

@@ -7,6 +7,7 @@ import { FLOOR_CRIT_CONFIG } from "./floorCrits/config";
 import { INCOME_CRIT_CONFIG } from "./incomeCrits/config";
 import { BUTTON_CRIT_CONFIG } from "./buttonCrits/config";
 import { LOCK_CRIT_CONFIG } from "./lockCrits/config";
+import { RATE_CRIT_CONFIG } from "./rateCrits/config";
 import { ANIMATED_EVENT_CONFIG } from "./animatedCrits/config";
 
 export const CRIT_CONFIG = {
@@ -41,6 +42,16 @@ export const CRIT_CONFIG = {
     nailGunTaps: 3,
     // Bolt Cutter's levels on the floor it opens, per the crit's multiple
     boltCutterLevels: 5,
+    // Overclock: a bar this many times as fast for overclockMs
+    overclockSpeed: 2,
+    overclockMs: 30_000,
+    // Shift Up: a bar this many times as fast for good
+    shiftUpSpeed: 2,
+    // Quickstep: for quickstepMs every landing and payout speeds a bar up by
+    // quickstepStep, up to quickstepMaxSpeed
+    quickstepMs: 30_000,
+    quickstepStep: 0.1,
+    quickstepMaxSpeed: 3,
     // gateway roll for the whole "special crit" (chain/boost/bounce/
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
     // ultra, before any of the individual proc chances (badgeCrits/balance, floorCrits/balance) are even
@@ -48,7 +59,7 @@ export const CRIT_CONFIG = {
     // this time, silently (see rollCrit in crits/critTypes). A hit just
     // opens the door to the existing independent-roll-then-cap-at-2 logic,
     // it doesn't guarantee a proc actually lands
-    specialCritGatewayChance: 0.15,
+    specialCritGatewayChance: 0.1,
   },
 
   // crits/critTypes' rollCrit — what a landed crit's special slot carries
@@ -79,6 +90,11 @@ export const CRIT_CONFIG = {
       chance: 0.46,
       cooldownMs: 15_000,
     },
+    // a rate crit (rateCrits), always on a multiplier crit
+    rateCrit: {
+      chance: 0.46,
+      cooldownMs: 15_000,
+    },
     // an animated event (animatedCrits/config.ts); none can land again
     // until cooldownMs after one has fully played out
     animatedCrit: {
@@ -106,6 +122,9 @@ export const CRIT_CONFIG = {
 
   // the lock crits a lockCrit slot picks from (lockCrits/config.ts)
   ...LOCK_CRIT_CONFIG,
+
+  // the rate crits a rateCrit slot picks from (rateCrits/config.ts)
+  ...RATE_CRIT_CONFIG,
 
   // badgeCrits/badgeCapsule — the mystery badge capsule a building earns once
   // every floor is at the level cap with every upgrade bought, opened from its
