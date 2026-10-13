@@ -37,6 +37,14 @@ More little surprises in what's already on screen, each one only paying.
 3. **Cat nap**: a cat sometimes nods off at its desk without slowing anything, a little z floating up; tap it and it jolts awake and works at double speed for a while.
 4. **Echo**: a crit number sometimes echoes, a smaller copy of it landing on the floor above a beat later with its own levels.
 
+## List 140: game features ([playground](../tmp/_playground/ideas.html?list=next117))
+
+New things the game doesn't have yet, not more of the same crits.
+
+1. **Cat crits** (a new special group beside floor and income crits): a crit can land on the cats instead of the bars: the number bursts into wisps that zip to every cat in view one after another, each cat jumping as it climbs a perma tier in a pop and stays lit; the crit's own floor's cats last, all at once, in the huge blast.
+2. **Jackpot lever** (a new boost beside Sale and Overtime): a floor's button turns into a gold Spin button for fifteen seconds; every tap spins a reel of crit numbers in it that rattles to a stop, the number flying onto the bar as its levels; three of the same in a row and the button hits the jackpot: every bar in view blows.
+3. **Golden hour** (a new boost): the whole building turns gold, bar by bar from the bottom; for twenty seconds every bar pays on its own beat, coins pouring up into the total, the beats quickening as the hour runs out, until every bar pays at once and the total slams.
+
 ## Built
 
 - **Money gun** (`incomeCrits/crits/moneyGunCrit`): income crit; the number splits into two wisp guns under the total firing fans of bills up into it, left, right, quicker and quicker, a muzzle flash, recoil and pop each volley; then both let rip in one blizzard of bills into the huge blast. Test: New Effects "Money Gun Crit".
