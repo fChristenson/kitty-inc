@@ -23,7 +23,15 @@ import {
   MAX_FLOORS_PER_BUILDING,
   setFloorLockPriceHidden,
 } from "../../floors/floorLock";
-import { increaseIncomeRateBy, punchIncomeBar } from "../../floors/incomePanel";
+import {
+  currentPayoutAmount,
+  getIncomeBarCenter,
+  increaseIncomeRateBy,
+  punchIncomeBar,
+} from "../../floors/incomePanel";
+import { spawnHomingCoinBurst as animateHomingCoins } from "../../floors/coins";
+import { addTotalIncome } from "../../totalIncome";
+import { pulseHudTotalFlash } from "../../shared/totalIncomeCoins";
 import {
   celebrateWorkerBoost,
   getRenderedWorkerCount,
@@ -37,6 +45,7 @@ import { liveEffect } from "../../shared/detachedJob";
 import { flipUpgradeButton as animateFlip } from "../../floors/upgradeButton";
 
 const flipUpgradeButton = liveEffect(animateFlip);
+const spawnHomingCoinBurst = liveEffect(animateHomingCoins);
 
 // where Move In's cats land across the floor they open, 0..1 of its walk
 export const MOVE_IN_SPOTS = [0.15, 0.5, 0.85];
@@ -57,6 +66,7 @@ const OPENS_THEN_REWARDS: readonly LockCritKind[] = [
   "freshPaintCrit",
   "luckyStarCrit",
   "skeletonKeyCrit",
+  "jumpStartCrit",
 ];
 
 // a lock crit playing out from floor's crit onto the locked floor, if it's in
@@ -127,6 +137,14 @@ export function lockCritPlayFor(
         } else if (kind === "skeletonKeyCrit") {
           addFreeTaps(opened, count * 2);
           flipUpgradeButton(opened);
+        } else if (kind === "jumpStartCrit") {
+          const payouts = count * CONFIG.crit.jumpStartPayouts;
+          addTotalIncome(multiply(currentPayoutAmount(opened, now), payouts));
+          const bar = getIncomeBarCenter(false);
+          spawnHomingCoinBurst(opened, bar.x, bar.y, {
+            onEachArrive: pulseHudTotalFlash,
+          });
+          punchIncomeBar(opened, `x${payouts} Payout`, color);
         } else {
           const spot = MOVE_IN_SPOTS[movedIn++ % MOVE_IN_SPOTS.length];
           const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * spot;

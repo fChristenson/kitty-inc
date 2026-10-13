@@ -344,6 +344,11 @@ export const FLOOR_CRIT_CONFIG = {
     collectCrit: {
       chance: 0.03,
     },
+    // a wisp on its own bar's end charging, ripping sparks off every other
+    // bar, then tearing back along its own in a rattle of blasts
+    gatherCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

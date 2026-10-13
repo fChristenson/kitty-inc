@@ -56,5 +56,10 @@ export const LOCK_CRIT_CONFIG = {
     skeletonKeyCrit: {
       chance: 0.03,
     },
+    // a wisp charging in the locked floor, its dust sucked in, until it
+    // bursts open and its new bar pays out at once
+    jumpStartCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

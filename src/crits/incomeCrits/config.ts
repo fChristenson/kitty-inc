@@ -118,5 +118,9 @@ export const INCOME_CRIT_CONFIG = {
     moneyGunCrit: {
       chance: 0.03,
     },
+    // a gold coin under the total spinning up to a blur, then shot into it
+    coinSpinCrit: {
+      chance: 0.03,
+    },
   },
 };

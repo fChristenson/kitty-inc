@@ -73,6 +73,12 @@ Three more triggers that roll nothing today.
 
 ## Built
 
+- **Gemstone** (animated crit), **Gather** (floor crit), **Coin Spin** (income crit), **Jump Start** (lock crit), from List 193, all on the Charge look (`shared/charge`, `tickCharge` rumble). Test: New Effects.
+  - **Gemstone** (`animatedCrits/events/gemstoneEvent`, Charge + Drawing): glitter all over the frozen screen is sucked into a giant gem that crushes smaller and whiter; it bursts, shards diving onto every bar with levels, the clicked one last a crit tier up.
+  - **Gather** (`floorCrits/crits/gatherCrit`): a wisp on its own bar's end rips sparks off every other bar (levels on each rip) as it charges, then tears back along its own bar in a rattle of blasts.
+  - **Coin Spin** (`incomeCrits/crits/coinSpinCrit`): a gold coin under the total spins up to a blur, then shoots into the readout in a rattle of blasts, a share each.
+  - **Jump Start** (`lockCrits/crits/jumpStartCrit`): a wisp in the locked floor sucks in its dust while the lock shudders; it bursts open and its new bar pays `CONFIG.crit.jumpStartPayouts` full payouts per crit multiple at once.
+
 - **Rate crits**, a new group (`src/crits/rateCrits`, `CONFIG.specialCrits.rateCrit`), with **Overclock**, **Shift Up**, **Quickstep** from List 153 (Fill Up removed). Test: New Effects. Every open bar in view (maxed too), own last; each reward turns its readout over (`flipIncomeRate`), a full bar's beat follows the speed (`drawPressureBar` pace).
   - **Overclock** (Lightning): a bolt cracks onto each bar's left end and crawls along it; at the far end the bar runs `CONFIG.crit.overclockSpeed` times as fast for `overclockMs`.
   - **Shift Up** (Race): a racer and its chaser lap each bar (two laps round its own); crossing the line halves the bar's interval for good (`shiftUpSpeed`, saved with the floor). Rarer (0.01).

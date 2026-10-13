@@ -42,6 +42,9 @@ export const CRIT_CONFIG = {
     nailGunTaps: 3,
     // Bolt Cutter's levels on the floor it opens, per the crit's multiple
     boltCutterLevels: 5,
+    // Jump Start's payout from the floor it opens, in full payouts per the
+    // crit's multiple
+    jumpStartPayouts: 1,
     // Overclock: a bar this many times as fast for overclockMs
     overclockSpeed: 2,
     overclockMs: 30_000,

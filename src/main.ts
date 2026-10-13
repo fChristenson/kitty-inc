@@ -2324,6 +2324,7 @@ async function main() {
           "lotto-drum": forceOnActive((e) => e.forceLottoDrumEvent),
           markdown: forceOnActive((e) => e.forceMarkdownEvent),
           "raise-the-roof": forceOnActive((e) => e.forceRaiseTheRoofEvent),
+          gemstone: forceOnActive((e) => e.forceGemstoneEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {

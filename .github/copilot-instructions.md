@@ -146,6 +146,7 @@ New ideas go in `docs/ideas.md` as a `## List N` section.
 
 - **Animated ideas** (floor crits, income crits, events, anything whose look is the point) are ALWAYS pitched with the playground in the same turn: one `IDEAS.push({ list: "nextK", name, about, ms, shakes, draw })` each in `tmp/_playground/ideas.ts`, drawn with the game's libs, the list heading linking `tmp/_playground/ideas.html?list=nextK`. Never text only.
 - **Everything else** (features, systems, economy, collection) gets a playground cell too, showing the feature in play; build nothing in `src/` until the user picks one.
+- **Badges are random, unrelated images, not sets.** Never pitch completing a set, category or group, set bonuses, or a second collection; badges are the game's one collection.
 
 Rejected ideas leave `docs/ideas.md` (their playground cells stay unless asked). An idea the user calls good gets built.
 
