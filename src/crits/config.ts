@@ -5,6 +5,8 @@ import { BADGE_CRIT_BALANCE } from "./badgeCrits/balance";
 import { PROC_CRIT_BALANCE } from "./floorCrits/balance";
 import { FLOOR_CRIT_CONFIG } from "./floorCrits/config";
 import { INCOME_CRIT_CONFIG } from "./incomeCrits/config";
+import { BUTTON_CRIT_CONFIG } from "./buttonCrits/config";
+import { LOCK_CRIT_CONFIG } from "./lockCrits/config";
 import { ANIMATED_EVENT_CONFIG } from "./animatedCrits/config";
 
 export const CRIT_CONFIG = {
@@ -58,13 +60,24 @@ export const CRIT_CONFIG = {
     // and after it played out (they share one player)
     floorCrit: {
       chance: 0.46,
-      cooldownMs: 10_000,
+      cooldownMs: 15_000,
+    },
+    // a button crit (buttonCrits) or a lock crit (lockCrits, only while the
+    // locked floor is in view), always on a multiplier crit; each group can't
+    // land again until its cooldownMs after the last was picked and played out
+    buttonCrit: {
+      chance: 0.46,
+      cooldownMs: 15_000,
+    },
+    lockCrit: {
+      chance: 0.46,
+      cooldownMs: 15_000,
     },
     // an animated event (animatedCrits/config.ts); none can land again
     // until cooldownMs after one has fully played out
     animatedCrit: {
       chance: 0.46,
-      cooldownMs: 30_000,
+      cooldownMs: 15_000,
     },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
     // (100+) foil
@@ -81,6 +94,12 @@ export const CRIT_CONFIG = {
 
   // the income crits an incomeCrit slot picks from (incomeCrits/config.ts)
   ...INCOME_CRIT_CONFIG,
+
+  // the button crits a buttonCrit slot picks from (buttonCrits/config.ts)
+  ...BUTTON_CRIT_CONFIG,
+
+  // the lock crits a lockCrit slot picks from (lockCrits/config.ts)
+  ...LOCK_CRIT_CONFIG,
 
   // badgeCrits/badgeCapsule — the mystery badge capsule a building earns once
   // every floor is at the level cap with every upgrade bought, opened from its

@@ -28,8 +28,10 @@ export {
   withBadgeCatalog,
 } from "./critTypes";
 export type {
+  ButtonCritKind,
   FloorCritKind,
   IncomeCritKind,
+  LockCritKind,
   CritProcKind,
   CritRollResult,
   CritTier,
@@ -54,14 +56,18 @@ export {
   createBuildingCrits,
   critNow,
   eventProcContext,
+  forceButtonCrit,
   forceCashCrit,
   forceFloorCrit,
   forceIncomeCrit,
+  forceLockCrit,
   forceCritUpDown,
   forceMergeCrit,
   forceTestCrit,
+  getButtonCrit,
   getFloorCrit,
   getIncomeCrit,
+  getLockCrit,
   getCritTier,
   getMergeCrit,
   isCashCrit,
@@ -74,6 +80,12 @@ export {
   rollFloorBuyCrit,
   triggerCritCelebration,
 } from "./floorCrits";
+export {
+  buttonBonusLabel,
+  hasButtonBonus,
+  takeButtonCharge,
+  takeFreeTap,
+} from "./buttonCrits/buttonBonus";
 export {
   BADGE_GLITTER_AT,
   BADGE_SHIMMER_AT,

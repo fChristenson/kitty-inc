@@ -1,7 +1,8 @@
 // floor crits playing a crit's number out onto the income bars in view once
-// its flash has slammed in and sat (see critTypes' FloorCritKind), and income
-// crits playing it onto the total income (its one "bar"). Each kind is
-// its own module under ../crits (../../incomeCrits/crits), loaded when its
+// its flash has slammed in and sat (see critTypes' FloorCritKind), income
+// crits playing it onto the total income (its one "bar"), button crits onto
+// the upgrade buttons and lock crits onto the locked floor. Each kind is
+// its own module under ../crits (../../<group>Crits/crits), loaded when its
 // crit is armed or played; every hit calls back so the floors or the total
 // can jolt and land their reward
 import { coolDownFloorCrits, type CritPlayKind } from "../../critTypes";
@@ -325,6 +326,14 @@ const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
   stormBallCrit: () => import("../../incomeCrits/crits/stormBallCrit"),
   billCounterCrit: () => import("../../incomeCrits/crits/billCounterCrit"),
   moneyGunCrit: () => import("../../incomeCrits/crits/moneyGunCrit"),
+  sureShotCrit: () => import("../../buttonCrits/crits/sureShotCrit"),
+  autopressCrit: () => import("../../buttonCrits/crits/autopressCrit"),
+  freeTapsCrit: () => import("../../buttonCrits/crits/freeTapsCrit"),
+  overchargeCrit: () => import("../../buttonCrits/crits/overchargeCrit"),
+  breachCrit: () => import("../../lockCrits/crits/breachCrit"),
+  twoUpCrit: () => import("../../lockCrits/crits/twoUpCrit"),
+  clearanceCrit: () => import("../../lockCrits/crits/clearanceCrit"),
+  lockpickCrit: () => import("../../lockCrits/crits/lockpickCrit"),
   rapidFireCrit: () => import("../crits/rapidFireCrit"),
   pinballCrit: () => import("../crits/pinballCrit"),
   snowballCrit: () => import("../crits/snowballCrit"),
@@ -596,7 +605,7 @@ export function drawFloorCrit(
   if (ms >= r.endsAt) {
     running = null;
     r.play.hideBars?.(null);
-    coolDownFloorCrits();
+    coolDownFloorCrits(r.play.kind);
     return;
   }
   ctx.save();

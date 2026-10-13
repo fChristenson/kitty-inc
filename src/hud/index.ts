@@ -142,6 +142,8 @@ export {
   wireMergeCritTestButton,
   wireFloorCritTestButtons,
   wireIncomeCritTestButtons,
+  wireButtonCritTestButtons,
+  wireLockCritTestButtons,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
   wireTwisterEventTestButton,

@@ -15,9 +15,10 @@
 // Each crit plays twice: cold (its first play after a page load) and warm
 // (played once first), budgets checked on both.
 //
-// Targets: a floor or income crit kind (fooCrit), an event (foo-bar or
-// fooBarEvent), any other crit kind (a proc or badge crit, at the top tier), or
-// a rig run name (floor-crit:, income-crit:, event:, crit:). Needs the dev
+// Targets: a floor, income, button or lock crit kind (fooCrit), an event
+// (foo-bar or fooBarEvent), any other crit kind (a proc or badge crit, at the
+// top tier), or a rig run name (floor-crit:, income-crit:, button-crit:,
+// lock-crit:, event:, crit:). Needs the dev
 // server (npx vite) or a perf preview behind --url. Results land in
 // tmp/_crit-perf/last.json.
 import { execSync, spawn } from "node:child_process";
@@ -29,6 +30,8 @@ import { audit, formatFinding } from "./perf-audit.mjs";
 const ROOT = process.cwd();
 const FLOOR_CRITS = "src/crits/floorCrits/crits";
 const INCOME_CRITS = "src/crits/incomeCrits/crits";
+const BUTTON_CRITS = "src/crits/buttonCrits/crits";
+const LOCK_CRITS = "src/crits/lockCrits/crits";
 const EVENTS = "src/crits/animatedCrits/events";
 const CRIT_DATA = "src/crits/badgeCrits/critData";
 const OUT = path.join(ROOT, "tmp", "_crit-perf");
@@ -72,9 +75,11 @@ const camel = (id) => id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
 function toRun(target) {
   // any rig run as it is, e.g. run:idle for a baseline
   if (target.startsWith("run:")) return { run: target.slice(4), dir: null };
-  if (/^(floor-crit|income-crit|event|crit):/.test(target)) {
+  if (
+    /^(floor-crit|income-crit|button-crit|lock-crit|event|crit):/.test(target)
+  ) {
     const [kind, name] = target.split(/:(.*)/);
-    if (kind === "floor-crit" || kind === "income-crit") return toRun(name);
+    if (kind.endsWith("-crit")) return toRun(name);
     if (kind === "event") return toRun(`${camel(name)}Event`);
     return { run: target, dir: null };
   }
@@ -85,6 +90,13 @@ function toRun(target) {
       run: `income-crit:${target}`,
       dir: path.join(INCOME_CRITS, target),
     };
+  if (fs.existsSync(path.join(BUTTON_CRITS, target)))
+    return {
+      run: `button-crit:${target}`,
+      dir: path.join(BUTTON_CRITS, target),
+    };
+  if (fs.existsSync(path.join(LOCK_CRITS, target)))
+    return { run: `lock-crit:${target}`, dir: path.join(LOCK_CRITS, target) };
   const event = target.endsWith("Event") ? target : `${camel(target)}Event`;
   if (fs.existsSync(path.join(EVENTS, event)))
     return {
@@ -99,14 +111,16 @@ function toRun(target) {
 function changedTargets() {
   const git = (cmd) => execSync(`git ${cmd}`, { encoding: "utf8" });
   const files = git(
-    `status --porcelain=v1 -uall -- ${FLOOR_CRITS} ${INCOME_CRITS} ${EVENTS} ${CRIT_DATA}`,
+    `status --porcelain=v1 -uall -- ${FLOOR_CRITS} ${INCOME_CRITS} ${BUTTON_CRITS} ${LOCK_CRITS} ${EVENTS} ${CRIT_DATA}`,
   )
     .split("\n")
     .filter(Boolean)
     .map((line) => ({ state: line.slice(0, 2), file: line.slice(3).trim() }));
   const targets = new Set();
   for (const { state, file } of files) {
-    const floor = file.match(/(?:floor|income)Crits\/crits\/(\w+)\//);
+    const floor = file.match(
+      /(?:floor|income|button|lock)Crits\/crits\/(\w+)\//,
+    );
     if (floor) targets.add(floor[1]);
     const event = file.match(/animatedCrits\/events\/(\w+Event)\//);
     if (event) targets.add(event[1]);

@@ -69,12 +69,12 @@ import {
 } from "../../floors/upgradeButton";
 import { formatPrice } from "../../utils";
 
-import {
-  isVisibleOnFloor,
-  type EventProcContext,
-} from "../animatedCrits/eventProcs";
+import type { EventProcContext } from "../animatedCrits/eventProcs";
 import type { FloorCritPlay } from "./critPlayer";
 import { incomeCritBonus, incomeCritPlayFor } from "../incomeCrits";
+import { buttonCritPlayFor } from "../buttonCrits";
+import { lockCritPlayFor } from "../lockCrits";
+import { otherFloorsInView, spotsFromFlash } from "./playTargets";
 
 import {
   increaseIncomeRate,
@@ -1507,6 +1507,13 @@ export function openBuildingBadgeCapsule(
   return openBadgeCapsule(deps.floors, eventProcContext(deps, true), force);
 }
 
+// a floor opened for free, its price slammed as its overlay drops
+function unlockFloorFree(deps: FloorActionsDeps, floor: Floor): void {
+  completeFloorUnlock(deps, floor, true);
+  levelFreeFloor(deps.floors, floor);
+  deps.persist();
+}
+
 // what an event proc rolled or armed by a click in this building can work with
 export function eventProcContext(
   deps: FloorActionsDeps,
@@ -1536,11 +1543,7 @@ export function eventProcContext(
       triggerCritCelebration(tier);
       deps.persist();
     },
-    unlockFloorFree: (floor) => {
-      completeFloorUnlock(deps, floor, true);
-      levelFreeFloor(deps.floors, floor);
-      deps.persist();
-    },
+    unlockFloorFree: (floor) => unlockFloorFree(deps, floor),
     upgradeFloorFree: (floor, levels) => {
       increaseIncomeRateBy(floor, levels);
       deps.persist();
@@ -1666,13 +1669,40 @@ export function applyFloorCrit(
         down,
         merge: result.mergeCrit,
       },
-      result.floorCrit && !result.cash
-        ? floorCritPlayFor(deps, floor, result.floorCrit, count)
-        : null,
+      result.cash ? null : playFor(deps, floor, result, count),
       granted,
     );
   for (const kind of landed)
     revealFoilOf(deps, floor, kind, isGroundFloor, result.badgeFoil);
+}
+
+// the floor, button or lock crit a multiplier crit plays out, if any can
+function playFor(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  result: CritRollResult,
+  count: number,
+): FloorCritPlay | null {
+  if (result.floorCrit)
+    return floorCritPlayFor(deps, floor, result.floorCrit, count);
+  if (result.buttonCrit)
+    return buttonCritPlayFor(
+      deps,
+      floor,
+      result.buttonCrit,
+      result.tier,
+      count,
+    );
+  if (result.lockCrit)
+    return lockCritPlayFor(
+      deps,
+      floor,
+      result.lockCrit,
+      result.tier,
+      count,
+      (locked) => unlockFloorFree(deps, locked),
+    );
+  return null;
 }
 
 // the levels a floor crit's hit lands on a bar: its own floor already has
@@ -1819,16 +1849,11 @@ function floorCritPlayFor(
   count: number,
 ): FloorCritPlay {
   const isGround = (f: Floor) => deps.floors.indexOf(f) === 0;
-  const others = (deps.getOnScreenFloors?.() ?? [])
-    .filter(
-      (entry) =>
-        entry.floor !== floor &&
-        entry.floor.unlocked &&
-        !isFloorLocked(entry.floor) &&
-        !isFloorMaxed(entry.floor) &&
-        isVisibleOnFloor(entry, getIncomeBarCenter(isGround(entry.floor)).y),
-    )
-    .map((entry) => entry.floor);
+  const others = otherFloorsInView(
+    deps,
+    floor,
+    (f) => getIncomeBarCenter(isGround(f)).y,
+  );
   const targets = [floor, ...others];
   const given = new Map<Floor, number>([[floor, count]]);
   const shown = new Set<Floor>();
@@ -1836,16 +1861,9 @@ function floorCritPlayFor(
     kind,
     barHalfWidth: getIncomeBarBox(isGround(floor)).width / 2,
     // each bar from the screen's middle, where the flash is
-    bars: () => {
-      const center = deps.getScreenCenterLocal(floor);
-      const onScreen = deps.getOnScreenFloors?.() ?? [];
-      const ownTop = onScreen.find((e) => e.floor === floor)?.top ?? 0;
-      return targets.map((target) => {
-        const top = onScreen.find((e) => e.floor === target)?.top ?? ownTop;
-        const bar = getIncomeBarCenter(isGround(target));
-        return { x: bar.x - center.x, y: top - ownTop + bar.y - center.y };
-      });
-    },
+    bars: spotsFromFlash(deps, floor, targets, (target) =>
+      getIncomeBarCenter(isGround(target)),
+    ),
     onLift: (bar, ms, haul) => liftIncomeBar(targets[bar], ms, haul),
     onCrumble: (bar, crumbleMs, holdMs, rebuildMs) =>
       crumbleIncomeBar(targets[bar], crumbleMs, holdMs, rebuildMs),

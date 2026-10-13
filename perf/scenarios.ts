@@ -641,8 +641,9 @@ export function warmScenario(scenario: Scenario): Scenario {
   };
 }
 
-// one floor (or income) crit: armed on the ground floor from its test
-// button, then tapped; withSpawns puts every random spawn out first
+// one floor (or income, button, lock) crit: armed from its test button on
+// the ground floor (a lock crit on the floor under the locked one), then
+// tapped; withSpawns puts every random spawn out first
 export function floorCritScenario(
   kind: string,
   group = "floor",
@@ -654,7 +655,14 @@ export function floorCritScenario(
     about: `the ${kind} ${group} crit, start to finish${withSpawns ? ", every random spawn out" : ""}`,
     run: async (bridge) => {
       click("#add-money");
-      bridge.scrollToFloor(ground(bridge), 0.6);
+      let target = ground(bridge);
+      if (group === "lock") {
+        // a full fixture building has no locked floor: its top one locks again
+        const floors = bridge.getActiveFloors();
+        floors[floors.length - 1].unlocked = false;
+        target = floors[floors.length - 2] ?? target;
+      }
+      bridge.scrollToFloor(target, group === "lock" ? 0.75 : 0.6);
       if (withSpawns) {
         for (const id of ["wisp", "coin"]) click(`#test-${id}-spawn-event`);
         click("#test-bubbles-event");
@@ -662,7 +670,7 @@ export function floorCritScenario(
       }
       click(`[data-${group}-crit="${kind}"]`);
       await sleep(300);
-      tap(bridge, ground(bridge));
+      tap(bridge, target);
       return measure(name, 4000);
     },
   };

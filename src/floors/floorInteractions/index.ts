@@ -10,6 +10,10 @@ import {
   getMergeCrit,
   getFloorCrit,
   getIncomeCrit,
+  getButtonCrit,
+  getLockCrit,
+  takeButtonCharge,
+  takeFreeTap,
   getCritTier,
   consumeCritUpgrade,
   rollCritUpgrade,
@@ -73,6 +77,8 @@ import {
 } from "../../shared/screenFreeze";
 import {
   increaseIncomeRate,
+  increaseIncomeRateBy,
+  punchIncomeBar,
   UPGRADE_MILESTONE_STEP,
   hitTestIncomeBar,
   triggerIncomeBarPress,
@@ -111,6 +117,7 @@ import {
   UNLOCK_OVERLAY_MS,
 } from "../floorLock";
 import { activateBoosted, isFloorMaxed, type Floor } from "../../gameState";
+import { COLOR } from "../../palette";
 import { type BigNumber, multiply } from "../../shared/bigNumber";
 
 const spawnCoinBurst = liveEffect(animateCoinBurst);
@@ -594,6 +601,8 @@ export function handleFloorClick(
       const mergeCrit = getMergeCrit(floor);
       const floorCrit = getFloorCrit(floor);
       const incomeCrit = getIncomeCrit(floor);
+      const buttonCrit = getButtonCrit(floor);
+      const lockCrit = getLockCrit(floor);
       const cash = isCashCrit(floor);
       const eventContext = eventProcContext(deps, isGroundFloor);
       const cover = getClaimedEventCover(floor);
@@ -620,6 +629,8 @@ export function handleFloorClick(
             mergeCrit,
             floorCrit,
             incomeCrit,
+            buttonCrit,
+            lockCrit,
           }),
         );
         // the special event this crit carried instead of a special crit
@@ -628,6 +639,23 @@ export function handleFloorClick(
       // after the celebration, not before: Deja Vu grants its follow-up procs'
       // rewards synchronously from in there, and they'd otherwise miss this save
       persist();
+      return;
+    }
+    // a button crit's charge lands its levels for free, else a free tap is
+    // a free upgrade
+    const charge = takeButtonCharge(floor);
+    if (charge > 0 || takeFreeTap(floor)) {
+      if (charge > 0) {
+        // the tick below lands the last of its levels
+        increaseIncomeRateBy(floor, charge - 1);
+        punchIncomeBar(floor, `+${charge} Lvl`, COLOR.heavenlyGold);
+        playSold();
+      }
+      applyUpgradeTick(floor, isGroundFloor, true);
+      rollCritUpgrade(floor, true, eventProcContext(deps, isGroundFloor));
+      persist();
+      triggerButtonPress(floor);
+      playCoinDrop();
       return;
     }
     if (spendTotalIncome(getUpgradeCost(floor))) {

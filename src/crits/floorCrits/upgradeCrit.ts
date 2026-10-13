@@ -15,6 +15,8 @@ import {
   type CritTier,
   type FloorCritKind,
   type IncomeCritKind,
+  type ButtonCritKind,
+  type LockCritKind,
   type CritRollResult,
   pickHigherCritTier as higherCritTier,
   rollCrit,
@@ -122,6 +124,7 @@ import {
   type BadgeCritKind,
 } from "../badgeCrits/badgeProcs";
 import { preloadFloorCritWhenIdle } from "./critPlayer";
+import { lockedFloorInView } from "../lockCrits/lockedFloor";
 
 const critTiers = snapshotMap<Floor, CritTier>();
 // armed crits that pay cash instead of free upgrades
@@ -244,6 +247,8 @@ export function rollCritUpgrade(
       if (result.mergeCrit) mergeCrits.set(floor, result.mergeCrit);
       if (result.floorCrit) armFloorCrit(floor, result.floorCrit);
       if (result.incomeCrit) armIncomeCrit(floor, result.incomeCrit);
+      if (result.buttonCrit) armButtonCrit(floor, result.buttonCrit);
+      if (result.lockCrit) armLockCrit(floor, result.lockCrit);
       if (result.critUp) critUpCrits.add(floor);
       if (result.critDown) critDownCrits.add(floor);
       for (const kind of landedProcs) {
@@ -332,6 +337,10 @@ export function rollCritUpgrade(
     },
     allowSpecialProcs,
     eventContext && (() => claimEventProc(floor, eventContext)),
+    eventContext &&
+      ((type) =>
+        type !== "lockCrit" ||
+        lockedFloorInView(eventContext.floors, eventContext.getOnScreenFloors)),
   );
 }
 
@@ -813,6 +822,43 @@ export function forceIncomeCrit(floor: Floor, kind: IncomeCritKind): void {
   armIncomeCrit(floor, kind);
 }
 
+// armed crits' button and lock crits: their number playing out onto the
+// buttons in view or the locked floor
+const armedButtonCrits = snapshotMap<Floor, ButtonCritKind>();
+const armedLockCrits = snapshotMap<Floor, LockCritKind>();
+
+function armButtonCrit(floor: Floor, kind: ButtonCritKind): void {
+  armedButtonCrits.set(floor, kind);
+  preloadFloorCritWhenIdle(kind);
+}
+
+function armLockCrit(floor: Floor, kind: LockCritKind): void {
+  armedLockCrits.set(floor, kind);
+  preloadFloorCritWhenIdle(kind);
+}
+
+export function getButtonCrit(floor: Floor): ButtonCritKind | undefined {
+  return armedButtonCrits.get(floor);
+}
+
+export function getLockCrit(floor: Floor): LockCritKind | undefined {
+  return armedLockCrits.get(floor);
+}
+
+// dev/test-only: arms a multiplier crit of a random tier carrying a button
+// or lock crit
+export function forceButtonCrit(floor: Floor, kind: ButtonCritKind): void {
+  const tiers: CritTier[] = ["crit", "mega", "ultra"];
+  forceTestCrit(floor, null, tiers[Math.floor(Math.random() * 3)], "upgrade");
+  armButtonCrit(floor, kind);
+}
+
+export function forceLockCrit(floor: Floor, kind: LockCritKind): void {
+  const tiers: CritTier[] = ["crit", "mega", "ultra"];
+  forceTestCrit(floor, null, tiers[Math.floor(Math.random() * 3)], "upgrade");
+  armLockCrit(floor, kind);
+}
+
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
@@ -822,6 +868,8 @@ export function consumeCritUpgrade(floor: Floor): void {
   mergeCrits.delete(floor);
   armedFloorCrits.delete(floor);
   armedIncomeCrits.delete(floor);
+  armedButtonCrits.delete(floor);
+  armedLockCrits.delete(floor);
   consumeCritProcs(floor);
   dropClaimedEventProc(floor);
 }

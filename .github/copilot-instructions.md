@@ -109,12 +109,14 @@ Draw with these (each module's header documents its API); never rebuild them ins
 
 ## Crit rules
 
-- **Four special groups** fill the special slot (`CONFIG.specialCrits`) after a gateway hit; never blur their focus:
+- **Six special groups** fill the special slot (`CONFIG.specialCrits`) after a gateway hit; never blur their focus:
   - **Floor crits** (`floorCrits/crits`), only on a multiplier crit: the number plays out onto the income bars in view, every hit upgrading floors (levels, payouts).
   - **Income crits** (`incomeCrits/crits`), only on a cash crit: the green `+$` amount (its cash plus `CONFIG.crit.incomeCritSeconds` of the company's income per tier multiple) slams in, then plays out onto the total income readout, every hit paying its share. Never the bars or floors; never a multiplier number.
+  - **Button crits** (`buttonCrits/crits`), only on a multiplier crit: the number plays out onto the upgrade buttons in view, every reward on a button (sure crits, free taps, charges, presses).
+  - **Lock crits** (`lockCrits/crits`), only on a multiplier crit and only while the locked floor is in view: the number plays out onto the locked floor, every reward on it (free floors, a cheaper unlock).
   - **Badge crits** (`badgeCrits`): give badges, shown by the flash.
-  - **Animated crits** (`animatedCrits/events`): full events, any reward.
-  - Floor and income crits share one slot (`CONFIG.specialCrits.floorCrit`), `critPlayer` and its cooldown. Wiring a new one: its kind in `FLOOR_CRIT_KINDS`/`INCOME_CRIT_KINDS` and `CONFIG.floorCrits`/`CONFIG.incomeCrits` (`floorCrits/config.ts`, `incomeCrits/config.ts`), a `LOADERS` line in `critPlayer`, a `data-floor-crit`/`data-income-crit` button in **New Effects**, its module calling `registerFloorCrit`; a floor crit also gets a `floorCritLevels` line.
+  - **Animated crits** (`animatedCrits/events`): full events on the dark frozen backdrop, any reward.
+  - Floor, income, button and lock crits share `critPlayer`; each group has its own `CONFIG.specialCrits` slot and cooldown (floor and income crits one, `floorCrit`). Wiring a new one: its kind in `FLOOR_CRIT_KINDS`/`INCOME_CRIT_KINDS`/`BUTTON_CRIT_KINDS`/`LOCK_CRIT_KINDS` and its group's config, a `LOADERS` line in `critPlayer`, a `data-floor-crit`/`data-income-crit`/`data-button-crit`/`data-lock-crit` test button, its module calling `registerFloorCrit`; a floor crit also gets a `floorCritLevels` line.
 - **Two layers:** a tier (`crit`/`mega`/`ultra`) sets free upgrades and multiplier; a proc (special crit) rides on a landed tier, shown only by the flash. Canonical list: `CRIT_PROC_KINDS`/`CRIT_PROC_INFO` (`crits/critTypes`).
 - **Rolling** only via `rollCrit`: tiers rarest first, one `SPECIAL_CRIT_GATEWAY_CHANCE` roll, every proc independently, capped to `MAX_SPECIAL_CRIT_PROCS` with `pickAtMost` (never bypass).
 - **Rewards** in `applyFloorCrit` via `CRIT_REWARDS` (`floorCrits/floorCritRewards.ts`); map/building effects in `floorCrits/buildingCrits.ts` (don't claim a floor-only proc works on the map). Always positive and instant; no two crits share an effect or description.

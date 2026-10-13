@@ -984,6 +984,10 @@ export interface CritRollResult extends Record<BadgeCritKind, boolean> {
   floorCrit?: FloorCritKind;
   // an income crit: its number playing out onto the total income
   incomeCrit?: IncomeCritKind;
+  // a button crit: its number playing out onto the upgrade buttons in view
+  buttonCrit?: ButtonCritKind;
+  // a lock crit: its number playing out onto the locked floor
+  lockCrit?: LockCritKind;
   // a badge crit whose landed badges turn this foil, once they qualify
   badgeFoil?: BadgeFoil;
   chain: boolean;
@@ -1088,6 +1092,8 @@ export type CritProcKind = Exclude<
   | "mergeCrit"
   | "floorCrit"
   | "incomeCrit"
+  | "buttonCrit"
+  | "lockCrit"
   | "badgeFoil"
 >;
 
@@ -2059,12 +2065,20 @@ type FloorCritType = keyof typeof CONFIG.floorCrits;
 const FLOOR_CRIT_TYPES = Object.keys(CONFIG.floorCrits) as FloorCritType[];
 type IncomeCritType = keyof typeof CONFIG.incomeCrits;
 const INCOME_CRIT_TYPES = Object.keys(CONFIG.incomeCrits) as IncomeCritType[];
-// what a special slot ends up carrying: a floorCrit slot is its floor or
-// income crit
+type ButtonCritType = keyof typeof CONFIG.buttonCrits;
+const BUTTON_CRIT_TYPES = Object.keys(CONFIG.buttonCrits) as ButtonCritType[];
+type LockCritType = keyof typeof CONFIG.lockCrits;
+const LOCK_CRIT_TYPES = Object.keys(CONFIG.lockCrits) as LockCritType[];
+// the special slots the floor crits' player plays
+type PlayedSlotType = "floorCrit" | "buttonCrit" | "lockCrit";
+// what a special slot ends up carrying: a played slot is one of its group's
+// kinds
 type SlotType =
-  | Exclude<SpecialCritType, "floorCrit">
+  | Exclude<SpecialCritType, PlayedSlotType>
   | FloorCritType
-  | IncomeCritType;
+  | IncomeCritType
+  | ButtonCritType
+  | LockCritType;
 
 // the floor crits whose number plays out onto the bars (floorCrits'
 // critPlayer)
@@ -2198,8 +2212,39 @@ export function isIncomeCritKind(type: string | null): type is IncomeCritKind {
   return (INCOME_CRIT_KINDS as readonly string[]).includes(type ?? "");
 }
 
-// what the crit player plays: a floor or an income crit
-export type CritPlayKind = FloorCritKind | IncomeCritKind;
+// the button crits whose number plays out onto the upgrade buttons
+// (buttonCrits)
+export const BUTTON_CRIT_KINDS = [
+  "sureShotCrit",
+  "autopressCrit",
+  "freeTapsCrit",
+  "overchargeCrit",
+] as const satisfies readonly ButtonCritType[];
+export type ButtonCritKind = (typeof BUTTON_CRIT_KINDS)[number];
+
+export function isButtonCritKind(type: string | null): type is ButtonCritKind {
+  return (BUTTON_CRIT_KINDS as readonly string[]).includes(type ?? "");
+}
+
+// the lock crits whose number plays out onto the locked floor (lockCrits)
+export const LOCK_CRIT_KINDS = [
+  "breachCrit",
+  "twoUpCrit",
+  "clearanceCrit",
+  "lockpickCrit",
+] as const satisfies readonly LockCritType[];
+export type LockCritKind = (typeof LOCK_CRIT_KINDS)[number];
+
+export function isLockCritKind(type: string | null): type is LockCritKind {
+  return (LOCK_CRIT_KINDS as readonly string[]).includes(type ?? "");
+}
+
+// what the crit player plays: a floor, income, button or lock crit
+export type CritPlayKind =
+  | FloorCritKind
+  | IncomeCritKind
+  | ButtonCritKind
+  | LockCritKind;
 
 // one of `types`, each weighted by its chance in `table`
 function pickByChance<K extends string>(
@@ -2211,28 +2256,53 @@ function pickByChance<K extends string>(
   return types.find((t) => (roll -= table[t].chance) < 0) ?? types[0];
 }
 
-// game time before which a floorCrit or incomeCrit slot is a badge crit
-// instead: they share one player
-let floorCritsFreeAt = 0;
+// game time before which each played slot (floor and income crits share
+// one) is a badge crit instead
+const playedFreeAt: Record<PlayedSlotType, number> = {
+  floorCrit: 0,
+  buttonCrit: 0,
+  lockCrit: 0,
+};
 
-// no floor or income crit lands again until CONFIG's cooldown from now;
+function coolDown(type: PlayedSlotType): void {
+  playedFreeAt[type] = Math.max(
+    playedFreeAt[type],
+    Date.now() + CONFIG.specialCrits[type].cooldownMs,
+  );
+}
+
+// no crit of kind's group lands again until its CONFIG cooldown from now;
 // called when one is picked and when it finishes playing
-export function coolDownFloorCrits(): void {
-  floorCritsFreeAt = Math.max(
-    floorCritsFreeAt,
-    Date.now() + CONFIG.specialCrits.floorCrit.cooldownMs,
+export function coolDownFloorCrits(kind: CritPlayKind): void {
+  coolDown(
+    isButtonCritKind(kind)
+      ? "buttonCrit"
+      : isLockCritKind(kind)
+        ? "lockCrit"
+        : "floorCrit",
   );
 }
 
 // what a gateway-passing crit's special slot carries: a type by its
 // CONFIG.specialCrits chance; a floorCrit slot is then a floor crit (by its
 // CONFIG.floorCrits chance) on a multiplier crit, an income crit (by its
-// CONFIG.incomeCrits chance) on a cash crit
-function pickSpecialCrit(cash: boolean): SlotType {
+// CONFIG.incomeCrits chance) on a cash crit; a buttonCrit or lockCrit slot
+// one of its group's kinds. `plays` turns down a slot that can't play
+// where the crit was rolled (a lock crit with no locked floor in view)
+function pickSpecialCrit(
+  cash: boolean,
+  plays?: (type: PlayedSlotType) => boolean,
+): SlotType {
   const type = pickByChance(CONFIG.specialCrits, SPECIAL_CRIT_TYPES);
-  if (type !== "floorCrit") return type;
-  if (Date.now() < floorCritsFreeAt) return "badgeCrit";
-  coolDownFloorCrits();
+  if (type !== "floorCrit" && type !== "buttonCrit" && type !== "lockCrit")
+    return type;
+  if (Date.now() < playedFreeAt[type] || (plays && !plays(type)))
+    return "badgeCrit";
+  coolDown(type);
+  if (type === "buttonCrit")
+    return pickByChance(CONFIG.buttonCrits, BUTTON_CRIT_TYPES);
+  if (type === "lockCrit")
+    return pickByChance(CONFIG.lockCrits, LOCK_CRIT_TYPES);
   return cash
     ? pickByChance(CONFIG.incomeCrits, INCOME_CRIT_TYPES)
     : pickByChance(CONFIG.floorCrits, FLOOR_CRIT_TYPES);
@@ -2338,15 +2408,19 @@ export function rollCrit(
   // an animated crit (crits/animatedCrits/eventProcs) taking the slot, true when it did;
   // false leaves the slot to a badge crit
   claimSpecialSlot?: () => boolean,
+  // whether a played slot (pickSpecialCrit) can play where this was rolled
+  slotPlays?: (type: PlayedSlotType) => boolean,
 ): void {
   const tier = rollTier();
   if (tier === null) return;
   // the starting crit is a multiplier or a cash crit, gateway or not
-  const cash = critRandom() < CONFIG.crit.cashCrit.chance;
+  const cashRoll = critRandom() < CONFIG.crit.cashCrit.chance;
   const slot =
     allowSpecialProcs && critRandom() < SPECIAL_CRIT_GATEWAY.chance
-      ? pickSpecialCrit(cash)
+      ? pickSpecialCrit(cashRoll, slotPlays)
       : null;
+  // a button or lock crit plays its tier's number out: a multiplier crit
+  const cash = cashRoll && !isButtonCritKind(slot) && !isLockCritKind(slot);
   const badge =
     slot === "badgeCrit" ||
     slot === "badgeShimmer" ||
@@ -2365,6 +2439,8 @@ export function rollCrit(
   else if (slot === "mergeCrit") result.mergeCrit = pickCritTierByOdds();
   else if (isFloorCritKind(slot)) result.floorCrit = slot;
   else if (isIncomeCritKind(slot)) result.incomeCrit = slot;
+  else if (isButtonCritKind(slot)) result.buttonCrit = slot;
+  else if (isLockCritKind(slot)) result.lockCrit = slot;
   else if (slot === "badgeShimmer") result.badgeFoil = "shimmer";
   else if (slot === "badgeGlitter") result.badgeFoil = "glitter";
   for (const kind of landedProcs) result[kind] = true;

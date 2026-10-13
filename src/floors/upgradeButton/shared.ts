@@ -9,7 +9,7 @@ import { baseIncomeRatePerSecond } from "../../shared/income";
 import { getTotalIncome } from "../../totalIncome";
 import { isFloorMaxed, type Floor } from "../../gameState";
 import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
-import { isCritUpgrade, getPriceMatchCost } from "../../crits";
+import { isCritUpgrade, getPriceMatchCost, hasButtonBonus } from "../../crits";
 
 import { isFreeClickEventActive } from "../../shared/floorEvents";
 
@@ -414,7 +414,9 @@ export function isUpgradeButtonEnabled(pressed: Floor): boolean {
   return (
     isFreeClickEventActive(floor, now) ||
     (!isFloorMaxed(floor) &&
-      (isCritUpgrade(floor) || gte(getTotalIncome(), getUpgradeCost(floor))))
+      (isCritUpgrade(floor) ||
+        hasButtonBonus(floor) ||
+        gte(getTotalIncome(), getUpgradeCost(floor))))
   );
 }
 

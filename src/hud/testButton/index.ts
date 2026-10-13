@@ -7,8 +7,10 @@ import {
   getCritProcCount,
   queueBadgeFoilReveal,
   type BadgeFoil,
+  type ButtonCritKind,
   type FloorCritKind,
   type IncomeCritKind,
+  type LockCritKind,
   type CritProcKind,
   type CritTier,
 } from "../../crits";
@@ -304,6 +306,31 @@ export function wireIncomeCritTestButtons(
   ))
     button.addEventListener("click", () =>
       onClick(button.dataset.incomeCrit as IncomeCritKind),
+    );
+}
+
+// arms a crit carrying a button or a lock crit
+export function wireButtonCritTestButtons(
+  container: HTMLElement,
+  onClick: (kind: ButtonCritKind) => void,
+): void {
+  for (const button of container.querySelectorAll<HTMLButtonElement>(
+    "[data-button-crit]",
+  ))
+    button.addEventListener("click", () =>
+      onClick(button.dataset.buttonCrit as ButtonCritKind),
+    );
+}
+
+export function wireLockCritTestButtons(
+  container: HTMLElement,
+  onClick: (kind: LockCritKind) => void,
+): void {
+  for (const button of container.querySelectorAll<HTMLButtonElement>(
+    "[data-lock-crit]",
+  ))
+    button.addEventListener("click", () =>
+      onClick(button.dataset.lockCrit as LockCritKind),
     );
 }
 

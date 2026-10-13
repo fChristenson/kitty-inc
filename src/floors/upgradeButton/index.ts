@@ -57,6 +57,7 @@ import {
   CRIT_TIER_CONFIG,
   type CritTier,
   getClaimedEventCover,
+  buttonBonusLabel,
 } from "../../crits";
 
 import { isSaleActive } from "./sale";
@@ -81,6 +82,7 @@ prepareSoon(() =>
     COLOR.cyan,
     COLOR.red,
     COLOR.purple,
+    COLOR.heavenlyGold,
     ...Object.values(CRIT_TIER_CONFIG).map((tier) => tier.color),
   ]),
 );
@@ -182,6 +184,10 @@ function renderUpgradeButton(
   const critMultiplier = crit
     ? CRIT_TIER_CONFIG[critTier as CritTier].multiplier
     : null;
+  // a button crit's free taps or charge, played under any crit or event
+  const bonus = crit || activeEvent || maxed ? null : buttonBonusLabel(floor);
+  // it rocks like a crit, free like an event's clicks
+  const lively = crit || !!activeEvent || bonus !== null;
   const slam = getSlamPose(own, "button", now);
   const box = { x, y, width: BTN_W, height: BTN_H };
   const buttonCtx = ctx;
@@ -190,12 +196,11 @@ function renderUpgradeButton(
 
   function drawBody(target?: CanvasRenderingContext2D): void {
     const ctx = target ?? buttonCtx;
-    const wiggle =
-      (crit || activeEvent ? getWiggleRotation(now) : 0) + holdAnim.rotation;
+    const wiggle = (lively ? getWiggleRotation(now) : 0) + holdAnim.rotation;
     // a wiggling button (a crit, an event, a Sale) only rocks, like the Sale:
     // squashing it while it's rotated warps it; a greyed-out MAX keeps still
     const jelly =
-      crit || activeEvent || maxed
+      lively || maxed
         ? null
         : getJellyPose(own, now, getBoilHeat(floor, now), wiggle);
     ctx.save();
@@ -203,7 +208,7 @@ function renderUpgradeButton(
       ctx.translate(cx, cy);
     } else {
       ctx.translate(cx + holdAnim.shakeX, cy + holdAnim.shakeY);
-      if (crit || activeEvent) {
+      if (lively) {
         ctx.rotate(getWiggleRotation(now));
       }
       ctx.rotate(holdAnim.rotation);
@@ -214,7 +219,7 @@ function renderUpgradeButton(
     if (flip !== 1) ctx.scale(flip, 1);
     ctx.translate(-cx, -cy);
     let dim = false;
-    if (!crit && !activeEvent?.freeClick) {
+    if (!crit && !activeEvent?.freeClick && !bonus) {
       if (!affordable) ctx.globalAlpha = 0.5;
       else if (hovered) dim = true;
     } else if (hovered) {
@@ -233,11 +238,13 @@ function renderUpgradeButton(
         ? (cover?.color ?? CRIT_TIER_CONFIG[critTier as CritTier].color)
         : activeEvent
           ? activeEvent.color
-          : floor.critMultiplierTier && !maxed
-            ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
-            : affordable
-              ? COLOR.moneyGreen
-              : COLOR.disabledGray,
+          : bonus
+            ? COLOR.heavenlyGold
+            : floor.critMultiplierTier && !maxed
+              ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
+              : affordable
+                ? COLOR.moneyGreen
+                : COLOR.disabledGray,
     );
 
     ctx.font = '900 52px "Fredoka", system-ui, sans-serif';
@@ -252,7 +259,7 @@ function renderUpgradeButton(
             : CRIT_TIER_CONFIG[critTier as CritTier].label))
         : maxed
           ? "MAX"
-          : formatPrice(cost);
+          : (bonus ?? formatPrice(cost));
     drawCachedCartoonText(ctx, label, cx, cy, 52);
     // a hover darkening; ctx.filter here cost every frame of a mouse hold
     if (dim) {

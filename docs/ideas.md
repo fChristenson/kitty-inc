@@ -71,18 +71,19 @@ Three more triggers that roll nothing today.
 2. **Spawn crits** (rolled on catching a random spawn: the mouse, a bubble, the wisp's glitter): the popped bubble's crit number splits into new bubbles that float off onto every bar, each bursting on it with its levels, quicker each, the last huge.
 3. **Streak crits** (rolled when three crits land in a row in one hold): the three numbers stack up over the button, then fly together and fuse into their sum, which slams onto the bar in a run of blasts along it. The three crits paid again as one.
 
-## List 145: one of each kind ([playground](../tmp/_playground/ideas.html?list=next122))
-
-An animated crit, a floor crit and an income crit, each in a look that kind hasn't used yet.
-
-1. **Burnout** (animated crit, Race and Drawing): a racer wisp and its chaser tear round a giant star, flat out on the straights, braking hard into every point, laying a trail of gold dots behind them; they cross the line in a blast each, the star blazes and dives onto the clicked bar in a run of blasts, a crit tier up.
-2. **Sprinklers** (floor crit, Spray): the number bursts into sprinkler wisps that drop onto every bar and spin, hissing arcs of gold mist along it until the coat is full; then the bars flash and blow one after another, the crit's own last and hardest.
-3. **Spike** (income crit, Bounce): the green amount slams in low; a wisp bumps it up, a second sets it high, and a third leaps and spikes it down onto the total in a huge blast.
-
 ## Built
 
-- **Markdown** (`animatedCrits/events/markdownEvent`): animated crit, gunfire; a wisp gun shoots the price on every button in view in quick fire, each price flipping over onto a cheaper one for good (`-20%`), the clicked floor's own last in the huge blast (`-40%`). Test: New Effects "Markdown".
-- **Raise the Roof** (`animatedCrits/events/raiseTheRoofEvent`): animated crit, explosion; the view pulls back, a wisp rockets up and blows the top of the building open, and new floors slam down out of the sky onto it one by one, quicker each, the last the hardest; they unlock as the screen goes live. Test: New Effects "Raise the Roof".
+- **Button crits** (`crits/buttonCrits`) and **Lock crits** (`crits/lockCrits`): two new special groups (`CONFIG.specialCrits.buttonCrit` 0.2, `lockCrit` 0.15), always on a multiplier crit, played on the live screen by the floor crits' player (sharing its cooldown); a lock crit only lands while the locked floor is in view. Button crits leave free taps and charges on buttons (`buttonCrits/buttonBonus.ts`, a gold button labelled "Free 6" or "+9 Lvl"). Test: "Button Crits" (on the ground floor) and "Lock Crits" (on the top open floor).
+  - **Sure Shot**: the number bursts into wisps diving onto every button in view, each blasting it into a sure crit (x3), the crit's own last at its tier.
+  - **Autopress**: a wisp over every button hammers it down in a quickening rattle, each press levels on its floor; the own wisp winds up and slams its button for the crit's multiple.
+  - **Free Taps** (Bounce): the number turns into a ball banking off the screen's side onto each button, stamping it with free taps (the crit's multiple, twice on its own).
+  - **Overcharge** (Lightning): bolts fork into every other button in a blink, each left crackling with a charge of the crit's multiple in levels for its next tap; a giant bolt into the own (thrice).
+  - **Breach** (Gunfire): a wisp gun under the locked floor hammers it all over in quickening volleys, the floor glowing hotter, until it bursts open in a cluster of blasts, free.
+  - **Two Up** (Explosion): bomb wisps lobbed onto the locked floor and the one above, lit fuses, blowing in a chain; each floor bursts open free, the last the biggest (one floor when the building's last is next).
+  - **Clearance** (Beam): a scanner beam sweeps the locked floor and its price, quicker each pass; the price flips and shatters down to 1/multiple of it.
+  - **Lockpick** (Drill): a drill bites up into the locked floor, stalls rumbling, bores in eight shoves, sparks gushing, and punches through: the floor opens free at the crit's tier.
+- **Markdown** (`animatedCrits/events/markdownEvent`): animated crit, gunfire; a wisp gun shoots the price on every button in view in quick fire, each price flipping over onto a cheaper one for good (`-20%`), the clicked floor's own last in the huge blast (`-40%`). Test: Animated Crits "Markdown".
+- **Raise the Roof** (`animatedCrits/events/raiseTheRoofEvent`): animated crit, explosion; the view pulls back, a wisp rockets up and blows the top of the building open, and new floors slam down out of the sky onto it one by one, quicker each, the last the hardest; they unlock as the screen goes live. Test: Animated Crits "Raise the Roof".
 
 - **Money gun** (`incomeCrits/crits/moneyGunCrit`): income crit; the number splits into two wisp guns under the total firing fans of bills up into it, left, right, quicker and quicker, a muzzle flash, recoil and pop each volley; then both let rip in one blizzard of bills into the huge blast. Test: New Effects "Money Gun Crit".
 

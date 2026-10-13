@@ -47,13 +47,31 @@ export function createTestButtonMarkup(): string {
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
           <button class="game__button" data-income-crit="moneyGunCrit">Money Gun Crit</button>
-          <button id="test-markdown-event" class="game__button">Markdown</button>
-          <button id="test-raise-the-roof-event" class="game__button">Raise the Roof</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Button Crits</summary>
+        <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-button-crit="sureShotCrit">Sure Shot</button>
+          <button class="game__button" data-button-crit="autopressCrit">Autopress</button>
+          <button class="game__button" data-button-crit="freeTapsCrit">Free Taps</button>
+          <button class="game__button" data-button-crit="overchargeCrit">Overcharge</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Lock Crits</summary>
+        <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-lock-crit="breachCrit">Breach</button>
+          <button class="game__button" data-lock-crit="twoUpCrit">Two Up</button>
+          <button class="game__button" data-lock-crit="clearanceCrit">Clearance</button>
+          <button class="game__button" data-lock-crit="lockpickCrit">Lockpick</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Animated Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-markdown-event" class="game__button">Markdown</button>
+          <button id="test-raise-the-roof-event" class="game__button">Raise the Roof</button>
           <button id="test-lotto-drum-event" class="game__button">Lotto Drum</button>
           <button id="test-prize-wheel-event" class="game__button">Prize Wheel</button>
           <button id="test-mystery-stacks-event" class="game__button">Mystery Stacks</button>
