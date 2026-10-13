@@ -2221,6 +2221,8 @@ export const BUTTON_CRIT_KINDS = [
   "overchargeCrit",
   "gildedCrit",
   "blastingCapsCrit",
+  "linkUpCrit",
+  "hotButtonCrit",
 ] as const satisfies readonly ButtonCritType[];
 export type ButtonCritKind = (typeof BUTTON_CRIT_KINDS)[number];
 
@@ -2236,6 +2238,7 @@ export const LOCK_CRIT_KINDS = [
   "lockpickCrit",
   "boltCutterCrit",
   "moveInCrit",
+  "hotLapCrit",
 ] as const satisfies readonly LockCritType[];
 export type LockCritKind = (typeof LOCK_CRIT_KINDS)[number];
 

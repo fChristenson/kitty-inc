@@ -46,15 +46,16 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-button-crit="gildedCrit">Gilded</button>
-          <button class="game__button" data-button-crit="blastingCapsCrit">Blasting Caps</button>
-          <button class="game__button" data-lock-crit="boltCutterCrit">Bolt Cutter</button>
-          <button class="game__button" data-lock-crit="moveInCrit">Move In</button>
+          <button class="game__button" data-button-crit="linkUpCrit">Link Up</button>
+          <button class="game__button" data-button-crit="hotButtonCrit">Hot Button</button>
+          <button class="game__button" data-lock-crit="hotLapCrit">Hot Lap</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Button Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-button-crit="gildedCrit">Gilded</button>
+          <button class="game__button" data-button-crit="blastingCapsCrit">Blasting Caps</button>
           <button class="game__button" data-button-crit="sureShotCrit">Sure Shot</button>
           <button class="game__button" data-button-crit="autopressCrit">Autopress</button>
           <button class="game__button" data-button-crit="freeTapsCrit">Free Taps</button>
@@ -64,6 +65,8 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Lock Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-lock-crit="boltCutterCrit">Bolt Cutter</button>
+          <button class="game__button" data-lock-crit="moveInCrit">Move In</button>
           <button class="game__button" data-lock-crit="breachCrit">Breach</button>
           <button class="game__button" data-lock-crit="twoUpCrit">Two Up</button>
           <button class="game__button" data-lock-crit="clearanceCrit">Clearance</button>

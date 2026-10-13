@@ -96,8 +96,8 @@ export function planRace(
       const lo = search(times, ms);
       const hi = Math.min(lo + 1, line.length - 1);
       const f = clamp01((ms - times[lo]) / (times[hi] - times[lo] || 1));
-      into.x = lerp([line[lo].x, line[hi].x], f);
-      into.y = lerp([line[lo].y, line[hi].y], f);
+      into.x = line[lo].x + (line[hi].x - line[lo].x) * f;
+      into.y = line[lo].y + (line[hi].y - line[lo].y) * f;
       return into;
     },
     msAt: (s) => {

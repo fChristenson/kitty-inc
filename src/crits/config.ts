@@ -35,6 +35,10 @@ export const CRIT_CONFIG = {
     // a floor unlocked for free starts at this share of the level below it,
     // so a free floor is still worth having once floors are cheap
     freeFloorLevelShare: 0.5,
+    // a Hot Button tap rolls its next crit up to this many times, till one lands
+    hotButtonRolls: 3,
+    // Bolt Cutter's levels on the floor it opens, per the crit's multiple
+    boltCutterLevels: 5,
     // gateway roll for the whole "special crit" (chain/boost/bounce/
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
     // ultra, before any of the individual proc chances (badgeCrits/balance, floorCrits/balance) are even

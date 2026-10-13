@@ -86,6 +86,8 @@ export {
   takeButtonCharge,
   takeDoubleTap,
   takeFreeTap,
+  takeHotTap,
+  takeLinkedFloors,
   takePayoutTap,
 } from "./buttonCrits/buttonBonus";
 export {

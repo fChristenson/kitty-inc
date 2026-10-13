@@ -13,7 +13,10 @@ import {
   addButtonCharge,
   addDoubleTaps,
   addFreeTaps,
+  addHotTaps,
+  addLinkedTaps,
   addPayoutTaps,
+  linkButton,
 } from "./buttonBonus";
 import { liveEffect } from "../../shared/detachedJob";
 import { playBarExplosion } from "../../shared/explosionBang";
@@ -34,16 +37,17 @@ const flipUpgradeButton = liveEffect(animateFlip);
 const COIN_SPILL: [number, number] = [8, 14];
 
 // what one reward hit (step 1, or 2 for the crit's own last) gives a
-// button: own is the crit's own button, count the crit's multiple. Returns
-// the levels it landed on the floor, if any
+// button: own is the crit's own button (ownFloor's), count the crit's
+// multiple. Returns the levels it landed on the floor, if any
 function reward(
   kind: ButtonCritKind,
   target: Floor,
-  own: boolean,
+  ownFloor: Floor,
   step: number,
   tier: CritTier,
   count: number,
 ): number {
+  const own = target === ownFloor;
   switch (kind) {
     // a sure crit: the crit's own tier on its own button, a crit on the rest
     case "sureShotCrit":
@@ -75,6 +79,18 @@ function reward(
       addDoubleTaps(target, own ? count * 2 : count);
       flipUpgradeButton(target);
       return 0;
+    // every other button linked to the own one, whose taps (the crit's
+    // multiple) then level them all
+    case "linkUpCrit":
+      if (own) addLinkedTaps(target, count);
+      else linkButton(ownFloor, target);
+      flipUpgradeButton(target);
+      return 0;
+    // taps that each roll the next crit hot, twice as many on its own
+    case "hotButtonCrit":
+      addHotTaps(target, own ? count * 2 : count);
+      flipUpgradeButton(target);
+      return 0;
   }
 }
 
@@ -104,7 +120,7 @@ export function buttonCritPlayFor(
       const target = targets[bar];
       playBarExplosion(1 + step * 0.08);
       if (step === 0 || isFloorMaxed(target)) return;
-      const levels = reward(kind, target, bar === 0, step, tier, count);
+      const levels = reward(kind, target, floor, step, tier, count);
       // each press pops its own levels, so its few labels are made once
       if (levels > 0) punchIncomeBar(target, `+${levels} Lvl`, color);
       triggerButtonPress(target);

@@ -31,5 +31,15 @@ export const BUTTON_CRIT_CONFIG = {
     blastingCapsCrit: {
       chance: 0.03,
     },
+    // beams locking the crit's own button onto every other, each tap of it
+    // then levelling them all
+    linkUpCrit: {
+      chance: 0.03,
+    },
+    // a disk of stars flung onto every button, each tap of it then rolling
+    // its next crit more often
+    hotButtonCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

@@ -15,6 +15,8 @@ import {
   takeButtonCharge,
   takeDoubleTap,
   takeFreeTap,
+  takeHotTap,
+  takeLinkedFloors,
   takePayoutTap,
   getCritTier,
   consumeCritUpgrade,
@@ -120,6 +122,7 @@ import {
 } from "../floorLock";
 import { activateBoosted, isFloorMaxed, type Floor } from "../../gameState";
 import { COLOR } from "../../palette";
+import { CONFIG } from "../../config";
 import { type BigNumber, multiply } from "../../shared/bigNumber";
 
 const spawnCoinBurst = liveEffect(animateCoinBurst);
@@ -380,11 +383,39 @@ export function paySaleClick(
 }
 
 // what a button crit left on floor's button for a tap that just landed: a
-// second level, and its bar's payout into the total
-function landTapBonuses(floor: Floor, isGroundFloor: boolean): void {
+// second level, its bar's payout into the total, and a level on every
+// button linked to it
+function landTapBonuses(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  isGroundFloor: boolean,
+): void {
   if (!isFloorMaxed(floor) && takeDoubleTap(floor))
     applyUpgradeTick(floor, isGroundFloor);
   if (takePayoutTap(floor)) paySaleClick(floor, isGroundFloor, 1);
+  const linked = takeLinkedFloors(floor);
+  if (!linked) return;
+  for (const other of linked) {
+    const index = deps.floors.indexOf(other);
+    if (index < 0 || !other.unlocked || isFloorMaxed(other)) continue;
+    applyUpgradeTick(other, index === 0);
+    triggerButtonPress(other);
+  }
+}
+
+// rolls the crit a landed tap arms next; a hot tap rolls again till one lands
+function rollTapCrit(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  isGroundFloor: boolean,
+): void {
+  const context = eventProcContext(deps, isGroundFloor);
+  rollCritUpgrade(floor, true, context);
+  if (!takeHotTap(floor)) return;
+  for (let k = 1; k < CONFIG.crit.hotButtonRolls; k++) {
+    if (isCritUpgrade(floor)) return;
+    rollCritUpgrade(floor, true, context);
+  }
 }
 
 // handles a click at floor-local (x, y): unlocking, upgrading, or clicking a worker.
@@ -662,8 +693,8 @@ export function handleFloorClick(
         playSold();
       }
       applyUpgradeTick(floor, isGroundFloor, true);
-      landTapBonuses(floor, isGroundFloor);
-      rollCritUpgrade(floor, true, eventProcContext(deps, isGroundFloor));
+      landTapBonuses(deps, floor, isGroundFloor);
+      rollTapCrit(deps, floor, isGroundFloor);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
@@ -671,8 +702,8 @@ export function handleFloorClick(
     }
     if (spendTotalIncome(getUpgradeCost(floor))) {
       applyUpgradeTick(floor, isGroundFloor, true);
-      landTapBonuses(floor, isGroundFloor);
-      rollCritUpgrade(floor, true, eventProcContext(deps, isGroundFloor));
+      landTapBonuses(deps, floor, isGroundFloor);
+      rollTapCrit(deps, floor, isGroundFloor);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();

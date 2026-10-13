@@ -2,8 +2,8 @@
 // locked floor at the top of the building (bar 0; Two Up's floor above it is
 // bar 1), every reward landing on it. Each kind is its own module under
 // ./crits, played by floorCrits/critPlayer; a hit of step 0 only jolts, any
-// other lands its reward on that bar's floor (Bolt Cutter's and Move In's
-// step 2 hits on the floor they opened)
+// other lands its reward on that bar's floor (Bolt Cutter's, Move In's and
+// Hot Lap's step 2 hits on the floor they opened)
 import type { FloorActionsDeps } from "../../floors/floorInteractions";
 import type { Floor } from "../../gameState";
 import { FLOOR_H, FLOOR_X_MAX, FLOOR_X_MIN } from "../../floors/constants";
@@ -25,11 +25,17 @@ import {
 } from "../../floors/floorLock";
 import { increaseIncomeRateBy, punchIncomeBar } from "../../floors/incomePanel";
 import { celebrateWorkerBoost, recruitWorker } from "../../floors/worker";
+import { CONFIG } from "../../config";
 
 // where Move In's cats land across the floor they open, 0..1 of its walk
 export const MOVE_IN_SPOTS = [0.15, 0.5, 0.85];
-// Bolt Cutter's levels on the floor it opens, per the crit's multiple
-const BOLT_CUTTER_LEVELS = 5;
+
+// Hot Lap's drops, one each, onto the floor it opens
+const FURNISH = [
+  (floor: Floor) => (floor.hasOfficeChairs = true),
+  (floor: Floor) => (floor.hasOfficeSupplies = true),
+  (floor: Floor) => (floor.hasManager = true),
+];
 
 // a lock crit playing out from floor's crit onto the locked floor, if it's in
 // view; unlockFree opens a floor for free
@@ -60,9 +66,11 @@ export function lockCritPlayFor(
         return [at, { x: at.x, y: at.y - pitch() }];
       }
     : spot;
-  const opensThenRewards = kind === "boltCutterCrit" || kind === "moveInCrit";
+  const opensThenRewards =
+    kind === "boltCutterCrit" || kind === "moveInCrit" || kind === "hotLapCrit";
   let opened: Floor | null = null;
   let movedIn = 0;
+  let furnished = 0;
   return {
     kind,
     barHalfWidth: getLockCenter().x,
@@ -73,9 +81,11 @@ export function lockCritPlayFor(
       if (opensThenRewards && step === 2) {
         if (!opened) return;
         if (kind === "boltCutterCrit") {
-          const levels = count * BOLT_CUTTER_LEVELS;
+          const levels = count * CONFIG.crit.boltCutterLevels;
           increaseIncomeRateBy(opened, levels);
           punchIncomeBar(opened, `+${levels} Lvl`, color);
+        } else if (kind === "hotLapCrit") {
+          FURNISH[furnished++ % FURNISH.length](opened);
         } else {
           const spot = MOVE_IN_SPOTS[movedIn++ % MOVE_IN_SPOTS.length];
           const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * spot;

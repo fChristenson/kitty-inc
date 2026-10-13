@@ -73,6 +73,11 @@ Three more triggers that roll nothing today.
 
 ## Built
 
+- **Link Up**, **Hot Button** (button crits) and **Hot Lap** (lock crit), from List 150. Test: New Effects.
+  - **Link Up** (Beam): beams lock from the crit's own button onto every other button in view; its next taps (the crit's multiple, `Linked N`) each land a level on every linked button too.
+  - **Hot Button** (Galaxy): a disk of stars flings knots onto every button, the core diving onto the own last; each button's next taps (`Hot N`) roll their next crit up to `CONFIG.crit.hotButtonRolls` times till one lands.
+  - **Hot Lap** (Race): a racer wisp and its chaser lap the locked floor twice; it bursts open and three wisps drop in onto its chairs, supplies and manager.
+
 - **Gilded**, **Blasting Caps** (button crits) and **Bolt Cutter**, **Move In** (lock crits), from List 149. Test: New Effects.
   - **Gilded** (Spray): a nozzle wisp hisses gold mist over every button until its coat flashes and it flips over gilded: its next taps (the crit's multiple, twice on its own) each also pay its bar's payout into the total (`Payout N` on the button).
   - **Blasting Caps** (Explosion): bombs lobbed onto every button blow in a chain, the own bursting into a cluster of bomblets then the biggest blast: its next taps each land two levels (`Double N`).

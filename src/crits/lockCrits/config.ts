@@ -31,5 +31,10 @@ export const LOCK_CRIT_CONFIG = {
     moveInCrit: {
       chance: 0.03,
     },
+    // a racer wisp and its chaser lapping the locked floor until it bursts
+    // open, its chairs, supplies and manager dropped in
+    hotLapCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };
