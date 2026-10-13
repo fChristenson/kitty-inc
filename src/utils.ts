@@ -10,6 +10,7 @@ import {
   lt,
   lte,
 } from "./shared/bigNumber";
+import { createSpriteCache, type SpriteCache } from "./shared/spriteCache";
 
 export function loadImage(src: string): Promise<HTMLImageElement> {
   const early = earlyImages.get(src);
@@ -727,7 +728,10 @@ export function drawCartoonText(
 // frame but rarely changing (prices, rates): stroked text is slow to raster,
 // so each (font, text) is rastered once and stamped. ctx.font must already be
 // set (its px size is fontSize) and the text centered on (x, y)
-const cartoonTextSprites = new Map<string, Map<string, HTMLCanvasElement>>();
+const cartoonTextSprites = new Map<
+  string,
+  SpriteCache<{ canvas: HTMLCanvasElement }>
+>();
 const readyFonts = new Set<string>();
 const MAX_CARTOON_TEXTS_PER_FONT = 160;
 const CARTOON_STROKE = 5;
@@ -858,8 +862,12 @@ export function drawCachedCartoonText(
     readyFonts.add(font);
   }
   let byText = cartoonTextSprites.get(font);
-  if (!byText) cartoonTextSprites.set(font, (byText = new Map()));
-  let sprite = byText.get(text);
+  if (!byText)
+    cartoonTextSprites.set(
+      font,
+      (byText = createSpriteCache(MAX_CARTOON_TEXTS_PER_FONT)),
+    );
+  let sprite = byText.get(text)?.canvas;
   if (!sprite) {
     let pending = pendingTexts.get(font);
     if (!pending) pendingTexts.set(font, (pending = new Map()));
@@ -871,19 +879,16 @@ export function drawCachedCartoonText(
       return;
     }
     pending.delete(text);
-    if (byText.size >= MAX_CARTOON_TEXTS_PER_FONT) byText.clear();
-    sprite = document.createElement("canvas");
-    const c = sprite.getContext("2d")!;
-    c.font = font;
-    sprite.width = Math.ceil(
-      c.measureText(text).width + CARTOON_STROKE * 2 + 4,
+    sprite = byText.take(
+      ctx.measureText(text).width + CARTOON_STROKE * 2 + 4,
+      cartoonTextHeight(fontSize),
     );
-    sprite.height = cartoonTextHeight(fontSize);
+    const c = sprite.getContext("2d")!;
     c.font = font;
     c.textAlign = "center";
     c.textBaseline = "middle";
     drawCartoonText(c, text, sprite.width / 2, sprite.height / 2);
-    byText.set(text, sprite);
+    byText.set(text, { canvas: sprite });
   }
   ctx.drawImage(sprite, x - sprite.width / 2, y - sprite.height / 2);
 }

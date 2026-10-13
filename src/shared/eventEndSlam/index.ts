@@ -17,6 +17,7 @@ import { isDetachedJobRunning } from "../detachedJob";
 import { holdExplosions } from "../../sound";
 import { playSlamExplosion } from "../explosionBang";
 import { shakeScreen } from "../screenShake";
+import { createSpriteCache, type SpriteCache } from "../spriteCache";
 import {
   SLAM_SHINE_MS,
   SLAM_WAVE_HOP,
@@ -485,7 +486,7 @@ interface RestGlyph {
 interface RestGlyphSet {
   glyphs: Map<string, RestGlyph>;
   // whole texts that stayed put, baked from the glyphs: one stamp a frame
-  words: Map<string, RestWord>;
+  words: SpriteCache<RestWord>;
   // how many frames in a row each text not yet baked has been drawn
   pending: Map<string, number>;
   baseline: CanvasTextBaseline;
@@ -526,7 +527,7 @@ function getRestGlyphSet(
   }
   const set: RestGlyphSet = {
     glyphs: new Map(),
-    words: new Map(),
+    words: createSpriteCache<RestWord>(MAX_REST_WORDS),
     pending: new Map(),
     baseline,
     fillColor,
@@ -612,7 +613,6 @@ function getRestWord(
     return null;
   }
   set.pending.delete(text);
-  if (set.words.size >= MAX_REST_WORDS) set.words.clear();
   const { scale } = set;
   let minX = Infinity;
   let maxX = -Infinity;
@@ -629,9 +629,7 @@ function getRestWord(
   }
   if (minX === Infinity) return null;
   up = Math.ceil(up);
-  const canvas = document.createElement("canvas");
-  canvas.width = maxX - minX;
-  canvas.height = up + Math.ceil(down);
+  const canvas = set.words.take(maxX - minX, up + Math.ceil(down));
   const c = canvas.getContext("2d")!;
   for (let pass = 0; pass < 2; pass++)
     for (let i = 0; i < text.length; i++) {

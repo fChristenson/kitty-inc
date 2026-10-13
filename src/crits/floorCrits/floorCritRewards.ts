@@ -1779,7 +1779,14 @@ function floorCritLevels(
   // a thunderstorm strikes each bar about four times, a shotgun peppers
   // each with about ten pellets
   if (kind === "thunderstormCrit") return Math.ceil(count / 4);
-  if (kind === "shotgunCrit") return Math.ceil(count / 10);
+  // a shotgun's shot lands its pellets on a bar as one hit: half the
+  // pellets on each of two bars, the double barrel's all on its own
+  if (kind === "shotgunCrit")
+    return step === 2
+      ? count
+      : step === 1
+        ? Math.ceil(count / 10)
+        : Math.ceil(count / 2);
   // a solar flare's lashes land about nine blasts a bar, flak about fifteen
   // bits of shrapnel, a revolver about three shots
   if (kind === "solarFlareCrit") return Math.ceil(count / 9);

@@ -8,7 +8,7 @@ import {
   playBarExplosion,
   playExplosion,
 } from "../../../../shared/explosionBang";
-import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
+import { drawWisp, drawWispHead, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,
   type Point,
@@ -55,6 +55,9 @@ interface Pellet {
   side: number;
   dy: number;
   at: number;
+  // where it lands this frame, and its flight from the muzzle
+  to: Point;
+  path: (ms: number) => Point;
 }
 interface Shot {
   at: number;
@@ -68,15 +71,19 @@ interface Blasting {
   boom: number;
 }
 const guns = new WeakMap<Running, Blasting>();
+// the muzzle this frame: every pellet's path reads it
+const muzzle: Point = { x: 0, y: 0 };
+const muzzlePath = (): Point => muzzle;
 
-const muzzleAt = (r: Running, bars: Point[]): Point => ({
-  x: r.viewportWidth * SG_MUZZLE_X,
-  y: skyY(r, bars, SG_ABOVE),
-});
+const muzzleAt = (r: Running, bars: Point[], into: Point): Point => {
+  into.x = r.viewportWidth * SG_MUZZLE_X;
+  into.y = skyY(r, bars, SG_ABOVE);
+  return into;
+};
 
 function planShots(r: Running, bars: Point[]): Blasting {
   const order = ownLast(bars);
-  const muzzle = muzzleAt(r, bars);
+  muzzleAt(r, bars, muzzle);
   // two bars a shot, top to bottom, then the double barrel on its own bar
   const aims: { at: number; targets: number[]; double: boolean }[] = [];
   const pairs = order.length - 1;
@@ -103,37 +110,54 @@ function planShots(r: Running, bars: Point[]): Blasting {
           holeHash(k * SG_PELLETS + i, 841) * SG_FLY_SPREAD_MS,
       );
       last = Math.max(last, at);
-      return {
+      const pellet: Pellet = {
         bar,
         side,
         dy: (holeHash(k * SG_PELLETS + i, 842) - 0.5) * SG_SPREAD_Y,
         at,
+        to: { x: 0, y: 0 },
+        path: () => muzzle,
       };
+      const flying: Point = { x: 0, y: 0 };
+      pellet.path = (t) => {
+        const u = clamp01((t - aim.at) / (pellet.at - aim.at));
+        flying.x = lerp(muzzle.x, pellet.to.x, u);
+        flying.y = lerp(muzzle.y, pellet.to.y, u);
+        return flying;
+      };
+      return pellet;
     });
     return { at: aim.at, aim: aim.targets[0], double: aim.double, pellets };
   });
   return { shots, boom: last + SG_BOOM_MS };
 }
 
+// where pellet p lands on its bar this frame, into p.to
 const landAt = (r: Running, bars: Point[], p: Pellet): Point => {
-  const at = along(r, bars, p.bar, p.side);
-  at.y += p.dy;
-  return at;
+  p.to.x = bars[p.bar].x + p.side * (r.play.barHalfWidth - 120);
+  p.to.y = bars[p.bar].y + p.dy;
+  return p.to;
 };
 
 registerFloorCrit("shotgunCrit", {
   plan(r, bars, hit) {
     const g = planShots(r, bars);
     guns.set(r, g);
+    // a bar takes a shot's pellets as one hit, on the first to land
     for (const shot of g.shots)
-      for (const p of shot.pellets) hit(p.bar, p.at, 0);
+      for (const bar of new Set(shot.pellets.map((p) => p.bar))) {
+        let at = Infinity;
+        for (const p of shot.pellets)
+          if (p.bar === bar) at = Math.min(at, p.at);
+        hit(bar, at, shot.double ? 2 : 0);
+      }
     hit(0, g.boom, 1);
   },
   draw(ctx, r, ms, bars) {
     const g = guns.get(r);
     if (!g) return;
     const now = r.startedAt + ms;
-    const muzzle = muzzleAt(r, bars);
+    muzzleAt(r, bars, muzzle);
     if (ms < SG_IN_MS) {
       const p = (ms / SG_IN_MS) ** 2;
       drawText(
@@ -158,8 +182,10 @@ registerFloorCrit("shotgunCrit", {
     }
 
     if (ms >= SG_IN_MS && ms < g.boom)
-      drawWisp(ctx, () => muzzle, ms, now, WISP_SIZE);
+      drawWisp(ctx, muzzlePath, ms, now, WISP_SIZE);
     for (const shot of g.shots) {
+      // done with it: its flash, pellets and blasts all over
+      if (ms > shot.pellets[shot.pellets.length - 1].at + SG_TAIL_MS) continue;
       const aim = bars[shot.aim];
       drawMuzzleFlash(
         ctx,
@@ -170,22 +196,16 @@ registerFloorCrit("shotgunCrit", {
       );
       for (const p of shot.pellets) {
         const to = landAt(r, bars, p);
-        drawWispBetween(
-          ctx,
-          (t) => {
-            const u = clamp01((t - shot.at) / (p.at - shot.at));
-            return {
-              x: lerp(muzzle.x, to.x, u),
-              y: lerp(muzzle.y, to.y, u),
-            };
-          },
-          ms,
-          now,
-          WISP_SIZE * SG_PELLET,
-          SG_PELLET_HEAT,
-          shot.at,
-          p.at,
-        );
+        // a pellet flies for a blink: a smeared head, no sparkle trail
+        if (ms >= shot.at && ms <= p.at)
+          drawWispHead(
+            ctx,
+            p.path,
+            ms,
+            now,
+            WISP_SIZE * SG_PELLET,
+            SG_PELLET_HEAT,
+          );
         drawDetonation(
           ctx,
           to,

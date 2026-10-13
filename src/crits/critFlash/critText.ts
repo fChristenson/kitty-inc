@@ -1,5 +1,15 @@
 import { shadeColor, drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
+import { createSpriteCache } from "../../shared/spriteCache";
+
+// one context to measure labels with, so a sprite's size is known before it
+// takes a canvas
+let measureCtx: CanvasRenderingContext2D | null = null;
+function critTextWidth(label: string, font: string): number {
+  measureCtx ??= document.createElement("canvas").getContext("2d")!;
+  measureCtx.font = font;
+  return measureCtx.measureText(label).width;
+}
 
 export interface CritTextStyle {
   fontSize: number;
@@ -62,10 +72,11 @@ const POP_SCALE = 0.4;
 // stroked text is slow to raster, so a reward label is drawn once per look
 // and canvas scale into a sprite, at its popped-in size, then stamped
 const MAX_TEXT_SPRITES = 64;
-const textSprites = new Map<
-  string,
-  { canvas: HTMLCanvasElement; width: number; height: number }
->();
+const textSprites = createSpriteCache<{
+  canvas: HTMLCanvasElement;
+  width: number;
+  height: number;
+}>(MAX_TEXT_SPRITES);
 // document.fonts.check is slow: once a font is in, it stays in
 const readyFonts = new Set<string>();
 const spriteIndex = new Map<
@@ -102,17 +113,13 @@ function critTextSprite(
     byLook.set(look, sprite);
     return sprite;
   }
-  if (textSprites.size >= MAX_TEXT_SPRITES) {
-    textSprites.clear();
-    spriteIndex.clear();
-  }
-  const canvas = document.createElement("canvas");
-  const c = canvas.getContext("2d")!;
-  c.font = font;
-  const width = c.measureText(label).width + style.strokeWidth * 2 + 8;
+  const width = critTextWidth(label, font) + style.strokeWidth * 2 + 8;
   const height = style.fontSize * 1.4 + style.strokeWidth * 2;
-  canvas.width = Math.ceil(width * scale);
-  canvas.height = Math.ceil(height * scale);
+  const before = textSprites.size;
+  const canvas = textSprites.take(width * scale, height * scale);
+  // a sprite gave its canvas up: the index may still point at it
+  if (textSprites.size < before) spriteIndex.clear();
+  const c = canvas.getContext("2d")!;
   c.scale(scale, scale);
   drawCritText(c, label, width / 2, height / 2, color, style);
   sprite = { canvas, width, height };
