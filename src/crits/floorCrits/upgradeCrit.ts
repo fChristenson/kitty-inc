@@ -126,6 +126,7 @@ import {
 } from "../badgeCrits/badgeProcs";
 import { preloadFloorCritWhenIdle } from "./critPlayer";
 import { lockedFloorInView } from "../lockCrits/lockedFloor";
+import { canProcSpecialCrit } from "../../shared/critLoad";
 
 const critTiers = snapshotMap<Floor, CritTier>();
 // armed crits that pay cash instead of free upgrades
@@ -337,7 +338,7 @@ export function rollCritUpgrade(
       if (result.merger) forceMergerCritProc(floor);
       if (result.shareholders) forceShareholdersCritProc(floor);
     },
-    allowSpecialProcs,
+    allowSpecialProcs && canProcSpecialCrit(),
     eventContext && (() => claimEventProc(floor, eventContext)),
     eventContext &&
       ((type) =>
@@ -386,7 +387,7 @@ export function rollInstantCrit(
   let rolled: CritRollResult | null = null;
   rollCrit((result) => {
     rolled = result;
-  }, allowSpecialProcs);
+  }, allowSpecialProcs && canProcSpecialCrit());
   return rolled;
 }
 

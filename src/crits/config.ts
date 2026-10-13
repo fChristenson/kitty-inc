@@ -45,6 +45,11 @@ export const CRIT_CONFIG = {
     // Jump Start's payout from the floor it opens, in full payouts per the
     // crit's multiple
     jumpStartPayouts: 1,
+    // while frames run slower than this (ms, eased over the last ~10), a new
+    // special crit can't proc until the crits playing have finished and
+    // procSettleMs more have passed for their rewards' coins and labels
+    procSlowFrameMs: 18,
+    procSettleMs: 1000,
     // Conjure's cash: the price of the floor it opens, times this
     conjurePriceBack: 1,
     // Overclock: a bar this many times as fast for overclockMs

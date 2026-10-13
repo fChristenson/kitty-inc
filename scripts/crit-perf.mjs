@@ -5,6 +5,9 @@
 //
 //   node scripts/crit-perf.mjs                    the crits changed in git
 //   node scripts/crit-perf.mjs claymoresCrit dyson-sphere goldenTicket
+//   node scripts/crit-perf.mjs --rank played      every floor, income, button,
+//            lock and rate crit ranked by what a frame costs (also: floor,
+//            income, button, lock, rate, events; --chunk=20 runs a browser)
 //   options: --throttle=4 --ref=volcanoCrit --counts (canvas calls per frame)
 //            --url=http://localhost:5173/kitty-inc/perf/index.html
 //            --desktop (no phone screen) --keep (leave the browser open) --json
@@ -32,6 +35,7 @@ const FLOOR_CRITS = "src/crits/floorCrits/crits";
 const INCOME_CRITS = "src/crits/incomeCrits/crits";
 const BUTTON_CRITS = "src/crits/buttonCrits/crits";
 const LOCK_CRITS = "src/crits/lockCrits/crits";
+const RATE_CRITS = "src/crits/rateCrits/crits";
 const EVENTS = "src/crits/animatedCrits/events";
 const CRIT_DATA = "src/crits/badgeCrits/critData";
 const OUT = path.join(ROOT, "tmp", "_crit-perf");
@@ -64,6 +68,10 @@ const json = args.includes("--json");
 const warmOnly = args.includes("--warm");
 // counting canvas calls costs time of its own, so it's opt-in
 const counts = args.includes("--counts");
+// every crit named ranked by its warm frame cost, measured in chunks of runs
+// (one browser each) so a long sweep keeps what it has if one fails
+const rank = args.includes("--rank");
+const chunk = Number(flag("chunk", "20"));
 // extra rig options; by default the normal busy state: full maxed buildings
 // (late=1) with coin bursts storming (the rig's default). --rig= for the light one
 const rig = flag("rig", "late=1");
@@ -76,7 +84,9 @@ function toRun(target) {
   // any rig run as it is, e.g. run:idle for a baseline
   if (target.startsWith("run:")) return { run: target.slice(4), dir: null };
   if (
-    /^(floor-crit|income-crit|button-crit|lock-crit|event|crit):/.test(target)
+    /^(floor-crit|income-crit|button-crit|lock-crit|rate-crit|event|crit):/.test(
+      target,
+    )
   ) {
     const [kind, name] = target.split(/:(.*)/);
     if (kind.endsWith("-crit")) return toRun(name);
@@ -97,6 +107,8 @@ function toRun(target) {
     };
   if (fs.existsSync(path.join(LOCK_CRITS, target)))
     return { run: `lock-crit:${target}`, dir: path.join(LOCK_CRITS, target) };
+  if (fs.existsSync(path.join(RATE_CRITS, target)))
+    return { run: `rate-crit:${target}`, dir: path.join(RATE_CRITS, target) };
   const event = target.endsWith("Event") ? target : `${camel(target)}Event`;
   if (fs.existsSync(path.join(EVENTS, event)))
     return {
@@ -376,8 +388,73 @@ function report(targets, results, errors) {
   return lines.join("\n");
 }
 
+// a frame that drops below the frame rate: what makes a crit slow down the game
+const slowFrames = (s) =>
+  s.fps < BUDGET.minFps ||
+  s.frame.p95 > BUDGET.frameP95 ||
+  s.redraw.p95 > BUDGET.redrawP95 ||
+  s.hitches > BUDGET.hitches ||
+  s.longTasks > BUDGET.longTasks;
+
+// every crit's warm play, costliest frames first, against the game idle
+function rankReport(targets, results, errors) {
+  const result = (run) => results.find((s) => s.name === `${run}@${mode}`);
+  const idle = result("idle");
+  const rows = targets
+    .map((t) => ({ name: t.run, s: result(`warm:${t.run}`) }))
+    .filter((row) => row.s)
+    .sort((a, b) => b.s.redraw.p95 - a.s.redraw.p95);
+  const missing = targets.filter((t) => !result(`warm:${t.run}`));
+  const slow = rows.filter((row) => slowFrames(row.s));
+  const pad = (v, n) => String(v).padStart(n);
+  const lines = [
+    `crit cost per frame: warm play, ${throttle}x CPU, ${desktop ? "desktop" : "phone 430x932 @3x"}, stress rig (${rig}); a frame has 16.7ms`,
+    idle
+      ? `the game idle: redraw avg ${fixed(idle.redraw.avg, 2)} p95 ${fixed(idle.redraw.p95, 2)}ms; +avg = what the crit adds`
+      : "(no idle baseline)",
+    `${slow.length} of ${rows.length} crits drop frames (SLOW: fps under ${BUDGET.minFps}, frame p95 over ${BUDGET.frameP95}ms, redraw p95 over ${BUDGET.redrawP95}ms, a hitch or a long task)`,
+    "",
+    `      ${pad("p95", 6)} ${pad("avg", 6)} ${pad("+avg", 6)} ${pad("max", 6)} ${pad("frame95", 7)} ${pad("fps", 4)} ${pad("hitch", 5)} ${pad("long", 4)} ${pad("canv", 4)} ${pad("gc", 3)}  crit`,
+  ];
+  for (const { name, s } of rows)
+    lines.push(
+      `${slowFrames(s) ? "SLOW" : "    "}  ${pad(fixed(s.redraw.p95), 6)} ${pad(fixed(s.redraw.avg), 6)} ${pad(idle ? fixed(s.redraw.avg - idle.redraw.avg) : "-", 6)} ${pad(fixed(s.redraw.max), 6)} ${pad(fixed(s.frame.p95), 7)} ${pad(fixed(s.fps, 0), 4)} ${pad(s.hitches, 5)} ${pad(s.longTasks, 4)} ${pad(s.canvases, 4)} ${pad(s.gcs, 3)}  ${name}`,
+    );
+  if (missing.length)
+    lines.push("", `no result: ${missing.map((t) => t.run).join(", ")}`);
+  if (errors.length)
+    lines.push(
+      "",
+      `${errors.length} errors:`,
+      ...errors.slice(0, 10).map((e) => `  ${e.split("\n")[0]}`),
+    );
+  return lines.join("\n");
+}
+
 const names = args.filter((a) => !a.startsWith("--"));
-const targets = (names.length ? names : changedTargets()).map(toRun);
+const GROUP_DIRS = {
+  floor: FLOOR_CRITS,
+  income: INCOME_CRITS,
+  button: BUTTON_CRITS,
+  lock: LOCK_CRITS,
+  rate: RATE_CRITS,
+  events: EVENTS,
+};
+const subdirs = (dir) =>
+  fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name);
+// a group's name as all its kinds
+const expand = (name) =>
+  name === "played"
+    ? ["floor", "income", "button", "lock", "rate"].flatMap(expand)
+    : GROUP_DIRS[name]
+      ? subdirs(GROUP_DIRS[name])
+      : [name];
+const targets = (names.length ? names.flatMap(expand) : changedTargets()).map(
+  toRun,
+);
 if (targets.length === 0) {
   console.log("no changed crits: name the crits to measure");
   process.exit(1);
@@ -385,9 +462,10 @@ if (targets.length === 0) {
 const runs = [
   ...new Set([
     ...targets.flatMap((t) =>
-      warmOnly ? [`warm:${t.run}`] : [t.run, `warm:${t.run}`],
+      warmOnly || rank ? [`warm:${t.run}`] : [t.run, `warm:${t.run}`],
     ),
     ...(ref ? [`warm:${toRun(ref).run}`] : []),
+    ...(rank ? ["idle"] : []),
   ]),
 ];
 try {
@@ -397,6 +475,28 @@ try {
     `nothing serving ${url}: start the dev server (npx vite) or pass --url`,
   );
   process.exit(1);
+}
+if (rank) {
+  const results = [];
+  const errors = [];
+  fs.mkdirSync(OUT, { recursive: true });
+  for (let i = 0; i < runs.length; i += chunk) {
+    const part = runs.slice(i, i + chunk);
+    console.log(`${i + part.length}/${runs.length}: ${part.join(", ")}`);
+    try {
+      const got = await measure(part);
+      results.push(...got.results);
+      errors.push(...got.errors);
+    } catch (error) {
+      errors.push(`${part.join(", ")}: ${error.message}`);
+    }
+    fs.writeFileSync(
+      path.join(OUT, "rank.json"),
+      JSON.stringify({ throttle, results, errors }, null, 2),
+    );
+  }
+  console.log(rankReport(targets, results, errors));
+  process.exit(0);
 }
 console.log(`measuring ${runs.join(", ")} at ${throttle}x...`);
 const { results, errors } = await measure(runs);

@@ -37,6 +37,7 @@ import { drawRoof } from "../../buildings";
 import { drawHud, HUD_H } from "../../hud";
 import { updateMouse, hitTestMouse, handleMouseClick } from "../../spawn/mouse";
 import { setTapScale } from "../../shared/tapTarget";
+import { noteCritFrame } from "../../shared/critLoad";
 import {
   drawBubbles,
   hitTestBubbles,
@@ -615,6 +616,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // (derived from cssW), so drawing anything against a zero/invalid size produces
     // non-finite coordinates and throws (e.g. inside createLinearGradient)
     if (cssW <= 0 || cssH <= 0) return;
+    noteCritFrame(performance.now());
     beginLightFrame(true);
     try {
       drawFrame();

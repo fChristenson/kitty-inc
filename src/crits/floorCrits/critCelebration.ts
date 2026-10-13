@@ -40,6 +40,7 @@ import {
 import { tierColor } from "./bonusTierReward";
 
 import { getScreenUnfrozenAt, isScreenFrozen } from "../../shared/screenFreeze";
+import { setCritsPlaying } from "../../shared/critLoad";
 
 // crit celebrations are flash + sound only: no coin bursts (perf)
 function explosionAndCoins(): void {
@@ -244,6 +245,12 @@ interface QueuedCelebration {
   run: () => void;
 }
 const specialCelebrationQueue: QueuedCelebration[] = [];
+setCritsPlaying(
+  () =>
+    isScreenFrozen() ||
+    specialCelebrationQueue.length > 0 ||
+    isCritFlashActive(Date.now()),
+);
 let drainingSpecialQueue = false;
 const DEJA_VU_REPEAT_COUNT = 2;
 const DEJA_VU_FOLLOW_UP_MAX_AGE_MS = 5000;
