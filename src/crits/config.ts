@@ -58,12 +58,12 @@ export const CRIT_CONFIG = {
     // and after it played out (they share one player)
     floorCrit: {
       chance: 0.46,
-      cooldownMs: 5_000,
+      cooldownMs: 10_000,
     },
     // an animated event (animatedCrits/config.ts); none can land again
     // until cooldownMs after one has fully played out
     animatedCrit: {
-      chance: 0.04,
+      chance: 0.46,
       cooldownMs: 30_000,
     },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter

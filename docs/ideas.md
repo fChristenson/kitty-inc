@@ -45,7 +45,44 @@ New things the game doesn't have yet, not more of the same crits.
 2. **Jackpot lever** (a new boost beside Sale and Overtime): a floor's button turns into a gold Spin button for fifteen seconds; every tap spins a reel of crit numbers in it that rattles to a stop, the number flying onto the bar as its levels; three of the same in a row and the button hits the jackpot: every bar in view blows.
 3. **Golden hour** (a new boost): the whole building turns gold, bar by bar from the bottom; for twenty seconds every bar pays on its own beat, coins pouring up into the total, the beats quickening as the hour runs out, until every bar pays at once and the total slams.
 
+## List 142: crit groups rolled on other events ([playground](../tmp/_playground/ideas.html?list=next119))
+
+Special groups that roll on something other than buying a level (today every floor, income, badge and animated crit comes off a crit on an upgrade tap).
+
+1. **Unlock crits** (rolled on buying a floor): the lock bursts open, a crit number pops over the new floor and bursts into wisps that dive onto its bar in quick fire, the last huge. The new floor starts with levels.
+2. **Payout crits** (rolled on a bar paying out): the full bar's payout catches a number that slams onto its end; the bar heats and gushes a geyser of coins into the total, which slams. The payout multiplied.
+3. **Hire crits** (rolled on hiring a worker): the new cat lands glowing gold and wisps zip out of it to every empty desk in view, a cat dropping onto each with a blast; then every cat jumps. Free hires.
+4. **Boost crits** (rolled on starting a Sale or Overtime): beams jump from the boosted button to every other button in view, each turning into a Sale with a blast, its bar glowing hot; then they all flash at once. The boost on every floor in view.
+
+## List 143: more crit groups rolled on other events ([playground](../tmp/_playground/ideas.html?list=next120))
+
+More special groups off triggers that roll nothing today.
+
+1. **Tap crits** (rolled on tapping a cat): the tapped cat jumps and a crit number pops over it, then bursts into a wisp that hops cat to cat across the building in quick fire, each cat jumping lit as it's boosted, the last in the huge blast. Every cat in view boosted.
+2. **Manager crits** (rolled when a manager's own boost goes off, with no tap at all): the manager's pulse turns into a shockwave that rolls out over the whole building, every bar it crosses jolting with levels in a rolling run of blasts; then it snaps back onto the manager's bar. Levels on every bar in view.
+3. **Gauge crits** (rolled when an Overtime gauge fills): the full gauge overflows, gold pouring off its end in wisp streams onto every other bar, each turning gold from its left end with a blast; then they all blow at once. A crit tier on every bar in view.
+4. **Welcome-back crits** (rolled on opening the game after time away): the money earned while away lands in the middle, a crit number slams beside it and it flips over onto the bigger sum, then bursts into a river of coins into the total, which slams. The time-away money multiplied.
+
+## List 144: crit groups rolled on other events ([playground](../tmp/_playground/ideas.html?list=next121))
+
+Three more triggers that roll nothing today.
+
+1. **Max crits** (rolled when a floor reaches the level cap): the bar turns gold and MAX slams on it; then it shatters into gold shards that rain onto every other bar in quick fire. The levels it can't take any more go to the others.
+2. **Spawn crits** (rolled on catching a random spawn: the mouse, a bubble, the wisp's glitter): the popped bubble's crit number splits into new bubbles that float off onto every bar, each bursting on it with its levels, quicker each, the last huge.
+3. **Streak crits** (rolled when three crits land in a row in one hold): the three numbers stack up over the button, then fly together and fuse into their sum, which slams onto the bar in a run of blasts along it. The three crits paid again as one.
+
+## List 145: one of each kind ([playground](../tmp/_playground/ideas.html?list=next122))
+
+An animated crit, a floor crit and an income crit, each in a look that kind hasn't used yet.
+
+1. **Burnout** (animated crit, Race and Drawing): a racer wisp and its chaser tear round a giant star, flat out on the straights, braking hard into every point, laying a trail of gold dots behind them; they cross the line in a blast each, the star blazes and dives onto the clicked bar in a run of blasts, a crit tier up.
+2. **Sprinklers** (floor crit, Spray): the number bursts into sprinkler wisps that drop onto every bar and spin, hissing arcs of gold mist along it until the coat is full; then the bars flash and blow one after another, the crit's own last and hardest.
+3. **Spike** (income crit, Bounce): the green amount slams in low; a wisp bumps it up, a second sets it high, and a third leaps and spikes it down onto the total in a huge blast.
+
 ## Built
+
+- **Markdown** (`animatedCrits/events/markdownEvent`): animated crit, gunfire; a wisp gun shoots the price on every button in view in quick fire, each price flipping over onto a cheaper one for good (`-20%`), the clicked floor's own last in the huge blast (`-40%`). Test: New Effects "Markdown".
+- **Raise the Roof** (`animatedCrits/events/raiseTheRoofEvent`): animated crit, explosion; the view pulls back, a wisp rockets up and blows the top of the building open, and new floors slam down out of the sky onto it one by one, quicker each, the last the hardest; they unlock as the screen goes live. Test: New Effects "Raise the Roof".
 
 - **Money gun** (`incomeCrits/crits/moneyGunCrit`): income crit; the number splits into two wisp guns under the total firing fans of bills up into it, left, right, quicker and quicker, a muzzle flash, recoil and pop each volley; then both let rip in one blizzard of bills into the huge blast. Test: New Effects "Money Gun Crit".
 

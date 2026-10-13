@@ -8267,6 +8267,29 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 96
+  // gunfire, price cuts: src/crits/animatedCrits/events/markdownEvent ("Markdown"): a wisp gun shoots the price on every button in view in quick fire; each flips over onto a cheaper one, the clicked floor's own last with the biggest cut in the huge blast
+  markdownEvent: {
+    chance: 0.01,
+    firstShotMs: 260, // from the click to the first shot
+    flyMs: 150, // a shot's flight onto its button
+    gapMs: 48, // between shots
+    cut: 0.2, // off each other button's price, for good
+    ownCut: 0.4, // off the clicked button's price, for good
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, free floors: src/crits/animatedCrits/events/raiseTheRoofEvent ("Raise the Roof"): the view pulls back, a wisp rockets up and blows the building's top open; new floors slam down out of the sky onto it one by one, quicker each, the last the hardest
+  raiseTheRoofEvent: {
+    chance: 0.01,
+    floors: 3, // new floors, at most
+    zoomMs: 320, // the view pulling back
+    blowMs: 460, // the rocket reaching the top
+    dropMs: 220, // a floor's fall
+    landsMs: [780, 1020, 1220] as number[], // each floor landing
+    holdMs: 600,
+    mergeMs: 0,
+  },
   // batch 95
   // wisp, levels + crit tier: src/crits/animatedCrits/events/lottoDrumEvent ("Lotto Drum"): wisps pour from the clicked button into a glitter drum and tumble; one by one, quicker each, a wisp is drawn out of the top onto a bar with levels; then the drum bursts and the rest pour onto the clicked bar, a crit tier up
   lottoDrumEvent: {

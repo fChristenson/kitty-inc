@@ -47,6 +47,8 @@ export function createTestButtonMarkup(): string {
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
           <button class="game__button" data-income-crit="moneyGunCrit">Money Gun Crit</button>
+          <button id="test-markdown-event" class="game__button">Markdown</button>
+          <button id="test-raise-the-roof-event" class="game__button">Raise the Roof</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
