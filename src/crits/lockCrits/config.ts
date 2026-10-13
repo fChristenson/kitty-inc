@@ -21,5 +21,15 @@ export const LOCK_CRIT_CONFIG = {
     lockpickCrit: {
       chance: 0.03,
     },
+    // bolts striking the locked floor until a giant one splits it open, its
+    // bar filling with levels
+    boltCutterCrit: {
+      chance: 0.03,
+    },
+    // wisps bouncing up the building into the locked floor, dropping in as
+    // its new cats once it bursts open
+    moveInCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

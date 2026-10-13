@@ -46,7 +46,10 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-income-crit="moneyGunCrit">Money Gun Crit</button>
+          <button class="game__button" data-button-crit="gildedCrit">Gilded</button>
+          <button class="game__button" data-button-crit="blastingCapsCrit">Blasting Caps</button>
+          <button class="game__button" data-lock-crit="boltCutterCrit">Bolt Cutter</button>
+          <button class="game__button" data-lock-crit="moveInCrit">Move In</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -1349,6 +1352,7 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Income Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-income-crit="moneyGunCrit">Money Gun Crit</button>
           <button class="game__button" data-income-crit="billCounterCrit">Bill Counter Crit</button>
           <button class="game__button" data-income-crit="windfallCrit">Windfall Crit</button>
           <button class="game__button" data-income-crit="bulletHoseCrit">Bullet Hose Crit</button>

@@ -13,7 +13,9 @@ import {
   getButtonCrit,
   getLockCrit,
   takeButtonCharge,
+  takeDoubleTap,
   takeFreeTap,
+  takePayoutTap,
   getCritTier,
   consumeCritUpgrade,
   rollCritUpgrade,
@@ -377,6 +379,14 @@ export function paySaleClick(
   });
 }
 
+// what a button crit left on floor's button for a tap that just landed: a
+// second level, and its bar's payout into the total
+function landTapBonuses(floor: Floor, isGroundFloor: boolean): void {
+  if (!isFloorMaxed(floor) && takeDoubleTap(floor))
+    applyUpgradeTick(floor, isGroundFloor);
+  if (takePayoutTap(floor)) paySaleClick(floor, isGroundFloor, 1);
+}
+
 // handles a click at floor-local (x, y): unlocking, upgrading, or clicking a worker.
 // every hit test/mutation here is identical to the old per-canvas click listener,
 // just no longer tied to any one floor owning its own DOM canvas + event listener.
@@ -652,6 +662,7 @@ export function handleFloorClick(
         playSold();
       }
       applyUpgradeTick(floor, isGroundFloor, true);
+      landTapBonuses(floor, isGroundFloor);
       rollCritUpgrade(floor, true, eventProcContext(deps, isGroundFloor));
       persist();
       triggerButtonPress(floor);
@@ -660,6 +671,7 @@ export function handleFloorClick(
     }
     if (spendTotalIncome(getUpgradeCost(floor))) {
       applyUpgradeTick(floor, isGroundFloor, true);
+      landTapBonuses(floor, isGroundFloor);
       rollCritUpgrade(floor, true, eventProcContext(deps, isGroundFloor));
       persist();
       triggerButtonPress(floor);

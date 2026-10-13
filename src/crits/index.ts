@@ -84,7 +84,9 @@ export {
   buttonBonusLabel,
   hasButtonBonus,
   takeButtonCharge,
+  takeDoubleTap,
   takeFreeTap,
+  takePayoutTap,
 } from "./buttonCrits/buttonBonus";
 export {
   BADGE_GLITTER_AT,

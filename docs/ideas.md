@@ -73,6 +73,12 @@ Three more triggers that roll nothing today.
 
 ## Built
 
+- **Gilded**, **Blasting Caps** (button crits) and **Bolt Cutter**, **Move In** (lock crits), from List 149. Test: New Effects.
+  - **Gilded** (Spray): a nozzle wisp hisses gold mist over every button until its coat flashes and it flips over gilded: its next taps (the crit's multiple, twice on its own) each also pay its bar's payout into the total (`Payout N` on the button).
+  - **Blasting Caps** (Explosion): bombs lobbed onto every button blow in a chain, the own bursting into a cluster of bomblets then the biggest blast: its next taps each land two levels (`Double N`).
+  - **Bolt Cutter** (Lightning): bolts strike the locked floor all over, quicker and quicker; a giant bolt splits it open, then its bar fills crackling with 5 levels per crit multiple.
+  - **Move In** (Bounce): wisps bounce up the bars into the locked floor; it bursts open and each wisp drops in where a new cat is hired.
+
 - **Button crits** (`crits/buttonCrits`) and **Lock crits** (`crits/lockCrits`): two new special groups (`CONFIG.specialCrits.buttonCrit` 0.2, `lockCrit` 0.15), always on a multiplier crit, played on the live screen by the floor crits' player (sharing its cooldown); a lock crit only lands while the locked floor is in view. Button crits leave free taps and charges on buttons (`buttonCrits/buttonBonus.ts`, a gold button labelled "Free 6" or "+9 Lvl"). Test: "Button Crits" (on the ground floor) and "Lock Crits" (on the top open floor).
   - **Sure Shot**: the number bursts into wisps diving onto every button in view, each blasting it into a sure crit (x3), the crit's own last at its tier.
   - **Autopress**: a wisp over every button hammers it down in a quickening rattle, each press levels on its floor; the own wisp winds up and slams its button for the crit's multiple.

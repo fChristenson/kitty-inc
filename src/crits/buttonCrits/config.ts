@@ -21,5 +21,15 @@ export const BUTTON_CRIT_CONFIG = {
     overchargeCrit: {
       chance: 0.03,
     },
+    // a nozzle wisp spraying every button gold, each tap of it then paying
+    // its bar's payout too
+    gildedCrit: {
+      chance: 0.03,
+    },
+    // bombs on every button blowing in a chain, each tap of it then landing
+    // two levels
+    blastingCapsCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

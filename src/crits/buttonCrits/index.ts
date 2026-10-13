@@ -9,7 +9,12 @@ import type { ButtonCritKind, CritTier } from "../critTypes";
 import type { FloorCritPlay } from "../floorCrits/critPlayer";
 import { otherFloorsInView, spotsFromFlash } from "../floorCrits/playTargets";
 import { armCritUpgrade } from "../floorCrits/upgradeCrit";
-import { addButtonCharge, addFreeTaps } from "./buttonBonus";
+import {
+  addButtonCharge,
+  addDoubleTaps,
+  addFreeTaps,
+  addPayoutTaps,
+} from "./buttonBonus";
 import { liveEffect } from "../../shared/detachedJob";
 import { playBarExplosion } from "../../shared/explosionBang";
 import {
@@ -59,6 +64,16 @@ function reward(
     // its next tap lands the crit's multiple in levels, thrice on its own
     case "overchargeCrit":
       addButtonCharge(target, own ? count * 3 : count);
+      return 0;
+    // taps that each also pay its bar's payout, twice as many on its own
+    case "gildedCrit":
+      addPayoutTaps(target, own ? count * 2 : count);
+      flipUpgradeButton(target);
+      return 0;
+    // taps that each land two levels, twice as many on its own
+    case "blastingCapsCrit":
+      addDoubleTaps(target, own ? count * 2 : count);
+      flipUpgradeButton(target);
       return 0;
   }
 }
