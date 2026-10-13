@@ -1,7 +1,11 @@
 // a one-off copy of the frozen screen, for events that cut, move or flip
 // pieces of it (Shatter's shards, flipping tiles): take it from an event's
 // drawUnder before drawing over the frame, then draw parts of it back
-// anywhere in floor-local coords
+// anywhere in floor-local coords. It's washed to the freeze's full dim, so
+// the floors stay on the dark overlay however early it's taken
+import { COLOR } from "../../palette";
+import { getScreenFreezeDimLeft } from "../screenFreeze";
+
 export interface ScreenCopy {
   canvas: HTMLCanvasElement;
   // the floor-local transform it was taken under
@@ -12,7 +16,14 @@ export function copyScreen(ctx: CanvasRenderingContext2D): ScreenCopy {
   const canvas = document.createElement("canvas");
   canvas.width = ctx.canvas.width;
   canvas.height = ctx.canvas.height;
-  canvas.getContext("2d")!.drawImage(ctx.canvas, 0, 0);
+  const copy = canvas.getContext("2d")!;
+  copy.drawImage(ctx.canvas, 0, 0);
+  const dim = getScreenFreezeDimLeft();
+  if (dim > 0) {
+    copy.globalAlpha = dim;
+    copy.fillStyle = COLOR.black;
+    copy.fillRect(0, 0, canvas.width, canvas.height);
+  }
   return { canvas, at: ctx.getTransform() };
 }
 

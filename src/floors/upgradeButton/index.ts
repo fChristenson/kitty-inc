@@ -57,7 +57,8 @@ import {
   CRIT_TIER_CONFIG,
   type CritTier,
   getClaimedEventCover,
-  buttonBonusLabel,
+  buttonFreeLabel,
+  buttonPerkLabel,
 } from "../../crits";
 
 import { isSaleActive } from "./sale";
@@ -185,7 +186,11 @@ function renderUpgradeButton(
     ? CRIT_TIER_CONFIG[critTier as CritTier].multiplier
     : null;
   // a button crit's free taps or charge, played under any crit or event
-  const bonus = crit || activeEvent || maxed ? null : buttonBonusLabel(floor);
+  // a button crit's free taps or charge, or its perk on paid taps, played
+  // under any crit or event; only free taps press when it can't be paid
+  const free = crit || activeEvent || maxed ? null : buttonFreeLabel(floor);
+  const bonus =
+    crit || activeEvent || maxed ? null : (free ?? buttonPerkLabel(floor));
   // it rocks like a crit, free like an event's clicks
   const lively = crit || !!activeEvent || bonus !== null;
   const slam = getSlamPose(own, "button", now);
@@ -219,7 +224,7 @@ function renderUpgradeButton(
     if (flip !== 1) ctx.scale(flip, 1);
     ctx.translate(-cx, -cy);
     let dim = false;
-    if (!crit && !activeEvent?.freeClick && !bonus) {
+    if (!crit && !activeEvent?.freeClick && !free) {
       if (!affordable) ctx.globalAlpha = 0.5;
       else if (hovered) dim = true;
     } else if (hovered) {

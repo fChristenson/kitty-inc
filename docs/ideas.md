@@ -73,6 +73,10 @@ Three more triggers that roll nothing today.
 
 ## Built
 
+- **Lucky Star**, **Skeleton Key** (lock crits), from List 152. Test: New Effects.
+  - **Lucky Star** (Galaxy): a disk of stars spirals into the locked floor's core until it collapses and opens it; a star leaps onto its button, arming a crit at the crit's tier.
+  - **Skeleton Key** (Drawing, new `key` shape in `shared/drawing`): dots build a giant key over the locked floor that blazes and snaps in; it opens with free taps on its button (twice the crit's multiple).
+
 - **Nail Gun** (button crit) and **Carbon Copy**, **Fresh Paint** (lock crits), from List 151. Test: New Effects.
   - **Nail Gun** (Gunfire): a gun wisp hops beside each button and hammers nails into it; the next crit landing on a nailed button (`Sticky N`) is armed again for its next taps, `CONFIG.crit.nailGunTaps` plays in all (twice on its own).
   - **Carbon Copy** (Wisp): a wisp races along the bar of the floor below and hauls a gold copy of it up into the locked floor; it opens, then climbs to the whole level of the floor below.

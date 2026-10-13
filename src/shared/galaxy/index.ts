@@ -85,7 +85,7 @@ export function planDisk(
       const diff =
         ((((angle(to, ms) - own) % TAU) + TAU + Math.PI) % TAU) - Math.PI;
       return place(
-        lerp([from.radius, to.radius], u),
+        from.radius + (to.radius - from.radius) * u,
         own + diff * u,
         into,
         grow,

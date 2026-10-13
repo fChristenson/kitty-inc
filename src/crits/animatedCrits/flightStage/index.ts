@@ -135,10 +135,11 @@ export function canStartFlightStage(context: EventProcContext): boolean {
   );
 }
 
-// the way in, before the flight's ms 0
+// the way in, before the flight's ms 0: an entrance after the frozen floors'
+// rumble on the dark overlay, or the wind-up and dive
 function enterMs(content: FlightContent): number {
   const { windUpMs, diveMs } = CONFIG.flightStage;
-  return content.enter?.ms ?? windUpMs + diveMs;
+  return windUpMs + (content.enter?.ms ?? diveMs);
 }
 
 // the view's twin guns, at the screen's bottom corners
@@ -176,18 +177,21 @@ function warpAt(ms: number, content: FlightContent): number {
   return smoothstep(clamp01((ms - windUpMs) / dive));
 }
 
-// the frozen floors rumbling, then zooming and blurring as the view dives in
-function frameMotion(ms: number): FrameMotion {
+// the frozen floors rumbling, then zooming and blurring as the view dives in;
+// before an entrance they only rumble, which draws the floors itself after
+function frameMotion(ms: number, entrance: boolean): FrameMotion {
   const { windUpMs, diveMs: dive } = CONFIG.flightStage;
   if (ms < windUpMs) {
     const p = smoothstep(clamp01(ms / windUpMs));
+    const zoom = entrance ? 0 : WIND_ZOOM;
     return {
       pan: Math.sin(ms / RUMBLE_MS) * RUMBLE * p,
-      scaleX: 1 + WIND_ZOOM * p + 2 * RUMBLE * p,
-      scaleY: 1 + WIND_ZOOM * p,
+      scaleX: 1 + zoom * p + 2 * RUMBLE * p,
+      scaleY: 1 + zoom * p,
       blur: 0,
     };
   }
+  if (entrance) return STILL;
   const p = clamp01((ms - windUpMs) / dive);
   // once the stage covers the floors they needn't move
   if (p >= 1) return STILL;
@@ -276,7 +280,7 @@ function drawOverlay(
     ctx.rect(x, y, w, h);
     ctx.clip();
   }
-  if (ms < crashAt && (content.enter || ms >= windUpMs)) {
+  if (ms < crashAt && ms >= windUpMs) {
     ctx.globalAlpha = content.enter
       ? 1
       : smoothstep(clamp01((ms - windUpMs) / dive));
@@ -284,9 +288,10 @@ function drawOverlay(
     ctx.globalAlpha = 1;
   }
   drawSpeedLines(ctx, view, warpAt(ms, content), now);
-  if (content.enter && ms < flyAt)
-    content.enter.draw(ctx, view, ms, now, stage.shot);
-  else if (ms < crashAt) content.draw(ctx, view, ms - flyAt, now, stage.shot);
+  if (content.enter && ms < flyAt) {
+    if (ms >= windUpMs)
+      content.enter.draw(ctx, view, ms - windUpMs, now, stage.shot);
+  } else if (ms < crashAt) content.draw(ctx, view, ms - flyAt, now, stage.shot);
   if (ms >= crashAt || (ms >= arriveAt && !content.ownLanding)) {
     // the floors rushing up out of the distance until they fill the screen
     const z = Math.max(
@@ -359,10 +364,8 @@ export function startFlightStage(
   const isLive = () => running === stage;
   freezeScreen(drawOverlay, {
     spotlightTotal,
-    // an entrance draws the floors itself
-    frameMotion: content.enter
-      ? undefined
-      : () => frameMotion(performance.now() - stage.startedAt),
+    frameMotion: () =>
+      frameMotion(performance.now() - stage.startedAt, !!content.enter),
   });
   const beat: FlightBeat = (ms, fn) =>
     setTimeout(

@@ -132,6 +132,13 @@ export function getScreenFreezeDim(): number {
   return DIM_ALPHA * Math.min(1, (performance.now() - frozenAt) / DIM_FADE_MS);
 }
 
+// the wash still to go over the frozen frame as it is now to reach the full
+// dim (0 once it has, or when not frozen)
+export function getScreenFreezeDimLeft(): number {
+  if (!frozen) return 0;
+  return 1 - (1 - DIM_ALPHA) / (1 - getScreenFreezeDim());
+}
+
 let dimLayer: HTMLCanvasElement | null = null;
 // what the dim layer last held: its key, wash and the transform it was drawn in
 let dimKey: readonly unknown[] | null = null;

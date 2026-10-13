@@ -2242,6 +2242,8 @@ export const LOCK_CRIT_KINDS = [
   "hotLapCrit",
   "carbonCopyCrit",
   "freshPaintCrit",
+  "luckyStarCrit",
+  "skeletonKeyCrit",
 ] as const satisfies readonly LockCritType[];
 export type LockCritKind = (typeof LOCK_CRIT_KINDS)[number];
 

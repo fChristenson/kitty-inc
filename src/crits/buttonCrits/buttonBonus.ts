@@ -125,20 +125,15 @@ export function takeLinkedFloors(floor: Floor): Floor[] | null {
   return floors;
 }
 
-export function hasButtonBonus(floor: Floor): boolean {
-  return (
-    charges.has(floor) ||
-    freeTaps.has(floor) ||
-    doubleTaps.has(floor) ||
-    payoutTaps.has(floor) ||
-    hotTaps.has(floor) ||
-    linkedTaps.has(floor) ||
-    nails.has(floor)
-  );
+// whether floor's next tap is free (a charge or a free tap): the only bonuses
+// that change how its button looks and whether it can be pressed
+export function hasFreeButtonTap(floor: Floor): boolean {
+  return charges.has(floor) || freeTaps.has(floor);
 }
 
-// the button's label while it carries one, "+30 Lvl", "Free 7", "Double 7",
-// "Payout 7", "Hot 7", "Linked 7" or "Sticky 3", made once per number
+// a free tap's label in place of the price, "+30 Lvl" or "Free 7", and a
+// perk's tag shown over the button, "Double 7", "Payout 7", "Hot 7",
+// "Linked 7" or "Sticky 3"; made once per number
 const chargeLabels = new Map<number, string>();
 const tapLabels = new Map<number, string>();
 const doubleLabels = new Map<number, string>();
@@ -160,15 +155,17 @@ function tapsLabel(
   if (!n) return null;
   return labels.get(n) ?? labelOf(labels, n, `${word} ${n}`);
 }
-export function buttonBonusLabel(floor: Floor): string | null {
+export function buttonFreeLabel(floor: Floor): string | null {
   const charge = charges.get(floor);
   if (charge)
     return (
       chargeLabels.get(charge) ??
       labelOf(chargeLabels, charge, `+${charge} Lvl`)
     );
+  return tapsLabel(freeTaps, tapLabels, floor, "Free");
+}
+export function buttonPerkLabel(floor: Floor): string | null {
   return (
-    tapsLabel(freeTaps, tapLabels, floor, "Free") ??
     tapsLabel(doubleTaps, doubleLabels, floor, "Double") ??
     tapsLabel(payoutTaps, payoutLabels, floor, "Payout") ??
     tapsLabel(hotTaps, hotLabels, floor, "Hot") ??

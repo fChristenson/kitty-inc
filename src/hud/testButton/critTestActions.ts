@@ -46,14 +46,14 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-button-crit="nailGunCrit">Nail Gun</button>
-          <button class="game__button" data-lock-crit="carbonCopyCrit">Carbon Copy</button>
-          <button class="game__button" data-lock-crit="freshPaintCrit">Fresh Paint</button>
+          <button class="game__button" data-lock-crit="luckyStarCrit">Lucky Star</button>
+          <button class="game__button" data-lock-crit="skeletonKeyCrit">Skeleton Key</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Button Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-button-crit="nailGunCrit">Nail Gun</button>
           <button class="game__button" data-button-crit="linkUpCrit">Link Up</button>
           <button class="game__button" data-button-crit="hotButtonCrit">Hot Button</button>
           <button class="game__button" data-button-crit="gildedCrit">Gilded</button>
@@ -67,6 +67,8 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Lock Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-lock-crit="carbonCopyCrit">Carbon Copy</button>
+          <button class="game__button" data-lock-crit="freshPaintCrit">Fresh Paint</button>
           <button class="game__button" data-lock-crit="hotLapCrit">Hot Lap</button>
           <button class="game__button" data-lock-crit="boltCutterCrit">Bolt Cutter</button>
           <button class="game__button" data-lock-crit="moveInCrit">Move In</button>

@@ -31,6 +31,12 @@ import {
   recruitWorker,
 } from "../../floors/worker";
 import { CONFIG } from "../../config";
+import { armCritUpgrade } from "../floorCrits/upgradeCrit";
+import { addFreeTaps } from "../buttonCrits/buttonBonus";
+import { liveEffect } from "../../shared/detachedJob";
+import { flipUpgradeButton as animateFlip } from "../../floors/upgradeButton";
+
+const flipUpgradeButton = liveEffect(animateFlip);
 
 // where Move In's cats land across the floor they open, 0..1 of its walk
 export const MOVE_IN_SPOTS = [0.15, 0.5, 0.85];
@@ -49,6 +55,8 @@ const OPENS_THEN_REWARDS: readonly LockCritKind[] = [
   "hotLapCrit",
   "carbonCopyCrit",
   "freshPaintCrit",
+  "luckyStarCrit",
+  "skeletonKeyCrit",
 ];
 
 // a lock crit playing out from floor's crit onto the locked floor, if it's in
@@ -113,6 +121,12 @@ export function lockCritPlayFor(
             promoteWorkerPermaTier(opened, i);
             celebrateWorkerBoost(opened, i, now);
           }
+        } else if (kind === "luckyStarCrit") {
+          armCritUpgrade(opened, tier);
+          flipUpgradeButton(opened);
+        } else if (kind === "skeletonKeyCrit") {
+          addFreeTaps(opened, count * 2);
+          flipUpgradeButton(opened);
         } else {
           const spot = MOVE_IN_SPOTS[movedIn++ % MOVE_IN_SPOTS.length];
           const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * spot;

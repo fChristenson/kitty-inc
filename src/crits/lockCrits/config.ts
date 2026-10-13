@@ -46,5 +46,15 @@ export const LOCK_CRIT_CONFIG = {
     freshPaintCrit: {
       chance: 0.03,
     },
+    // a disk of stars spiralling into the locked floor until it opens, a star
+    // arming its button with a sure crit
+    luckyStarCrit: {
+      chance: 0.03,
+    },
+    // dots building a giant key that snaps into the locked floor, opening it
+    // with free taps on its button
+    skeletonKeyCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

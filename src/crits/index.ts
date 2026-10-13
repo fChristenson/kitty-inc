@@ -81,8 +81,9 @@ export {
   triggerCritCelebration,
 } from "./floorCrits";
 export {
-  buttonBonusLabel,
-  hasButtonBonus,
+  buttonFreeLabel,
+  buttonPerkLabel,
+  hasFreeButtonTap,
   takeButtonCharge,
   takeDoubleTap,
   takeFreeTap,

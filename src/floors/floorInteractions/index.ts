@@ -384,15 +384,17 @@ export function paySaleClick(
 }
 
 // what a button crit left on floor's button for a tap that just landed: a
-// second level, its bar's payout into the total, and a level on every
+// second level, its bar's payout into the total and a level on every
 // button linked to it
 function landTapBonuses(
   deps: FloorActionsDeps,
   floor: Floor,
   isGroundFloor: boolean,
 ): void {
-  if (!isFloorMaxed(floor) && takeDoubleTap(floor))
+  if (!isFloorMaxed(floor) && takeDoubleTap(floor)) {
     applyUpgradeTick(floor, isGroundFloor);
+    punchIncomeBar(floor, "+2 Lvl", COLOR.heavenlyGold);
+  }
   if (takePayoutTap(floor)) paySaleClick(floor, isGroundFloor, 1);
   const linked = takeLinkedFloors(floor);
   if (!linked) return;

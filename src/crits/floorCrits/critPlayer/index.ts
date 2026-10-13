@@ -344,6 +344,8 @@ const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
   hotLapCrit: () => import("../../lockCrits/crits/hotLapCrit"),
   carbonCopyCrit: () => import("../../lockCrits/crits/carbonCopyCrit"),
   freshPaintCrit: () => import("../../lockCrits/crits/freshPaintCrit"),
+  luckyStarCrit: () => import("../../lockCrits/crits/luckyStarCrit"),
+  skeletonKeyCrit: () => import("../../lockCrits/crits/skeletonKeyCrit"),
   rapidFireCrit: () => import("../crits/rapidFireCrit"),
   pinballCrit: () => import("../crits/pinballCrit"),
   snowballCrit: () => import("../crits/snowballCrit"),

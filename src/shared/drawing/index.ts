@@ -1,6 +1,6 @@
 // pictures for events, drawn out of dots: the outline or the filled body of
 // a picture (a star, a heart, a coin, a crown, a gem, a cat's head, a
-// lightning bolt), as hundreds of points to land wisps, bullets or glitter
+// lightning bolt, a key), as hundreds of points to land wisps, bullets or glitter
 // on, scaled onto the screen once at arm. Build the dots with shapeOutline
 // or shapeFill, order them with penOrder for a pen wisp to trace them in one
 // stroke, and stamp the ones that have landed with drawDots
@@ -88,6 +88,26 @@ export const SHAPES = {
       { x: 0.6, y: -0.2 },
       { x: 0.05, y: -0.2 },
     ],
+  ],
+  // a ring bow on the left, its shaft out to the right, two teeth under it
+  key: [
+    [
+      ...Array.from({ length: 33 }, (_, k) => {
+        const a = 0.2527 + (k / 32) * (TAU - 2 * 0.2527);
+        return { x: -0.55 + Math.cos(a) * 0.4, y: Math.sin(a) * 0.4 };
+      }),
+      { x: 1, y: -0.1 },
+      { x: 1, y: 0.1 },
+      { x: 0.85, y: 0.1 },
+      { x: 0.85, y: 0.4 },
+      { x: 0.7, y: 0.4 },
+      { x: 0.7, y: 0.1 },
+      { x: 0.55, y: 0.1 },
+      { x: 0.55, y: 0.3 },
+      { x: 0.42, y: 0.3 },
+      { x: 0.42, y: 0.1 },
+    ],
+    ring(0.2, 24).map((p) => ({ x: p.x - 0.55, y: p.y })),
   ],
 } satisfies Record<string, Shape>;
 export type ShapeName = keyof typeof SHAPES;
