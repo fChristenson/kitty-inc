@@ -5,7 +5,6 @@
 // huge blast
 import { COLOR } from "../../../../palette";
 import { BILL_SPIN_FRAME_COUNT } from "../../../../coinBurst";
-import { loadSprite } from "../../../../loadAssets";
 import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import {
@@ -16,7 +15,12 @@ import {
   type Running,
 } from "../../../floorCrits/critPlayer";
 import { holeHash } from "../../../floorCrits/critPlayer/shared";
-import { drawFinale, drawNumberShrink, readoutSpot } from "../shared";
+import {
+  billFrames,
+  drawFinale,
+  drawNumberShrink,
+  readoutSpot,
+} from "../shared";
 
 const BILLS = 30;
 // the stack, this share of the way from the number up to the total, a
@@ -67,20 +71,6 @@ interface Counter {
   slamAt: number;
 }
 const counters = new WeakMap<Running, Counter>();
-// the bill's flutter frames, cut once from the full-size sheet: the coin
-// bursts' own frames are too small for bills this big
-let frames: HTMLCanvasElement[] = [];
-void loadSprite("cashBill").then((sheet) => {
-  const w = Math.round(sheet.naturalWidth / BILL_SPIN_FRAME_COUNT);
-  const h = sheet.naturalHeight;
-  frames = Array.from({ length: BILL_SPIN_FRAME_COUNT }, (_, i) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-    canvas.getContext("2d")!.drawImage(sheet, i * w, 0, w, h, 0, 0, w, h);
-    return canvas;
-  });
-});
 const tilts = Array.from(
   { length: BILLS },
   (_, i) => (holeHash(i, 1601) - 0.5) * 0.3,
@@ -156,6 +146,7 @@ registerFloorCrit("billCounterCrit", {
     }
 
     // the bills, the stack's bottom first, then the ones flicked up
+    const frames = billFrames();
     if (frames.length > 0) {
       const h = BILL * 2;
       const w = (h * frames[0].width) / frames[0].height;

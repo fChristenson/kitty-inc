@@ -39,6 +39,8 @@ More little surprises in what's already on screen, each one only paying.
 
 ## Built
 
+- **Money gun** (`incomeCrits/crits/moneyGunCrit`): income crit; the number splits into two wisp guns under the total firing fans of bills up into it, left, right, quicker and quicker, a muzzle flash, recoil and pop each volley; then both let rip in one blizzard of bills into the huge blast. Test: New Effects "Money Gun Crit".
+
 - **Lotto drum** (`animatedCrits/events/lottoDrumEvent`): animated crit; wisps pour from the clicked button into a glitter drum and tumble; one by one, quicker each, the drum rattles and a wisp is drawn out of its top onto a bar with levels; then the drum bursts and the rest pour onto the clicked bar, a crit tier up. Test: New Effects "Lotto Drum".
 
 - **Bill counter** (`incomeCrits/crits/billCounterCrit`): income crit; the number bursts into a stack of bills that riffle up into the total one by one like a money counter, faster and faster, the last handful together into the finale. Test: New Effects "Bill Counter Crit".
@@ -49,7 +51,7 @@ More little surprises in what's already on screen, each one only paying.
 
 - **Pick me** (`spawn/pickMe`): gesture spawn; x3, x7 and x10 pop up over a bar, wisps fly in and cover them, then shuffle like cups, quicker and quicker; the tapped wisp bursts on its number, which drops onto the bar as that many levels, the other two showing theirs. Test: Random Spawns "Spawn Pick Me".
 
-- **Badge lights** (`shared/badgeLights` `drawBadgeLights`): the lights behind the badge crit flash and the pacman badge; the gold shimmer rays in a light gold, swaying.
+- **Light rays** (`shared/lightRays` `drawLightRays`): the game's one set of light rays, Overtime's, behind stream targets, end slams, the badge crit flash, the pacman badge and Pick me's number; one gold, one spin speed.
 
 - **Collect** (`floorCrits/crits/collectCrit`): floor crit; a hail of gold orbs onto every bar, then a collector wisp snakes up the bars bottom to top taking them all (levels per pickup) and dives onto its own bar. Test: New Effects "Collect Crit".
 

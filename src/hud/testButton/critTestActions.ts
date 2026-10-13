@@ -46,13 +46,13 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-lotto-drum-event" class="game__button">Lotto Drum</button>
-          <button class="game__button" data-income-crit="billCounterCrit">Bill Counter Crit</button>
+          <button class="game__button" data-income-crit="moneyGunCrit">Money Gun Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Animated Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-lotto-drum-event" class="game__button">Lotto Drum</button>
           <button id="test-prize-wheel-event" class="game__button">Prize Wheel</button>
           <button id="test-mystery-stacks-event" class="game__button">Mystery Stacks</button>
           <button id="test-third-scatter-event" class="game__button">Third Scatter</button>
@@ -1329,6 +1329,7 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Income Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-income-crit="billCounterCrit">Bill Counter Crit</button>
           <button class="game__button" data-income-crit="windfallCrit">Windfall Crit</button>
           <button class="game__button" data-income-crit="bulletHoseCrit">Bullet Hose Crit</button>
           <button class="game__button" data-income-crit="boltMagnetCrit">Bolt Magnet Crit</button>

@@ -1,4 +1,6 @@
 // helpers more than one income crit plays with
+import { BILL_SPIN_FRAME_COUNT } from "../../../coinBurst";
+import { loadSprite } from "../../../loadAssets";
 import { drawDetonation } from "../../../shared/explosion";
 import {
   drawText,
@@ -9,6 +11,22 @@ import { holeHash } from "../../floorCrits/critPlayer/shared";
 
 const SHRINK_MS = 100;
 const SHRINK = 0.6;
+
+// the bill's flutter frames, cut once from the full-size sheet (the coin
+// bursts' own frames are too small for big bills); empty until it loads
+const frames: HTMLCanvasElement[] = [];
+void loadSprite("cashBill").then((sheet) => {
+  const w = Math.round(sheet.naturalWidth / BILL_SPIN_FRAME_COUNT);
+  const h = sheet.naturalHeight;
+  for (let i = 0; i < BILL_SPIN_FRAME_COUNT; i++) {
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    canvas.getContext("2d")!.drawImage(sheet, i * w, 0, w, h, 0, 0, w, h);
+    frames.push(canvas);
+  }
+});
+export const billFrames = (): readonly HTMLCanvasElement[] => frames;
 
 // the number shrinking away at the flash's spot as it turns into wisps
 export function drawNumberShrink(

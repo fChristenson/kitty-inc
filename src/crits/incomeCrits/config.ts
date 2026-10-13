@@ -114,5 +114,9 @@ export const INCOME_CRIT_CONFIG = {
     billCounterCrit: {
       chance: 0.03,
     },
+    // two wisp guns firing fans of bills up into the total
+    moneyGunCrit: {
+      chance: 0.03,
+    },
   },
 };
