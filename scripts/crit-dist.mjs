@@ -88,6 +88,7 @@ const BASE_STYLES = [
   "summon",
   "snowball",
   "ripple",
+  "assemble",
   "experiment",
   ...WORLDS,
 ];

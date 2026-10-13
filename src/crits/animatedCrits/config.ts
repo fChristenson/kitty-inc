@@ -8267,6 +8267,16 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 100
+  // assemble, perma tiers: src/crits/animatedCrits/events/starPiecesEvent ("Star Pieces"): ten pieces of a giant gold star fly in turning and lock together one by one, quicker and quicker; it blazes and flies apart, every piece diving onto a worker, a perma tier up
+  starPiecesEvent: {
+    chance: 0.01,
+    assembleMs: 1250, // from the click till the last piece locks in
+    diveMs: 300, // from the blaze till the first dive lands
+    diveGapMs: 55, // between the dives landing
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 99
   // magnet, hires: src/crits/animatedCrits/events/lodestonesEvent ("Lodestones"): two gold poles light up on the frozen screen and the glitter all over it snaps onto them into spiky crusts, quicker and quicker; they yank together and slam, then repel, wisps flung off onto every empty spot in view, each a new worker
   lodestonesEvent: {

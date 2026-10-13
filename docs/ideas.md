@@ -86,6 +86,10 @@ New animation styles, each with its own verb and lib in `shared/animationStyles`
 
 ## Built
 
+- **Assemble** animation style and **Star Pieces** (animated crit, perma tiers, batch 100), from List 198. Test: New Effects.
+  - `shared/animationStyles/assemble`: `fanPieces`, `planAssemble`, `drawAssembly`.
+  - **Star Pieces** (`animatedCrits/events/starPiecesEvent`): ten pieces of a giant gold star fly in turning and lock in one by one, quicker and quicker; it blazes and flies apart, every piece diving onto a worker that can still climb, a perma tier up.
+
 - **Summon**, **Snowball** and **Ripple** animation styles with **Conjure** (lock crit), **Sticky Ball** (income crit) and **Raindrops** (floor crit), from List 197. Test: New Effects.
   - `shared/animationStyles/summon`: `planSummon`, `summonTurn`, `drawSummon`, `drawSummonPillar`.
   - `shared/animationStyles/snowball`: `planSnowball`, `rollAt`, `stuckAt`, `snowballRadius`, `drawSnowball`.

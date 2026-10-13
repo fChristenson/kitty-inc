@@ -2329,6 +2329,7 @@ async function main() {
           "kick-in": forceOnActive((e) => e.forceKickInEvent),
           springboard: forceOnActive((e) => e.forceSpringboardEvent),
           lodestones: forceOnActive((e) => e.forceLodestonesEvent),
+          "star-pieces": forceOnActive((e) => e.forceStarPiecesEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {
