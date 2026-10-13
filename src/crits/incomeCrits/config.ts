@@ -122,5 +122,10 @@ export const INCOME_CRIT_CONFIG = {
     coinSpinCrit: {
       chance: 0.03,
     },
+    // a wisp ball rolling along a band of glitter under the total, picking
+    // it all up, then rolling up into the readout
+    stickyBallCrit: {
+      chance: 0.03,
+    },
   },
 };

@@ -349,6 +349,11 @@ export const FLOOR_CRIT_CONFIG = {
     gatherCrit: {
       chance: 0.03,
     },
+    // drops of light splashing onto the bars, rings rippling along them,
+    // quickening to a downpour, then a huge drop onto its own
+    raindropsCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

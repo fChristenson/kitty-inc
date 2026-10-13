@@ -1826,6 +1826,10 @@ function floorCritLevels(
   if (kind === "collectCrit") return step === 2 ? count : Math.ceil(count / 3);
   // a gather rips about three sparks off each bar; its run lands on its own
   if (kind === "gatherCrit") return step ? 0 : Math.ceil(count / 3);
+  // raindrops splash about seven drops onto each bar; the huge one onto its
+  // own lands half
+  if (kind === "raindropsCrit")
+    return step ? Math.ceil(count / 2) : Math.ceil(count / 7);
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it
   if (kind === "saberCrit" || kind === "freezeRayCrit")
     return Math.ceil(count / 2);

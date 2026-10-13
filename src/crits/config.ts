@@ -45,6 +45,8 @@ export const CRIT_CONFIG = {
     // Jump Start's payout from the floor it opens, in full payouts per the
     // crit's multiple
     jumpStartPayouts: 1,
+    // Conjure's cash: the price of the floor it opens, times this
+    conjurePriceBack: 1,
     // Overclock: a bar this many times as fast for overclockMs
     overclockSpeed: 2,
     overclockMs: 30_000,

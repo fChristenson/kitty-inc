@@ -67,6 +67,7 @@ const OPENS_THEN_REWARDS: readonly LockCritKind[] = [
   "luckyStarCrit",
   "skeletonKeyCrit",
   "jumpStartCrit",
+  "conjureCrit",
 ];
 
 // a lock crit playing out from floor's crit onto the locked floor, if it's in
@@ -100,6 +101,8 @@ export function lockCritPlayFor(
     : spot;
   const opensThenRewards = OPENS_THEN_REWARDS.includes(kind);
   let opened: Floor | null = null;
+  // what the floor it opened would have cost
+  let price: Floor["unlockCost"] | null = null;
   let movedIn = 0;
   let furnished = 0;
   return {
@@ -145,6 +148,15 @@ export function lockCritPlayFor(
             onEachArrive: pulseHudTotalFlash,
           });
           punchIncomeBar(opened, `x${payouts} Payout`, color);
+        } else if (kind === "conjureCrit") {
+          if (price) {
+            addTotalIncome(multiply(price, CONFIG.crit.conjurePriceBack));
+            const bar = getIncomeBarCenter(false);
+            spawnHomingCoinBurst(opened, bar.x, bar.y, {
+              onEachArrive: pulseHudTotalFlash,
+            });
+            punchIncomeBar(opened, "Price Back", color);
+          }
         } else {
           const spot = MOVE_IN_SPOTS[movedIn++ % MOVE_IN_SPOTS.length];
           const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * spot;
@@ -170,6 +182,7 @@ export function lockCritPlayFor(
           target.critMultiplierTier,
           tier,
         );
+      price = target.unlockCost;
       unlockFree(target);
       opened = target;
     },

@@ -47,6 +47,9 @@ export function createTestButtonMarkup(): string {
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
           <button id="test-lodestones-event" class="game__button">Lodestones</button>
+          <button class="game__button" data-floor-crit="raindropsCrit">Raindrops</button>
+          <button class="game__button" data-income-crit="stickyBallCrit">Sticky Ball</button>
+          <button class="game__button" data-lock-crit="conjureCrit">Conjure</button>
           <button id="test-night-train-event" class="game__button">Night Train</button>
           <button id="test-kick-in-event" class="game__button">Kick In</button>
           <button id="test-springboard-event" class="game__button">Springboard</button>

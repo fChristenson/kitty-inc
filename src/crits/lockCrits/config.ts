@@ -61,5 +61,10 @@ export const LOCK_CRIT_CONFIG = {
     jumpStartCrit: {
       chance: 0.03,
     },
+    // a magic circle drawn on the locked floor, turning faster and faster
+    // until a pillar of light erupts and it opens, its price paid back
+    conjureCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

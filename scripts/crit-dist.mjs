@@ -85,6 +85,9 @@ const BASE_STYLES = [
   "portal",
   "slice",
   "magnet",
+  "summon",
+  "snowball",
+  "ripple",
   "experiment",
   ...WORLDS,
 ];

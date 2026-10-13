@@ -90,6 +90,7 @@ export const PLAYED_STYLES = {
   moneyWeatherCrit: "money",
   collectCrit: "wisp",
   gatherCrit: "charge",
+  raindropsCrit: "ripple",
   // income crits
   windfallCrit: "explosion",
   bulletHoseCrit: "gunfire",
@@ -120,6 +121,7 @@ export const PLAYED_STYLES = {
   billCounterCrit: "money",
   moneyGunCrit: "money",
   coinSpinCrit: "charge",
+  stickyBallCrit: "snowball",
   // button crits
   sureShotCrit: "wisp",
   autopressCrit: "wisp",
@@ -143,6 +145,7 @@ export const PLAYED_STYLES = {
   luckyStarCrit: "galaxy",
   skeletonKeyCrit: "drawing",
   jumpStartCrit: "charge",
+  conjureCrit: "summon",
   // rate crits
   overclockCrit: "lightning",
   shiftUpCrit: "race",

@@ -86,6 +86,14 @@ New animation styles, each with its own verb and lib in `shared/animationStyles`
 
 ## Built
 
+- **Summon**, **Snowball** and **Ripple** animation styles with **Conjure** (lock crit), **Sticky Ball** (income crit) and **Raindrops** (floor crit), from List 197. Test: New Effects.
+  - `shared/animationStyles/summon`: `planSummon`, `summonTurn`, `drawSummon`, `drawSummonPillar`.
+  - `shared/animationStyles/snowball`: `planSnowball`, `rollAt`, `stuckAt`, `snowballRadius`, `drawSnowball`.
+  - `shared/animationStyles/ripple`: `rainTimes`, `drawDrop`, `drawRipple`, `drawSplash`.
+  - **Conjure** (`lockCrits/crits/conjureCrit`): a magic circle drawn on the locked floor turns faster and faster until a pillar of light erupts; the floor opens free and its price pays back as cash (`CONFIG.crit.conjurePriceBack`). Not the pitched crit tier: Lockpick already opens at the crit's tier.
+  - **Sticky Ball** (`incomeCrits/crits/stickyBallCrit`): a wisp ball rolls three lanes of glitter under the total, picking it up, then rolls into the readout, a share a blast.
+  - **Raindrops** (`floorCrits/crits/raindropsCrit`): drops splash onto the bars with rings, levels on each, quickening to a downpour, then a huge drop onto its own bar.
+
 - **Magnet** animation style and **Lodestones** (animated crit, hires, batch 99), from List 196. Test: New Effects.
   - `shared/animationStyles/magnet`: `planSnaps`, `snapAt`, `flingAt`, `drawFieldLines`.
   - **Lodestones** (`animatedCrits/events/lodestonesEvent`): two gold poles snap the glitter all over the frozen screen into spiky crusts, quicker and quicker; they yank together and slam, then repel, wisps flung off onto every empty spot in view, each a new worker.
