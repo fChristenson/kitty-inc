@@ -24,7 +24,7 @@ import {
   hops,
   type Bounce,
   type BouncePath,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 
 const KEY = "hackySack";

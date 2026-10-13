@@ -21,7 +21,7 @@ import {
   drawDetonation,
   drawLitFuse,
   DETONATION_MS,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 import { findRewardWorkers } from "../../eventRewards";
 
 const KEY = "torpedoes";

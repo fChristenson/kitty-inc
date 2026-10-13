@@ -19,9 +19,9 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { ringTargets } from "../../../../shared/coinTargets";
-import { fireBullet } from "../../../../shared/bullets";
+import { fireBullet } from "../../../../shared/animationStyles/bullets";
 
 const KEY = "bombCarousel";
 const REWARD = 4;

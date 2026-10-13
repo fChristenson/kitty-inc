@@ -3,8 +3,8 @@
 // onto a bar in a run of blasts, quicker and quicker; then it hurls one fat
 // beam of flare straight down onto its own bar and a huge blast
 import { COLOR } from "../../../../palette";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";

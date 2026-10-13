@@ -15,7 +15,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { alongRoute } from "../../../../shared/curves";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { measure, pointAlong, sampleLine, totalSpot } from "../../cashFlow";
 import type { Point } from "../../../../shared/wisp";
 

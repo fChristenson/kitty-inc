@@ -4,7 +4,7 @@
 // flashing harder, until the well bursts and flings the bars back out, each
 // slamming onto its floor in a rattle of blasts, its own bar last and hardest
 import { COLOR } from "../../../../palette";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { smoothstep } from "../../../../shared/easing";
 import { drawGlow } from "../../../../shared/glowSprite";

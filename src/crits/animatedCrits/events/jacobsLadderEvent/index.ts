@@ -12,8 +12,8 @@ import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
-import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { createBolt, drawBolt, drawStrike } from "../../../../shared/animationStyles/lightning";
 import {
   drawWispBetween,
   WISP_SIZE,

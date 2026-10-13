@@ -20,7 +20,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOutBack, lerp } from "../../../../shared/easing";
 import { sprayTargets } from "../../../../shared/coinTargets";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import {
   pourDurationMs,
   pourLine,

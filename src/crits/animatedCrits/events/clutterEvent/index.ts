@@ -20,7 +20,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { bezier } from "../../../../shared/curves";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   BLOW_UP,
   drawBroom,
@@ -32,7 +32,7 @@ import {
   sweepLane,
   SWEEP_DEPTH,
   type BroomState,
-} from "../../../../shared/clutter";
+} from "../../../../shared/animationStyles/clutter";
 import { totalSpot } from "../../cashFlow";
 
 const KEY = "clutter";

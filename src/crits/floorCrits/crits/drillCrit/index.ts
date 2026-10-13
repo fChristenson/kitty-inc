@@ -1,8 +1,8 @@
 // the drill floor crit: the number spins into a drill and bores straight down
 // through every bar in view, stalling and grinding on each in a gush of
 // sparks before punching through
-import { drawDrillHead, drawDrillSpray } from "../../../../shared/drill";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDrillHead, drawDrillSpray } from "../../../../shared/animationStyles/drill";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import { smoothstep } from "../../../../shared/easing";
 import {

@@ -4,8 +4,8 @@
 // bar down, quicker each time; then it whips it once round the hand and fires
 // it straight down into its own bar in a huge blast
 import { COLOR } from "../../../../palette";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";

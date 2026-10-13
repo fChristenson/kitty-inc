@@ -18,7 +18,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { createBeats } from "../../../../shared/eventBeats";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";

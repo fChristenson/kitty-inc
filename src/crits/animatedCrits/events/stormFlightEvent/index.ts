@@ -8,7 +8,7 @@ import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playCritExplosion,
   playExplosion,
@@ -18,7 +18,7 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { hash01 } from "../../../../shared/twinkle";
 import { lerp } from "../../../../shared/easing";

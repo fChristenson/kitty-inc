@@ -19,7 +19,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { clampTargetsY, ringTargets } from "../../../../shared/coinTargets";
 import {

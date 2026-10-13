@@ -24,7 +24,7 @@ import {
 } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { bezier } from "../../../../shared/curves";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { totalSpot } from "../../cashFlow";
 
 const KEY = "parting";

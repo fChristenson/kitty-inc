@@ -1,5 +1,5 @@
 // the "Bullet Cancel" event (shmup; cash), a flight-stage event (see
-// ../../flightStage) with its own way in, on the Shmup look (shared/shmup):
+// ../../flightStage) with its own way in, on the Shmup look (shared/animationStyles/shmup):
 // its crit's click lifts the view high off the floors into space and a boss
 // core at the top spins up a bullet curtain, spirals and rings thickening
 // till the screen is a storm of hundreds of bullets, the ship weaving
@@ -18,7 +18,7 @@ import {
   fireBullet,
   type Box,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import {
   beginCoinBatch,
   drawCoinBurstFrame,
@@ -32,7 +32,7 @@ import {
   lerp,
   smoothstep,
 } from "../../../../shared/easing";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playCritExplosion,
   playExplosion,
@@ -41,7 +41,7 @@ import {
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawScreenPart } from "../../../../shared/screenCopy";
-import { drawStarfield } from "../../../../shared/shmup";
+import { drawStarfield } from "../../../../shared/animationStyles/shmup";
 import { pulseHudTotalFlash } from "../../../../shared/totalIncomeCoins";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";

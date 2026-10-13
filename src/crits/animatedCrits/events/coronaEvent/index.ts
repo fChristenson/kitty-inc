@@ -24,7 +24,7 @@ import {
   easeOutCubic,
   lerp,
 } from "../../../../shared/easing";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { createBeats } from "../../../../shared/eventBeats";
 import { sprayTargets } from "../../../../shared/coinTargets";
 import { hash01 } from "../../../../shared/twinkle";

@@ -3,9 +3,9 @@
 // streak and a big blast on a bar in view; the cylinder spins and it fans six
 // more, the last into its own bar with a huge blast
 import { COLOR } from "../../../../palette";
-import { drawBeam } from "../../../../shared/beam";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";

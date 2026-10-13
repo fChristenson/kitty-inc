@@ -3,9 +3,9 @@
 // length, braking hard into the hairpins at its ends; they cross the line,
 // the floor bursts open, and three wisps drop in onto its chairs, supplies
 // and manager
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { smoothstep } from "../../../../shared/easing";
-import { planRace, type RaceCorner } from "../../../../shared/race";
+import { planRace, type RaceCorner } from "../../../../shared/animationStyles/race";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { playSwoosh } from "../../../../sound";
 import {

@@ -10,7 +10,7 @@ import {
   endCoinBatch,
   type CoinBurstSprite,
 } from "../../../../coinBurst";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

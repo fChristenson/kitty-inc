@@ -21,13 +21,13 @@ import {
   DETONATION_MS,
   drawDetonation,
   drawLitFuse,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

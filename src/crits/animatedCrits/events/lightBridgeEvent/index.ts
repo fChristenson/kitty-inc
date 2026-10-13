@@ -17,7 +17,7 @@ import {
 } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { createBeats } from "../../../../shared/eventBeats";
 import { bezier } from "../../../../shared/curves";
 import {

@@ -11,7 +11,7 @@ import { getIncomeBarBox } from "../../floors";
 import type { Floor } from "../../gameState";
 import { playSpawnNotice, playJackpot, playSwoosh } from "../../sound";
 import { clamp01 } from "../../shared/easing";
-import { drawDetonation } from "../../shared/explosion";
+import { drawDetonation } from "../../shared/animationStyles/explosion";
 import { playBarExplosion, playExplosion } from "../../shared/explosionBang";
 import { beginLightBatch, endLightBatch } from "../../shared/lightBatch";
 import {
@@ -19,8 +19,8 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../shared/lightning";
-import { drawLightningArc } from "../../shared/lightningArc";
+} from "../../shared/animationStyles/lightning";
+import { drawLightningArc } from "../../shared/animationStyles/lightningArc";
 import { shakeScreen } from "../../shared/screenShake";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { isSpawnGone, spawnFade } from "../../shared/spawnFade";

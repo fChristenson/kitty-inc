@@ -14,7 +14,7 @@ import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOutBack, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import type { Point } from "../../../../shared/wisp";
 import { levelsFor } from "../../../../gameState";

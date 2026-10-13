@@ -25,7 +25,7 @@ import {
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 

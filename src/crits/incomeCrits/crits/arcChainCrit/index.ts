@@ -2,13 +2,13 @@
 // air; a bolt chains from coin to coin, each coin it hits firing a bolt up
 // into the total, quicker and quicker; the last fires one giant bolt into
 // the middle
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   createBolt,
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import {
   beginCoinBatch,
   drawCoinBurstFrame,

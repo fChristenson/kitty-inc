@@ -18,8 +18,8 @@ import {
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
-import { drawSprayCoat } from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/bullets";
+import { drawSprayCoat } from "../../../../shared/animationStyles/spray";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

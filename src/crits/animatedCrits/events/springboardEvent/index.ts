@@ -1,6 +1,6 @@
 // the "Springboard" event (fps; free levels), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps: its crit's click bows the floors' screen like a trampoline and
+// shared/animationStyles/fps: its crit's click bows the floors' screen like a trampoline and
 // flings the view up an atrium; it bounces higher and higher, the balconies
 // dropping past, and at the top of every bounce a guard at a rail is dropped,
 // a big imp on the highest taking two. The last bounce flies it through a lit
@@ -34,7 +34,7 @@ import {
   type FpsEnemyLook,
   type FpsLens,
   type FpsShot,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp } from "../../../../shared/easing";

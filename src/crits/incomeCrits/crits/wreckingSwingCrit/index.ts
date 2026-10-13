@@ -2,8 +2,8 @@
 // chain of light hung from above the total, swinging through the readout end
 // to end and smashing a trail of blasts across it every pass, wider and
 // faster; the last pass snaps the chain and the ball slams into the middle
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
-import { drawBeam } from "../../../../shared/beam";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { smoothstep } from "../../../../shared/easing";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

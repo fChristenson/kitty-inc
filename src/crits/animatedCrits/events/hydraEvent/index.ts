@@ -21,14 +21,14 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { bezier } from "../../../../shared/curves";
 import { clamp01, easeIn, easeOutBack } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/bullets";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawRewardHires,
   findRewardHires,

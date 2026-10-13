@@ -15,7 +15,7 @@ import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
+import { createBolt, drawBolt, drawStrike } from "../../../../shared/animationStyles/lightning";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

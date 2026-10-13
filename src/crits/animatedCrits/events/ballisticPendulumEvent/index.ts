@@ -18,13 +18,13 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawAimLaser, drawBeam } from "../../../../shared/beam";
+import { drawAimLaser, drawBeam } from "../../../../shared/animationStyles/beam";
 import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 
 const KEY = "ballisticPendulum";

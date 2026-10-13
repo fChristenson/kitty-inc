@@ -20,7 +20,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { findRewardBars } from "../../eventRewards";
 
 const KEY = "pinballBomb";

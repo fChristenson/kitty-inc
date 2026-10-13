@@ -27,7 +27,7 @@ import {
   drawDetonation,
   drawLitFuse,
   DETONATION_MS,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 
 const KEY = "seismicCharges";
 const REWARD = 4;

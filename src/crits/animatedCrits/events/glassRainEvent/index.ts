@@ -12,7 +12,7 @@ import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeamFlare } from "../../../../shared/beam";
+import { drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import {
   copyPane,
   createPane,

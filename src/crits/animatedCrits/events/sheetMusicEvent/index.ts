@@ -18,7 +18,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { ringTargets } from "../../../../shared/coinTargets";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 
 const KEY = "sheetMusic";
 const REWARD = 4;

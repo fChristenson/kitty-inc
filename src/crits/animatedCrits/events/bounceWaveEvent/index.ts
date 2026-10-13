@@ -15,7 +15,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { bezier } from "../../../../shared/curves";
-import { drawBounceSplash, type Bounce } from "../../../../shared/bounce";
+import { drawBounceSplash, type Bounce } from "../../../../shared/animationStyles/bounce";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 
 const KEY = "bounceWave";

@@ -19,7 +19,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { bezier } from "../../../../shared/curves";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
 
 const KEY = "pursuit";

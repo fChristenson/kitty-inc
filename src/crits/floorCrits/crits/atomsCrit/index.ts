@@ -4,7 +4,7 @@
 // glow, then every electron collapses into its bar and the bars go off one
 // after another from the top in runs of blasts, its own bar last and biggest
 import { COLOR } from "../../../../palette";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";

@@ -1,6 +1,6 @@
 // the lightning floor crit: a bolt cracking down from the sky, chaining through the bars
-import { createBolt, drawBolt } from "../../../../shared/lightning";
-import { drawDetonation } from "../../../../shared/explosion";
+import { createBolt, drawBolt } from "../../../../shared/animationStyles/lightning";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   registerFloorCrit,
   type Point,

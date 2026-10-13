@@ -1,6 +1,6 @@
 // the "Doom" event (fps; perma tier), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps like an old shooter: its crit's click raises the floors' screen
+// shared/animationStyles/fps like an old shooter: its crit's click raises the floors' screen
 // like a shutter onto a dark corridor, the player's pistol comes
 // up and the view marches down it, blasting the one-eyed demon heads that
 // float at it one after another, the last a big one taking two shots. The
@@ -11,7 +11,7 @@ import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playCritExplosion,
   playExplosion,
@@ -32,7 +32,7 @@ import {
   type FpsHeadLook,
   type FpsLens,
   type FpsScreen,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { hash01 } from "../../../../shared/twinkle";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";

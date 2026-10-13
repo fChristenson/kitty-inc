@@ -22,7 +22,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { bezier } from "../../../../shared/curves";
 import { clamp01, easeOut } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

@@ -22,7 +22,7 @@ import { bezier } from "../../../../shared/curves";
 import { clamp01, easeIn, easeOutBack, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { planDisk, scatterDisk } from "../../../../shared/galaxy";
+import { planDisk, scatterDisk } from "../../../../shared/animationStyles/galaxy";
 import {
   drawRewardHires,
   findRewardHires,

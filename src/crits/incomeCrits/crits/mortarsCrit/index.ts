@@ -2,8 +2,8 @@
 // of mortar tubes along the bottom of the screen; they thump shells up off
 // the top of the screen, quicker and quicker, each dropping back down onto
 // the total; then all five fire at once and the volley comes down
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { smoothstep } from "../../../../shared/easing";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

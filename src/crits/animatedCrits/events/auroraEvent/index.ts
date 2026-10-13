@@ -11,7 +11,7 @@ import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { createBeats } from "../../../../shared/eventBeats";
 import { findRewardBars } from "../../eventRewards";
 

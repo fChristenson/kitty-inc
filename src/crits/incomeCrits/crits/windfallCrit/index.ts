@@ -1,6 +1,6 @@
 // the windfall income crit: its number rocketing up into the total, a cluster
 // of blasts rattling across the readout, capped by a huge one
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   registerFloorCrit,
   FLOOR_CRIT_FONT,

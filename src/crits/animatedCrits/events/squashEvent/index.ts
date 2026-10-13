@@ -24,7 +24,7 @@ import {
   ricochetThrough,
   type Bounce,
   type BouncePath,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 
 const KEY = "squash";

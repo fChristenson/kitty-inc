@@ -11,7 +11,7 @@ import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { scatterEvenly } from "../../../../shared/clutter";
+import { scatterEvenly } from "../../../../shared/animationStyles/clutter";
 import type { CoinPath } from "../../../../floors/coins";
 import { totalSpot } from "../../cashFlow";
 

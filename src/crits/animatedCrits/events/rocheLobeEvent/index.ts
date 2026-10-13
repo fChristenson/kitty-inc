@@ -18,7 +18,7 @@ import { clamp01, easeIn, easeOutBack, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { ringTargets } from "../../../../shared/coinTargets";
-import { planDisk, scatterDisk, type Orbit } from "../../../../shared/galaxy";
+import { planDisk, scatterDisk, type Orbit } from "../../../../shared/animationStyles/galaxy";
 import { totalSpot } from "../../cashFlow";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

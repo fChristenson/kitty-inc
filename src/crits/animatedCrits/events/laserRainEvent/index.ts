@@ -12,7 +12,7 @@ import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { createBeats } from "../../../../shared/eventBeats";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";

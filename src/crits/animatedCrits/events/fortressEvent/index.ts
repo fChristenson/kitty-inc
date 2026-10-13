@@ -1,5 +1,5 @@
 // the "Fortress" event (shmup; cash), a flight-stage event (see
-// ../../flightStage) with its own way in, on the Shmup look (shared/shmup):
+// ../../flightStage) with its own way in, on the Shmup look (shared/animationStyles/shmup):
 // its crit's click lifts the view high off the floors into space, where a
 // fortress core hangs at the top of the screen inside three rings of shield
 // wisps turning opposite ways, firing rings of bullets; the ship weaves
@@ -19,7 +19,7 @@ import {
   drawBullets,
   type Box,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { createBeats, type Beats } from "../../../../shared/eventBeats";
 import {
   clamp01,
@@ -29,14 +29,14 @@ import {
   lerp,
   smoothstep,
 } from "../../../../shared/easing";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playExplosion,
   playSlamExplosion,
 } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawScreenPart } from "../../../../shared/screenCopy";
-import { drawStarfield } from "../../../../shared/shmup";
+import { drawStarfield } from "../../../../shared/animationStyles/shmup";
 import { pulseHudTotalFlash } from "../../../../shared/totalIncomeCoins";
 import {
   drawWisp,

@@ -22,7 +22,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { planRace, type RaceCorner } from "../../../../shared/race";
+import { planRace, type RaceCorner } from "../../../../shared/animationStyles/race";
 import { hash01 } from "../../../../shared/twinkle";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 

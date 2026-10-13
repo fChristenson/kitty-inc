@@ -14,13 +14,13 @@ import { WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeamFlare } from "../../../../shared/beam";
+import { drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 
 const KEY = "tightGroup";

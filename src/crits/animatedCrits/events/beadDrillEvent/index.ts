@@ -15,7 +15,7 @@ import { drawWispHead, WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDrill, planDrill, type Drill } from "../../../../shared/drill";
+import { drawDrill, planDrill, type Drill } from "../../../../shared/animationStyles/drill";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
 

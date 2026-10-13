@@ -20,13 +20,13 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { easeOut, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawAimLaser } from "../../../../shared/beam";
+import { drawAimLaser } from "../../../../shared/animationStyles/beam";
 import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
-} from "../../../../shared/bullets";
-import { drawDetonation, DETONATION_MS } from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/bullets";
+import { drawDetonation, DETONATION_MS } from "../../../../shared/animationStyles/explosion";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
 

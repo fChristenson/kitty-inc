@@ -1,6 +1,6 @@
 // the "Arena" event (fps; levels), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps: its crit's click dives the view through the floors' screen into
+// shared/animationStyles/fps: its crit's click dives the view through the floors' screen into
 // a walled pit under the night sky. Imps teleport in on glowing pads one
 // after another, each in a pillar of light, the view strafing side to side as
 // the pistol drops them, every kill shooting a gold wisp up off the screen;
@@ -11,8 +11,8 @@ import { levelsFor, type Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playCritExplosion,
   playExplosion,
@@ -35,7 +35,7 @@ import {
   type FpsEnemyLook,
   type FpsLens,
   type FpsShot,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, smoothstep } from "../../../../shared/easing";
 import { stampGlimmer } from "../../../../shared/twinkle";

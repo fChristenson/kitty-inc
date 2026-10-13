@@ -1,8 +1,8 @@
 // the tractor beam floor crit: the number rises into a wisp over the bars,
 // whose wide beam hauls every bar in view up off its floor, holds them
 // shaking, then cuts out so they all crash back down at once
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import { smoothstep } from "../../../../shared/easing";

@@ -9,7 +9,7 @@ import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { drawScreenPart, type ScreenCopy } from "../../../../shared/screenCopy";

@@ -18,9 +18,9 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { bezier } from "../../../../shared/curves";
 import { lerp } from "../../../../shared/easing";
-import { planRace } from "../../../../shared/race";
+import { planRace } from "../../../../shared/animationStyles/race";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { measure, totalSpot } from "../../cashFlow";
 import { findRewardBars } from "../../eventRewards";
 

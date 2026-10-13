@@ -1,6 +1,6 @@
 // the "Overtake" event (road race; crit tiers), a flight-stage event (see
-// ../../flightStage) with its own way in, drawn with shared/race's street and
-// racer wisps in shared/fps's world: its crit's click zooms the floors away into a
+// ../../flightStage) with its own way in, drawn with shared/animationStyles/race's street and
+// racer wisps in shared/animationStyles/fps's world: its crit's click zooms the floors away into a
 // street race already flat out, three rival wisps strung out ahead. The racer
 // tucks in behind each one, white slipstream streaming off its tail, then
 // slingshots out and past with a jolt, the rival dropping back, quicker each
@@ -15,8 +15,8 @@ import {
   playCritExplosion,
   playExplosion,
 } from "../../../../shared/explosionBang";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawFpsGround,
   drawFpsSky,
@@ -25,7 +25,7 @@ import {
   type FpsCamera,
   type FpsLens,
   type FpsScreen,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import {
   createRaceWisp,
   drawFinishGate,
@@ -33,7 +33,7 @@ import {
   roadBend,
   ROAD_STREET,
   type RoadCurve,
-} from "../../../../shared/race";
+} from "../../../../shared/animationStyles/race";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { hash01, stampGlimmer } from "../../../../shared/twinkle";

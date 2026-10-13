@@ -22,7 +22,7 @@ import {
   scatterArms,
   type Disk,
   type Orbit,
-} from "../../../../shared/galaxy";
+} from "../../../../shared/animationStyles/galaxy";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

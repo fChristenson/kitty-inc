@@ -14,13 +14,13 @@ import { WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import {
   drawGrind,
   planDrill,
   planGrind,
   type Grind,
-} from "../../../../shared/drill";
+} from "../../../../shared/animationStyles/drill";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 
 const KEY = "kebab";

@@ -24,14 +24,14 @@ import {
   type StageRect,
 } from "../../revealStage";
 import { findRewardBars } from "../../eventRewards";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { bezier } from "../../../../shared/curves";
 import { clamp01, lerp } from "../../../../shared/easing";
 import {
   drawIncomePanel,
   getIncomeBarBox,
 } from "../../../../floors/incomePanel";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playBarExplosion,
   playSlamExplosion,

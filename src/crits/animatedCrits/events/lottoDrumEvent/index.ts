@@ -10,7 +10,7 @@ import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSpinTick } from "../../../../sound";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 import { shakeScreen } from "../../../../shared/screenShake";

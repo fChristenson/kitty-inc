@@ -2,8 +2,8 @@
 // middle firing shots that bank off the screen's sides once, twice or three
 // times, zigzagging up onto the total, quicker and quicker, a pop on every
 // wall; then one fat shot straight up the middle for the huge blast
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { smoothstep } from "../../../../shared/easing";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

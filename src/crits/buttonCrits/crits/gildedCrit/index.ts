@@ -2,7 +2,7 @@
 // button to button, hissing gold mist over each, quicker each, until its coat
 // flashes and it flips over gilded, each tap of it then paying its bar's
 // payout too; the crit's own last in the biggest blast
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {
   drawSpray,
@@ -10,7 +10,7 @@ import {
   drawSprayMist,
   planSpray,
   type Spray,
-} from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/spray";
 import { BTN_H, BTN_W } from "../../../../floors/upgradeButton";
 import {
   registerFloorCrit,

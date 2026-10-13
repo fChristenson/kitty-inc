@@ -17,13 +17,13 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   createBolt,
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

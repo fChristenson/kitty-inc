@@ -20,7 +20,7 @@ import {
   penOrder,
   shapeOutline,
   SHAPES,
-} from "../../../../shared/drawing";
+} from "../../../../shared/animationStyles/drawing";
 import { findRewardWorkers } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

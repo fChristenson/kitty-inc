@@ -19,7 +19,7 @@ import {
   drawBounceSplash,
   SPLASH_MS,
   type Bounce,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import { totalSpot } from "../../cashFlow";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";

@@ -2,7 +2,7 @@
 // and ring the total, whirling tighter and faster round it; then they dive
 // into it one after another across the readout, the last bringing the huge
 // blast
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { smoothstep } from "../../../../shared/easing";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

@@ -15,7 +15,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { clampTargetsY, ringTargets } from "../../../../shared/coinTargets";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 
 const KEY = "bombTornado";
 const REWARD = 4;

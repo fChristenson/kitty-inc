@@ -19,7 +19,7 @@ import {
   smoothstep,
 } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBounceSplash, type Bounce } from "../../../../shared/bounce";
+import { drawBounceSplash, type Bounce } from "../../../../shared/animationStyles/bounce";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

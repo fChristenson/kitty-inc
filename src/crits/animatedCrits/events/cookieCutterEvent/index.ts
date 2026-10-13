@@ -17,7 +17,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp, smoothstep } from "../../../../shared/easing";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { totalSpot } from "../../cashFlow";
 import type { Point } from "../../../../shared/wisp";
 

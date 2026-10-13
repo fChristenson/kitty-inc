@@ -17,8 +17,8 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { bezier } from "../../../../shared/curves";
 import {
   pourDurationMs,

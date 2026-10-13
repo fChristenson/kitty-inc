@@ -24,7 +24,7 @@ import {
   drawMuzzleFlash,
   fireBullet,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 
 const KEY = "bulletRose";
 const REWARD = 4;

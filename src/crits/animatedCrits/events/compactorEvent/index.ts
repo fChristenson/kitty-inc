@@ -18,8 +18,8 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawBounceSplash, type Bounce } from "../../../../shared/bounce";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawBounceSplash, type Bounce } from "../../../../shared/animationStyles/bounce";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

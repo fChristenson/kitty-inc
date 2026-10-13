@@ -2,8 +2,8 @@
 // into a drill that bites up into it, stalls rumbling, then bores in shove
 // by shove, sparks gushing out both sides, until it punches through and the
 // floor bursts open at the crit's tier
-import { drawDrillHead, drawDrillSpray } from "../../../../shared/drill";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDrillHead, drawDrillSpray } from "../../../../shared/animationStyles/drill";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import { FLOOR_H } from "../../../../floors/constants";
 import {

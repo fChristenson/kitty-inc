@@ -1,7 +1,7 @@
 // helpers more than one income crit plays with
 import { BILL_SPIN_FRAME_COUNT } from "../../../coinBurst";
 import { loadSprite } from "../../../loadAssets";
-import { drawDetonation } from "../../../shared/explosion";
+import { drawDetonation } from "../../../shared/animationStyles/explosion";
 import {
   drawText,
   type Point,

@@ -28,7 +28,7 @@ import {
 } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
-import { drawAimLaser, drawBeam } from "../../../../shared/beam";
+import { drawAimLaser, drawBeam } from "../../../../shared/animationStyles/beam";
 import { totalSpot } from "../../cashFlow";
 
 const KEY = "convexHull";

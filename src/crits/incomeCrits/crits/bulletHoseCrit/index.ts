@@ -1,8 +1,8 @@
 // the bullet hose income crit: the number climbs under the total and hoses a
 // quickening stream of wisp bullets up into it, the hits walking back and
 // forth across the readout; then it fires itself in as one heavy slug
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { smoothstep } from "../../../../shared/easing";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

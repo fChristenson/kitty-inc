@@ -2,7 +2,7 @@
 // in view, each hammering its button down in a quickening rattle, every
 // press a pop and levels on its floor; then the crit's own wisp, wound up
 // high over its button, slams it in one huge blast
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

@@ -18,9 +18,9 @@ import {
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { shapeOutline, SHAPES } from "../../../../shared/drawing";
+import { shapeOutline, SHAPES } from "../../../../shared/animationStyles/drawing";
 import { findRewardBars } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

@@ -1,8 +1,8 @@
 // the airstrike floor crit: the number shoots off the edge and a jet screams
 // back across the top, dropping a string of blinking bombs that arc down
 // onto the bars in view, its sonic boom shaking the building
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { smoothstep } from "../../../../shared/easing";

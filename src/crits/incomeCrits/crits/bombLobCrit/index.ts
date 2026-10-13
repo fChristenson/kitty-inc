@@ -6,7 +6,7 @@ import {
   DETONATION_MS,
   drawDetonation,
   drawLitFuse,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

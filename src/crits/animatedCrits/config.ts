@@ -8267,6 +8267,17 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 99
+  // magnet, hires: src/crits/animatedCrits/events/lodestonesEvent ("Lodestones"): two gold poles light up on the frozen screen and the glitter all over it snaps onto them into spiky crusts, quicker and quicker; they yank together and slam, then repel, wisps flung off onto every empty spot in view, each a new worker
+  lodestonesEvent: {
+    chance: 0.01,
+    pullMs: 1100, // from the click till the last speck snaps on and the poles yank together
+    slamMs: 240, // the poles yanked together
+    hireMs: 360, // from the slam till the first hire lands
+    hireGapMs: 70, // between the hires landing
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 98
   // fps, perma tiers: src/crits/animatedCrits/events/nightTrainEvent ("Night Train"): the floors' screen slides aside like a train's door; the view sprints down a speeding night train, each carriage's door opening on a guard it drops, a big one last; the end door opens on the floors and every worker in view climbs a perma tier
   nightTrainEvent: {

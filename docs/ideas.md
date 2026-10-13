@@ -71,14 +71,37 @@ Three more triggers that roll nothing today.
 2. **Spawn crits** (rolled on catching a random spawn: the mouse, a bubble, the wisp's glitter): the popped bubble's crit number splits into new bubbles that float off onto every bar, each bursting on it with its levels, quicker each, the last huge.
 3. **Streak crits** (rolled when three crits land in a row in one hold): the three numbers stack up over the button, then fly together and fuse into their sum, which slams onto the bar in a run of blasts along it. The three crits paid again as one.
 
+## List 196: new animation styles ([playground](../tmp/_playground/ideas.html?list=next173))
+
+New animation styles, each with its own verb and lib in `shared/animationStyles`. They are aimed at the gaps in `node scripts/crit-dist.mjs`: rate crits have only three crits; floor crits lean on explosions. Each cell shows one crit from a thin group.
+
+1. **Wind** (gusts; `shared/animationStyles/wind`: streaks of wind racing along things with glitter riding them, ending in a gale). Shown as **Tailwind**, a rate crit (rate crits have three):
+   - Gusts streak along every bar from its left end, quicker each time.
+   - Each gust shoves the bar on and turns its readout over a step faster.
+   - The last gust is a gale, and its own bar ends twice as fast.
+2. **Flip** (turning over; `shared/animationStyles/flip`: tiles turning over in a running wave to a gold face, quicker and quicker, like dominoes). Shown as **Flip Over**, a floor crit (floor crits are a fifth explosion):
+   - A wisp hops along each bar, and every tile it lands on flips gold.
+   - Each finished bar gives its levels.
+   - On its own bar, every tile flips at once from the middle out, into a huge blast.
+
 ## Built
+
+- **Magnet** animation style and **Lodestones** (animated crit, hires, batch 99), from List 196. Test: New Effects.
+  - `shared/animationStyles/magnet`: `planSnaps`, `snapAt`, `flingAt`, `drawFieldLines`.
+  - **Lodestones** (`animatedCrits/events/lodestonesEvent`): two gold poles snap the glitter all over the frozen screen into spiky crusts, quicker and quicker; they yank together and slam, then repel, wisps flung off onto every empty spot in view, each a new worker.
+
+- **Portal** and **Slice** animation styles, from List 195. Their example crits are not built yet: **Warp** (income crit; playground `next172`) and **Cut Open** (lock crit; playground `next172`).
+  - Each has its own entries in the instructions: an Animation styles entry, per-style rules and its drawing libs.
+  - `shared/animationStyles/portal`: `drawPortal`, `drawPortalPass`, `planWarp`.
+  - `shared/animationStyles/slice`: `planSlash`, `drawSlash`, `drawSliceSpill`, `sliceOffset`.
+  - `crit-dist` now counts both styles.
 
 - **Night Train**, **Kick In**, **Springboard** (animated crits, FPS look, batch 98), from List 194. Test: New Effects.
   - **Night Train** (`animatedCrits/events/nightTrainEvent`, perma tiers): the view sprints down a speeding night train, each carriage's door opening on a guard it drops, a big one last; the end door opens on the floors and every worker in view climbs a perma tier. Arms only with a worker that can still climb.
   - **Kick In** (`animatedCrits/events/kickInEvent`, crit tiers): the floors' screen is kicked flat like a door; the view storms two rooms of guards, kicking the door between down, a big one last; the last door falls on the floors and every bar in view climbs a crit tier.
   - **Springboard** (`animatedCrits/events/springboardEvent`, levels): the floors' screen bows like a trampoline and flings the view up an atrium, higher each bounce, a guard at a balcony rail dropped at every top, a big imp last; the last bounce flies it through a lit window onto the floors and every bar takes its levels.
 
-- **Gemstone** (animated crit), **Gather** (floor crit), **Coin Spin** (income crit), **Jump Start** (lock crit), from List 193, all on the Charge look (`shared/charge`, `tickCharge` rumble). Test: New Effects.
+- **Gemstone** (animated crit), **Gather** (floor crit), **Coin Spin** (income crit), **Jump Start** (lock crit), from List 193, all on the Charge look (`shared/animationStyles/charge`, `tickCharge` rumble). Test: New Effects.
   - **Gemstone** (`animatedCrits/events/gemstoneEvent`, Charge + Drawing): glitter all over the frozen screen is sucked into a giant gem that crushes smaller and whiter; it bursts, shards diving onto every bar with levels, the clicked one last a crit tier up.
   - **Gather** (`floorCrits/crits/gatherCrit`): a wisp on its own bar's end rips sparks off every other bar (levels on each rip) as it charges, then tears back along its own bar in a rattle of blasts.
   - **Coin Spin** (`incomeCrits/crits/coinSpinCrit`): a gold coin under the total spins up to a blur, then shoots into the readout in a rattle of blasts, a share each.
@@ -91,7 +114,7 @@ Three more triggers that roll nothing today.
 
 - **Lucky Star**, **Skeleton Key** (lock crits), from List 152. Test: New Effects.
   - **Lucky Star** (Galaxy): a disk of stars spirals into the locked floor's core until it collapses and opens it; a star leaps onto its button, arming a crit at the crit's tier.
-  - **Skeleton Key** (Drawing, new `key` shape in `shared/drawing`): dots build a giant key over the locked floor that blazes and snaps in; it opens with free taps on its button (twice the crit's multiple).
+  - **Skeleton Key** (Drawing, new `key` shape in `shared/animationStyles/drawing`): dots build a giant key over the locked floor that blazes and snaps in; it opens with free taps on its button (twice the crit's multiple).
 
 - **Nail Gun** (button crit) and **Carbon Copy**, **Fresh Paint** (lock crits), from List 151. Test: New Effects.
   - **Nail Gun** (Gunfire): a gun wisp hops beside each button and hammers nails into it; the next crit landing on a nailed button (`Sticky N`) is armed again for its next taps, `CONFIG.crit.nailGunTaps` plays in all (twice on its own).

@@ -23,7 +23,7 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import { findRewardWorkers } from "../../eventRewards";
 
 const KEY = "thunderhead";

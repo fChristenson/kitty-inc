@@ -2,8 +2,8 @@
 // launcher and ripple-fires a salvo of small rockets, a flash and a streak
 // each, slamming all over the bars in view quick-fire; then one heavy rocket
 // into its own bar, a huge blast and a cluster
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

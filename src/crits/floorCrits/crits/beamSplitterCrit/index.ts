@@ -3,8 +3,8 @@
 // sweeps across the building, blasts rattling wherever a beam crosses a bar
 // in view; it swings back faster, then the fan snaps shut onto its own bar in
 // one fat beam and a huge blast
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {

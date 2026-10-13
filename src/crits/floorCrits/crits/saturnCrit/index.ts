@@ -4,7 +4,7 @@
 // shatters into wisps that slam onto the bars and the planet drops onto its
 // own bar in a huge blast
 import { COLOR } from "../../../../palette";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";

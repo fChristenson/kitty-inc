@@ -2,7 +2,7 @@
 // hundreds of coins twisting up from the middle of the screen, narrowing as
 // it climbs, its top swaying across the total and rattling it with blasts as
 // the coins pour in; the last of it slams in with the huge blast
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   beginCoinBatch,
   drawCoinBurstFrame,

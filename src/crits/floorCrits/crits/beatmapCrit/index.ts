@@ -4,7 +4,7 @@
 // blast on that bar; the beat speeds up and up, then a spinner whirls the
 // cursor round its own bar into a huge blast
 import { COLOR } from "../../../../palette";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {

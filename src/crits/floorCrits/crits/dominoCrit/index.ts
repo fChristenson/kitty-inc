@@ -1,5 +1,5 @@
 // the domino floor crit: its number diving into the lowest bar, knocking up bar to bar
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

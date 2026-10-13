@@ -21,8 +21,8 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
-import { drawBounceSplash, ricochetThrough } from "../../../../shared/bounce";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawBounceSplash, ricochetThrough } from "../../../../shared/animationStyles/bounce";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
 

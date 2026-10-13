@@ -20,7 +20,7 @@ import {
   drawSprayMist,
   planSpray,
   type Spray,
-} from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/spray";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

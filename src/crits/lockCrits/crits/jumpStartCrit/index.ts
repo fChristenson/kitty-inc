@@ -11,8 +11,8 @@ import {
   tickCharge,
   trembleAt,
   type Charge,
-} from "../../../../shared/charge";
-import { drawDetonation } from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/charge";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";

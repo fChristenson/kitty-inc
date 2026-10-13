@@ -2,8 +2,8 @@
 // becomes a scanner beam sweeping the floor and its unlock price back and
 // forth, quicker each pass, the price flaring white as it's crossed; then the
 // price flips over and shatters down to a fraction of it
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { COLOR } from "../../../../palette";

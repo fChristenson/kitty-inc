@@ -19,7 +19,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawSpray,
   drawSprayCoat,
@@ -27,7 +27,7 @@ import {
   planSpray,
   sprayLandsAt,
   type Spray,
-} from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/spray";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

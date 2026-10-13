@@ -18,7 +18,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { bezier } from "../../../../shared/curves";
-import { drawBeamFlare } from "../../../../shared/beam";
+import { drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

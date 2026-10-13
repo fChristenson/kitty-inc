@@ -3,7 +3,7 @@
 // time, pinging off pegs that flash and landing across the readout in
 // blasts; the last brings the huge blast
 import { COLOR } from "../../../../palette";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

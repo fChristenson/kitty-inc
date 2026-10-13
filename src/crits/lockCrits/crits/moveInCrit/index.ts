@@ -2,7 +2,7 @@
 // below the locked floor and bounce up the building bar by bar, quicker each
 // hop, slamming into the dark locked floor one by one, which glows hotter;
 // it bursts open and each wisp drops in where a new cat is hired
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { COLOR } from "../../../../palette";

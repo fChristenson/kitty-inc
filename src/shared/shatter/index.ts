@@ -3,7 +3,7 @@
 // them into shards that fly off. Build the pane at arm, draw from the event's
 // drawUnder (under its coins), in floor-local coords
 import { clamp01, easeOut } from "../easing";
-import { drawBeam } from "../beam";
+import { drawBeam } from "../animationStyles/beam";
 import { copyScreen, drawScreenPart, type ScreenCopy } from "../screenCopy";
 import type { Point } from "../wisp";
 

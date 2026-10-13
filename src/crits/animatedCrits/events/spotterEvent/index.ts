@@ -19,12 +19,12 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawAimLaser } from "../../../../shared/beam";
+import { drawAimLaser } from "../../../../shared/animationStyles/beam";
 import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
 
 const KEY = "spotter";

@@ -14,7 +14,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01 } from "../../../../shared/easing";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeamFlare } from "../../../../shared/beam";
+import { drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import {
   copyPane,
   createPane,

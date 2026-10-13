@@ -20,7 +20,7 @@ import {
   drawGravityHole,
   scatterChecker,
   simulateClean,
-} from "../../../../shared/clutter";
+} from "../../../../shared/animationStyles/clutter";
 import { findRewardBars } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

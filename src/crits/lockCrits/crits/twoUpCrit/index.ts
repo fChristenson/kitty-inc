@@ -2,7 +2,7 @@
 // locked floor and the one above it, sticking there on lit fuses; they blow
 // in a chain, the first floor bursting open, then the next in the biggest
 // blast: two floors free (one when the building's last floor is next)
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

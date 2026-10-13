@@ -21,7 +21,7 @@ import {
   planDisk,
   scatterArms,
   scatterDisk,
-} from "../../../../shared/galaxy";
+} from "../../../../shared/animationStyles/galaxy";
 import { findRewardBars } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

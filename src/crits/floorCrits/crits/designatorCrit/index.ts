@@ -3,8 +3,8 @@
 // and quicker; a pillar of light slams down on every spot it marked a beat
 // behind it, the strikes chasing it down the building; it stops on its own
 // bar and holds, then one giant pillar and a huge blast
-import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import {
   registerFloorCrit,

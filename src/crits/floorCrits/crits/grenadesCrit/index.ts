@@ -3,7 +3,7 @@
 // lands, skips twice along its bar with a pop on every touch and blows on the
 // third; the last, a fat one, skips along its own bar and goes off in a huge
 // blast and a cluster
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

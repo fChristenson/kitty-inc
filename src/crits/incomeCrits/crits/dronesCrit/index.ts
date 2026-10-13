@@ -2,9 +2,9 @@
 // hover under the total, weaving, and rattle it with laser bolts in turn,
 // quicker and quicker; then they ram it one after another, the last one in
 // for the huge blast
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
-import { drawBeam } from "../../../../shared/beam";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { smoothstep } from "../../../../shared/easing";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

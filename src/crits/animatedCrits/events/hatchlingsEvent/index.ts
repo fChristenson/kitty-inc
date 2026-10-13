@@ -20,7 +20,7 @@ import {
   dropBounce,
   drawBounceSplash,
   type BouncePath,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import {
   drawRewardHires,
   findRewardHires,

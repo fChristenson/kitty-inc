@@ -24,7 +24,7 @@ import {
   drawDrillSparks,
   planDrill,
   type Drill,
-} from "../../../../shared/drill";
+} from "../../../../shared/animationStyles/drill";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 
 const KEY = "drillDuel";

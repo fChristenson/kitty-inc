@@ -7,8 +7,8 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
-import { drawDetonation } from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/lightning";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { COLOR } from "../../../../palette";
 import { FLOOR_H } from "../../../../floors/constants";

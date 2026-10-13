@@ -4,13 +4,13 @@
 // streaking up into the total in a blast; then the core shoots up in the
 // huge blast
 import { COLOR } from "../../../../palette";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   planDisk,
   scatterArms,
   type Disk,
   type Orbit,
-} from "../../../../shared/galaxy";
+} from "../../../../shared/animationStyles/galaxy";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

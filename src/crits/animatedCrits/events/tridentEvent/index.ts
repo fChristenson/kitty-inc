@@ -17,7 +17,7 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 import type { Point } from "../../../../shared/wisp";
 

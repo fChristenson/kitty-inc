@@ -27,7 +27,7 @@ import {
   drawDetonation,
   drawLitFuse,
   DETONATION_MS,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 
 const KEY = "detonator";

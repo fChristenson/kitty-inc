@@ -15,7 +15,7 @@ import { clamp01, easeOutCubic, lerp } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";
 import { sprayTargets } from "../../../../shared/coinTargets";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import {
   pourDurationMs,
   pourLine,

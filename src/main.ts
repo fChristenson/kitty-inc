@@ -2328,6 +2328,7 @@ async function main() {
           "night-train": forceOnActive((e) => e.forceNightTrainEvent),
           "kick-in": forceOnActive((e) => e.forceKickInEvent),
           springboard: forceOnActive((e) => e.forceSpringboardEvent),
+          lodestones: forceOnActive((e) => e.forceLodestonesEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {

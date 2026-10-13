@@ -2,13 +2,13 @@
 // the screen's side; it banks off and bounces along under the total,
 // smacking up into the readout on every bounce; off the other side, back in
 // quicker, shorter bounces, then a last kick dunks it into the middle
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawBounceSplash,
   hops,
   type Bounce,
   type BouncePath,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import type { Range } from "../../../../shared/easing";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

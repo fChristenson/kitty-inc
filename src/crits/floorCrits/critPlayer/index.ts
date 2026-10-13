@@ -7,8 +7,8 @@
 // can jolt and land their reward
 import { coolDownFloorCrits, type CritPlayKind } from "../../critTypes";
 import { fadeStops, type FadeStops } from "../../../shared/glowSprite";
-import type { Bolt } from "../../../shared/lightning";
-import type { Disk, Orbit } from "../../../shared/galaxy";
+import type { Bolt } from "../../../shared/animationStyles/lightning";
+import type { Disk, Orbit } from "../../../shared/animationStyles/galaxy";
 import type { BarLaunch } from "../../../shared/barLaunch";
 import { loadWhenIdle } from "../../../shared/idle";
 import { deferLights, flushLights } from "../../../shared/lightBatch";

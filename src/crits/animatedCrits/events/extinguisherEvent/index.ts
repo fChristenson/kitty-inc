@@ -22,7 +22,7 @@ import {
   planSpray,
   sprayLandsAt,
   type Spray,
-} from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/spray";
 import { findRewardWorkers } from "../../eventRewards";
 
 const KEY = "extinguisher";

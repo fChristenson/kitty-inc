@@ -27,7 +27,7 @@ import {
   smoothstep,
 } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
 
 const KEY = "clawMachine";

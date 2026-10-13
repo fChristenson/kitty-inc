@@ -1,8 +1,8 @@
 // the plasma ball floor crit: the number swells into a crackling ball of
 // plasma that drifts slowly down through every bar in view, arcing into each
 // as it nears and blasting it as it passes, until it bursts on the ground
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { stampGlimmer } from "../../../../shared/twinkle";

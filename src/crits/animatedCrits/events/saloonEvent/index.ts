@@ -1,6 +1,6 @@
 // the "High Noon" event (flight + fps; levels), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps: it covers its crit, whose click swings the floors' screen open
+// shared/animationStyles/fps: it covers its crit, whose click swings the floors' screen open
 // down its middle like a pair of saloon doors onto a dusty western street,
 // shops down both sides and a bandit standing in the road. The view steps
 // out onto the street; a countdown slams in, 3, 2, 1, SHOOT!, the bandit
@@ -11,7 +11,7 @@ import { levelsFor, type Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop, playSwoosh } from "../../../../sound";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { drawWhiteBurst } from "../../../../shared/eventFx";
 import {
   playCritExplosion,
@@ -29,7 +29,7 @@ import {
   type FpsCamera,
   type FpsEnemyLook,
   type FpsLens,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { hash01, stampGlimmer } from "../../../../shared/twinkle";

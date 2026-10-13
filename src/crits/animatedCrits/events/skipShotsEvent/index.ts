@@ -21,8 +21,8 @@ import {
   ricochetThrough,
   drawBounceSplash,
   type BouncePath,
-} from "../../../../shared/bounce";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bounce";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

@@ -4,7 +4,7 @@
 // cracks down from the sky through the bars onto its own, every bar blowing
 // apart as it strikes, into a huge blast
 import { COLOR } from "../../../../palette";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawGlow } from "../../../../shared/glowSprite";
 import {
@@ -12,7 +12,7 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

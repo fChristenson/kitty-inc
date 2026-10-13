@@ -2,14 +2,14 @@
 // bottle, a cork wisp pops up into the total with a bang, and a gushing jet
 // of gold spray follows, its top whipping back and forth across the readout
 // in a rattle of pops, a last big gush blowing it
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawSpray,
   drawSprayMist,
   planSpray,
   sprayLandsAt,
   type Spray,
-} from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/spray";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

@@ -25,7 +25,7 @@ import {
   planSpray,
   sprayLandsAt,
   type Spray,
-} from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/spray";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 
 const KEY = "carWash";

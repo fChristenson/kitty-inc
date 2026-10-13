@@ -13,7 +13,7 @@ import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOutBack } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { totalSpot } from "../../cashFlow";
 
 const KEY = "tractorBeam";

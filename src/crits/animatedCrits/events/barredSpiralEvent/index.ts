@@ -21,7 +21,7 @@ import { bezier } from "../../../../shared/curves";
 import { clamp01, easeIn, easeOutBack, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { drawStars, planDisk, scatterArms } from "../../../../shared/galaxy";
+import { drawStars, planDisk, scatterArms } from "../../../../shared/animationStyles/galaxy";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";

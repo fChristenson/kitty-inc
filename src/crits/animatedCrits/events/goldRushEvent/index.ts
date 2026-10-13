@@ -21,7 +21,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { hops, type BouncePath } from "../../../../shared/bounce";
+import { hops, type BouncePath } from "../../../../shared/animationStyles/bounce";
 import {
   drawRewardHires,
   findRewardHires,

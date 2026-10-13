@@ -18,7 +18,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawLitFuse } from "../../../../shared/explosion";
+import { drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { findRewardWorkers } from "../../eventRewards";
 
 const KEY = "pressureCooker";

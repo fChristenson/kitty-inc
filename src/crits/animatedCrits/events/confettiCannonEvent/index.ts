@@ -20,9 +20,9 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

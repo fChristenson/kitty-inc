@@ -18,7 +18,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOutBack, lerp } from "../../../../shared/easing";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 
 const KEY = "pinata";
 const REWARD = 4;

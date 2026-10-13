@@ -15,7 +15,7 @@ import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { pourLine, sampleLine, totalSpot, type Pour } from "../../cashFlow";
 import {

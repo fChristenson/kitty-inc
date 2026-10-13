@@ -20,7 +20,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp, smoothstep } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";
 import { createBeats } from "../../../../shared/eventBeats";
-import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
+import { createBolt, drawBolt, drawStrike } from "../../../../shared/animationStyles/lightning";
 import {
   findRewardBars,
   findRewardWorkers,

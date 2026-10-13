@@ -23,7 +23,7 @@ import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { createBeats } from "../../../../shared/eventBeats";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";

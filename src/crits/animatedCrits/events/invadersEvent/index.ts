@@ -22,7 +22,7 @@ import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { ringTargets } from "../../../../shared/coinTargets";
 
 const KEY = "invaders";

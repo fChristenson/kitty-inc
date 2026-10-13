@@ -20,7 +20,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 
 const KEY = "fragOut";

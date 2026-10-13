@@ -19,8 +19,8 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
-import { drawBeam } from "../../../../shared/beam";
-import { drawSprayCoat } from "../../../../shared/spray";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawSprayCoat } from "../../../../shared/animationStyles/spray";
 
 const KEY = "dotsAndBoxes";
 const REWARD = 4;

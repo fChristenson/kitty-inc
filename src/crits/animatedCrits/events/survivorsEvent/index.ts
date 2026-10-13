@@ -22,9 +22,9 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { drawDetonation } from "../../../../shared/explosion";
-import { drawBeam } from "../../../../shared/beam";
-import { createBolt, drawBolt, type Bolt } from "../../../../shared/lightning";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { createBolt, drawBolt, type Bolt } from "../../../../shared/animationStyles/lightning";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 
 const KEY = "survivors";

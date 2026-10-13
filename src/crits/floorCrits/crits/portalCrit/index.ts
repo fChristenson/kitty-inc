@@ -1,8 +1,8 @@
 // the portal floor crit: portals open over the top bar and under the lowest;
 // the number falls through every bar in view from one to the other, comes
 // out of the top again and falls faster, and again, then both implode
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { smoothstep } from "../../../../shared/easing";

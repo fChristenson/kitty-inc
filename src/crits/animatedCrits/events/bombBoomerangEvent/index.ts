@@ -21,7 +21,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { alongRoute } from "../../../../shared/curves";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { measure, pointAlong, sampleLine } from "../../cashFlow";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 

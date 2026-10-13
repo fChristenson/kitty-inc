@@ -3,9 +3,9 @@
 // blazing, blasts rattling where its stream crosses each bar in view; it dives
 // back the other way, crossing its own track in an X, then roars in low along
 // its own bar strafing it end to end and a huge blast
-import { drawBeam } from "../../../../shared/beam";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

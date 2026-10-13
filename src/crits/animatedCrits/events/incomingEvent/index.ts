@@ -21,7 +21,7 @@ import {
   DETONATION_MS,
   drawDetonation,
   drawLitFuse,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 

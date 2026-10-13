@@ -2,8 +2,8 @@
 // bars in view with a shotgun: each shot a muzzle flash, a kick and a spread
 // of pellets rattling into two bars, working down the building, then a
 // double barrel into its own bar and a huge blast
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playBarExplosion,
   playExplosion,

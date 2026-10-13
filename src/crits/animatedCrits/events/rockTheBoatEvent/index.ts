@@ -15,7 +15,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { scatterWaves, simulateClean } from "../../../../shared/clutter";
+import { scatterWaves, simulateClean } from "../../../../shared/animationStyles/clutter";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";

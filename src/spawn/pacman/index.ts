@@ -15,7 +15,7 @@ import {
   playSwoosh,
 } from "../../sound";
 import { clamp01, lerp } from "../../shared/easing";
-import { drawDetonation } from "../../shared/explosion";
+import { drawDetonation } from "../../shared/animationStyles/explosion";
 import { drawLightRays } from "../../shared/lightRays";
 import { beginLightBatch, endLightBatch } from "../../shared/lightBatch";
 import { shakeScreen } from "../../shared/screenShake";

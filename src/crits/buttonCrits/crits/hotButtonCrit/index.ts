@@ -4,13 +4,13 @@
 // button, which glows hot, its next taps rolling crits more often; the core
 // dives onto the crit's own last, the biggest
 import { COLOR } from "../../../../palette";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   planDisk,
   scatterArms,
   type Disk,
   type Orbit,
-} from "../../../../shared/galaxy";
+} from "../../../../shared/animationStyles/galaxy";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";

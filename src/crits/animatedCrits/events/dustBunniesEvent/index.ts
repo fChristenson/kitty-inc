@@ -27,7 +27,7 @@ import {
   sweepLane,
   type BroomState,
   type SweepStroke,
-} from "../../../../shared/clutter";
+} from "../../../../shared/animationStyles/clutter";
 import { findRewardWorkers } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

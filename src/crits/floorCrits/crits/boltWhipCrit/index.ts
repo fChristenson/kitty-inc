@@ -3,14 +3,14 @@
 // lashing along each one end to end in a rattle of blasts, quicker each
 // crack; then it raises it high and cracks it straight down onto its own bar
 // in a giant bolt and a huge blast
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import {
   createBolt,
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

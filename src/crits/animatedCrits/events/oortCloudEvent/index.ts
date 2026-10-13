@@ -28,7 +28,7 @@ import {
 } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { drawStars, planDisk, type Orbit } from "../../../../shared/galaxy";
+import { drawStars, planDisk, type Orbit } from "../../../../shared/animationStyles/galaxy";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

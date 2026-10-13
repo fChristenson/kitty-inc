@@ -16,7 +16,7 @@ import { bezier } from "../../../../shared/curves";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { scatterEvenly, simulateClean } from "../../../../shared/clutter";
+import { scatterEvenly, simulateClean } from "../../../../shared/animationStyles/clutter";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";

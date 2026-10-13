@@ -25,8 +25,8 @@ import {
   DETONATION_MS,
   drawDetonation,
   drawLitFuse,
-} from "../../../../shared/explosion";
-import { drawStars, planDisk, type Orbit } from "../../../../shared/galaxy";
+} from "../../../../shared/animationStyles/explosion";
+import { drawStars, planDisk, type Orbit } from "../../../../shared/animationStyles/galaxy";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

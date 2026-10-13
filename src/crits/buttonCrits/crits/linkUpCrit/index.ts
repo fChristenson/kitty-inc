@@ -3,8 +3,8 @@
 // by one, quicker each, each linked button lit; the own button taps itself
 // and pulses race down the beams, then it slams: its next taps each land a
 // level on every linked button too
-import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

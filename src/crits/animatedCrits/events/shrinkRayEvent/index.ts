@@ -13,7 +13,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOutBack, lerp } from "../../../../shared/easing";
 import { ringTargets } from "../../../../shared/coinTargets";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import {
   copyScreen,
   drawScreenPart,

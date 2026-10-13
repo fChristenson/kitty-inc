@@ -20,7 +20,7 @@ import {
   bulletSpiral,
   drawBullets,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { forceClaimEventProc, registerEventProc } from "../../eventProcs";

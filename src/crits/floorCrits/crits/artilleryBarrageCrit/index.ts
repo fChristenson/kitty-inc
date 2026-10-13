@@ -1,7 +1,7 @@
 // the artillery barrage floor crit: the number dives off the edge and shells
 // come whistling in from off it in high arcs, the barrage walking up the
 // building bar by bar, then one last huge salvo on every bar in view
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

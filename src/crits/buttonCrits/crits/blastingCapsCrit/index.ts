@@ -3,7 +3,7 @@
 // on to set off the next, top to bottom, each button left gold, its taps
 // then landing two levels each; the crit's own blows into a cluster of
 // bomblets round it, then the biggest blast
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

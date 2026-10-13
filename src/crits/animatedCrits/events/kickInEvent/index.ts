@@ -1,6 +1,6 @@
 // the "Kick In" event (fps; crit tiers), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps: its crit's click kicks the floors' screen flat like a door and
+// shared/animationStyles/fps: its crit's click kicks the floors' screen flat like a door and
 // the view storms in on three guards, dropping them left to right in quick
 // fire; it strides to the next door and kicks it down on two more and a big
 // one taking two. The last door goes down on the floors, the view dives
@@ -13,7 +13,7 @@ import {
   playCritExplosion,
   playExplosion,
 } from "../../../../shared/explosionBang";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   createFpsShot,
   drawFpsEnemy,
@@ -35,7 +35,7 @@ import {
   type FpsEnemyLook,
   type FpsLens,
   type FpsShot,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { drawScreenPart, type ScreenCopy } from "../../../../shared/screenCopy";

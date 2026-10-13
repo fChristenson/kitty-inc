@@ -23,7 +23,7 @@ import {
   drawDetonation,
   drawLitFuse,
   DETONATION_MS,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 
 const KEY = "criticalMass";
 const REWARD = 4;

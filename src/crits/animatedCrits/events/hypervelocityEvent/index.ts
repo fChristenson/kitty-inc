@@ -25,7 +25,7 @@ import {
   planDisk,
   scatterArms,
   type Orbit,
-} from "../../../../shared/galaxy";
+} from "../../../../shared/animationStyles/galaxy";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

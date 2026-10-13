@@ -24,7 +24,7 @@ import {
   drawDetonation,
   drawLitFuse,
   DETONATION_MS,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
 

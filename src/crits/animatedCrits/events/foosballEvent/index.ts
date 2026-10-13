@@ -20,12 +20,12 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import {
   drawBounceSplash,
   ricochetThrough,
   SPLASH_MS,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import { totalSpot } from "../../cashFlow";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";

@@ -16,7 +16,7 @@ import { lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
 import { bezier } from "../../../../shared/curves";
-import { drawDrill, planDrill, type Drill } from "../../../../shared/drill";
+import { drawDrill, planDrill, type Drill } from "../../../../shared/animationStyles/drill";
 import {
   pourDurationMs,
   pourLine,

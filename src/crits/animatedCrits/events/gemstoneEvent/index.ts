@@ -16,11 +16,11 @@ import {
   planCharge,
   tickCharge,
   trembleAt,
-} from "../../../../shared/charge";
-import { SHAPES, shapeOutline } from "../../../../shared/drawing";
+} from "../../../../shared/animationStyles/charge";
+import { SHAPES, shapeOutline } from "../../../../shared/animationStyles/drawing";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";

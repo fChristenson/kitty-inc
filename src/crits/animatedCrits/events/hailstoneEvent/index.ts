@@ -20,8 +20,8 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { hops } from "../../../../shared/bounce";
-import { drawBeam } from "../../../../shared/beam";
+import { hops } from "../../../../shared/animationStyles/bounce";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";

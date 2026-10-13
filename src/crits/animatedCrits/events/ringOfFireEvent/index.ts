@@ -21,7 +21,7 @@ import {
   drawDetonation,
   drawLitFuse,
   DETONATION_MS,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 
 const KEY = "ringOfFire";

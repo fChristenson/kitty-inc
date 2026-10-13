@@ -1,8 +1,8 @@
 // the railgun floor crit: the number rises over the bars and charges,
 // glitter streaming into it, then fires one blinding shot straight down
 // through every bar in view at once, recoiling up off the screen
-import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { stampGlimmer } from "../../../../shared/twinkle";

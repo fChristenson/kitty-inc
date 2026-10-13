@@ -17,7 +17,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBounceSplash, hops } from "../../../../shared/bounce";
+import { drawBounceSplash, hops } from "../../../../shared/animationStyles/bounce";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 
 const KEY = "lamplighter";

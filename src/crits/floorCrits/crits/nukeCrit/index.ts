@@ -1,7 +1,7 @@
 // the nuke floor crit: the number turns into a bomb dropping slowly past the
 // bars, blinking ever faster, hits the ground in a blinding flash and a
 // glitter mushroom cloud, and the shockwave blasts up through every bar
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";

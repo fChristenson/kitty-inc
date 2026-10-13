@@ -20,8 +20,8 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
-import { drawBounceSplash, type Bounce } from "../../../../shared/bounce";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawBounceSplash, type Bounce } from "../../../../shared/animationStyles/bounce";
 import {
   drawRewardHires,
   findRewardHires,

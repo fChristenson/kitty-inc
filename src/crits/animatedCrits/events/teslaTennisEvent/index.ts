@@ -25,7 +25,7 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import { totalSpot } from "../../cashFlow";
 
 const KEY = "teslaTennis";

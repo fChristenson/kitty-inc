@@ -1,7 +1,7 @@
 // the laser floor crit: the number floats aside, charges, and sweeps a beam
 // down every bar in view, then locks onto its own for the final blast
-import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { smoothstep } from "../../../../shared/easing";
 import {
   registerFloorCrit,

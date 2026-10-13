@@ -9,7 +9,7 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { multiply } from "../../../../shared/bigNumber";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playCritExplosion,
   playExplosion,

@@ -22,8 +22,8 @@ import {
   drawGravityHole,
   scatterChecker,
   simulateClean,
-} from "../../../../shared/clutter";
-import { ricochet } from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/clutter";
+import { ricochet } from "../../../../shared/animationStyles/bounce";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";

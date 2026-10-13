@@ -20,7 +20,7 @@ import { between, clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { bezier } from "../../../../shared/curves";
 import { clampTargetsY, ringTargets } from "../../../../shared/coinTargets";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 
 const KEY = "midAir";
 const REWARD = 4;

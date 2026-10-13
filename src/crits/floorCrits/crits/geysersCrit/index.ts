@@ -2,8 +2,8 @@
 // light burst up out of it one after another across the screen, each
 // blasting up through every bar in view over it in a rattle; the last, giant
 // one bursts up under its own bar in a huge blast
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import {
   registerFloorCrit,

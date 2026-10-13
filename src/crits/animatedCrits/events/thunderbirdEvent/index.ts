@@ -20,7 +20,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { alongRoute } from "../../../../shared/curves";
 import { createBeats } from "../../../../shared/eventBeats";
-import { createBolt, drawBolt } from "../../../../shared/lightning";
+import { createBolt, drawBolt } from "../../../../shared/animationStyles/lightning";
 import { ringTargets } from "../../../../shared/coinTargets";
 
 const KEY = "thunderbird";

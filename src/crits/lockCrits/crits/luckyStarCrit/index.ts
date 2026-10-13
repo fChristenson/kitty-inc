@@ -2,14 +2,14 @@
 // into a tilted disk of stars turning inside it; they spiral in onto the
 // core, quicker and quicker, until it collapses and blows the floor open,
 // one star leaping onto its button: a sure crit at the crit's tier
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawGlow } from "../../../../shared/glowSprite";
 import {
   planDisk,
   scatterDisk,
   type Disk,
   type Orbit,
-} from "../../../../shared/galaxy";
+} from "../../../../shared/animationStyles/galaxy";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";

@@ -1,6 +1,6 @@
 // the "Rooftops" event (fps; free hires), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps: its crit's click tips the floors' screen forward flat into the
+// shared/animationStyles/fps: its crit's click tips the floors' screen forward flat into the
 // first roof and the view sprints off across the night rooftops, leaping the
 // gaps between them; guards on the roofs ahead are dropped mid-leap, a big
 // one on the last roof taking two. A final leap through a lit window across
@@ -32,7 +32,7 @@ import {
   type FpsEnemyLook,
   type FpsLens,
   type FpsShot,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";

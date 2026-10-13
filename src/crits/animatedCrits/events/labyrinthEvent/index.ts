@@ -17,7 +17,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { glowSprite, fadeStops } from "../../../../shared/glowSprite";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { pourDurationMs, pourLine, type Pour } from "../../cashFlow";
 
 const KEY = "labyrinth";

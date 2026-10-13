@@ -19,7 +19,7 @@ import {
   DETONATION_MS,
   drawDetonation,
   drawLitFuse,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

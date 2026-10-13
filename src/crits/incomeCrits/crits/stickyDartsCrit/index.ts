@@ -6,9 +6,9 @@ import {
   DETONATION_MS,
   drawDetonation,
   drawLitFuse,
-} from "../../../../shared/explosion";
-import { drawBeam } from "../../../../shared/beam";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { smoothstep } from "../../../../shared/easing";
 import {
   drawWispBetween,

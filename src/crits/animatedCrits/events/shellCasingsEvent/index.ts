@@ -21,7 +21,7 @@ import {
   drawBullets,
   drawMuzzleFlash,
   fireBullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { createBeats } from "../../../../shared/eventBeats";
 import { ringTargets } from "../../../../shared/coinTargets";
 

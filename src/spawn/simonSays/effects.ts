@@ -13,9 +13,9 @@ import {
 import { getIncomeBarBox } from "../../floors";
 import type { Floor } from "../../gameState";
 import { playJackpot } from "../../sound";
-import { drawBeam } from "../../shared/beam";
+import { drawBeam } from "../../shared/animationStyles/beam";
 import { clamp01 } from "../../shared/easing";
-import { drawDetonation } from "../../shared/explosion";
+import { drawDetonation } from "../../shared/animationStyles/explosion";
 import { playBarExplosion, playExplosion } from "../../shared/explosionBang";
 import { drawGlow, fadeStops } from "../../shared/glowSprite";
 import { beginLightBatch, endLightBatch } from "../../shared/lightBatch";

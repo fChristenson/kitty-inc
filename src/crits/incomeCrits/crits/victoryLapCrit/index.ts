@@ -3,9 +3,9 @@
 // and under the readout with blasts trailing the leader across it, braking
 // hard into the hairpins at its ends; the leader dives into the total at the
 // finish, the chaser right behind with the huge blast
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { smoothstep } from "../../../../shared/easing";
-import { planRace, type Race, type RaceCorner } from "../../../../shared/race";
+import { planRace, type Race, type RaceCorner } from "../../../../shared/animationStyles/race";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { playSwoosh } from "../../../../sound";
 import {

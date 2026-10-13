@@ -2,7 +2,7 @@
 // dart out either side of the total and hiss gold mist across it, sweeping,
 // the readout coating gold as pops of mist burst on it quicker and quicker;
 // once it's covered it flashes white and blows in the huge blast
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawSpray,
   drawSprayCoat,
@@ -10,7 +10,7 @@ import {
   planSpray,
   sprayLandsAt,
   type Spray,
-} from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/spray";
 import { smoothstep } from "../../../../shared/easing";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

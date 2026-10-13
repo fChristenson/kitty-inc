@@ -25,7 +25,7 @@ import {
   planSpray,
   sweepAim,
   type Spray,
-} from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/spray";
 import {
   drawRewardHires,
   findRewardHires,

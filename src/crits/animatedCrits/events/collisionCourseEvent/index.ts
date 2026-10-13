@@ -22,7 +22,7 @@ import {
   drawDetonation,
   drawLitFuse,
   DETONATION_MS,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 
 const KEY = "collisionCourse";
 const REWARD = 4;

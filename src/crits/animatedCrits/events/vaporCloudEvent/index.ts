@@ -19,8 +19,8 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
-import { drawDetonation, DETONATION_MS } from "../../../../shared/explosion";
-import { drawSprayMist } from "../../../../shared/spray";
+import { drawDetonation, DETONATION_MS } from "../../../../shared/animationStyles/explosion";
+import { drawSprayMist } from "../../../../shared/animationStyles/spray";
 
 const KEY = "vaporCloud";
 const REWARD = 4;

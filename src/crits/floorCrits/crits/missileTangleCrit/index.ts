@@ -3,7 +3,7 @@
 // crisscrossing back over the building in a wild tangle, then raining onto
 // the bars one after another in a rattling cluster of blasts, a huge one
 // onto its own last
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { cubic } from "../../../../shared/curves";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";

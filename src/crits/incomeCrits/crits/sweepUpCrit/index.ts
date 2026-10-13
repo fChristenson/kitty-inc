@@ -3,8 +3,8 @@
 // under the total, the first bits spilling in; side brooms squeeze the line
 // into a heap that slams up into the total
 import { COLOR } from "../../../../palette";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
-import { drawBroom, type BroomState } from "../../../../shared/clutter";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
+import { drawBroom, type BroomState } from "../../../../shared/animationStyles/clutter";
 import { smoothstep } from "../../../../shared/easing";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { playSwoosh } from "../../../../sound";

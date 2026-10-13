@@ -18,7 +18,7 @@ import { clamp01, easeOut, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { bezier } from "../../../../shared/curves";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import {
   pourDurationMs,
   pourLine,

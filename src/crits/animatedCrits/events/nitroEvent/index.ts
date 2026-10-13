@@ -1,6 +1,6 @@
 // the "Nitro" event (road race; crit tiers), a flight-stage event (see
-// ../../flightStage) with its own way in, drawn with shared/race's street and
-// racer wisp in shared/fps's world: its crit's click zooms the floors away into a
+// ../../flightStage) with its own way in, drawn with shared/animationStyles/race's street and
+// racer wisp in shared/animationStyles/fps's world: its crit's click zooms the floors away into a
 // street race already flat out, a run of gold boost pads down the street.
 // The ship hits them one after another, each a surge: the view punching
 // wide, speed lines tearing past, its flames roaring; through a tunnel under
@@ -16,8 +16,8 @@ import {
   playCritExplosion,
   playExplosion,
 } from "../../../../shared/explosionBang";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawFpsFace,
   drawFpsFlat,
@@ -29,13 +29,13 @@ import {
   type Fps,
   type FpsCorner,
   type FpsScreen,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import {
   createRaceWisp,
   drawFinishGate,
   drawRoadStreet,
   ROAD_STREET,
-} from "../../../../shared/race";
+} from "../../../../shared/animationStyles/race";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { hash01, stampGlimmer } from "../../../../shared/twinkle";

@@ -4,7 +4,7 @@
 // top bar blows in a run of blasts along it that sparks over to the next one
 // down, and on, its own bar's run the biggest, capped by one huge blast
 import { COLOR } from "../../../../palette";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { smoothstep } from "../../../../shared/easing";
 import { stampGlimmer } from "../../../../shared/twinkle";

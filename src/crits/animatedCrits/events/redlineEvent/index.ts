@@ -15,7 +15,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
-import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
+import { createBolt, drawBolt, drawStrike } from "../../../../shared/animationStyles/lightning";
 import {
   pourDurationMs,
   pourLine,

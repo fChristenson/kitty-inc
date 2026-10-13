@@ -13,7 +13,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { between, clamp01, easeOutCubic } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import {
   pourDurationMs,
   pourLine,

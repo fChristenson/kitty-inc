@@ -1,8 +1,8 @@
 // the missile swarm floor crit: the number fires a fan of missiles that
 // climb, curl over in long loops and dive onto the bars in view one after
 // another in a rolling string of blasts
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { cubic } from "../../../../shared/curves";
 import {

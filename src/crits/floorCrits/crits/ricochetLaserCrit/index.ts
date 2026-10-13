@@ -1,8 +1,8 @@
 // the ricochet laser floor crit: the number floats to the edge and fires a
 // laser that bounces from bar to bar down the building, flaring at every
 // bounce, then the whole zigzag burns brighter and blows up at every bounce
-import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { smoothstep } from "../../../../shared/easing";
 import {
   registerFloorCrit,

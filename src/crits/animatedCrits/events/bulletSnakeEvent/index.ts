@@ -19,7 +19,7 @@ import {
 } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { createBeats } from "../../../../shared/eventBeats";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";

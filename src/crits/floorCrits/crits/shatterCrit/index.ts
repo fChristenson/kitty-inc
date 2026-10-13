@@ -1,6 +1,6 @@
 // the shatter floor crit: the number cracks and shatters into shards that
 // spin off and embed in every bar in view, then every shard detonates at once
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { COLOR } from "../../../../palette";

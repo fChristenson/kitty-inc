@@ -18,7 +18,7 @@ import type { Floor } from "../../gameState";
 import { playSpawnNotice, playJackpot, playSpinTick } from "../../sound";
 import { clamp01, lerp } from "../../shared/easing";
 import { drawLightRays } from "../../shared/lightRays";
-import { drawDetonation } from "../../shared/explosion";
+import { drawDetonation } from "../../shared/animationStyles/explosion";
 import { playExplosion } from "../../shared/explosionBang";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { shakeScreen } from "../../shared/screenShake";

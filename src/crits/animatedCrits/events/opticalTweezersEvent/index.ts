@@ -21,7 +21,7 @@ import {
   smoothstep,
 } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 
 const KEY = "opticalTweezers";

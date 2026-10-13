@@ -3,7 +3,7 @@
 // quicker, each bursting right on the total in a ring of glitter and a
 // blast; three go up together for the finale
 import { COLOR } from "../../../../palette";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

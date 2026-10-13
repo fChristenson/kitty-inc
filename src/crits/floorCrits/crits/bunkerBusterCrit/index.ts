@@ -1,7 +1,7 @@
 // the bunker buster floor crit: the number slams like a heavy bomb into the
 // top bar in view and burrows down through the rest with muffled thuds,
 // goes quiet under the ground, then erupts back up through every bar
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";

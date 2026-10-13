@@ -8,10 +8,10 @@
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playCoinDrop } from "../../../../sound";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { clamp01 } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawGoldBar } from "../../../../shared/glossyWidgets";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";

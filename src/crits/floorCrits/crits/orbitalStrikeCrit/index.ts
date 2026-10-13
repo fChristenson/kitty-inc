@@ -1,8 +1,8 @@
 // the orbital strike floor crit: the number shoots up off the screen, aim
 // rings lock onto the bars in view one by one, then pillars of light slam
 // down from the sky onto each in turn, the last onto its own bar the biggest
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { smoothstep } from "../../../../shared/easing";
 import { COLOR } from "../../../../palette";

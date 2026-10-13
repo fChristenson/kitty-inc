@@ -1,6 +1,6 @@
 // the "Crate Yard" event (fps; free levels), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps: its crit's click slides the floors' screen aside like a
+// shared/animationStyles/fps: its crit's click slides the floors' screen aside like a
 // warehouse door onto a yard of stacked crates, the view crouched behind
 // one. It leans out, a guard pops up from behind a crate and the pistol drops
 // him, it ducks back, again and again, quicker; the last is a big one behind
@@ -11,7 +11,7 @@ import { levelsFor, type Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playCritExplosion,
   playExplosion,
@@ -36,7 +36,7 @@ import {
   type FpsEnemyLook,
   type FpsLens,
   type FpsShot,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { stampGlimmer } from "../../../../shared/twinkle";

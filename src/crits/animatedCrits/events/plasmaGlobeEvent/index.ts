@@ -16,7 +16,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
 import { createBeats } from "../../../../shared/eventBeats";
-import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
+import { createBolt, drawBolt, drawStrike } from "../../../../shared/animationStyles/lightning";
 import { totalSpot } from "../../cashFlow";
 
 const KEY = "plasmaGlobe";

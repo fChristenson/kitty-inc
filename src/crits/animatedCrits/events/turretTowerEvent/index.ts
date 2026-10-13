@@ -18,13 +18,13 @@ import {
 } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOutBack, lerp } from "../../../../shared/easing";
-import { drawAimLaser } from "../../../../shared/beam";
+import { drawAimLaser } from "../../../../shared/animationStyles/beam";
 import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { createBeats } from "../../../../shared/eventBeats";
 import { findRewardWorkers } from "../../eventRewards";
 

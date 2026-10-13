@@ -2,9 +2,9 @@
 // into a crackling ball of plasma, then fires heavy plasma shots down into
 // the bars in view, each a big blast throwing arcs along its bar that pop in
 // blasts; the last, fattest shot into its own bar and a huge blast
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { createBolt, drawBolt, type Bolt } from "../../../../shared/lightning";
+import { createBolt, drawBolt, type Bolt } from "../../../../shared/animationStyles/lightning";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

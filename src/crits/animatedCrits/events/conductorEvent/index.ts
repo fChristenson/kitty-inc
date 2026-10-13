@@ -19,7 +19,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
+import { createBolt, drawBolt, drawStrike } from "../../../../shared/animationStyles/lightning";
 import { findRewardBars } from "../../eventRewards";
 
 const KEY = "conductor";

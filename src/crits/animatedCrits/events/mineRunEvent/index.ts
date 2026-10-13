@@ -1,6 +1,6 @@
 // the "Mine Run" event (fps; crit tiers), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps: its crit's click drops the floors' screen away under a mine
+// shared/animationStyles/fps: its crit's click drops the floors' screen away under a mine
 // cart and the view rides it down a timbered tunnel, faster and faster,
 // lanterns streaking past. Imps leap out from behind the props on either side
 // and the pistol drops each as the cart rattles by, then a big one standing
@@ -32,7 +32,7 @@ import {
   type FpsEnemyLook,
   type FpsLens,
   type FpsShot,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";

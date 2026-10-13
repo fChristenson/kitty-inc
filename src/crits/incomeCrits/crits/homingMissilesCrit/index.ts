@@ -2,7 +2,7 @@
 // little missile wisps that fan out in every direction, then all hook round
 // and home in on the total, slamming into it one after another in a long
 // rattle; the last one in is the huge blast
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

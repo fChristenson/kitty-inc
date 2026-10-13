@@ -2,14 +2,14 @@
 // along it to the right, each hop quicker and shorter, the crit's own last;
 // every landing a tick that turns the bar's readout over a step faster, and
 // for a while after, each of its payouts comes quicker than the last
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawBounceSplash,
   hops,
   SPLASH_MS,
   type Bounce,
   type BouncePath,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { getIncomeBarBox } from "../../../../floors/incomePanel";
 import {

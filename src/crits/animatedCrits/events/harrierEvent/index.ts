@@ -1,6 +1,6 @@
 // the "Harrier" event (rail shooter; cash), a flight-stage event (see
-// ../../flightStage) with its own way in, drawn with shared/railShooter's
-// plain and pillars and shared/race's racer wisp in shared/fps's world: its crit's
+// ../../flightStage) with its own way in, drawn with shared/animationStyles/railShooter's
+// plain and pillars and shared/animationStyles/race's racer wisp in shared/animationStyles/fps's world: its crit's
 // click splits the floors' screen into strips that slide apart onto a
 // checkerboard plain racing at the view, the ship weaving low between
 // towering pillars. Waves of wisps swirl in from the horizon and the ship's
@@ -19,7 +19,7 @@ import {
   playCritExplosion,
   playExplosion,
 } from "../../../../shared/explosionBang";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   createFpsCoin,
   drawFpsCoins,
@@ -32,13 +32,13 @@ import {
   type Fps,
   type FpsCoin,
   type FpsLens,
-} from "../../../../shared/fps";
-import { createRaceWisp } from "../../../../shared/race";
+} from "../../../../shared/animationStyles/fps";
+import { createRaceWisp } from "../../../../shared/animationStyles/race";
 import {
   drawCheckerPlain,
   drawRailPillar,
   type RailPillar,
-} from "../../../../shared/railShooter";
+} from "../../../../shared/animationStyles/railShooter";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { hash01 } from "../../../../shared/twinkle";

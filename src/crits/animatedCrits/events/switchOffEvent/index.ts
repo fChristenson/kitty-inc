@@ -16,7 +16,7 @@ import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { clampTargetsY, ringTargets } from "../../../../shared/coinTargets";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { bezier } from "../../../../shared/curves";
 import { pourLine, sampleLine, totalSpot, type Pour } from "../../cashFlow";
 import {

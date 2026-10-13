@@ -23,7 +23,7 @@ import {
   drawDetonation,
   drawLitFuse,
   DETONATION_MS,
-} from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/explosion";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
 
 const KEY = "airstrike";

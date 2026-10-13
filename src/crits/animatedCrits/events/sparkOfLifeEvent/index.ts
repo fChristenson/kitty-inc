@@ -12,7 +12,7 @@ import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
+import { createBolt, drawBolt, drawStrike } from "../../../../shared/animationStyles/lightning";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
 import { WORKER_HEIGHT } from "../../../../floors/worker";
 import type { Point } from "../../../../shared/wisp";

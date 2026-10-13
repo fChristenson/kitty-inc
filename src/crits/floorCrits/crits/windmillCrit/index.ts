@@ -2,8 +2,8 @@
 // spin up faster and faster, every blade blasting each bar it sweeps across
 // in a rattling stream; then the blades fly off, each slamming onto a bar,
 // and the hub drops onto its own bar in a huge blast
-import { drawBeam } from "../../../../shared/beam";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

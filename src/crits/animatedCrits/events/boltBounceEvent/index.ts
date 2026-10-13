@@ -14,9 +14,9 @@ import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { fireBullet } from "../../../../shared/bullets";
+import { fireBullet } from "../../../../shared/animationStyles/bullets";
 import { ringTargets } from "../../../../shared/coinTargets";
-import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
+import { createBolt, drawBolt, drawStrike } from "../../../../shared/animationStyles/lightning";
 
 const KEY = "boltBounce";
 const REWARD = 4;

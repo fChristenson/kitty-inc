@@ -3,9 +3,9 @@
 // and a fan of pellets rattling blasts along its bar, then the right ones
 // bottom to top, quicker; last its own bar's two fire at once, the rattles
 // meeting in the middle in a huge blast
-import { drawBeam } from "../../../../shared/beam";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

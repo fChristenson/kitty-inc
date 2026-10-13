@@ -1,6 +1,6 @@
 // the "Night Train" event (fps; perma tiers), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps: its crit's click slides the floors' screen aside like a train's
+// shared/animationStyles/fps: its crit's click slides the floors' screen aside like a train's
 // door and the view sprints down a speeding night train, city lights
 // streaking past the windows, the carriage swaying; each carriage's door
 // hisses open on a guard, dropped as the view runs at him, a big one in the
@@ -33,7 +33,7 @@ import {
   type FpsEnemyLook,
   type FpsLens,
   type FpsShot,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { hash01 } from "../../../../shared/twinkle";

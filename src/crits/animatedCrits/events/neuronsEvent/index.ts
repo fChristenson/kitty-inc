@@ -19,7 +19,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { createBolt, drawBolt, type Bolt } from "../../../../shared/lightning";
+import { createBolt, drawBolt, type Bolt } from "../../../../shared/animationStyles/lightning";
 import { ringTargets } from "../../../../shared/coinTargets";
 import { totalSpot } from "../../cashFlow";
 

@@ -1,6 +1,6 @@
 // the blackHole floor crit: a black hole swallowing every bar's coins and flinging them back
-import { drawDetonation } from "../../../../shared/explosion";
-import { drawGravityHole } from "../../../../shared/clutter";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
+import { drawGravityHole } from "../../../../shared/animationStyles/clutter";
 import {
   beginCoinBatch,
   drawCoinBurstFrame,

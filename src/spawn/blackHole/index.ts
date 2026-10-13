@@ -29,10 +29,10 @@ import {
   playJackpot,
   playSwoosh,
 } from "../../sound";
-import { drawBeam } from "../../shared/beam";
-import { drawGravityHole } from "../../shared/clutter";
+import { drawBeam } from "../../shared/animationStyles/beam";
+import { drawGravityHole } from "../../shared/animationStyles/clutter";
 import { clamp01, lerp } from "../../shared/easing";
-import { drawDetonation } from "../../shared/explosion";
+import { drawDetonation } from "../../shared/animationStyles/explosion";
 import { playExplosion } from "../../shared/explosionBang";
 import {
   drawStars,
@@ -40,7 +40,7 @@ import {
   scatterArms,
   type Disk,
   type Orbit,
-} from "../../shared/galaxy";
+} from "../../shared/animationStyles/galaxy";
 import { drawGlow, fadeStops } from "../../shared/glowSprite";
 import { beginLightBatch, endLightBatch } from "../../shared/lightBatch";
 import { shakeScreen } from "../../shared/screenShake";

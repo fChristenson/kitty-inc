@@ -10,12 +10,12 @@ import {
   type CoinBurstSprite,
 } from "../../../../coinBurst";
 import { COLOR } from "../../../../palette";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
-import { drawStrike } from "../../../../shared/lightning";
-import { drawLightningArc } from "../../../../shared/lightningArc";
+import { drawStrike } from "../../../../shared/animationStyles/lightning";
+import { drawLightningArc } from "../../../../shared/animationStyles/lightningArc";
 import { clamp01 } from "../../../../shared/easing";
 import {
   registerFloorCrit,

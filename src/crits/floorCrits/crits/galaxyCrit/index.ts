@@ -1,7 +1,7 @@
 // the galaxy floor crit: a galaxy round a sun that goes supernova, flinging comets onto the bars
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
-import { drawStars, planDisk, scatterArms } from "../../../../shared/galaxy";
+import { drawStars, planDisk, scatterArms } from "../../../../shared/animationStyles/galaxy";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { COLOR } from "../../../../palette";
 import {

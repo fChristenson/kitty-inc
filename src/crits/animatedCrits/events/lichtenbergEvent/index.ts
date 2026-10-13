@@ -18,7 +18,7 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import type { Point } from "../../../../shared/wisp";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";

@@ -3,8 +3,8 @@
 // another onto the bars in view; each one hits, wraps round its bar, winding
 // tighter and tighter, and blows in a pair of blasts; the last, a fat one,
 // wraps round its own bar and goes off in a huge blast
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

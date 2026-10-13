@@ -15,7 +15,7 @@ import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";
 import { createBeats } from "../../../../shared/eventBeats";
 import { ringTargets } from "../../../../shared/coinTargets";
-import { drawDots, shapeFill, SHAPES } from "../../../../shared/drawing";
+import { drawDots, shapeFill, SHAPES } from "../../../../shared/animationStyles/drawing";
 import { totalSpot } from "../../cashFlow";
 
 const KEY = "denoise";

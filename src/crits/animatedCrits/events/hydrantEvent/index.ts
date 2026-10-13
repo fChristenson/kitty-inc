@@ -13,7 +13,7 @@ import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { fireBullet } from "../../../../shared/bullets";
+import { fireBullet } from "../../../../shared/animationStyles/bullets";
 import {
   pourDurationMs,
   pourLine,

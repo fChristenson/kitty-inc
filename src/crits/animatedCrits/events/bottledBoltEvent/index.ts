@@ -14,8 +14,8 @@ import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
-import { drawBeam } from "../../../../shared/beam";
+import { createBolt, drawBolt, drawStrike } from "../../../../shared/animationStyles/lightning";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { findRewardBars } from "../../eventRewards";
 
 const KEY = "bottledBolt";

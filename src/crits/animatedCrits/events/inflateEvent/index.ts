@@ -22,7 +22,7 @@ import {
 import { createBeats } from "../../../../shared/eventBeats";
 import { clampTargetsY, ringTargets } from "../../../../shared/coinTargets";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { pourLine, sampleLine, totalSpot, type Pour } from "../../cashFlow";
 import {
   copyScreen,

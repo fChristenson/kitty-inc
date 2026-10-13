@@ -23,7 +23,7 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import { createBeats } from "../../../../shared/eventBeats";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 

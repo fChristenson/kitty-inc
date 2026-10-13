@@ -14,7 +14,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { drawDots, shapeFill, SHAPES } from "../../../../shared/drawing";
+import { drawDots, shapeFill, SHAPES } from "../../../../shared/animationStyles/drawing";
 import { findRewardBars } from "../../eventRewards";
 
 const KEY = "mint";

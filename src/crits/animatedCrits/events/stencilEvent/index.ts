@@ -21,8 +21,8 @@ import {
   drawSprayMist,
   planSpray,
   sprayLandsAt,
-} from "../../../../shared/spray";
-import { shapeFill, SHAPES } from "../../../../shared/drawing";
+} from "../../../../shared/animationStyles/spray";
+import { shapeFill, SHAPES } from "../../../../shared/animationStyles/drawing";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";

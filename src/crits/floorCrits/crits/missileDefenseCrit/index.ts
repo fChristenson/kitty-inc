@@ -1,8 +1,8 @@
 // the missile defense floor crit: meteors streak down at the building and
 // the number, down by the street, fires interceptors that blow each one
 // apart in mid-air, its debris showering down onto the bars in view
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { smoothstep } from "../../../../shared/easing";

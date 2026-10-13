@@ -3,14 +3,14 @@
 // three strikes along a bar at once, quicker and quicker; then it lets go one
 // giant discharge that forks onto every bar in view at once and into its own
 // bar in a huge blast
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import {
   createBolt,
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

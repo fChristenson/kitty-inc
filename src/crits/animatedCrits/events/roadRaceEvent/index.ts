@@ -1,6 +1,6 @@
 // the "Road Race" event (road race; cash), a flight-stage event (see
-// ../../flightStage) with its own way in, drawn with shared/race's street and
-// racer wisp in shared/fps's world: its crit's click zooms the floors away into a
+// ../../flightStage) with its own way in, drawn with shared/animationStyles/race's street and
+// racer wisp in shared/animationStyles/fps's world: its crit's click zooms the floors away into a
 // race already flat out, a racing wisp skimming the street between the
 // buildings, weaving through a snake of coins, each paying into the live
 // total, round a bend and faster and faster down the straight to the finish
@@ -18,7 +18,7 @@ import {
   type FpsCamera,
   type FpsLens,
   type FpsScreen,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import {
   createRaceWisp,
   drawFinishGate,
@@ -26,7 +26,7 @@ import {
   roadBend,
   ROAD_STREET,
   type RoadCurve,
-} from "../../../../shared/race";
+} from "../../../../shared/animationStyles/race";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { drawScreenPart, type ScreenCopy } from "../../../../shared/screenCopy";

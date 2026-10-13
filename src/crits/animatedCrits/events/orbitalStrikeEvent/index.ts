@@ -16,7 +16,7 @@ import {
   pickCritTierByOdds,
 } from "../../../critTypes";
 import { drawExplosion } from "../../../../shared/eventFx";
-import { drawBeamFlare } from "../../../../shared/beam";
+import { drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import {
   freezeScreen,
   isScreenFrozen,

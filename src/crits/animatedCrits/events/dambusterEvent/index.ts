@@ -17,7 +17,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawLitFuse } from "../../../../shared/explosion";
+import { drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { ringTargets } from "../../../../shared/coinTargets";
 
 const KEY = "dambuster";

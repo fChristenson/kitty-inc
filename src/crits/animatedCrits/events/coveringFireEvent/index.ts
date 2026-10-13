@@ -24,7 +24,7 @@ import {
   fireBullet,
   type Box,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
 

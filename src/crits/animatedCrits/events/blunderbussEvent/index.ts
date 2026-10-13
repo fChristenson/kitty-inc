@@ -19,7 +19,7 @@ import {
 } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { createBeats } from "../../../../shared/eventBeats";
 import { pourDurationMs, pourLine, type Pour } from "../../cashFlow";
 

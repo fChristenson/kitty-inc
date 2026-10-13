@@ -1,5 +1,5 @@
 // the "Sky Raid" event (shmup; cash), a flight-stage event (see
-// ../../flightStage) with its own way in, on the Shmup look (shared/shmup): a
+// ../../flightStage) with its own way in, on the Shmup look (shared/animationStyles/shmup): a
 // bullet hell seen from straight above. Its crit's click lifts the view high
 // off the floors into space, the ship flies in from the bottom and weaves up
 // a streaming starfield past waves of wisp drones' fans, gunships' rings and
@@ -18,7 +18,7 @@ import {
   drawBullets,
   type Box,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { createBeats, type Beats } from "../../../../shared/eventBeats";
 import {
   clamp01,
@@ -27,7 +27,7 @@ import {
   lerp,
   smoothstep,
 } from "../../../../shared/easing";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playExplosion,
   playSlamExplosion,
@@ -42,7 +42,7 @@ import {
   shotHeat,
   type ShipShot,
   type ShmupEnemy,
-} from "../../../../shared/shmup";
+} from "../../../../shared/animationStyles/shmup";
 import { pulseHudTotalFlash } from "../../../../shared/totalIncomeCoins";
 import {
   drawWisp,

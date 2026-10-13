@@ -7,8 +7,8 @@ import {
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import { COLOR } from "../../../../palette";

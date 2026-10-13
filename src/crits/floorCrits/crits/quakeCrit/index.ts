@@ -1,7 +1,7 @@
 // the quake floor crit: the number slams into the ground and a quake ripples
 // up the building, every bar in view leaping off its floor and crashing back
 // down in turn
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { COLOR } from "../../../../palette";

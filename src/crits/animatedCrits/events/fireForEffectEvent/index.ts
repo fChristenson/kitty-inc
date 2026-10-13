@@ -21,9 +21,9 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawAimLaser } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawAimLaser } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardBars } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";

@@ -22,7 +22,7 @@ import {
   drawSprayCoat,
   drawSprayMist,
   planSpray,
-} from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/spray";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
 

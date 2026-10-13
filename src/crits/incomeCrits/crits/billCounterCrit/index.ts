@@ -5,7 +5,7 @@
 // huge blast
 import { COLOR } from "../../../../palette";
 import { BILL_SPIN_FRAME_COUNT } from "../../../../coinBurst";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import {
   registerFloorCrit,

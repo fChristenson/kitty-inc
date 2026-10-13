@@ -2,13 +2,13 @@
 // the screen's sides from button to button, quicker each leg, every strike
 // stamping a button with the taps it now gives free; the last strike slams
 // the crit's own
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   drawBounceSplash,
   ricochetThrough,
   type BouncePath,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import {
   registerFloorCrit,
   type Point,

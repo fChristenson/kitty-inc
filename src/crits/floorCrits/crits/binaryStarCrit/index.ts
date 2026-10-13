@@ -1,5 +1,5 @@
 // the binaryStar floor crit: two suns circling into a collision, flinging blobs onto the bars
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { registerFloorCrit, clamp01, drawText, along } from "../../critPlayer";
 import { quadratic, holeHash } from "../../critPlayer/shared";

@@ -3,8 +3,8 @@
 // blast on each bar it punches through top to bottom, quicker and quicker;
 // then a fat one down the middle through every bar into its own, a huge blast
 import { COLOR } from "../../../../palette";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import {

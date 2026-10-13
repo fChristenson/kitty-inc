@@ -21,7 +21,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01 } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { ringTargets, sprayTargets } from "../../../../shared/coinTargets";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import {
   createCritTextSprite,

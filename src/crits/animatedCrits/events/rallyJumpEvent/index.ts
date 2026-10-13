@@ -15,7 +15,7 @@ import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { planRace, type RaceCorner } from "../../../../shared/race";
+import { planRace, type RaceCorner } from "../../../../shared/animationStyles/race";
 import { findRewardBars, findRewardWorkers } from "../../eventRewards";
 
 const KEY = "rallyJump";

@@ -3,8 +3,8 @@
 // like a cutting torch, a blast every few steps; it drops to the bar below
 // and cuts back the other way, quicker, zigzagging down the bars in view
 // until it stops on the middle of its own, swells fat and a huge blast
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import {
   registerFloorCrit,

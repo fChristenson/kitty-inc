@@ -4,8 +4,8 @@
 // then the power surges back and the bars slam back on one after another from
 // the top in runs of blasts, its own bar last and hardest
 import { COLOR } from "../../../../palette";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";

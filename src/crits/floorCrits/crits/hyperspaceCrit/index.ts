@@ -1,8 +1,8 @@
 // the hyperspace floor crit: stars streak out of the middle faster and faster
 // as the number jumps to lightspeed, then it drops out in a white flash,
 // copies streaking out onto every bar in view, its own last and hardest
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { COLOR } from "../../../../palette";
 import {

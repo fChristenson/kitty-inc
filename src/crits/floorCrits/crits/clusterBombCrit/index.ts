@@ -1,7 +1,7 @@
 // the cluster bomb floor crit: the number turns into a blinking bomb that
 // drops and bursts in mid-air into bomblets, which arc down onto the bars in
 // view and each burst again into a cluster of blasts along the bar
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { smoothstep } from "../../../../shared/easing";

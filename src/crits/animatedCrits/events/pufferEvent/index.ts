@@ -18,7 +18,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { fireBullet } from "../../../../shared/bullets";
+import { fireBullet } from "../../../../shared/animationStyles/bullets";
 import {
   pourDurationMs,
   pourLine,

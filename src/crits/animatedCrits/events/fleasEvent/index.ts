@@ -18,7 +18,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { between, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBounceSplash, hops, SPLASH_MS } from "../../../../shared/bounce";
+import { drawBounceSplash, hops, SPLASH_MS } from "../../../../shared/animationStyles/bounce";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
 
 const KEY = "fleas";

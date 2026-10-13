@@ -18,8 +18,8 @@ import {
   planDrill,
   planGrind,
   type Grind,
-} from "../../../../shared/drill";
-import { drawDetonation } from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/drill";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   BTN_H,
   BTN_W,

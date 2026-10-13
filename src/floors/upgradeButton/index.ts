@@ -1,6 +1,6 @@
 // Barrel for src/floors/upgradeButton/ — every sibling import (incomePanel.ts,
 // floorLock.ts, critCelebration.ts, floorInteractions.ts, floors/index.ts's own
-// facade, main.ts) keeps importing from "../upgradeButton"/"./upgradeButton"
+// facade, main.ts) keeps importing from "./"/"./upgradeButton"
 // unchanged; only this directory's own internal layout changed.
 //
 // Layout:

@@ -4,7 +4,7 @@
 // bottom to top, every orb it passes zipping into it with a pop as it
 // swells, and it dives onto its own bar in a huge blast
 import { COLOR } from "../../../../palette";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 import { stampGlimmer } from "../../../../shared/twinkle";

@@ -2,8 +2,8 @@
 // screen as a wisp and races along it while pillars of light blast up from
 // under it into the total, quick-fire, all across the readout; it stops in
 // the middle and one giant pillar goes up for the huge blast
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { smoothstep } from "../../../../shared/easing";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

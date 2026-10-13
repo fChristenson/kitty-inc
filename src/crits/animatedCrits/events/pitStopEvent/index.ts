@@ -17,7 +17,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { bezier } from "../../../../shared/curves";
 import { easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { planRace, type RaceCorner } from "../../../../shared/race";
+import { planRace, type RaceCorner } from "../../../../shared/animationStyles/race";
 import type { CoinPath } from "../../../../floors/coins";
 import { totalSpot } from "../../cashFlow";
 import { findRewardBars } from "../../eventRewards";

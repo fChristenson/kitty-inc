@@ -1,6 +1,6 @@
 // the "Lift Ride" event (fps; a free floor), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps: its crit's click slides the floors' screen apart like lift
+// shared/animationStyles/fps: its crit's click slides the floors' screen apart like lift
 // doors and the view is standing in a lift. At each stop the doors open on a
 // lobby with a guard in it; he draws, the pistol drops him, the steel doors
 // clunk shut and the car rattles on up, the shaft's lights strobing through
@@ -11,8 +11,8 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { getLockCenter } from "../../../../floors/floorLock";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playCritExplosion,
   playExplosion,
@@ -34,7 +34,7 @@ import {
   type FpsEnemyLook,
   type FpsLens,
   type FpsShot,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, smoothstep } from "../../../../shared/easing";
 import { hash01 } from "../../../../shared/twinkle";

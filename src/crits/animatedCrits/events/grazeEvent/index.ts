@@ -20,7 +20,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { alongRoute } from "../../../../shared/curves";
 import { createBeats } from "../../../../shared/eventBeats";
-import { bulletSpiral, drawBullets } from "../../../../shared/bullets";
+import { bulletSpiral, drawBullets } from "../../../../shared/animationStyles/bullets";
 import { findRewardBars } from "../../eventRewards";
 
 const KEY = "graze";

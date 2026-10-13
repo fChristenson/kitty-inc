@@ -2,14 +2,14 @@
 // onto the total quick-fire, a blast on every strike, while the number
 // crackles below; then one giant bolt joins the two and the number shoots up
 // it into the total
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { smoothstep } from "../../../../shared/easing";
 import {
   createBolt,
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import {
   registerFloorCrit,
   lerp,

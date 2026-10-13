@@ -21,9 +21,9 @@ import {
   lerp,
 } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { heapSpots } from "../../../../shared/clutter";
+import { heapSpots } from "../../../../shared/animationStyles/clutter";
 import type { CoinPath } from "../../../../floors/coins";
 import { totalSpot } from "../../cashFlow";
 import { findRewardBars } from "../../eventRewards";

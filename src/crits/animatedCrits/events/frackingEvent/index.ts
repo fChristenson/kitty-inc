@@ -24,8 +24,8 @@ import {
   drawGrind,
   planDrill,
   planGrind,
-} from "../../../../shared/drill";
-import { drawDetonation } from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/drill";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { findRewardBars } from "../../eventRewards";
 
 const KEY = "fracking";

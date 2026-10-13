@@ -23,7 +23,7 @@ import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
 

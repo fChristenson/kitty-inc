@@ -17,18 +17,18 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawAimLaser } from "../../../../shared/beam";
+import { drawAimLaser } from "../../../../shared/animationStyles/beam";
 import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import {
   dropBounce,
   drawBounceSplash,
   type BouncePath,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
 
 const KEY = "williamTell";

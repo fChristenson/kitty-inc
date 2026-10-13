@@ -1,7 +1,7 @@
 // Sure Shot, a button crit: the number bursts into wisps that dive onto
 // every button in view, quicker and quicker, each blasting it into a sure
 // crit; its own button last, the biggest
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

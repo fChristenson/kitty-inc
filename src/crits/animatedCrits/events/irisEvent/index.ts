@@ -13,7 +13,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOutBack, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { ringTargets } from "../../../../shared/coinTargets";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 
 const KEY = "iris";
 const REWARD = 4;

@@ -3,8 +3,8 @@
 // quicker, each volley a muzzle flash, a recoil and a pop on the total; then
 // both let rip together in one blizzard of bills into the huge blast
 import { BILL_SPIN_FRAME_COUNT } from "../../../../coinBurst";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,

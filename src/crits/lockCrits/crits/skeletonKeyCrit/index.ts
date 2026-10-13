@@ -1,9 +1,9 @@
 // Skeleton Key, a lock crit: the number arcs into the locked floor and
 // sprays dots that build a giant key over it, faster and faster; it blazes,
 // then snaps into the floor, which bursts open, its button left with free taps
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawGlow } from "../../../../shared/glowSprite";
-import { SHAPES, shapeOutline } from "../../../../shared/drawing";
+import { SHAPES, shapeOutline } from "../../../../shared/animationStyles/drawing";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 import { playSpinTick } from "../../../../sound";

@@ -25,7 +25,7 @@ import {
   SPLASH_MS,
   type Bounce,
   type BouncePath,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import {
   drawRewardHires,
   findRewardHires,

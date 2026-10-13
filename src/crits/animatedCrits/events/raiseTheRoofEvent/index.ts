@@ -9,7 +9,7 @@ import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { isFloorLocked } from "../../../../shared/detachedJob";

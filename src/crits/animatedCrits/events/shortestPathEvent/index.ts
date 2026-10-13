@@ -20,7 +20,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { measure, pointAlong } from "../../cashFlow";
 import { findRewardWorkers } from "../../eventRewards";

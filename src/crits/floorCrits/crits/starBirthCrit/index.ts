@@ -1,5 +1,5 @@
 // the starBirth floor crit: a glitter cloud collapsing into a star firing jets through the bars
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { COLOR } from "../../../../palette";

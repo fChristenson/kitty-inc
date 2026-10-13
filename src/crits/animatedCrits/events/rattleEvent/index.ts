@@ -19,7 +19,7 @@ import {
   hops,
   type Bounce,
   type BouncePath,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import {
   copyScreen,
   drawScreenPart,

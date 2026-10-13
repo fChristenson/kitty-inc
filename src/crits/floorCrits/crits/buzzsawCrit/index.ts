@@ -1,9 +1,9 @@
 // the buzzsaw floor crit: the number spins into a whirling saw blade that
 // rips along each bar in view end to end in a fountain of sparks, hopping
 // down onto the next bar after each
-import { drawBeam } from "../../../../shared/beam";
-import { drawDrillSpray } from "../../../../shared/drill";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDrillSpray } from "../../../../shared/animationStyles/drill";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";

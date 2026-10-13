@@ -14,7 +14,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { alongRoute, bezier } from "../../../../shared/curves";
 import { clamp01, easeIn, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { ringTargets } from "../../../../shared/coinTargets";
 import type { CoinPath } from "../../../../floors/coins";
 import { totalSpot } from "../../cashFlow";

@@ -3,8 +3,8 @@
 // each, then hops on to the next, quicker each volley, the crit's own last in
 // the heaviest volley: the next crit landing on a nailed button sticks there
 // for a few taps
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { BTN_H, BTN_W } from "../../../../floors/upgradeButton";
 import {

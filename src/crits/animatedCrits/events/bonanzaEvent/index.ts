@@ -16,8 +16,8 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { bezier } from "../../../../shared/curves";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawGrind, planDrill, planGrind } from "../../../../shared/drill";
-import { heapSpots } from "../../../../shared/clutter";
+import { drawGrind, planDrill, planGrind } from "../../../../shared/animationStyles/drill";
+import { heapSpots } from "../../../../shared/animationStyles/clutter";
 import type { CoinPath } from "../../../../floors/coins";
 import { totalSpot } from "../../cashFlow";
 

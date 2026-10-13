@@ -27,7 +27,7 @@ import {
   scatterRings,
   simulateClean,
   type GravityHole,
-} from "../../../../shared/clutter";
+} from "../../../../shared/animationStyles/clutter";
 import { findRewardBars } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

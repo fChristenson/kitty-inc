@@ -24,8 +24,8 @@ import {
   drawDetonation,
   drawLitFuse,
   DETONATION_MS,
-} from "../../../../shared/explosion";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { findRewardBars } from "../../eventRewards";
 
 const KEY = "cannonade";

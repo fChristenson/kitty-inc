@@ -19,8 +19,8 @@ import {
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
-import { drawBeamFlare } from "../../../../shared/beam";
+} from "../../../../shared/animationStyles/bullets";
+import { drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 
 const KEY = "showdown";

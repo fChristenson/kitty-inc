@@ -20,14 +20,14 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
-import { drawSpray, planSpray } from "../../../../shared/spray";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
+import { drawSpray, planSpray } from "../../../../shared/animationStyles/spray";
 import {
   createBolt,
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";

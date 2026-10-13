@@ -1,8 +1,8 @@
 // the crash landing floor crit: the number turns into a burning ship that
 // tears in from the sky, scraping and bouncing off every bar in view on its
 // way down, then ploughs into the street in a huge blast
-import { drawDrillSpray } from "../../../../shared/drill";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDrillSpray } from "../../../../shared/animationStyles/drill";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";

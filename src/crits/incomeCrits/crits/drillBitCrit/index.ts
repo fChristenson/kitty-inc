@@ -2,8 +2,8 @@
 // under the total and bites in, stalling and grinding with sparks gushing out
 // both sides, then bores up through it in eight shoves, each a jolt and a
 // blast, punching out the top in the huge blast
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
-import { drawDrillHead, drawDrillSpray } from "../../../../shared/drill";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
+import { drawDrillHead, drawDrillSpray } from "../../../../shared/animationStyles/drill";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import { smoothstep } from "../../../../shared/easing";
 import {

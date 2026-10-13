@@ -23,7 +23,7 @@ import {
   aimBullet,
   drawBullets,
   drawMuzzleFlash,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { findRewardWorkers } from "../../eventRewards";
 
 const KEY = "pointDefense";

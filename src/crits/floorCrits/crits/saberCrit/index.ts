@@ -1,8 +1,8 @@
 // the saber floor crit: the number ignites into a blade of light that slashes
 // across the whole screen through every bar in view, back across the other
 // way, then cuts an X across its own bar, which blows
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import {
   registerFloorCrit,

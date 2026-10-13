@@ -20,7 +20,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut } from "../../../../shared/easing";
 import { alongRoute } from "../../../../shared/curves";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
+import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { findRewardWorkers } from "../../eventRewards";
 
 const KEY = "bombSnake";

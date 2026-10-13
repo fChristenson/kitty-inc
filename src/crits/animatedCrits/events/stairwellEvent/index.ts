@@ -16,7 +16,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBounceSplash, hops, type Bounce } from "../../../../shared/bounce";
+import { drawBounceSplash, hops, type Bounce } from "../../../../shared/animationStyles/bounce";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

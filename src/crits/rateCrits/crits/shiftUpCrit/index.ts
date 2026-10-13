@@ -3,9 +3,9 @@
 // round its ends, quicker each, the crit's own last with two laps; as the
 // chaser crosses the line the bar shifts up a gear with a jolt, its readout
 // turning over onto twice its rate for good
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { smoothstep } from "../../../../shared/easing";
-import { planRace, type Race, type RaceCorner } from "../../../../shared/race";
+import { planRace, type Race, type RaceCorner } from "../../../../shared/animationStyles/race";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { playSwoosh } from "../../../../sound";
 import { getIncomeBarBox } from "../../../../floors/incomePanel";

@@ -17,7 +17,7 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { between, clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBounceSplash, hops } from "../../../../shared/bounce";
+import { drawBounceSplash, hops } from "../../../../shared/animationStyles/bounce";
 import { findRewardBars } from "../../eventRewards";
 
 const KEY = "tennis";

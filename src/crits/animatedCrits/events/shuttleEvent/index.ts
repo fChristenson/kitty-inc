@@ -22,7 +22,7 @@ import {
   drawBounceSplash,
   ricochetThrough,
   type Bounce,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 
 const KEY = "shuttle";

@@ -10,7 +10,7 @@ import type { Floor } from "../../../gameState";
 import { CONFIG } from "../../../config";
 import { COLOR } from "../../../palette";
 import { playSwoosh, startBoostEventStreamLoop } from "../../../sound";
-import { drawBeam } from "../../../shared/beam";
+import { drawBeam } from "../../../shared/animationStyles/beam";
 import { drawExplosion, drawWhiteBurst } from "../../../shared/eventFx";
 import { playSlamExplosion } from "../../../shared/explosionBang";
 import { shakeScreen } from "../../../shared/screenShake";

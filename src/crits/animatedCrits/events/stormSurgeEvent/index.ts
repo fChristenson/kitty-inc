@@ -14,7 +14,7 @@ import { lerp } from "../../../../shared/easing";
 import { alongRoute } from "../../../../shared/curves";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
 import { createBeats } from "../../../../shared/eventBeats";
-import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
+import { createBolt, drawBolt, drawStrike } from "../../../../shared/animationStyles/lightning";
 import {
   pourDurationMs,
   pourLine,

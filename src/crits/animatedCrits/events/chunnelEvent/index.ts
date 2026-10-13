@@ -20,8 +20,8 @@ import {
   planDrill,
   planGrind,
   type Grind,
-} from "../../../../shared/drill";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+} from "../../../../shared/animationStyles/drill";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

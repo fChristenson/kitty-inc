@@ -3,8 +3,8 @@
 // over; then it dives onto the top bar and the ice shatters down the
 // building bar by bar in bursts of glitter
 import { COLOR } from "../../../../palette";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { smoothstep } from "../../../../shared/easing";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";

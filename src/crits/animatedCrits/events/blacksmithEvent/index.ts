@@ -19,7 +19,7 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 
 const KEY = "blacksmith";

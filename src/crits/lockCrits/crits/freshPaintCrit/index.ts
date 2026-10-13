@@ -2,7 +2,7 @@
 // turns into a nozzle wisp sweeping back and forth along its top, hissing
 // gold mist down over it, quicker each pass, until its coat flashes and it
 // bursts open; its cats step out gold, each a perma tier up
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawSpray,
   drawSprayCoat,
@@ -10,7 +10,7 @@ import {
   planSpray,
   sprayLandsAt,
   type Spray,
-} from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/spray";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import { FLOOR_H } from "../../../../floors/constants";
 import {

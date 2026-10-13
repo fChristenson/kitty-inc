@@ -1,5 +1,5 @@
 // the supernova floor crit: a star going supernova, its shards slamming into the bars
-import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { registerFloorCrit, clamp01, drawText, along } from "../../critPlayer";
 import { holeHash } from "../../critPlayer/shared";

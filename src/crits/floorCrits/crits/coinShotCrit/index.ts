@@ -9,9 +9,9 @@ import {
   endCoinBatch,
   type CoinBurstSprite,
 } from "../../../../coinBurst";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {

@@ -4,8 +4,8 @@
 // whiter and shaking harder; at critical the beams flare, every bar blows out
 // from its middle to its ends at once, and the core bursts onto its own bar
 import { COLOR } from "../../../../palette";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { stampGlimmer } from "../../../../shared/twinkle";

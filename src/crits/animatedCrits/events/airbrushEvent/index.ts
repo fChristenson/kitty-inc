@@ -25,7 +25,7 @@ import {
   sprayLandsAt,
   sweepAim,
   type Spray,
-} from "../../../../shared/spray";
+} from "../../../../shared/animationStyles/spray";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 
 const KEY = "airbrush";

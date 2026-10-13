@@ -1,6 +1,6 @@
 // the "Ghost Hall" event (fps; cash), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps: its crit's click drops the floors' screen away in strips like a
+// shared/animationStyles/fps: its crit's click drops the floors' screen away in strips like a
 // curtain onto a candlelit hall hung with portraits. Ghost wisps swoop out of
 // the frames at the view and the pistol pops each in a burst of coins that
 // pay into the total, quicker and quicker; a huge ghost rises at the end of
@@ -35,7 +35,7 @@ import {
   type FpsCoin,
   type FpsLens,
   type FpsShot,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { hash01, stampGlimmer } from "../../../../shared/twinkle";

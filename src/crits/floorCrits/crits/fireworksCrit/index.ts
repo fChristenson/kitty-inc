@@ -1,7 +1,7 @@
 // the fireworks floor crit: the number shoots up as a rocket and bursts into
 // a shell of copies high over the building that drift down onto every bar in
 // view, then a second, bigger shell goes off
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { easeOut } from "../../../../shared/easing";

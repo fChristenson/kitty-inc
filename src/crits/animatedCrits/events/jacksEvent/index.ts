@@ -22,7 +22,7 @@ import {
   hops,
   SPLASH_MS,
   type BouncePath,
-} from "../../../../shared/bounce";
+} from "../../../../shared/animationStyles/bounce";
 import {
   drawRewardHires,
   findRewardHires,

@@ -19,10 +19,10 @@ import {
   lerp,
 } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
+import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { COLOR } from "../../../../palette";
-import { planDisk, scatterArms, type Orbit } from "../../../../shared/galaxy";
+import { planDisk, scatterArms, type Orbit } from "../../../../shared/animationStyles/galaxy";
 import { findRewardBars } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

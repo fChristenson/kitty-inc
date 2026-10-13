@@ -25,7 +25,7 @@ import {
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 
 const KEY = "bulletBloom";
 const REWARD = 4;

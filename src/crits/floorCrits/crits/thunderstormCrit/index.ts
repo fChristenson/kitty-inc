@@ -2,7 +2,7 @@
 // crack down all over the bars in view, quick-fire, every strike a flash and
 // a blast; then one giant bolt onto its own bar and a huge blast
 import { COLOR } from "../../../../palette";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawGlow } from "../../../../shared/glowSprite";
 import {
@@ -10,7 +10,7 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
+} from "../../../../shared/animationStyles/lightning";
 import {
   registerFloorCrit,
   type Point,

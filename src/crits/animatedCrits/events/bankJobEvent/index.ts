@@ -1,6 +1,6 @@
 // the "Bank Job" event (fps; cash), a flight-stage event (see
 // ../../flightStage) with its own way in, drawn in first person with
-// shared/fps: its crit's click swings the floors' screen open on its hinge
+// shared/animationStyles/fps: its crit's click swings the floors' screen open on its hinge
 // like a vault door onto a steel strongroom lined with stacks of gold bars.
 // The view walks in, guards stepping out from the sides one after another;
 // the pistol drops each, the gold beside him bursting into coins that pay
@@ -12,7 +12,7 @@ import { COLOR } from "../../../../palette";
 import { playCoinDrop, playSwoosh } from "../../../../sound";
 import { rewardPayoutAmount } from "../../../../floors/incomePanel";
 import { addTotalIncome } from "../../../../totalIncome";
-import { drawBeam } from "../../../../shared/beam";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { multiply } from "../../../../shared/bigNumber";
 import {
   playCritExplosion,
@@ -38,7 +38,7 @@ import {
   type FpsCoin,
   type FpsLens,
   type FpsShot,
-} from "../../../../shared/fps";
+} from "../../../../shared/animationStyles/fps";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";

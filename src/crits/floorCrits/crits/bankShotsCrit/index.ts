@@ -2,8 +2,8 @@
 // shots that bank off the screen's sides, zigzagging down the building, a
 // spark at every bounce and a blast wherever a shot crosses a bar in view;
 // then a fat slug banks twice and slams into its own bar in a huge blast
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {

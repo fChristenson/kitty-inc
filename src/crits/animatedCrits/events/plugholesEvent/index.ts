@@ -21,7 +21,7 @@ import {
   scatterSpiral,
   simulateClean,
   type Cleaner,
-} from "../../../../shared/clutter";
+} from "../../../../shared/animationStyles/clutter";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 

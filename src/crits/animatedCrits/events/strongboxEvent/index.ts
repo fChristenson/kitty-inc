@@ -14,7 +14,7 @@ import { WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawGrind, planDrill, planGrind } from "../../../../shared/drill";
+import { drawGrind, planDrill, planGrind } from "../../../../shared/animationStyles/drill";
 import { totalSpot } from "../../cashFlow";
 
 const KEY = "strongbox";

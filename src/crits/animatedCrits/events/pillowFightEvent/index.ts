@@ -28,7 +28,7 @@ import {
   simulateSweep,
   sweepLane,
   type BroomState,
-} from "../../../../shared/clutter";
+} from "../../../../shared/animationStyles/clutter";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";

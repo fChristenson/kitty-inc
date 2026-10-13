@@ -12,8 +12,8 @@ import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawBeam } from "../../../../shared/beam";
-import { drawBounceSplash, ricochetThrough } from "../../../../shared/bounce";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawBounceSplash, ricochetThrough } from "../../../../shared/animationStyles/bounce";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
 

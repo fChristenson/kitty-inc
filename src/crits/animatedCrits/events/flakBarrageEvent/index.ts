@@ -24,8 +24,8 @@ import {
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+} from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 
 const KEY = "flakBarrage";
 const REWARD = 4;

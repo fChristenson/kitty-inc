@@ -17,8 +17,8 @@ import {
   drawBolt,
   drawStrike,
   type Bolt,
-} from "../../../../shared/lightning";
-import { drawDots, shapeOutline, SHAPES } from "../../../../shared/drawing";
+} from "../../../../shared/animationStyles/lightning";
+import { drawDots, shapeOutline, SHAPES } from "../../../../shared/animationStyles/drawing";
 import {
   drawRewardHires,
   findRewardHires,

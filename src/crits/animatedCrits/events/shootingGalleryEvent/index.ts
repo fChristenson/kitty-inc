@@ -25,7 +25,7 @@ import {
   drawMuzzleFlash,
   fireBullet,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
 
 const KEY = "shootingGallery";

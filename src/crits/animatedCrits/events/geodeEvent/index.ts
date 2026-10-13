@@ -19,8 +19,8 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { drawGrind, planDrill, planGrind } from "../../../../shared/drill";
-import { drawBeam } from "../../../../shared/beam";
+import { drawGrind, planDrill, planGrind } from "../../../../shared/animationStyles/drill";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
 
 const KEY = "geode";
 const REWARD = 4;

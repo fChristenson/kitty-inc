@@ -3,9 +3,9 @@
 // the bars in view in quicker and quicker passes, blasts rattling along
 // wherever it lands; then it locks onto its own bar, blasts stacking, and a
 // huge blast
-import { drawBeam } from "../../../../shared/beam";
-import { drawMuzzleFlash } from "../../../../shared/bullets";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {

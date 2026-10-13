@@ -23,7 +23,7 @@ import {
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 
 const KEY = "crisscross";

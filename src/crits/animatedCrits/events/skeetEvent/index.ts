@@ -25,7 +25,7 @@ import {
   drawBullets,
   drawMuzzleFlash,
   type Bullet,
-} from "../../../../shared/bullets";
+} from "../../../../shared/animationStyles/bullets";
 import { pourLine, sampleLine, totalSpot, type Pour } from "../../cashFlow";
 
 const KEY = "skeet";

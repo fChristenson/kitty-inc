@@ -4,7 +4,7 @@
 // into the locked floor, slamming it in: the floor opens, then climbs to the
 // whole level of the one below
 import { COLOR } from "../../../../palette";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";

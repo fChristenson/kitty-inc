@@ -18,8 +18,8 @@ import {
 } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";
-import { drawBeam } from "../../../../shared/beam";
-import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { createBolt, drawBolt, drawStrike } from "../../../../shared/animationStyles/lightning";
 import { createBeats } from "../../../../shared/eventBeats";
 import { ringTargets } from "../../../../shared/coinTargets";
 

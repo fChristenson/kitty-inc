@@ -3,7 +3,7 @@
 // burst a blast in the air spraying shrapnel down into the bar below in a
 // rattle; the last shell bursts right over its own bar in a huge blast
 import { COLOR } from "../../../../palette";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   playBarExplosion,
   playExplosion,

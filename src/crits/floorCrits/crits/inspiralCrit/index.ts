@@ -4,8 +4,8 @@
 // squeezing as it passes, harder each time; then they merge in a flash and
 // the bars blow outward from the middle, its own bar last and biggest
 import { COLOR } from "../../../../palette";
-import { drawBeam } from "../../../../shared/beam";
-import { drawDetonation } from "../../../../shared/explosion";
+import { drawBeam } from "../../../../shared/animationStyles/beam";
+import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {
