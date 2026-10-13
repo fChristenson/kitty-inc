@@ -2,8 +2,8 @@
 // locked floor at the top of the building (bar 0; Two Up's floor above it is
 // bar 1), every reward landing on it. Each kind is its own module under
 // ./crits, played by floorCrits/critPlayer; a hit of step 0 only jolts, any
-// other lands its reward on that bar's floor (Bolt Cutter's, Move In's and
-// Hot Lap's step 2 hits on the floor they opened)
+// other lands its reward on that bar's floor (the step 2 hits of the kinds
+// that open it first land on the floor they opened)
 import type { FloorActionsDeps } from "../../floors/floorInteractions";
 import type { Floor } from "../../gameState";
 import { FLOOR_H, FLOOR_X_MAX, FLOOR_X_MIN } from "../../floors/constants";
@@ -24,7 +24,12 @@ import {
   setFloorLockPriceHidden,
 } from "../../floors/floorLock";
 import { increaseIncomeRateBy, punchIncomeBar } from "../../floors/incomePanel";
-import { celebrateWorkerBoost, recruitWorker } from "../../floors/worker";
+import {
+  celebrateWorkerBoost,
+  getRenderedWorkerCount,
+  promoteWorkerPermaTier,
+  recruitWorker,
+} from "../../floors/worker";
 import { CONFIG } from "../../config";
 
 // where Move In's cats land across the floor they open, 0..1 of its walk
@@ -35,6 +40,15 @@ const FURNISH = [
   (floor: Floor) => (floor.hasOfficeChairs = true),
   (floor: Floor) => (floor.hasOfficeSupplies = true),
   (floor: Floor) => (floor.hasManager = true),
+];
+
+// the kinds that open the floor on their step 1 hit, then reward it on step 2
+const OPENS_THEN_REWARDS: readonly LockCritKind[] = [
+  "boltCutterCrit",
+  "moveInCrit",
+  "hotLapCrit",
+  "carbonCopyCrit",
+  "freshPaintCrit",
 ];
 
 // a lock crit playing out from floor's crit onto the locked floor, if it's in
@@ -66,8 +80,7 @@ export function lockCritPlayFor(
         return [at, { x: at.x, y: at.y - pitch() }];
       }
     : spot;
-  const opensThenRewards =
-    kind === "boltCutterCrit" || kind === "moveInCrit" || kind === "hotLapCrit";
+  const opensThenRewards = OPENS_THEN_REWARDS.includes(kind);
   let opened: Floor | null = null;
   let movedIn = 0;
   let furnished = 0;
@@ -80,17 +93,31 @@ export function lockCritPlayFor(
       if (step === 0) return;
       if (opensThenRewards && step === 2) {
         if (!opened) return;
+        const now = Date.now();
         if (kind === "boltCutterCrit") {
           const levels = count * CONFIG.crit.boltCutterLevels;
           increaseIncomeRateBy(opened, levels);
           punchIncomeBar(opened, `+${levels} Lvl`, color);
         } else if (kind === "hotLapCrit") {
           FURNISH[furnished++ % FURNISH.length](opened);
+        } else if (kind === "carbonCopyCrit") {
+          // up from a free floor's share to the whole level of the one below
+          const below = deps.floors[deps.floors.indexOf(opened) - 1];
+          const levels = below ? below.upgradeCount - opened.upgradeCount : 0;
+          if (levels > 0) {
+            increaseIncomeRateBy(opened, levels);
+            punchIncomeBar(opened, `+${levels} Lvl`, color);
+          }
+        } else if (kind === "freshPaintCrit") {
+          for (let i = 0; i < getRenderedWorkerCount(opened); i++) {
+            promoteWorkerPermaTier(opened, i);
+            celebrateWorkerBoost(opened, i, now);
+          }
         } else {
           const spot = MOVE_IN_SPOTS[movedIn++ % MOVE_IN_SPOTS.length];
           const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * spot;
-          const worker = recruitWorker(opened, x, Date.now());
-          if (worker !== null) celebrateWorkerBoost(opened, worker, Date.now());
+          const worker = recruitWorker(opened, x, now);
+          if (worker !== null) celebrateWorkerBoost(opened, worker, now);
         }
         deps.persist();
         return;

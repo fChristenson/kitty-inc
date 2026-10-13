@@ -41,5 +41,9 @@ export const BUTTON_CRIT_CONFIG = {
     hotButtonCrit: {
       chance: 0.03,
     },
+    // a gun wisp nailing every button, its next crit then sticking on it
+    nailGunCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

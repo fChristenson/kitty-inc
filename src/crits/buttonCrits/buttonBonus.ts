@@ -1,11 +1,14 @@
 // what button crits leave on an upgrade button: free taps (each a free
 // upgrade), a charge (levels its next tap lands, free), double taps (each
 // landing two levels), payout taps (each paying its bar's payout too), hot
-// taps (each rolling its next crit more often) and linked taps (each landing
-// a level on every button linked to it too). Read by the button's draw and
-// its tap (floors/upgradeButton, floors/floorInteractions)
+// taps (each rolling its next crit more often), linked taps (each landing
+// a level on every button linked to it too) and nails (its next crit landing
+// again on the taps after it). Read by the button's draw and its tap
+// (floors/upgradeButton, floors/floorInteractions)
 import { snapshotMap } from "../../shared/snapshotState";
 import type { Floor } from "../../gameState";
+import type { CritTier } from "../critTypes";
+import { armCritUpgrade } from "../floorCrits/upgradeCrit";
 
 const freeTaps = snapshotMap<Floor, number>();
 const charges = snapshotMap<Floor, number>();
@@ -13,6 +16,10 @@ const doubleTaps = snapshotMap<Floor, number>();
 const payoutTaps = snapshotMap<Floor, number>();
 const hotTaps = snapshotMap<Floor, number>();
 const linkedTaps = snapshotMap<Floor, number>();
+// how many taps the next crit landing on a nailed button plays for
+const nails = snapshotMap<Floor, number>();
+// a crit stuck on its button, and how many more times it's armed again
+const stuck = snapshotMap<Floor, { tier: CritTier; left: number }>();
 // not a snapshotMap: a snapshot would deep-copy the linked floors themselves
 const links = new WeakMap<Floor, Floor[]>();
 
@@ -43,6 +50,27 @@ export function addPayoutTaps(floor: Floor, taps: number): void {
 
 export function addHotTaps(floor: Floor, taps: number): void {
   addTaps(hotTaps, floor, taps);
+}
+
+export function addNails(floor: Floor, taps: number): void {
+  addTaps(nails, floor, taps);
+}
+
+// after floor's crit of `tier` is spent: armed again while it's stuck, or
+// stuck if the button was nailed
+export function stickSpentCrit(floor: Floor, tier: CritTier): void {
+  const held = stuck.get(floor);
+  if (held) {
+    if (held.left > 1) held.left--;
+    else stuck.delete(floor);
+    armCritUpgrade(floor, held.tier);
+    return;
+  }
+  const taps = nails.get(floor);
+  if (!taps) return;
+  nails.delete(floor);
+  if (taps > 2) stuck.set(floor, { tier, left: taps - 2 });
+  if (taps > 1) armCritUpgrade(floor, tier);
 }
 
 // links `linked`'s button to floor's, for floor's linked taps
@@ -104,18 +132,20 @@ export function hasButtonBonus(floor: Floor): boolean {
     doubleTaps.has(floor) ||
     payoutTaps.has(floor) ||
     hotTaps.has(floor) ||
-    linkedTaps.has(floor)
+    linkedTaps.has(floor) ||
+    nails.has(floor)
   );
 }
 
 // the button's label while it carries one, "+30 Lvl", "Free 7", "Double 7",
-// "Payout 7", "Hot 7" or "Linked 7", made once per number
+// "Payout 7", "Hot 7", "Linked 7" or "Sticky 3", made once per number
 const chargeLabels = new Map<number, string>();
 const tapLabels = new Map<number, string>();
 const doubleLabels = new Map<number, string>();
 const payoutLabels = new Map<number, string>();
 const hotLabels = new Map<number, string>();
 const linkedLabels = new Map<number, string>();
+const nailLabels = new Map<number, string>();
 function labelOf(labels: Map<number, string>, n: number, text: string) {
   labels.set(n, text);
   return text;
@@ -142,6 +172,7 @@ export function buttonBonusLabel(floor: Floor): string | null {
     tapsLabel(doubleTaps, doubleLabels, floor, "Double") ??
     tapsLabel(payoutTaps, payoutLabels, floor, "Payout") ??
     tapsLabel(hotTaps, hotLabels, floor, "Hot") ??
-    tapsLabel(linkedTaps, linkedLabels, floor, "Linked")
+    tapsLabel(linkedTaps, linkedLabels, floor, "Linked") ??
+    tapsLabel(nails, nailLabels, floor, "Sticky")
   );
 }

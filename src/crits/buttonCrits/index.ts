@@ -15,9 +15,11 @@ import {
   addFreeTaps,
   addHotTaps,
   addLinkedTaps,
+  addNails,
   addPayoutTaps,
   linkButton,
 } from "./buttonBonus";
+import { CONFIG } from "../../config";
 import { liveEffect } from "../../shared/detachedJob";
 import { playBarExplosion } from "../../shared/explosionBang";
 import {
@@ -89,6 +91,14 @@ function reward(
     // taps that each roll the next crit hot, twice as many on its own
     case "hotButtonCrit":
       addHotTaps(target, own ? count * 2 : count);
+      flipUpgradeButton(target);
+      return 0;
+    // its next crit sticks for a few taps, twice as many on its own
+    case "nailGunCrit":
+      addNails(
+        target,
+        own ? CONFIG.crit.nailGunTaps * 2 : CONFIG.crit.nailGunTaps,
+      );
       flipUpgradeButton(target);
       return 0;
   }

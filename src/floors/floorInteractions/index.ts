@@ -18,6 +18,7 @@ import {
   takeHotTap,
   takeLinkedFloors,
   takePayoutTap,
+  stickSpentCrit,
   getCritTier,
   consumeCritUpgrade,
   rollCritUpgrade,
@@ -651,6 +652,7 @@ export function handleFloorClick(
       consumeCritUpgrade(floor);
       // rolled before the rewards so a Golden/Silver Ticket arms the roll after this one
       rollCritUpgrade(floor, true, eventContext);
+      stickSpentCrit(floor, tier);
       // an event covering this crit reveals and pays its tier once it plays out
       const covered =
         carriesEvent &&

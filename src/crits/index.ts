@@ -89,6 +89,7 @@ export {
   takeHotTap,
   takeLinkedFloors,
   takePayoutTap,
+  stickSpentCrit,
 } from "./buttonCrits/buttonBonus";
 export {
   BADGE_GLITTER_AT,

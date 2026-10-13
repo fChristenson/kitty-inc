@@ -37,6 +37,8 @@ export const CRIT_CONFIG = {
     freeFloorLevelShare: 0.5,
     // a Hot Button tap rolls its next crit up to this many times, till one lands
     hotButtonRolls: 3,
+    // the taps a crit landing on a Nail Gun's button plays for (twice on its own)
+    nailGunTaps: 3,
     // Bolt Cutter's levels on the floor it opens, per the crit's multiple
     boltCutterLevels: 5,
     // gateway roll for the whole "special crit" (chain/boost/bounce/

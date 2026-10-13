@@ -73,6 +73,11 @@ Three more triggers that roll nothing today.
 
 ## Built
 
+- **Nail Gun** (button crit) and **Carbon Copy**, **Fresh Paint** (lock crits), from List 151. Test: New Effects.
+  - **Nail Gun** (Gunfire): a gun wisp hops beside each button and hammers nails into it; the next crit landing on a nailed button (`Sticky N`) is armed again for its next taps, `CONFIG.crit.nailGunTaps` plays in all (twice on its own).
+  - **Carbon Copy** (Wisp): a wisp races along the bar of the floor below and hauls a gold copy of it up into the locked floor; it opens, then climbs to the whole level of the floor below.
+  - **Fresh Paint** (Spray): a nozzle wisp sweeps the locked floor's top spraying gold until the coat flashes and it opens; every cat on it climbs a perma tier.
+
 - **Link Up**, **Hot Button** (button crits) and **Hot Lap** (lock crit), from List 150. Test: New Effects.
   - **Link Up** (Beam): beams lock from the crit's own button onto every other button in view; its next taps (the crit's multiple, `Linked N`) each land a level on every linked button too.
   - **Hot Button** (Galaxy): a disk of stars flings knots onto every button, the core diving onto the own last; each button's next taps (`Hot N`) roll their next crit up to `CONFIG.crit.hotButtonRolls` times till one lands.

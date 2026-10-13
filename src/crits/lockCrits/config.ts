@@ -36,5 +36,15 @@ export const LOCK_CRIT_CONFIG = {
     hotLapCrit: {
       chance: 0.03,
     },
+    // a wisp hauling a gold copy of the bar below up into the locked floor,
+    // which opens at that floor's level
+    carbonCopyCrit: {
+      chance: 0.03,
+    },
+    // a nozzle wisp spraying the locked floor gold until it opens, its cats
+    // a perma tier up
+    freshPaintCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };
