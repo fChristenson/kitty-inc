@@ -8267,6 +8267,28 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 98
+  // fps, perma tiers: src/crits/animatedCrits/events/nightTrainEvent ("Night Train"): the floors' screen slides aside like a train's door; the view sprints down a speeding night train, each carriage's door opening on a guard it drops, a big one last; the end door opens on the floors and every worker in view climbs a perma tier
+  nightTrainEvent: {
+    chance: 0.01,
+    slideMs: 250, // the floors' screen sliding aside
+    flyMs: 0, // the dive through the end door is the landing
+    promoteGapMs: 60, // between the workers' perma tiers
+  },
+  // fps, crit tiers: src/crits/animatedCrits/events/kickInEvent ("Kick In"): the floors' screen is kicked flat like a door; the view storms two rooms of guards, kicking the door between them down, a big one last; the last door goes down on the floors and every bar in view climbs a crit tier
+  kickInEvent: {
+    chance: 0.01,
+    flyMs: 0, // the dive through the last door is the landing
+    tierGapMs: 70, // between the bars' crit tiers, top to bottom
+  },
+  // fps, levels: src/crits/animatedCrits/events/springboardEvent ("Springboard"): the floors' screen bows like a trampoline and flings the view up an atrium, higher each bounce, a guard at a balcony rail dropped at every top; the last bounce flies it through a lit window onto the floors and every bar takes its levels
+  springboardEvent: {
+    chance: 0.01,
+    bowMs: 220, // the floors' screen bowing before it flings the view up
+    flyMs: 0, // the flight through the window is the landing
+    levelShare: 0.1, // levels for every bar in view
+    levelGapMs: 70, // between the bars' levels, top to bottom
+  },
   // batch 97
   // charge + drawing, levels + crit tier: src/crits/animatedCrits/events/gemstoneEvent ("Gemstone"): glitter all over the frozen screen is sucked into a giant gem, a trickle then a flood, the gem crushing smaller and whiter, trembling harder; it blazes and bursts, its shards diving onto every bar, the clicked one last a crit tier up
   gemstoneEvent: {

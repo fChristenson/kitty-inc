@@ -2325,6 +2325,9 @@ async function main() {
           markdown: forceOnActive((e) => e.forceMarkdownEvent),
           "raise-the-roof": forceOnActive((e) => e.forceRaiseTheRoofEvent),
           gemstone: forceOnActive((e) => e.forceGemstoneEvent),
+          "night-train": forceOnActive((e) => e.forceNightTrainEvent),
+          "kick-in": forceOnActive((e) => e.forceKickInEvent),
+          springboard: forceOnActive((e) => e.forceSpringboardEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {

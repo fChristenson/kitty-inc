@@ -73,6 +73,11 @@ Three more triggers that roll nothing today.
 
 ## Built
 
+- **Night Train**, **Kick In**, **Springboard** (animated crits, FPS look, batch 98), from List 194. Test: New Effects.
+  - **Night Train** (`animatedCrits/events/nightTrainEvent`, perma tiers): the view sprints down a speeding night train, each carriage's door opening on a guard it drops, a big one last; the end door opens on the floors and every worker in view climbs a perma tier. Arms only with a worker that can still climb.
+  - **Kick In** (`animatedCrits/events/kickInEvent`, crit tiers): the floors' screen is kicked flat like a door; the view storms two rooms of guards, kicking the door between down, a big one last; the last door falls on the floors and every bar in view climbs a crit tier.
+  - **Springboard** (`animatedCrits/events/springboardEvent`, levels): the floors' screen bows like a trampoline and flings the view up an atrium, higher each bounce, a guard at a balcony rail dropped at every top, a big imp last; the last bounce flies it through a lit window onto the floors and every bar takes its levels.
+
 - **Gemstone** (animated crit), **Gather** (floor crit), **Coin Spin** (income crit), **Jump Start** (lock crit), from List 193, all on the Charge look (`shared/charge`, `tickCharge` rumble). Test: New Effects.
   - **Gemstone** (`animatedCrits/events/gemstoneEvent`, Charge + Drawing): glitter all over the frozen screen is sucked into a giant gem that crushes smaller and whiter; it bursts, shards diving onto every bar with levels, the clicked one last a crit tier up.
   - **Gather** (`floorCrits/crits/gatherCrit`): a wisp on its own bar's end rips sparks off every other bar (levels on each rip) as it charges, then tears back along its own bar in a rattle of blasts.
