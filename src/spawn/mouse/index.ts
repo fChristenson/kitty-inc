@@ -23,12 +23,12 @@ import {
 import { whitenImage } from "../../shared/mergeFlash";
 import { tapHitsMoving } from "../../shared/tapTarget";
 import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
+import { spawnGameDeps, type SpawnGame } from "../../shared/spawnGames";
 import {
   isVisibleOnFloor,
   pickCritTierByOdds,
   applyBonusTierIncome,
   celebrateBonusTier,
-  type OnScreenFloor,
 } from "../../crits";
 
 // a free bonus critter: spawns at random on a random unlocked floor in view
@@ -103,12 +103,9 @@ let huntedImage: HTMLCanvasElement | null = null;
 let active: MouseState | null = null;
 let lastUpdate = 0;
 const roll = createSpawnRoll(CONFIG.randomSpawns.mouse, Date.now());
-// the floors on screen, as gameCanvas last handed them in
-let onScreen: () => OnScreenFloor[] = () => [];
 
-// loads the mouse sprite once; main.ts awaits this alongside the other image loads
-// before the first redraw ever needs it
-export async function loadMouseImage(): Promise<HTMLImageElement> {
+// loads the mouse sprite once, as its chunk loads; it spawns once it's in
+async function loadMouseImage(): Promise<void> {
   const mouseImage = await loadImageByName("mouse");
   mouseSprite = document.createElement("canvas");
   mouseSprite.width = SPRITE_W;
@@ -118,8 +115,8 @@ export async function loadMouseImage(): Promise<HTMLImageElement> {
   const c = mouseSprite.getContext("2d")!;
   c.imageSmoothingQuality = "high";
   c.drawImage(mouseImage, 0, 0, mouseSprite.width, mouseSprite.height);
-  return mouseImage;
 }
+const sprite = loadMouseImage();
 
 function despawn(now: number): void {
   active = null;
@@ -154,7 +151,8 @@ function rollNextDart(state: MouseState, now: number): void {
 // mouse on it right now, unconditionally (no cooldown/existing-mouse check —
 // callers decide when that's appropriate)
 function spawnOn(now: number): void {
-  const unlocked = onScreen()
+  if (!mouseSprite) return;
+  const unlocked = (spawnGameDeps()?.getOnScreenFloors?.() ?? [])
     .filter((entry) => entry.floor.unlocked && isVisibleOnFloor(entry, MOUSE_Y))
     .map((entry) => entry.floor);
   if (unlocked.length === 0) return; // nothing in view to boost yet
@@ -177,14 +175,10 @@ function spawnOn(now: number): void {
 // advances the current run cycle — darting toward a random point, occasionally
 // pausing briefly, then picking a new random point once it arrives — and expires it
 // after its duration, or rolls a fresh spawn on a random unlocked floor once the
-// cooldown since the last one elapses. Call this once per frame — not per floor —
-// with the active building's floors on screen; there's only ever one mouse
-// building-wide, never one per floor
-export function updateMouse(
-  floorsOnScreen: () => OnScreenFloor[],
-  now: number,
-): void {
-  onScreen = floorsOnScreen;
+// cooldown since the last one elapses. Once per frame, on the game clock
+// (Date.now()); there's only ever one mouse building-wide, never one per floor
+function updateMouse(): void {
+  const now = Date.now();
   const dtSeconds = lastUpdate ? Math.max((now - lastUpdate) / 1000, 0) : 0;
   lastUpdate = now;
 
@@ -219,9 +213,9 @@ export function updateMouse(
 }
 
 // dev/test-only: force a spawn right now regardless of the cooldown, replacing
-// whatever mouse (if any) is already active — used by the testing actions bar's
-// "Spawn Mouse" button
-export function forceSpawnMouse(): void {
+// whatever mouse (if any) is already active, once its sprite is in
+async function forceSpawnMouse(): Promise<void> {
+  await sprite;
   spawnOn(Date.now());
 }
 
@@ -250,7 +244,7 @@ function getScale(state: MouseState, now: number): number {
 // draws the mouse into this floor's own canvas, a no-op unless it's the one floor
 // currently hosting it. Bottom-anchored at MOUSE_Y (feet/paws touch the same line
 // the cats stand on), not centered on it
-export function drawMouse(
+function drawMouse(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
   now: number,
@@ -342,7 +336,7 @@ function drawMouseSprite(
 }
 
 // whether a floor-local point lands on the currently-visible mouse on this floor
-export function hitTestMouse(x: number, y: number, floor: Floor): boolean {
+function hitTestMouse(x: number, y: number, floor: Floor): boolean {
   if (!active || active.floor !== floor) return false;
   const now = Date.now();
   if (now - active.spawnedAt >= CONFIG.randomSpawns.mouse.durationMs)
@@ -371,7 +365,7 @@ export function hitTestMouse(x: number, y: number, floor: Floor): boolean {
 // same point (e.g. an overlapping cat) — a click hitting both the mouse and a
 // worker triggers both, same as clicking overlapping cats already hits every one of
 // them
-export function handleMouseClick(
+function handleMouseClick(
   x: number,
   y: number,
   floor: Floor,
@@ -421,3 +415,11 @@ registerHuntTarget({
   drawStill: (ctx, floor, whiteAlpha, rotation) =>
     drawMouseSprite(ctx, floor, Date.now(), false, whiteAlpha, rotation),
 });
+
+export default {
+  force: forceSpawnMouse,
+  update: updateMouse,
+  drawOnFloor: drawMouse,
+  tapFloor: handleMouseClick,
+  hitTestFloor: hitTestMouse,
+} satisfies SpawnGame;

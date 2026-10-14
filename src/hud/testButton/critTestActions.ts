@@ -4,6 +4,7 @@ import {
   CRIT_PROC_INFO,
   CRIT_TIER_ORDER,
   CRIT_TIER_CONFIG,
+  MAP_CRIT_KINDS,
   PLAYED_CRITS,
   type CritGroup,
   type CritMeta,
@@ -11,21 +12,7 @@ import {
   type CritTier,
   type EventCard,
 } from "../../crits";
-
-export const MAP_CRIT_TEST_KINDS: readonly CritProcKind[] = [
-  "chain",
-  "upgrade",
-  "heavenly",
-  "skip",
-  "grandOpening",
-  "luckyClover",
-  "mystic",
-  "pair",
-  "threeOfAKind",
-  "fourOfAKind",
-  "fullHouse",
-  "royalFlush",
-];
+import type { SpawnMeta } from "../../shared/spawnGames";
 
 // a test button, wired by its id or its data attribute
 interface TestButton {
@@ -59,18 +46,6 @@ function tabMarkup(title: string, items: readonly TestItem[]): string {
   return `<details class="test-actions-dropdown"><summary class="test-actions-dropdown__toggle">${title}</summary><div class="test-actions-dropdown__menu">${items.map(itemMarkup).join("")}</div></details>`;
 }
 
-const SPAWN_ITEMS: readonly TestItem[] = [
-  { id: "spawn-mouse", label: "Spawn Mouse" },
-  { id: "test-bubbles-event", label: "Spawn Bubbles" },
-  { id: "test-wisp-spawn-event", label: "Spawn Wisp" },
-  { id: "test-coin-spawn-event", label: "Spawn Coin" },
-  { id: "test-pacman-spawn-event", label: "Spawn Pacman" },
-  { id: "test-black-hole-spawn-event", label: "Spawn Black Hole" },
-  { id: "test-simon-says-spawn-event", label: "Spawn Simon Says" },
-  { id: "test-lightning-storm-spawn-event", label: "Spawn Lightning Storm" },
-  { id: "test-pick-me-spawn-event", label: "Spawn Pick Me" },
-];
-
 const TEST_ACTION_ITEMS: readonly TestItem[] = [
   { id: "add-money", label: "Add Money" },
   { id: "test-idle-overlay", label: "Idle Overlay" },
@@ -83,15 +58,12 @@ const TEST_ACTION_ITEMS: readonly TestItem[] = [
   { id: "test-gold-switch-event", label: "Gold Standard" },
 ];
 
-// the floor slot's own kinds, beside the floor crits
-const FLOOR_SLOT_ITEMS: readonly TestItem[] = [
-  { data: ["crit-up-down", "up"], label: "Crit Up" },
-  { data: ["crit-up-down", "down"], label: "Crit Down" },
-  { id: "test-merge-crit", label: "Merge Crit" },
-];
-
-// the panel; `events` are the animated crits' cards (loadEventCards)
-export function createTestButtonMarkup(events: readonly EventCard[]): string {
+// the panel; `events` are the animated crits' cards (loadEventCards),
+// `spawns` the random spawns' (src/spawn)
+export function createTestButtonMarkup(
+  events: readonly EventCard[],
+  spawns: readonly (SpawnMeta & { key: string })[],
+): string {
   const label = (kind: (typeof CRIT_PROC_KINDS)[number]) =>
     CRIT_PROC_INFO[kind]?.label ?? kind;
   const tiers = [...CRIT_TIER_ORDER]
@@ -136,6 +108,11 @@ export function createTestButtonMarkup(events: readonly EventCard[]): string {
           data: [`${of}-crit`, kind] as const,
         })),
     );
+  // the spawns' buttons, from their meta.ts, the untested ones under New Effects
+  const spawnItems = (isNew: boolean): TestItem[] =>
+    spawns
+      .filter((spawn) => !spawn.isNew === !isNew)
+      .map(({ key, label }) => ({ label, data: ["spawn", key] as const }));
   const badgeItems: TestItem[] = [
     {
       select: "Event",
@@ -157,15 +134,18 @@ export function createTestButtonMarkup(events: readonly EventCard[]): string {
       })),
   ];
   const tabs: [string, readonly TestItem[]][] = [
-    ["New Effects", [...eventItems(true), ...playedItems(null)]],
+    [
+      "New Effects",
+      [...eventItems(true), ...playedItems(null), ...spawnItems(true)],
+    ],
     ["Rate Crits", playedItems("rate")],
     ["Button Crits", playedItems("button")],
     ["Lock Crits", playedItems("lock")],
     ["Animated Crits", eventItems(false)],
-    ["Random Spawns", SPAWN_ITEMS],
+    ["Random Spawns", spawnItems(false)],
     ["Test Actions", TEST_ACTION_ITEMS],
     ["Income Crits", playedItems("income")],
-    ["Floor Crits", [...playedItems("floor"), ...FLOOR_SLOT_ITEMS]],
+    ["Floor Crits", playedItems("floor")],
     ["Badge Crits", badgeItems],
   ];
   return `
@@ -201,8 +181,7 @@ export function wireCritTestActions(
     const map = event.value === "map";
     for (const button of buttons) {
       const kind = button.dataset.critKind as CritProcKind | "";
-      const unavailable =
-        map && kind !== "" && !MAP_CRIT_TEST_KINDS.includes(kind);
+      const unavailable = map && kind !== "" && !MAP_CRIT_KINDS.includes(kind);
       button.dataset.eventUnavailable = String(unavailable);
       button.hidden = unavailable;
       button.disabled = unavailable;

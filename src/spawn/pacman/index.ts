@@ -28,7 +28,7 @@ import {
   prepareMini,
   type Prize,
 } from "../../shared/spawnPrize";
-import { registerSpawnGame, spawnGameDeps } from "../../shared/spawnGames";
+import { spawnGameDeps, type SpawnGame } from "../../shared/spawnGames";
 import { createSpawnRoll } from "../../shared/spawnRoll";
 import { swipeHits, tapHits } from "../../shared/tapTarget";
 import { stampGlimmer } from "../../shared/twinkle";
@@ -186,7 +186,7 @@ function start(now: number): void {
 }
 
 // lays a path (test button)
-export function forcePacmanSpawn(): void {
+function forcePacmanSpawn(): void {
   start(performance.now());
 }
 
@@ -419,4 +419,12 @@ function draw(
   if (won >= 0) drawDetonation(ctx, at, won, WIN_BLAST, now);
 }
 
-registerSpawnGame({ update, draw, press, move, release, hitTest });
+export default {
+  force: forcePacmanSpawn,
+  update,
+  draw,
+  press,
+  move,
+  release,
+  hitTest,
+} satisfies SpawnGame;

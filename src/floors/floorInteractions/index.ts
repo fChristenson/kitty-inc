@@ -5,9 +5,6 @@ import {
   promoteTierKeepingLevel,
   isCashCrit,
   isCritUpgrade,
-  isCritUp,
-  isCritDown,
-  getMergeCrit,
   getFloorCrit,
   getIncomeCrit,
   getButtonCrit,
@@ -665,9 +662,6 @@ export function handleFloorClick(
     if (isCritUpgrade(floor)) {
       const tier = getCritTier(floor)!;
       const procs = readCritProcs(floor);
-      const critUp = isCritUp(floor);
-      const critDown = isCritDown(floor);
-      const mergeCrit = getMergeCrit(floor);
       const floorCrit = getFloorCrit(floor);
       const incomeCrit = getIncomeCrit(floor);
       const buttonCrit = getButtonCrit(floor);
@@ -695,9 +689,6 @@ export function handleFloorClick(
           Object.assign(procs, {
             tier,
             cash,
-            critUp,
-            critDown,
-            mergeCrit,
             floorCrit,
             incomeCrit,
             buttonCrit,

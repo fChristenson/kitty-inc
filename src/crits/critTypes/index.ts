@@ -994,11 +994,6 @@ export interface CritRollResult extends Record<BadgeCritKind, boolean> {
   tier: CritTier;
   // a cash crit: pays its upgrades' price instead of them
   cash?: boolean;
-  // the crit also landing on the floor above / below
-  critUp?: boolean;
-  critDown?: boolean;
-  // a merge crit's second number, added to the tier's
-  mergeCrit?: CritTier;
   // a floor crit: its number playing out onto the bars once it has flashed
   floorCrit?: FloorCritKind;
   // an income crit: its number playing out onto the total income
@@ -1108,9 +1103,6 @@ export type CritProcKind = Exclude<
   keyof CritRollResult,
   | "tier"
   | "cash"
-  | "critUp"
-  | "critDown"
-  | "mergeCrit"
   | "floorCrit"
   | "incomeCrit"
   | "buttonCrit"
@@ -2083,21 +2075,11 @@ type SpecialCritType = keyof typeof CONFIG.specialCrits;
 const SPECIAL_CRIT_TYPES = Object.keys(
   CONFIG.specialCrits,
 ) as SpecialCritType[];
-// the floor slot's own kinds (a crit up or down, a merge) and its floor crits
-type FloorSlotType = keyof typeof CONFIG.floorCrits | FloorCritKind;
-const FLOOR_SLOT_CHANCES: Record<FloorSlotType, { chance: number }> = {
-  ...CONFIG.floorCrits,
-  ...PLAYED_CRITS.floor,
-};
-const FLOOR_SLOT_TYPES = Object.keys(FLOOR_SLOT_CHANCES) as FloorSlotType[];
 // the special slots the floor crits' player plays
 type PlayedSlotType = "floorCrit" | "buttonCrit" | "lockCrit" | "rateCrit";
 // what a special slot ends up carrying: a played slot is one of its group's
 // kinds
-type SlotType =
-  | Exclude<SpecialCritType, PlayedSlotType>
-  | FloorSlotType
-  | CritPlayKind;
+type SlotType = Exclude<SpecialCritType, PlayedSlotType> | CritPlayKind;
 
 // the played crits (floor, income, button, lock and rate crits) are each
 // their own folder, collected by critKit
@@ -2162,7 +2144,7 @@ export function coolDownFloorCrits(kind: CritPlayKind): void {
 
 // what a gateway-passing crit's special slot carries: a type by its
 // CONFIG.specialCrits chance; a floorCrit slot is then a floor crit (by its
-// CONFIG.floorCrits chance) on a multiplier crit, an income crit (by its
+// meta.ts chance) on a multiplier crit, an income crit (by its
 // CONFIG.incomeCrits chance) on a cash crit; a buttonCrit or lockCrit slot
 // one of its group's kinds. `plays` turns down a slot that can't play
 // where the crit was rolled (a lock crit with no locked floor in view)
@@ -2189,7 +2171,7 @@ function pickSpecialCrit(
     return pickByChance(PLAYED_CRITS.rate, RATE_CRIT_KINDS);
   return cash
     ? pickByChance(PLAYED_CRITS.income, INCOME_CRIT_KINDS)
-    : pickByChance(FLOOR_SLOT_CHANCES, FLOOR_SLOT_TYPES);
+    : pickByChance(PLAYED_CRITS.floor, FLOOR_CRIT_KINDS);
 }
 
 // always lands a tier, weighted by each tier's own relative chance
@@ -2322,10 +2304,7 @@ export function rollCrit(
   const landedProcs = [...kept];
   const result = critResult(tier);
   if (cash) result.cash = true;
-  if (slot === "critUp") result.critUp = true;
-  else if (slot === "critDown") result.critDown = true;
-  else if (slot === "mergeCrit") result.mergeCrit = pickCritTierByOdds();
-  else if (isFloorCritKind(slot)) result.floorCrit = slot;
+  if (isFloorCritKind(slot)) result.floorCrit = slot;
   else if (isIncomeCritKind(slot)) result.incomeCrit = slot;
   else if (isButtonCritKind(slot)) result.buttonCrit = slot;
   else if (isLockCritKind(slot)) result.lockCrit = slot;

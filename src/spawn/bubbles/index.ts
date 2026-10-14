@@ -4,13 +4,9 @@
 // it vanishes. A tap pops one and pays it at once: a coin streams into the
 // total, a crit number slams into its floor's income bar (its levels) or one
 // of the floor's workers (a perma tier up), and a badge plays its crit
-// celebration.
-//
-// gameCanvas wires the floor actions in (wireBubbles), ticks the spawn timer
-// (updateBubbles), pops on presses (popBubbleAt) and draws them in screen
-// space over the HUD (drawBubbles)
+// celebration. It sweeps: a swipe pops every bubble it passes through, and it
+// draws in screen space over the crit flash
 import { CONFIG } from "../../config";
-import type { FloorActionsDeps } from "../../floors";
 import type { Floor } from "../../gameState";
 import { playBubbleAppear, playBubblePop, playSpawnNotice } from "../../sound";
 import { randomInt } from "../../utils";
@@ -31,6 +27,7 @@ import {
   type Prize,
 } from "../../shared/spawnPrize";
 import { swipeHits } from "../../shared/tapTarget";
+import { spawnGameDeps, type SpawnGame } from "../../shared/spawnGames";
 import type { Point } from "../../shared/wisp";
 
 const RADIUS = 130;
@@ -72,7 +69,6 @@ interface Bubble {
   payout: Payout | null;
 }
 
-let getDeps: (() => FloorActionsDeps) | null = null;
 const bubbles: Bubble[] = [];
 const roll = createSpawnRoll(CONFIG.randomSpawns.bubbles, performance.now());
 // the screen as last drawn, in gameCanvas's screen units
@@ -80,13 +76,8 @@ let width = 1;
 let height = 1;
 const spot: Point = { x: 0, y: 0 };
 
-// the floor actions of the building on screen
-export function wireBubbles(deps: () => FloorActionsDeps): void {
-  getDeps = deps;
-}
-
 // once the last bubbles are gone, rolls to blow a few more in, like the mouse
-export function updateBubbles(now: number): void {
+function updateBubbles(now: number): void {
   if (bubbles.length > 0) {
     roll.coolDown(now);
     return;
@@ -95,15 +86,17 @@ export function updateBubbles(now: number): void {
     roll.hold(now);
     return;
   }
-  if (!getDeps || !roll.procs(now)) return;
-  const floor = pickSpawnFloor(getDeps());
+  const deps = spawnGameDeps();
+  if (!deps || !roll.procs(now)) return;
+  const floor = pickSpawnFloor(deps);
   if (!floor) return;
   spawnBubbles(floor, now);
 }
 
 // blows a few bubbles in at once, alongside any already floating (test button)
-export function forceBubbles(): void {
-  const floor = getDeps && pickSpawnFloor(getDeps());
+function forceBubbles(): void {
+  const deps = spawnGameDeps();
+  const floor = deps && pickSpawnFloor(deps);
   if (floor) spawnBubbles(floor, performance.now());
 }
 
@@ -201,17 +194,18 @@ function hitBubble(
 }
 
 // whether a press at (x, y) (gameCanvas screen units) would pop a bubble
-export function hitTestBubbles(x: number, y: number): boolean {
+function hitTestBubbles(x: number, y: number): boolean {
   return !!hitBubble(x, y, performance.now());
 }
 
 function pop(bubble: Bubble, now: number): void {
-  if (!getDeps) return;
+  const deps = spawnGameDeps();
+  if (!deps) return;
   bubble.poppedAt = now;
   bubbleAt(bubble, now, bubble.from);
   playBubblePop();
   bubble.payout = collectPrize(
-    getDeps(),
+    deps,
     bubble.floor,
     bubble.content,
     bubble.from,
@@ -224,8 +218,8 @@ function pop(bubble: Bubble, now: number): void {
 
 // pops the bubble under (x, y) and pays what's inside; true if one popped,
 // so the press goes no further
-export function popBubbleAt(x: number, y: number): boolean {
-  if (!getDeps) return false;
+function popBubbleAt(x: number, y: number): boolean {
+  if (!spawnGameDeps()) return false;
   const now = performance.now();
   const bubble = hitBubble(x, y, now);
   if (!bubble) return false;
@@ -234,13 +228,8 @@ export function popBubbleAt(x: number, y: number): boolean {
 }
 
 // pops every bubble a swipe from (x0, y0) to (x1, y1) passes through
-export function sweepBubbles(
-  x0: number,
-  y0: number,
-  x1: number,
-  y1: number,
-): void {
-  if (!getDeps || bubbles.length === 0) return;
+function sweepBubbles(x0: number, y0: number, x1: number, y1: number): void {
+  if (bubbles.length === 0 || !spawnGameDeps()) return;
   const now = performance.now();
   for (
     let bubble = hitBubble(x1, y1, now, x0, y0);
@@ -263,19 +252,19 @@ function isDone(bubble: Bubble, now: number): boolean {
 }
 
 // every bubble, in gameCanvas's screen units (w x h), each frame
-export function drawBubbles(
+function drawBubbles(
   ctx: CanvasRenderingContext2D,
   w: number,
   h: number,
   now: number,
 ): void {
-  if (bubbles.length === 0 || !getDeps) return;
+  const deps = spawnGameDeps();
+  if (bubbles.length === 0 || !deps) return;
   width = w;
   height = h;
   const t = performance.now();
   for (let i = bubbles.length - 1; i >= 0; i--)
     if (isDone(bubbles[i], t)) bubbles.splice(i, 1);
-  const deps = getDeps();
   const { durationMs, pulseMs } = CONFIG.randomSpawns.bubbles;
   ctx.save();
   for (const bubble of bubbles) {
@@ -312,3 +301,12 @@ export function drawBubbles(
   }
   ctx.restore();
 }
+
+export default {
+  force: forceBubbles,
+  update: updateBubbles,
+  drawOver: (ctx, w, h, _totalAtY, now) => drawBubbles(ctx, w, h, now),
+  press: (x, y) => popBubbleAt(x, y),
+  sweep: sweepBubbles,
+  hitTest: (x, y) => hitTestBubbles(x, y),
+} satisfies SpawnGame;

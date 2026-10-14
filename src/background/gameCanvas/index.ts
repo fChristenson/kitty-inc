@@ -35,37 +35,18 @@ import { drawCity, CITY_MAX_HEIGHT, getCitySkyGroundColor } from "../city";
 import { drawStars } from "../stars";
 import { drawRoof } from "../../buildings";
 import { drawHud, HUD_H } from "../../hud";
-import { updateMouse, hitTestMouse, handleMouseClick } from "../../spawn/mouse";
 import { setTapScale } from "../../shared/tapTarget";
 import { noteCritFrame } from "../../shared/critLoad";
 import {
-  drawBubbles,
-  hitTestBubbles,
-  popBubbleAt,
-  sweepBubbles,
-  updateBubbles,
-  wireBubbles,
-} from "../../spawn/bubbles";
-import {
-  drawWispSpawn,
-  hitTestWispGlitter,
-  sweepWispGlitter,
-  updateWispSpawn,
-} from "../../spawn/wisp";
-import {
-  drawCoinSpawn,
-  hitTestCoinSpawn,
-  tapCoinSpawn,
-  sweepCoinSpawn,
-  updateCoinSpawn,
-  wireCoinSpawn,
-} from "../../spawn/coin";
-import {
   drawSpawnGames,
+  drawSpawnGamesOver,
   hitTestSpawnGames,
+  hitTestSpawnsOnFloor,
   moveSpawnGame,
   pressSpawnGames,
   releaseSpawnGame,
+  sweepSpawnGames,
+  tapSpawnsOnFloor,
   updateSpawnGames,
   wireSpawnGames,
 } from "../../shared/spawnGames";
@@ -786,10 +767,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     skipFlash = false,
     split = false,
   ): void {
-    updateMouse(onScreenFloors, Date.now());
-    updateBubbles(performance.now());
-    updateWispSpawn(performance.now());
-    updateCoinSpawn(performance.now());
     updateSpawnGames(performance.now());
     const dpr = getEffectiveDpr();
     ctx.save();
@@ -894,23 +871,15 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         SLOT_W,
         Date.now(),
       );
-    // the bubbles float over the crit celebration, rattling with the world
+    // the sweeping spawns float over the crit celebration, rattling with the world
     over.translate(shake.x / scale, shake.y / scale);
-    drawWispSpawn(
+    drawSpawnGamesOver(
       over,
       SLOT_W,
       contentViewportH(),
       HUD_H / 2,
       performance.now(),
     );
-    drawCoinSpawn(
-      over,
-      SLOT_W,
-      contentViewportH(),
-      HUD_H / 2,
-      performance.now(),
-    );
-    drawBubbles(over, SLOT_W, contentViewportH(), performance.now());
     ctx.restore();
   }
 
@@ -931,13 +900,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   // sits over whatever floor content happens to be scrolled underneath it, so
   // that gesture must never also fire a floor tap/upgrade-button hit
   let hudTapDown = false;
-  // true for the whole gesture if it popped a bubble: nothing under it fires
-  let bubbleTapDown = false;
-  // true for the whole gesture if it started on the wisp's glitter: it
-  // sweeps instead of scrolling or tapping; every drag sweeps from the last spot
-  let wispSwipe = false;
-  // true for the whole gesture if a gesture spawn took it (shared/spawnGames)
-  let spawnGameDown = false;
+  // true for the whole gesture if a spawn took it (shared/spawnGames): it
+  // plays or sweeps instead of scrolling or tapping; every drag sweeps from
+  // the last spot
+  let spawnDown = false;
   let sweepX = 0;
   let sweepY = 0;
 
@@ -1026,16 +992,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       hit.isGroundFloor,
     );
   }
-  wireBubbles(floorActionsDeps);
-  wireCoinSpawn(floorActionsDeps);
   wireSpawnGames(floorActionsDeps);
 
   // fires the upgrade button's click logic once (same overlapping-mouse-critter
   // courtesy a normal tap gets); called once on pointerdown, then again every
   // auto-repeat tick via fireHandleFloorClick alone (skipping the extra
-  // handleMouseClick, which only makes sense for the very first fire)
+  // floor spawn tap, which only makes sense for the very first fire)
   function fireUpgradeOnce(hit: UpgradeHit): void {
-    handleMouseClick(hit.localX, hit.localY, hit.floor, activeFloors);
+    tapSpawnsOnFloor(hit.localX, hit.localY, hit.floor, activeFloors);
     fireHandleFloorClick(hit);
   }
 
@@ -1078,20 +1042,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     stopHoldRepeat(); // safety net against a stale hold from an interrupted previous gesture
     upgradeFiredOnDown = false;
     const p = canvasPoint(event);
-    wispSwipe = false;
-    spawnGameDown = false;
     sweepX = p.x;
     sweepY = p.y;
-    // bubbles float over everything, the HUD too
-    bubbleTapDown = popBubbleAt(p.x, p.y) || tapCoinSpawn(p.x, p.y);
-    if (bubbleTapDown) return;
-    spawnGameDown = pressSpawnGames(p.x, p.y, performance.now());
-    if (spawnGameDown) return;
-    wispSwipe = hitTestWispGlitter(p.x, p.y);
-    if (wispSwipe) {
-      sweepWispGlitter(p.x, p.y, p.x, p.y);
-      return;
-    }
+    // spawns float over everything, the HUD too
+    spawnDown = pressSpawnGames(p.x, p.y, performance.now());
+    if (spawnDown) return;
     hudTapDown = p.y < hudBottomY;
     if (hudTapDown) return; // HUD is the topmost layer — no floor hit-test underneath it
     const hit = hitTestPoint(p.x, p.y);
@@ -1138,9 +1093,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     dragging = false;
     didDrag = false;
     hudTapDown = false;
-    bubbleTapDown = false;
-    wispSwipe = false;
-    spawnGameDown = false;
+    spawnDown = false;
     upgradeFiredOnDown = true;
     canvas.setPointerCapture(event.pointerId);
     button.fire();
@@ -1150,20 +1103,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   function onPointerMove(event: PointerEvent): void {
     if (dragPointerId !== event.pointerId) {
       const p = canvasPoint(event);
-      if (
-        p.y < hudBottomY ||
-        hitTestBubbles(p.x, p.y) ||
-        hitTestCoinSpawn(p.x, p.y) ||
-        hitTestSpawnGames(p.x, p.y, performance.now()) ||
-        hitTestWispGlitter(p.x, p.y)
-      ) {
+      if (p.y < hudBottomY || hitTestSpawnGames(p.x, p.y, performance.now())) {
         canvas.style.cursor = "pointer";
         hoveredPoint = null;
         return;
       }
       const hit = hitTestPoint(p.x, p.y);
       const hoverable = hit
-        ? hitTestMouse(hit.localX, hit.localY, hit.floor) ||
+        ? hitTestSpawnsOnFloor(hit.localX, hit.localY, hit.floor) ||
           hitTestFloorHover(
             hit.localX,
             hit.localY,
@@ -1186,17 +1133,12 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     if (isScreenFrozen()) return;
 
     const swipe = canvasPoint(event);
-    if (spawnGameDown) {
-      moveSpawnGame(swipe.x, swipe.y, performance.now());
-      return;
-    }
-    sweepWispGlitter(sweepX, sweepY, swipe.x, swipe.y);
-    sweepBubbles(sweepX, sweepY, swipe.x, swipe.y);
-    sweepCoinSpawn(sweepX, sweepY, swipe.x, swipe.y);
+    if (spawnDown && moveSpawnGame(swipe.x, swipe.y, performance.now())) return;
+    sweepSpawnGames(sweepX, sweepY, swipe.x, swipe.y);
     sweepX = swipe.x;
     sweepY = swipe.y;
-    // a swipe that started on glitter, a bubble or a coin sweeps, never scrolls
-    if (wispSwipe || bubbleTapDown) return;
+    // a swipe that started on a sweeping spawn sweeps, never scrolls
+    if (spawnDown) return;
 
     const dy = event.clientY - lastY;
     const now = performance.now();
@@ -1222,8 +1164,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     canvas.releasePointerCapture(event.pointerId);
     dragPointerId = null;
     stopHoldRepeat();
-    if (spawnGameDown) {
-      spawnGameDown = false;
+    if (spawnDown) {
+      spawnDown = false;
       releaseSpawnGame(performance.now());
       return;
     }
@@ -1233,7 +1175,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       }
       return;
     }
-    if (bubbleTapDown || wispSwipe) return;
     if (hudTapDown) {
       onOpenCorporationStats();
       return;
@@ -1248,7 +1189,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     }
     // both run unconditionally on the same click — an overlapping mouse and cat(s)
     // both register, same as clicking overlapping cats already hits every one of them
-    handleMouseClick(hit.localX, hit.localY, hit.floor, activeFloors);
+    tapSpawnsOnFloor(hit.localX, hit.localY, hit.floor, activeFloors);
     fireHandleFloorClick(hit);
   }
 

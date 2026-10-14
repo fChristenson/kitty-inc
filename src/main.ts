@@ -4,8 +4,6 @@ import "./style.css";
 import {
   forceTestCrit,
   forceCashCrit,
-  forceCritUpDown,
-  forceMergeCrit,
   forceFloorCrit,
   forceIncomeCrit,
   forceButtonCrit,
@@ -30,9 +28,7 @@ import {
   loadBadgeCatalog,
 } from "./crits";
 import { wireCritTestActions } from "./hud";
-import { forceBubbles } from "./spawn/bubbles";
-import { forceWispSpawn } from "./spawn/wisp";
-import { forceCoinSpawn } from "./spawn/coin";
+import { SPAWN_CARDS, forceSpawn, loadSpawns } from "./spawn";
 import {
   add,
   subtract,
@@ -117,7 +113,7 @@ import {
 import {
   createTestButtonMarkup,
   wireTestButton,
-  wireSpawnMouseButton,
+  wireSpawnTestButtons,
   wireTestActionsFilter,
   sortTestActionMenus,
   wireIdleOverlayTestButton,
@@ -200,8 +196,6 @@ import {
   wireRocketEventTestButton,
   wireRevealEventTestButton,
   wireBadgeCapsuleTestButton,
-  wireCritUpDownTestButtons,
-  wireMergeCritTestButton,
   wireFloorCritTestButtons,
   wireIncomeCritTestButtons,
   wireButtonCritTestButtons,
@@ -286,7 +280,6 @@ import {
   loadWallMaterial,
   loadRoofImage,
 } from "./buildings";
-import { loadMouseImage, forceSpawnMouse } from "./spawn/mouse";
 import {
   startBackgroundMusic,
   preloadSounds,
@@ -374,12 +367,8 @@ async function main() {
   // badge rewards, then the rest of the events
   queueEventParts(1);
   loadWhenIdle(loadBadgeRewards);
-  // the gesture spawns (shared/spawnGames) roll once their chunks land
-  loadWhenIdle(() => import("./spawn/pacman"));
-  loadWhenIdle(() => import("./spawn/blackHole"));
-  loadWhenIdle(() => import("./spawn/simonSays"));
-  loadWhenIdle(() => import("./spawn/lightningStorm"));
-  loadWhenIdle(() => import("./spawn/pickMe"));
+  // the random spawns roll once their chunks land
+  loadWhenIdle(loadSpawns);
   queueEventParts();
 
   // the page's markup (canvas, action bar, dialogs) is in index.html
@@ -396,7 +385,6 @@ async function main() {
     document.fonts.load('700 16px "Fredoka"'),
     document.fonts.load('900 16px "Fredoka"'),
     loadCloudImages(),
-    loadMouseImage(),
     loadCoinImage(),
     loadFloatingCoinImage(),
     loadRoofImage(), // same roof art for every theme, loaded once
@@ -714,7 +702,10 @@ async function main() {
       Promise.all([loadEventCards(), loadBadgeCatalog()]).then(([events]) => {
         app
           .querySelector(".game")!
-          .insertAdjacentHTML("beforeend", createTestButtonMarkup(events));
+          .insertAdjacentHTML(
+            "beforeend",
+            createTestButtonMarkup(events, SPAWN_CARDS),
+          );
         exposePerfBridge({
           getActiveFloors: () => buildings[activeBuildingIndex],
           floorToClient: gameCanvas.floorToClient,
@@ -735,9 +726,7 @@ async function main() {
           // of a name for however big this (or totalIncome) ever gets
           addTotalIncome(fromNumber(1e150));
         });
-        wireSpawnMouseButton(app, () => {
-          forceSpawnMouse();
-        });
+        wireSpawnTestButtons(app, (key) => void forceSpawn(key));
         wireCritTestActions(
           app,
           (kind, tier, event) => {
@@ -760,14 +749,6 @@ async function main() {
         wireFoilRevealTestButtons(app, (kind) => {
           const floor = buildings[activeBuildingIndex]?.[0];
           if (floor) forceTestCrit(floor, kind, "crit", "upgrade");
-        });
-        wireCritUpDownTestButtons(app, (up) => {
-          const floor = buildings[activeBuildingIndex]?.[0];
-          if (floor) forceCritUpDown(floor, up);
-        });
-        wireMergeCritTestButton(app, () => {
-          const floor = buildings[activeBuildingIndex]?.[0];
-          if (floor) forceMergeCrit(floor);
         });
         wireFloorCritTestButtons(app, (kind) => {
           const floor = buildings[activeBuildingIndex]?.[0];
@@ -2366,31 +2347,12 @@ async function main() {
           coronation: forceOnActive((e) => e.forceCoronationEvent),
           "torch-relay": forceOnActive((e) => e.forceTorchRelayEvent),
           "ring-hop": forceOnActive((e) => e.forceRingHopEvent),
-          bubbles: forceBubbles,
-          "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {
             const floor = buildings[activeBuildingIndex]?.[0];
             if (!floor) return;
             gameCanvas.scrollActiveToFloor(floor);
             forceGoldSwitch(floor);
           }),
-          "coin-spawn": forceCoinSpawn,
-          "pacman-spawn": () =>
-            void import("./spawn/pacman").then((m) => m.forcePacmanSpawn()),
-          "black-hole-spawn": () =>
-            void import("./spawn/blackHole").then((m) =>
-              m.forceBlackHoleSpawn(),
-            ),
-          "simon-says-spawn": () =>
-            void import("./spawn/simonSays").then((m) =>
-              m.forceSimonSaysSpawn(),
-            ),
-          "lightning-storm-spawn": () =>
-            void import("./spawn/lightningStorm").then((m) =>
-              m.forceLightningStormSpawn(),
-            ),
-          "pick-me-spawn": () =>
-            void import("./spawn/pickMe").then((m) => m.forcePickMeSpawn()),
           "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
           "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
           "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),
@@ -3086,10 +3048,10 @@ async function main() {
         // spawns a mouse if none is out, arms "Hunt!" on its floor and scrolls there
         wireHuntEventTestButton(
           app,
-          later(() => {
+          later(async () => {
             let floor = ev.forceHuntEvent();
             if (!floor) {
-              forceSpawnMouse();
+              await forceSpawn("mouse");
               floor = ev.forceHuntEvent();
             }
             if (floor) gameCanvas.scrollActiveToFloor(floor);

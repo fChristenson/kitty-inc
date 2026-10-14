@@ -362,9 +362,7 @@ export const SCENARIOS: Scenario[] = [
       triggerOvertimeBoost(floor, fromNumber(0));
       bridge.scrollToFloor(floor, 0.6);
       await sleep(300);
-      for (const id of ["wisp", "coin"]) click(`#test-${id}-spawn-event`);
-      click("#test-bubbles-event");
-      click("#spawn-mouse");
+      spawnAll();
       const income = [
         ...document.querySelectorAll<HTMLButtonElement>("[data-income-crit]"),
       ].map((button) => button.dataset.incomeCrit!);
@@ -663,11 +661,7 @@ export function floorCritScenario(
         target = floors[floors.length - 2] ?? target;
       }
       bridge.scrollToFloor(target, group === "lock" ? 0.75 : 0.6);
-      if (withSpawns) {
-        for (const id of ["wisp", "coin"]) click(`#test-${id}-spawn-event`);
-        click("#test-bubbles-event");
-        click("#spawn-mouse");
-      }
+      if (withSpawns) spawnAll();
       click(`[data-${group}-crit="${kind}"]`);
       await sleep(300);
       tap(bridge, target);
@@ -676,13 +670,17 @@ export function floorCritScenario(
   };
 }
 
-const SPAWN_BUTTONS: Record<string, string> = {
-  mouse: "#spawn-mouse",
-  bubbles: "#test-bubbles-event",
-};
+// puts every random spawn out (each src/spawn folder's test button)
+function spawnAll(): void {
+  for (const button of document.querySelectorAll<HTMLButtonElement>(
+    "[data-spawn]",
+  ))
+    button.click();
+}
 
-// a long-press with a random spawn (spawn:wisp, spawn:none for none)
-// forced on screen as it starts; spawn-idle: without the press
+// a long-press with a random spawn (spawn:wisp, spawn:none for none; its
+// src/spawn folder's name) forced on screen as it starts; spawn-idle: without
+// the press
 export function spawnScenario(id: string, hold = true): Scenario {
   const name = `spawn${hold ? "" : "-idle"}:${id}`;
   return {
@@ -693,7 +691,7 @@ export function spawnScenario(id: string, hold = true): Scenario {
       const floor = second(bridge);
       bridge.scrollToFloor(floor, 0.6);
       await sleep(300);
-      if (id !== "none") click(SPAWN_BUTTONS[id] ?? `#test-${id}-spawn-event`);
+      if (id !== "none") click(`[data-spawn="${id}"]`);
       const release = hold ? press(bridge, floor) : () => {};
       const summary = await measure(name, 6000);
       release();
@@ -724,8 +722,8 @@ function spawnTarget(): { x: number; y: number } | null {
   return n ? { x: x / n, y: y / n } : null;
 }
 
-// a gesture spawn played as it's meant to be: held (black-hole), dragged
-// along its bar (lightning-storm) or tapped (the rest)
+// a gesture spawn played as it's meant to be: held (blackHole), dragged
+// along its bar (lightningStorm) or tapped (the rest)
 export function spawnPlayScenario(id: string): Scenario {
   const name = `spawn-play:${id}`;
   return {
@@ -735,7 +733,7 @@ export function spawnPlayScenario(id: string): Scenario {
       click("#add-money");
       bridge.scrollToFloor(second(bridge), 0.6);
       await sleep(300);
-      click(`#test-${id}-spawn-event`);
+      click(`[data-spawn="${id}"]`);
       let at: { x: number; y: number } | null = null;
       for (let k = 0; k < 40 && !at; k++) {
         await sleep(100);
@@ -744,8 +742,8 @@ export function spawnPlayScenario(id: string): Scenario {
       const done = measure(name, 6000);
       if (at) {
         pressSpawnGames(at.x, at.y, performance.now());
-        if (id === "black-hole") await sleep(3500);
-        else if (id === "lightning-storm")
+        if (id === "blackHole") await sleep(3500);
+        else if (id === "lightningStorm")
           for (let k = 1; k <= 30; k++) {
             await sleep(30);
             moveSpawnGame(at.x + k * 25, at.y, performance.now());

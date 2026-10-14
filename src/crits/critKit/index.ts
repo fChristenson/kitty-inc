@@ -4,14 +4,21 @@
 //   meta.ts   its card (label, odds, style; see ./meta), all startup reads
 //   index.ts  its animation and its reward (registerFloorCrit, with its
 //             group's hooks: see floorCrits/critPlayer's FloorCritDef),
-//             loaded when it's armed or plays
+//             loaded when it's armed or plays; none for a floor crit's
+//             `twist` (see ./meta)
 // the rolls, the player's loaders and the test buttons all read the folders
 // from here
 import type { CritMeta } from "./meta";
 
 export type { CritMeta, CritStyle } from "./meta";
 
-export const CRIT_GROUPS = ["floor", "income", "button", "lock", "rate"] as const;
+export const CRIT_GROUPS = [
+  "floor",
+  "income",
+  "button",
+  "lock",
+  "rate",
+] as const;
 export type CritGroup = (typeof CRIT_GROUPS)[number];
 
 export type FloorCritKind = string;
@@ -48,7 +55,9 @@ const LOADERS: Record<string, () => Promise<unknown>> = {};
 const GROUP_OF: Record<string, CritGroup> = {};
 for (const [path, meta] of Object.entries(METAS)) {
   const [, group, kind] = /^\.\.\/(\w+)Crits\/crits\/(\w+)\//.exec(path)!;
-  const load = MODULES[path.replace(/meta\.ts$/, "index.ts")];
+  const load = meta.twist
+    ? () => Promise.resolve()
+    : MODULES[path.replace(/meta\.ts$/, "index.ts")];
   if (!load) throw new Error(`${kind}: a meta.ts with no index.ts`);
   PLAYED_CRITS[group as CritGroup][kind] = meta;
   LOADERS[kind] = load;

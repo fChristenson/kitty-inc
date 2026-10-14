@@ -246,14 +246,11 @@ export function rollCritUpgrade(
     (result, landedProcs) => {
       critTiers.set(floor, result.tier);
       if (result.cash) cashCrits.add(floor);
-      if (result.mergeCrit) mergeCrits.set(floor, result.mergeCrit);
       if (result.floorCrit) armFloorCrit(floor, result.floorCrit);
       if (result.incomeCrit) armIncomeCrit(floor, result.incomeCrit);
       if (result.buttonCrit) armButtonCrit(floor, result.buttonCrit);
       if (result.lockCrit) armLockCrit(floor, result.lockCrit);
       if (result.rateCrit) armRateCrit(floor, result.rateCrit);
-      if (result.critUp) critUpCrits.add(floor);
-      if (result.critDown) critDownCrits.add(floor);
       for (const kind of landedProcs) {
         if (isBadgeCritKind(kind)) forceCritProc(kind, floor);
       }
@@ -750,39 +747,6 @@ export function isCritUpgrade(floor: Floor): boolean {
   return critTiers.has(floor);
 }
 
-// armed crits that also land on the floor above / below when clicked
-const critUpCrits = snapshotSet<Floor>();
-const critDownCrits = snapshotSet<Floor>();
-
-export function isCritUp(floor: Floor): boolean {
-  return critUpCrits.has(floor);
-}
-
-export function isCritDown(floor: Floor): boolean {
-  return critDownCrits.has(floor);
-}
-
-// dev/test-only: arms an x3 crit that also lands above (or below)
-export function forceCritUpDown(floor: Floor, up: boolean): void {
-  forceTestCrit(floor, null, "crit", "upgrade");
-  (up ? critUpCrits : critDownCrits).add(floor);
-}
-
-// armed merge crits' second numbers
-const mergeCrits = snapshotMap<Floor, CritTier>();
-
-export function getMergeCrit(floor: Floor): CritTier | undefined {
-  return mergeCrits.get(floor);
-}
-
-// dev/test-only: arms a merge crit of two random tiers
-export function forceMergeCrit(floor: Floor): void {
-  const tiers: CritTier[] = ["crit", "mega", "ultra"];
-  const pick = () => tiers[Math.floor(Math.random() * tiers.length)];
-  forceTestCrit(floor, null, pick(), "upgrade");
-  mergeCrits.set(floor, pick());
-}
-
 // armed crits' floor crits: their number playing out onto the bars
 const armedFloorCrits = snapshotMap<Floor, FloorCritKind>();
 
@@ -885,9 +849,6 @@ export function forceRateCrit(floor: Floor, kind: RateCritKind): void {
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
   cashCrits.delete(floor);
-  critUpCrits.delete(floor);
-  critDownCrits.delete(floor);
-  mergeCrits.delete(floor);
   armedFloorCrits.delete(floor);
   armedIncomeCrits.delete(floor);
   armedButtonCrits.delete(floor);

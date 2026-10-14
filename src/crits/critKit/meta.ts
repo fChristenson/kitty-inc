@@ -40,6 +40,10 @@ export interface CritMeta {
   style: CritStyle;
   // its own amounts (taps per multiple, payouts...), read by its index.ts
   values?: Record<string, number>;
+  // a floor crit that twists the tier crit itself instead of playing out (no
+  // index.ts): it lands on the floor above or below too, or a second number
+  // merges into it
+  twist?: "up" | "down" | "merge";
   // its test button sits under New Effects until it's been tested
   isNew?: boolean;
 }

@@ -78,7 +78,7 @@ export function preloadFirstScreen(): void {
     ...getCloudUrls(),
     getRoofUrl(),
     ...(Object.keys(SPRITE_FILES) as SpriteName[]).map(getSpriteUrl),
-    ...(["city", "wallMaterial", "coin", "mouse"] as const).map(getImageUrl),
+    ...(["city", "wallMaterial", "coin"] as const).map(getImageUrl),
   ].forEach(loadImageEarly);
 }
 

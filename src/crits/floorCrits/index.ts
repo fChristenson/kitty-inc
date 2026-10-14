@@ -3,7 +3,11 @@
 // heavenly…), their rewards on floors and buildings, their celebration, and
 // the crits playing a number out onto the bars (crits/<kind>, critPlayer)
 
-export { celebrateBuildingCrit, createBuildingCrits } from "./buildingCrits";
+export {
+  celebrateBuildingCrit,
+  createBuildingCrits,
+  MAP_CRIT_KINDS,
+} from "./buildingCrits";
 export {
   consumeCritUpgrade,
   forceButtonCrit,
@@ -12,8 +16,6 @@ export {
   forceIncomeCrit,
   forceLockCrit,
   forceRateCrit,
-  forceCritUpDown,
-  forceMergeCrit,
   forceTestCrit,
   getButtonCrit,
   getFloorCrit,
@@ -21,10 +23,7 @@ export {
   getLockCrit,
   getRateCrit,
   getCritTier,
-  getMergeCrit,
   isCashCrit,
-  isCritDown,
-  isCritUp,
   isCritUpgrade,
   rollCritUpgrade,
   rollFloorBuyCrit,

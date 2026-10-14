@@ -28,7 +28,7 @@ import {
   barFloorsInView,
   barOnScreen,
   payTotal,
-  registerSpawnGame,
+  type SpawnGame,
   spawnGameDeps,
 } from "../../shared/spawnGames";
 import { createSpawnRoll } from "../../shared/spawnRoll";
@@ -117,7 +117,7 @@ function start(now: number): void {
 }
 
 // crackles a ball onto a bar (test button)
-export function forceLightningStormSpawn(): void {
+function forceLightningStormSpawn(): void {
   start(performance.now());
 }
 
@@ -302,4 +302,12 @@ function draw(
   drawWisp(ctx, ballPath, ms, now, BALL * fade.scale, 1, fade.alpha);
 }
 
-registerSpawnGame({ update, draw, press, move, release, hitTest });
+export default {
+  force: forceLightningStormSpawn,
+  update,
+  draw,
+  press,
+  move,
+  release,
+  hitTest,
+} satisfies SpawnGame;

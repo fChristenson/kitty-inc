@@ -27,7 +27,7 @@ import {
   barFloorsInView,
   barOnScreen,
   giveLevels,
-  registerSpawnGame,
+  type SpawnGame,
   spawnGameDeps,
 } from "../../shared/spawnGames";
 import { createSpawnRoll } from "../../shared/spawnRoll";
@@ -171,7 +171,7 @@ function start(now: number): void {
 }
 
 // shuffles a row of numbers (test button)
-export function forcePickMeSpawn(): void {
+function forcePickMeSpawn(): void {
   pick = null;
   start(performance.now());
 }
@@ -449,4 +449,10 @@ function draw(
     );
 }
 
-registerSpawnGame({ update, draw, press, hitTest });
+export default {
+  force: forcePickMeSpawn,
+  update,
+  draw,
+  press,
+  hitTest,
+} satisfies SpawnGame;

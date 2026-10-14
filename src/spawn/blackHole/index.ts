@@ -52,7 +52,7 @@ import {
   barOnScreen,
   giveLevels,
   payTotal,
-  registerSpawnGame,
+  type SpawnGame,
   spawnGameDeps,
 } from "../../shared/spawnGames";
 import { createSpawnRoll } from "../../shared/spawnRoll";
@@ -266,7 +266,7 @@ function start(now: number): void {
 }
 
 // drifts a nebula in (test button)
-export function forceBlackHoleSpawn(): void {
+function forceBlackHoleSpawn(): void {
   start(performance.now());
 }
 
@@ -661,4 +661,11 @@ function draw(
   }
 }
 
-registerSpawnGame({ update, draw, press, release, hitTest });
+export default {
+  force: forceBlackHoleSpawn,
+  update,
+  draw,
+  press,
+  release,
+  hitTest,
+} satisfies SpawnGame;

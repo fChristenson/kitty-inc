@@ -61,7 +61,9 @@ import {
   triggerPriceMatchCrit,
   LUCKY_NUMBER_MIN_FLOORS,
   LUCKY_NUMBER_MAX_FLOORS,
+  pickCritTierByOdds,
 } from "../critTypes";
+import { PLAYED_CRITS } from "../critKit";
 import {
   triggerButtonPress as animateButtonPress,
   triggerSaleBoost,
@@ -1604,9 +1606,14 @@ export function applyFloorCrit(
     result.cash = cash;
   }
   const isGroundFloor = deps.floors.indexOf(floor) === 0;
+  const twist = result.floorCrit
+    ? PLAYED_CRITS.floor[result.floorCrit]?.twist
+    : undefined;
+  // a merge crit's second number, added to the tier's
+  const merge = twist === "merge" ? pickCritTierByOdds() : undefined;
   const count =
     CRIT_TIER_CONFIG[result.tier].multiplier +
-    (result.mergeCrit ? CRIT_TIER_CONFIG[result.mergeCrit].multiplier : 0);
+    (merge ? CRIT_TIER_CONFIG[merge].multiplier : 0);
   // a cash crit pays where a crit upgrades; one carrying an income crit
   // leaves its own amount for the income crit to carry into the total
   const incomeCrit = result.cash ? result.incomeCrit : undefined;
@@ -1621,15 +1628,15 @@ export function applyFloorCrit(
   const cash = reward(floor, isGroundFloor);
   // a crit up/down lands the same tier on the floor above/below too
   const index = deps.floors.indexOf(floor);
-  const landsOn = (on: boolean | undefined, near: Floor | undefined) => {
+  const landsOn = (on: boolean, near: Floor | undefined) => {
     if (!on || !near?.unlocked || isFloorLocked(near) || isFloorMaxed(near))
       return false;
     reward(near, deps.floors.indexOf(near) === 0);
     triggerButtonPress(near);
     return true;
   };
-  const up = landsOn(result.critUp, deps.floors[index + 1]);
-  const down = landsOn(result.critDown, deps.floors[index - 1]);
+  const up = landsOn(twist === "up", deps.floors[index + 1]);
+  const down = landsOn(twist === "down", deps.floors[index - 1]);
   const context: CritRewardContext = {
     deps,
     floors: deps.floors,
@@ -1651,26 +1658,15 @@ export function applyFloorCrit(
     );
   }
   // a plain cash crit shows its amount where a plain crit shows its tier
-  else if (
-    cash &&
-    landed.length === 0 &&
-    !up &&
-    !down &&
-    !result.mergeCrit &&
-    !result.floorCrit
-  )
+  else if (cash && landed.length === 0 && !result.floorCrit)
     celebrateCashCrit(deps, floor, result.tier, cash);
   else
     triggerCritCelebration(
       result.tier,
       result,
       (kind) => grantFollowUpProc(kind, context),
-      {
-        up,
-        down,
-        merge: result.mergeCrit,
-      },
-      result.cash ? null : playFor(deps, floor, result, count),
+      { up, down, merge },
+      result.cash || twist ? null : playFor(deps, floor, result, count),
       granted,
     );
   for (const kind of landed)

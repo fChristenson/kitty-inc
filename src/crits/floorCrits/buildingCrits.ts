@@ -9,7 +9,6 @@ import {
   MAX_RENDERED_WORKERS,
 } from "../../floors";
 import {
-  applyCritProcs,
   nextCritTier,
   CHAIN_CRIT_CONTINUE_CHANCE,
   CRIT_TIER_CONFIG,
@@ -18,6 +17,7 @@ import {
   LUCKY_CLOVER_CRIT_TIER,
   MYSTIC_UPGRADE_COUNT,
   POKER_HAND_CRIT_COUNTS,
+  type CritProcKind,
   type CritRollResult,
 } from "../critTypes";
 import { applyChainCrit } from "./floorCritRewards";
@@ -118,6 +118,94 @@ export interface BuildingCrits {
   createMysticBuilding: (targetBuildings?: Floor[][]) => void;
 }
 
+// one building a crit bought on the map landed on
+interface MapCritAt {
+  floors: Floor[];
+  // unlocks every floor it has, for free
+  unlockAll(): void;
+  addMysticBuilding(): void;
+  // the floor chain climbing it from the ground floor, at the tier
+  chainFloors(): void;
+}
+
+// what a proc does to a building bought on the map; each runs on every
+// building the crit lands on, and `extra` adds that many more buildings it
+// lands on too. A proc with no entry does nothing on the map
+interface MapCrit {
+  each?(at: MapCritAt): void;
+  extra?(): number;
+}
+
+const pokerHand = (count: number): MapCrit => ({ extra: () => count - 1 });
+
+const MAP_CRITS: Partial<Record<CritProcKind, MapCrit>> = {
+  mystic: { each: (at) => at.addMysticBuilding() },
+  // promotes every floor one step past the tier they were just set to
+  upgrade: {
+    each: ({ floors }) => {
+      for (const floor of floors)
+        floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
+    },
+  },
+  // unlocks every floor, maxes every tier and grants each a max-tier batch;
+  // increaseIncomeRate, not applyUpgradeTick: the building may be off screen
+  heavenly: {
+    each: (at) => {
+      at.unlockAll();
+      const maxTier = CRIT_TIER_ORDER[0];
+      const count = CRIT_TIER_CONFIG[maxTier].multiplier;
+      for (const floor of at.floors) {
+        floor.critMultiplierTier = maxTier;
+        for (let i = 0; i < count; i++) increaseIncomeRate(floor);
+      }
+    },
+  },
+  grandOpening: { each: (at) => at.unlockAll() },
+  // unlocks every floor and staffs and furnishes it, tiers and levels kept
+  skip: {
+    each: (at) => {
+      at.unlockAll();
+      for (const floor of at.floors) {
+        if (!floor.unlocked) continue;
+        floor.workerCount = MAX_RENDERED_WORKERS;
+        floor.hasManager = true;
+        floor.hasOfficeChairs = true;
+        floor.hasOfficeSupplies = true;
+      }
+    },
+  },
+  luckyClover: {
+    each: ({ floors }) => {
+      const count = CRIT_TIER_CONFIG[LUCKY_CLOVER_CRIT_TIER].multiplier;
+      for (const floor of floors) {
+        if (!floor.unlocked) continue;
+        for (let run = 0; run < LUCKY_CLOVER_CRIT_COUNT; run++)
+          for (let i = 0; i < count; i++) increaseIncomeRate(floor);
+      }
+    },
+  },
+  // climbs every building it lands on, and always buys at least one more
+  // building, then each next with CHAIN_CRIT_CONTINUE_CHANCE
+  chain: {
+    each: (at) => at.chainFloors(),
+    extra: () => {
+      let count = 1;
+      while (Math.random() < CHAIN_CRIT_CONTINUE_CHANCE) count++;
+      return count;
+    },
+  },
+  // the poker hands: as many buildings as they'd promote floors, this one
+  // included
+  pair: pokerHand(POKER_HAND_CRIT_COUNTS.pair),
+  threeOfAKind: pokerHand(POKER_HAND_CRIT_COUNTS.threeOfAKind),
+  fourOfAKind: pokerHand(POKER_HAND_CRIT_COUNTS.fourOfAKind),
+  fullHouse: pokerHand(POKER_HAND_CRIT_COUNTS.fullHouse),
+  royalFlush: pokerHand(POKER_HAND_CRIT_COUNTS.royalFlush),
+};
+
+// the procs that do something on the map, in the order they apply
+export const MAP_CRIT_KINDS = Object.keys(MAP_CRITS) as CritProcKind[];
+
 export function createBuildingCrits(deps: BuildingCritDeps): BuildingCrits {
   const unlockAll = (
     floors: Floor[],
@@ -142,18 +230,12 @@ export function createBuildingCrits(deps: BuildingCritDeps): BuildingCrits {
 
   // sets EVERY floor a building currently has (locked or not) to the given crit
   // tier, permanently — no unlocking, no cost (see cityMap/index.ts's map-buy
-  // crit celebration). A brand new building only has its one free ground floor
-  // + the one locked floor already queued above it at this point; any floor
-  // added later inherits this same tier automatically (see floorLock.ts's
-  // ensureLockedFloorAbove). `chain` (see rollFloorBuyCrit's own chain flag)
-  // additionally UNLOCKS that already-queued locked floor (it already got the
-  // tier from the loop below, but was still sitting locked) and keeps climbing
-  // further above it — same "chain crit" behavior the other 2 crit events
-  // share. Chain must start from index 0 (the ground floor), NOT
-  // floors.length-1 — the walker's first step lands on startIndex+1, and the
-  // queued locked floor is always index 1 at this point (a brand new building
-  // is always exactly [ground, one queued locked floor] here), so starting
-  // any later just skips over it and the chain never actually unlocks anything
+  // crit celebration); any floor added later inherits this same tier (see
+  // floorLock.ts's ensureLockedFloorAbove). Then every landed map crit's
+  // `each` (MAP_CRITS). The chain climbs from index 0, NOT floors.length-1:
+  // the walker's first step lands on startIndex+1, and the queued locked floor
+  // is always index 1 here (a brand new building is exactly [ground, one
+  // queued locked floor]), so starting any later skips it
   function applyBuildingCritTier(
     buildingIndex: number,
     result: CritRollResult,
@@ -161,133 +243,50 @@ export function createBuildingCrits(deps: BuildingCritDeps): BuildingCrits {
   ): void {
     const floors = targetBuildings[buildingIndex];
     if (!floors) return;
-    const { tier, chain } = result;
+    const { tier } = result;
     for (const floor of floors) {
       if (!result.skip) floor.critMultiplierTier = tier;
     }
-    if (result.mystic) createMysticBuilding(targetBuildings);
-    // reward side of every proc this building-buy event actually supports —
-    // one handler per proc kind (see critTypes' applyCritProcs), so this is
-    // the ONE place that has to say what "upgrade"/"heavenly" mean for a
-    // whole building; a proc with no entry here (boost/bounce/explosion/
-    // booty/peppermint don't apply at building scope) is simply skipped
-    applyCritProcs(result, floors, {
-      // upgrade crit: promotes every floor this building has one further
-      // step past the tier they were just set to above (see
-      // rollFloorBuyCrit's own upgrade flag, applied here instead of
-      // floorCritRewards.ts since this is a whole-building event, not a
-      // single Floor)
-      upgrade: (floors) => {
-        for (const floor of floors) {
-          floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
-        }
-      },
-      // heavenly crit: the biggest reward of all, applied building-wide —
-      // unlocks every remaining floor for free, maxes every floor's tier,
-      // then grants each one a full max-tier free-upgrade batch. Uses
-      // increaseIncomeRate directly (not floorInteractions' applyUpgradeTick,
-      // which also spawns a coin burst/re-rolls a crit at a specific
-      // ON-SCREEN floor button position) since this building may not even
-      // be the one currently displayed
-      heavenly: (floors) => {
-        unlockAll(floors, buildingIndex, targetBuildings);
-        const maxTier = CRIT_TIER_ORDER[0];
-        const count = CRIT_TIER_CONFIG[maxTier].multiplier;
-        for (const floor of floors) {
-          floor.critMultiplierTier = maxTier;
-          for (let i = 0; i < count; i++) {
-            increaseIncomeRate(floor);
-          }
-        }
-      },
-      // skip crit: unlocks every floor and grants its free workers, manager,
-      // office chairs, and supplies without changing tiers or levels
-      skip: (floors) => {
-        unlockAll(floors, buildingIndex, targetBuildings);
-        for (const floor of floors) {
-          if (!floor.unlocked) continue;
-          floor.workerCount = MAX_RENDERED_WORKERS;
-          floor.hasManager = true;
-          floor.hasOfficeChairs = true;
-          floor.hasOfficeSupplies = true;
-        }
-      },
-      // grand opening crit: same reward as at floor scope — unlocks every
-      // remaining locked floor of this building for free
-      grandOpening: (floors) => {
-        unlockAll(floors, buildingIndex, targetBuildings);
-      },
-      luckyClover: (floors) => {
-        const count = CRIT_TIER_CONFIG[LUCKY_CLOVER_CRIT_TIER].multiplier;
-        for (const floor of floors) {
-          if (!floor.unlocked) continue;
-          for (let run = 0; run < LUCKY_CLOVER_CRIT_COUNT; run++) {
-            for (let i = 0; i < count; i++) increaseIncomeRate(floor);
-          }
-        }
-      },
-    });
-    if (!chain) return;
-    applyChainCrit(
-      {
-        floors,
-        backgroundCount: deps.backgroundCount(),
-        multiplier: deps.getBuildingMultiplier(buildingIndex),
-        onFloorAdded: (floor) =>
-          deps.onFloorAdded(targetBuildings, buildingIndex, floor),
-      },
-      0,
-      (floor) => {
-        floor.critMultiplierTier = tier;
-      },
-    );
+    const at: MapCritAt = {
+      floors,
+      unlockAll: () => unlockAll(floors, buildingIndex, targetBuildings),
+      addMysticBuilding: () => createMysticBuilding(targetBuildings),
+      chainFloors: () =>
+        applyChainCrit(
+          {
+            floors,
+            backgroundCount: deps.backgroundCount(),
+            multiplier: deps.getBuildingMultiplier(buildingIndex),
+            onFloorAdded: (floor) =>
+              deps.onFloorAdded(targetBuildings, buildingIndex, floor),
+          },
+          0,
+          (floor) => {
+            floor.critMultiplierTier = tier;
+          },
+        ),
+    };
+    for (const kind of MAP_CRIT_KINDS)
+      if (result[kind]) MAP_CRITS[kind]!.each?.(at);
   }
 
-  // a chain crit ALWAYS has at least +1 impact area — same guarantee
-  // applyChainCrit's own floor walker already gives (its first extra floor is
-  // unconditional, only whether it keeps going past that is a coin flip).
-  // "The building" being unlocked for THIS event is a whole building, not a
-  // floor, so a chain here must always unlock at least one MORE building
-  // (free, same tier, its own floor-chain too) — only whether it climbs PAST
-  // that first extra building is CHAIN_CRIT_CONTINUE_CHANCE
+  // the building bought, then every building the landed map crits add
+  // (`extra`), each landed on the same way
   function setBuildingCritTier(
     buildingIndex: number,
     result: CritRollResult,
     targetBuildings = deps.buildings,
   ): void {
     applyBuildingCritTier(buildingIndex, result, targetBuildings);
-    if (result.chain) {
-      let continueChain = true;
-      while (continueChain) {
-        const nextIndex = deps.addBuilding(targetBuildings);
-        applyBuildingCritTier(nextIndex, result, targetBuildings);
-        continueChain = Math.random() < CHAIN_CRIT_CONTINUE_CHANCE;
-      }
-    }
-    // pair/three of a kind/four of a kind/full house crits (see critTypes'
-    // POKER_HAND_CRIT_COUNTS): at floor scope these promote a fixed number of
-    // floors; at this whole-building scope they unlock/create that many
-    // buildings instead (the building this event is already for counts as
-    // the first of them, so only count-1 MORE get created here), each set to
-    // the same landed tier. Applied independently per landed kind
-    // (MAX_SPECIAL_CRIT_PROCS allows up to 2 to land together), same as
-    // every other proc's reward. Royal Flush is the ONE exception at floor
-    // scope (unlocks/upgrades every floor above it instead of a fixed 6 —
-    // see floorCritRewards.ts's applyPokerHandCrit call), but at this
-    // map/building scope it still just unlocks 6 buildings, same as every
-    // other poker-hand crit here
-    for (const count of [
-      result.pair && POKER_HAND_CRIT_COUNTS.pair,
-      result.threeOfAKind && POKER_HAND_CRIT_COUNTS.threeOfAKind,
-      result.fourOfAKind && POKER_HAND_CRIT_COUNTS.fourOfAKind,
-      result.fullHouse && POKER_HAND_CRIT_COUNTS.fullHouse,
-      result.royalFlush && POKER_HAND_CRIT_COUNTS.royalFlush,
-    ]) {
-      if (!count) continue;
-      for (let i = 1; i < count; i++) {
-        const nextIndex = deps.addBuilding(targetBuildings);
-        applyBuildingCritTier(nextIndex, result, targetBuildings);
-      }
+    for (const kind of MAP_CRIT_KINDS) {
+      if (!result[kind]) continue;
+      const extra = MAP_CRITS[kind]!.extra?.() ?? 0;
+      for (let i = 0; i < extra; i++)
+        applyBuildingCritTier(
+          deps.addBuilding(targetBuildings),
+          result,
+          targetBuildings,
+        );
     }
     deps.persist(targetBuildings);
   }

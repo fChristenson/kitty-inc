@@ -23,7 +23,7 @@ import { shakeScreen } from "../../shared/screenShake";
 import {
   barFloorsInView,
   barOnScreen,
-  registerSpawnGame,
+  type SpawnGame,
   spawnGameDeps,
 } from "../../shared/spawnGames";
 import { createSpawnRoll } from "../../shared/spawnRoll";
@@ -117,7 +117,7 @@ function start(now: number): void {
 }
 
 // flips the bars in view into a light show (test button)
-export function forceSimonSaysSpawn(): void {
+function forceSimonSaysSpawn(): void {
   if (game) end();
   start(performance.now());
 }
@@ -340,4 +340,10 @@ function draw(
   if (flipped && !effectOn) end();
 }
 
-registerSpawnGame({ update, draw, press, hitTest });
+export default {
+  force: forceSimonSaysSpawn,
+  update,
+  draw,
+  press,
+  hitTest,
+} satisfies SpawnGame;

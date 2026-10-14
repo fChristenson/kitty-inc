@@ -60,12 +60,15 @@ export function wireTestButton(
   button.addEventListener("click", onClick);
 }
 
-export function wireSpawnMouseButton(
+// puts a random spawn out
+export function wireSpawnTestButtons(
   container: HTMLElement,
-  onClick: () => void,
+  onClick: (key: string) => void,
 ): void {
-  const button = container.querySelector<HTMLButtonElement>("#spawn-mouse")!;
-  button.addEventListener("click", onClick);
+  for (const button of container.querySelectorAll<HTMLButtonElement>(
+    "[data-spawn]",
+  ))
+    button.addEventListener("click", () => onClick(button.dataset.spawn!));
 }
 
 export function wireIdleOverlayTestButton(
@@ -275,15 +278,6 @@ export function wireBadgeCapsuleTestButton(
   button.addEventListener("click", onClick);
 }
 
-export function wireMergeCritTestButton(
-  container: HTMLElement,
-  onClick: () => void,
-): void {
-  container
-    .querySelector<HTMLButtonElement>("#test-merge-crit")!
-    .addEventListener("click", onClick);
-}
-
 // arms a crit carrying a floor crit
 export function wireFloorCritTestButtons(
   container: HTMLElement,
@@ -344,19 +338,6 @@ export function wireRateCritTestButtons(
   ))
     button.addEventListener("click", () =>
       onClick(button.dataset.rateCrit as RateCritKind),
-    );
-}
-
-// arms a crit that also lands on the floor above or below
-export function wireCritUpDownTestButtons(
-  container: HTMLElement,
-  onClick: (up: boolean) => void,
-): void {
-  for (const button of container.querySelectorAll<HTMLButtonElement>(
-    "[data-crit-up-down]",
-  ))
-    button.addEventListener("click", () =>
-      onClick(button.dataset.critUpDown === "up"),
     );
 }
 

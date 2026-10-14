@@ -3,7 +3,6 @@
 // at load time
 import { BADGE_CRIT_BALANCE } from "./badgeCrits/balance";
 import { PROC_CRIT_BALANCE } from "./floorCrits/balance";
-import { FLOOR_CRIT_CONFIG } from "./floorCrits/config";
 import { ANIMATED_EVENT_CONFIG } from "./animatedCrits/config";
 
 export const CRIT_CONFIG = {
@@ -179,10 +178,6 @@ export const CRIT_CONFIG = {
       chance: 0.01,
     },
   },
-
-  // the floor slot's own kinds (floorCrits/config.ts); the played crits'
-  // chances are in their meta.ts (crits/critKit)
-  ...FLOOR_CRIT_CONFIG,
 
   // badgeCrits/badgeCapsule — the mystery badge capsule a building earns once
   // every floor is at the level cap with every upgrade bought, opened from its

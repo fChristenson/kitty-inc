@@ -10,7 +10,7 @@ import {
   drawIncomeFloatText,
 } from "../floors";
 import { drawOuterWall } from "../buildings";
-import { drawMouse } from "../spawn/mouse";
+import { drawSpawnsOnFloor } from "../shared/spawnGames";
 import { getTotalIncome } from "../totalIncome";
 import { gte } from "../shared/bigNumber";
 import type { Floor } from "../gameState";
@@ -35,7 +35,7 @@ export function drawFloorContent(
   drawFloor(ctx, backgrounds[floor.bgIndex] ?? backgrounds[0], floor);
   drawOuterWall(ctx);
   drawWorker(ctx, floor, now);
-  drawMouse(ctx, floor, now);
+  drawSpawnsOnFloor(ctx, floor, now);
   drawWorkerBoosts(ctx, floor, now);
   drawUpgradeStar(ctx, floor);
   drawIncomePanel(ctx, floor, isGroundFloor);

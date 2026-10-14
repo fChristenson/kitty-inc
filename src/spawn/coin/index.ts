@@ -5,11 +5,8 @@
 // then blinks and vanishes the way every spawn does (shared/spawnFade). A tap
 // flips one up into the air; at the peak of the flip it's sucked into the
 // total, paying its share of rewardSeconds of the company's income as it
-// lands.
-//
-// gameCanvas wires the floor actions in (wireCoinSpawn), ticks the spawn
-// timer (updateCoinSpawn), taps them (tapCoinSpawn) and draws them in screen
-// space over the HUD (drawCoinSpawn)
+// lands. It sweeps (a swipe flips up every coin it passes through) and draws
+// in screen space over the crit flash
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { playBloop, playSpawnNotice, playSold } from "../../sound";
@@ -18,12 +15,7 @@ import {
   addTotalIncome,
   getCompanyIncomeRatePerSecond,
 } from "../../totalIncome";
-import {
-  FLOOR_X_MAX,
-  FLOOR_X_MIN,
-  WORKER_FEET_Y,
-  type FloorActionsDeps,
-} from "../../floors";
+import { FLOOR_X_MAX, FLOOR_X_MIN, WORKER_FEET_Y } from "../../floors";
 import type { Floor } from "../../gameState";
 import { isVisibleOnFloor } from "../../crits";
 import { randomInt } from "../../utils";
@@ -40,6 +32,7 @@ import { clamp01, easeIn, easeOutBack, lerp } from "../../shared/easing";
 import { drawGlow, fadeStops } from "../../shared/glowSprite";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { createSpawnRoll } from "../../shared/spawnRoll";
+import { spawnGameDeps, type SpawnGame } from "../../shared/spawnGames";
 import { isSpawnGone, spawnFade } from "../../shared/spawnFade";
 import { swipeHits, tapHits } from "../../shared/tapTarget";
 import { wiggleHudTotal } from "../../shared/totalIncomeCoins";
@@ -78,7 +71,6 @@ interface Coin {
   done: boolean;
 }
 
-let getDeps: (() => FloorActionsDeps) | null = null;
 const coins: Coin[] = [];
 // what each coin pays
 let share: BigNumber | null = null;
@@ -87,13 +79,8 @@ const hole: Point = { x: 0, y: 0 };
 const spot: Point = { x: 0, y: 0 };
 const total: Point = { x: 0, y: 0 };
 
-// the floor actions of the building on screen
-export function wireCoinSpawn(deps: () => FloorActionsDeps): void {
-  getDeps = deps;
-}
-
 // once the last coins are gone, rolls to open more, like the mouse
-export function updateCoinSpawn(now: number): void {
+function updateCoinSpawn(now: number): void {
   if (coins.length > 0) {
     roll.coolDown(now);
     return;
@@ -106,7 +93,7 @@ export function updateCoinSpawn(now: number): void {
 }
 
 // opens a few coins now (test button)
-export function forceCoinSpawn(): void {
+function forceCoinSpawn(): void {
   startCoins(performance.now());
 }
 
@@ -125,9 +112,10 @@ function placeOn(floor: Floor): number {
 }
 
 function startCoins(now: number): void {
-  if (!getDeps) return;
+  const deps = spawnGameDeps();
+  if (!deps) return;
   loadSpinCoin();
-  const floors = (getDeps().getOnScreenFloors?.() ?? []).filter(
+  const floors = (deps.getOnScreenFloors?.() ?? []).filter(
     (entry) => entry.floor.unlocked && isVisibleOnFloor(entry, WORKER_FEET_Y),
   );
   if (!floors.length) return;
@@ -152,7 +140,7 @@ function startCoins(now: number): void {
 // where c's hole is on screen, following its floor as the view scrolls;
 // false once its floor is gone (another building is on screen)
 function holeAt(c: Coin): boolean {
-  const deps = getDeps?.();
+  const deps = spawnGameDeps();
   const area = deps?.floors.includes(c.floor)
     ? deps.getScreenAreaLocal?.(c.floor)
     : null;
@@ -200,7 +188,7 @@ function coinAt(x: number, y: number, now: number): Coin | null {
 }
 
 // whether a press at (x, y) (gameCanvas screen units) lands on a coin
-export function hitTestCoinSpawn(x: number, y: number): boolean {
+function hitTestCoinSpawn(x: number, y: number): boolean {
   return !!coinAt(x, y, performance.now());
 }
 
@@ -212,7 +200,7 @@ function flip(c: Coin, now: number): void {
 
 // flips the coin at (x, y) up; true if there was one, so the press goes no
 // further
-export function tapCoinSpawn(x: number, y: number): boolean {
+function tapCoinSpawn(x: number, y: number): boolean {
   const now = performance.now();
   const c = coinAt(x, y, now);
   if (!c) return false;
@@ -221,12 +209,7 @@ export function tapCoinSpawn(x: number, y: number): boolean {
 }
 
 // flips up every coin a swipe from (x0, y0) to (x1, y1) passes through
-export function sweepCoinSpawn(
-  x0: number,
-  y0: number,
-  x1: number,
-  y1: number,
-): void {
+function sweepCoinSpawn(x0: number, y0: number, x1: number, y1: number): void {
   if (coins.length === 0) return;
   const now = performance.now();
   for (let i = coins.length - 1; i >= 0; i--) {
@@ -301,7 +284,7 @@ function drawFlipped(
 
 // the holes and their coins, in gameCanvas's screen units (w wide, the
 // total's middle at totalAtY), each frame
-export function drawCoinSpawn(
+function drawCoinSpawn(
   ctx: CanvasRenderingContext2D,
   w: number,
   _h: number,
@@ -320,3 +303,12 @@ export function drawCoinSpawn(
   for (let i = coins.length - 1; i >= 0; i--)
     if (coins[i].done) coins.splice(i, 1);
 }
+
+export default {
+  force: forceCoinSpawn,
+  update: updateCoinSpawn,
+  drawOver: drawCoinSpawn,
+  press: (x, y) => tapCoinSpawn(x, y),
+  sweep: sweepCoinSpawn,
+  hitTest: (x, y) => hitTestCoinSpawn(x, y),
+} satisfies SpawnGame;

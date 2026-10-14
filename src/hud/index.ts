@@ -55,7 +55,7 @@ export type { MapMenu } from "./mapMenu";
 export {
   createTestButtonMarkup,
   wireTestButton,
-  wireSpawnMouseButton,
+  wireSpawnTestButtons,
   wireTestActionsFilter,
   sortTestActionMenus,
   wireIdleOverlayTestButton,
@@ -138,8 +138,6 @@ export {
   wireRocketEventTestButton,
   wireRevealEventTestButton,
   wireBadgeCapsuleTestButton,
-  wireCritUpDownTestButtons,
-  wireMergeCritTestButton,
   wireFloorCritTestButtons,
   wireIncomeCritTestButtons,
   wireButtonCritTestButtons,

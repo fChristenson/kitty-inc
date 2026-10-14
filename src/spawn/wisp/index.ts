@@ -4,11 +4,9 @@
 // popping rings of glitter out round itself). The glitter lingers
 // for CONFIG.randomSpawns.wisp.durationMs, blinking before it fades; a swipe
 // through it sweeps it up, every speck flying into the total income and
-// paying its share of the wisp's reward as it lands.
-//
-// gameCanvas ticks the spawn timer (updateWispSpawn), sweeps it along every
-// drag (sweepWispGlitter) and draws it in screen space over the HUD
-// (drawWispSpawn)
+// paying its share of the wisp's reward as it lands. It sweeps along every
+// drag, a press on its glitter taking the gesture, and draws in screen space
+// over the crit flash
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { playSpawnNotice, playCoinDrop, playSwoosh } from "../../sound";
@@ -24,6 +22,7 @@ import { beginLightBatch, endLightBatch } from "../../shared/lightBatch";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { shakeScreen } from "../../shared/screenShake";
 import { createSpawnRoll } from "../../shared/spawnRoll";
+import type { SpawnGame } from "../../shared/spawnGames";
 import { stampGlimmer } from "../../shared/twinkle";
 import { pulseHudTotalFlash } from "../../shared/totalIncomeCoins";
 import { spawnFade } from "../../shared/spawnFade";
@@ -139,7 +138,7 @@ const bend: Point = { x: 0, y: 0 };
 const target: Point = { x: 0, y: 0 };
 
 // once the last wisp is gone, rolls to send another, like the mouse
-export function updateWispSpawn(now: number): void {
+function updateWispSpawn(now: number): void {
   if (run) {
     roll.coolDown(now);
     return;
@@ -152,7 +151,7 @@ export function updateWispSpawn(now: number): void {
 }
 
 // sends a wisp across now (test button)
-export function forceWispSpawn(): void {
+function forceWispSpawn(): void {
   startRun(performance.now());
 }
 
@@ -394,7 +393,7 @@ const speckAt = (speck: Speck): Point => {
 };
 
 // whether a press at (x, y) (gameCanvas screen units) lands on glitter
-export function hitTestWispGlitter(x: number, y: number): boolean {
+function hitTestWispGlitter(x: number, y: number): boolean {
   const now = performance.now();
   if (!run) return false;
   for (const speck of run.specks) {
@@ -405,7 +404,7 @@ export function hitTestWispGlitter(x: number, y: number): boolean {
 }
 
 // a swipe from (x0, y0) to (x1, y1) sweeping up the glitter it passes over
-export function sweepWispGlitter(
+function sweepWispGlitter(
   x0: number,
   y0: number,
   x1: number,
@@ -452,7 +451,7 @@ function pay(r: Run, speck: Speck, now: number): void {
 
 // the wisp and its glitter, in gameCanvas's screen units (w x h, the total's
 // middle at totalAtY), each frame
-export function drawWispSpawn(
+function drawWispSpawn(
   ctx: CanvasRenderingContext2D,
   w: number,
   h: number,
@@ -556,3 +555,17 @@ export function drawWispSpawn(
   ctx.globalCompositeOperation = previous;
   if (!alive && ms > dashMs) run = null;
 }
+
+export default {
+  force: forceWispSpawn,
+  update: updateWispSpawn,
+  drawOver: drawWispSpawn,
+  // a press on the glitter starts sweeping it
+  press: (x, y) => {
+    if (!hitTestWispGlitter(x, y)) return false;
+    sweepWispGlitter(x, y, x, y);
+    return true;
+  },
+  sweep: sweepWispGlitter,
+  hitTest: (x, y) => hitTestWispGlitter(x, y),
+} satisfies SpawnGame;
