@@ -416,27 +416,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     const visibleTop = viewportTopY();
     const visibleBottom = Math.min(viewportBottomY(), -STAR_START_ALTITUDE);
     if (visibleBottom <= visibleTop) return; // nothing at/above floor 8 is on screen
-    const visibleLeft = 0;
-    const visibleRight = SLOT_W;
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(
-      visibleLeft,
-      visibleTop,
-      visibleRight - visibleLeft,
-      visibleBottom - visibleTop,
-    );
-    ctx.clip();
-    drawStars(
-      ctx,
-      SLOT_W,
-      now,
-      visibleLeft,
-      visibleRight,
-      visibleTop,
-      visibleBottom,
-    );
-    ctx.restore();
+    // no clip: drawStars skips every star outside these bounds itself
+    drawStars(ctx, SLOT_W, now, 0, SLOT_W, visibleTop, visibleBottom);
   }
 
   // clouds float in the world above CLOUD_START_ALTITUDE — one global threshold, not

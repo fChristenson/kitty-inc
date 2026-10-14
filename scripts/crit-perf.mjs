@@ -24,7 +24,7 @@
 // lock-crit:, event:, crit:). Needs the dev
 // server (npx vite) or a perf preview behind --url. Results land in
 // tmp/_crit-perf/last.json.
-import { execSync, spawn } from "node:child_process";
+import { execSync, spawn, spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -205,11 +205,13 @@ async function connect(wsUrl) {
   };
 }
 
+// a fresh profile per browser: a chunk's leftover Chrome can't lock the next's
+let launches = 0;
+
 async function launch() {
-  const profile = path.join(OUT, "browser");
+  const profile = path.join(OUT, "browser", `${process.pid}-${launches++}`);
   fs.mkdirSync(profile, { recursive: true });
   const portFile = path.join(profile, "DevToolsActivePort");
-  fs.rmSync(portFile, { force: true });
   const browser = spawn(
     findBrowser(),
     [
@@ -231,11 +233,34 @@ async function launch() {
     await fetch(`http://127.0.0.1:${port}/json/list`)
   ).json();
   const page = targets.find((t) => t.type === "page");
-  return { browser, cdp: await connect(page.webSocketDebuggerUrl) };
+  return { browser, profile, cdp: await connect(page.webSocketDebuggerUrl) };
+}
+
+// Chrome's renderers and GPU process outlive a plain kill on Windows and
+// eat the CPU of every later measurement: end the whole tree, wait for it
+async function closeBrowser(browser, profile) {
+  const exited = new Promise((resolve) => {
+    if (browser.exitCode !== null) resolve();
+    else browser.once("exit", resolve);
+  });
+  if (process.platform === "win32")
+    spawnSync("taskkill", ["/pid", String(browser.pid), "/T", "/F"], {
+      stdio: "ignore",
+    });
+  else browser.kill("SIGKILL");
+  await Promise.race([exited, sleep(5000)]);
+  for (let i = 0; i < 20; i++) {
+    try {
+      fs.rmSync(profile, { recursive: true, force: true });
+      return;
+    } catch {
+      await sleep(250);
+    }
+  }
 }
 
 async function measure(runs) {
-  const { browser, cdp } = await launch();
+  const { browser, profile, cdp } = await launch();
   const errors = [];
   cdp.on((message) => {
     if (message.method === "Runtime.exceptionThrown")
@@ -275,7 +300,7 @@ async function measure(runs) {
   }
   if (!keep) {
     cdp.close();
-    browser.kill();
+    await closeBrowser(browser, profile);
   }
   if (!results)
     throw new Error(
@@ -398,7 +423,7 @@ const slowFrames = (s) =>
 
 // every crit's warm play, costliest frames first, against the game idle
 function rankReport(targets, results, errors) {
-  const result = (run) => results.find((s) => s.name === `${run}@${mode}`);
+  const result = (run) => results.findLast((s) => s.name === `${run}@${mode}`);
   const idle = result("idle");
   const rows = targets
     .map((t) => ({ name: t.run, s: result(`warm:${t.run}`) }))
@@ -484,9 +509,18 @@ if (rank) {
     const part = runs.slice(i, i + chunk);
     console.log(`${i + part.length}/${runs.length}: ${part.join(", ")}`);
     try {
-      const got = await measure(part);
+      // the first run in a browser takes the background loading: idle through it
+      const got = await measure(["idle", ...part]);
       results.push(...got.results);
       errors.push(...got.errors);
+      // a whole chunk crawling is the machine (screen off or locked, busy),
+      // not the crits: stop rather than rank noise
+      if (got.results.length && got.results.every((s) => s.fps < 30)) {
+        console.log(
+          "every run in this chunk under 30fps: the machine is throttling frames (screen off or locked, or busy); stopped, re-run when it's in use and quiet",
+        );
+        break;
+      }
     } catch (error) {
       errors.push(`${part.join(", ")}: ${error.message}`);
     }
