@@ -20,12 +20,13 @@ import {
   hasBadgeCapsule,
   takeBadgeCapsule,
   loadEventCatalog,
+  loadNextEventPart,
   queueEventParts,
   type EventCatalog,
   getCritBadgeOverlay,
   warmTierFlashes,
   createBuildingCrits,
-  withBadgeCatalog,
+  loadBadgeCatalog,
 } from "./crits";
 import { wireCritTestActions } from "./hud";
 import { forceBubbles } from "./spawn/bubbles";
@@ -285,12 +286,23 @@ import {
   loadRoofImage,
 } from "./buildings";
 import { loadMouseImage, forceSpawnMouse } from "./spawn/mouse";
-import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
+import {
+  startBackgroundMusic,
+  preloadSounds,
+  prepareAudio,
+  playSwoosh,
+} from "./sound";
 import { createNewCorporation } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
 import { getBackgroundUrls } from "./loadAssets";
 
-import { loadWhenIdle, runWhenIdle, runWhenIdleWithin } from "./shared/idle";
+import {
+  drainSoon,
+  loadWhenIdle,
+  runWhenIdle,
+  runWhenIdleWithin,
+} from "./shared/idle";
+import { preheat, runPreheat } from "./shared/preheat";
 import {
   afterStartup,
   isStartupSettled,
@@ -314,6 +326,9 @@ const BOOST_BUTTON_SCREEN_SHARE = 0.6;
 const BUY_ALL_MAX_PURCHASES = 20_000;
 // matches style.css's .splash--out transition
 const SPLASH_FADE_MS = 150;
+// the most the splash waits on the preheat, and the frames drawn behind it
+const PREHEAT_MS = 2500;
+const PREHEAT_FRAMES = 3;
 // index.html's splash as it first showed, for the test button to bring back
 let splashCopy: HTMLElement | null = null;
 
@@ -341,6 +356,17 @@ async function main() {
   warmTierFlashes();
   // creating the AudioContext alone blocked the main thread for tens of ms
   runWhenIdle(preloadSounds);
+  // what the first seconds would hitch on runs behind the splash
+  // (shared/preheat): the badge catalog and rewards and the starter events
+  // start downloading, the sprite and text warm-ups and the audio device run
+  // while they come in, then they land
+  let chunks: Promise<unknown> = Promise.resolve();
+  preheat(() => {
+    chunks = Promise.all([loadBadgeRewards(), loadNextEventPart()]);
+  });
+  preheat(drainSoon);
+  preheat(prepareAudio);
+  preheat(() => chunks);
   // the events and badge crit rewards are most of the code: kept out of the
   // startup bundle, they load one chunk at a time while the game is quiet
   // (crits roll without them till then): the starter pile of events, the
@@ -683,8 +709,8 @@ async function main() {
   // Wired once the game is up, so dev and perf builds reach their first frame
   // as soon as the shipped game does; the crit buttons show the badge labels
   if (import.meta.env.MODE !== "production")
-    afterStartup(() =>
-      withBadgeCatalog(() => {
+    preheat(() =>
+      loadBadgeCatalog().then(() => {
         app
           .querySelector(".game")!
           .insertAdjacentHTML("beforeend", createTestButtonMarkup());
@@ -3576,22 +3602,11 @@ async function main() {
   // every floor's lastCollectedAt in memory, and that must land before a second quick
   // reload could otherwise re-collect the same already-paid-out idle time
   saveBuildings(buildings, activeCompanyIndex);
-  if (gt(totalIdleIncome, fromNumber(0))) {
-    addTotalIncome(idleIncome);
-    void whenDocumentReady()
-      .then(() => totalEarnedOverlay.show(totalIdleIncome))
-      .then(markStartupSettled);
-  } else {
-    setTimeout(markStartupSettled, 0);
-  }
+  const idleShown = gt(totalIdleIncome, fromNumber(0));
+  if (idleShown) addTotalIncome(idleIncome);
 
   gameCanvas.redraw();
   performance.mark("game:first-frame");
-  const splash = document.getElementById("splash");
-  if (splash) {
-    splashCopy = splash.cloneNode(true) as HTMLElement;
-    hideSplash(splash);
-  }
 
   // one continuous redraw loop drives every animation (workers, clouds, income bars,
   // coin bursts) — gameCanvas.ts itself only ever draws whichever buildings/floors are
@@ -3615,6 +3630,21 @@ async function main() {
       saveCurrentCompanyStateNow();
     },
   });
+
+  // a few more frames behind the splash bake the text and sprites the first
+  // ones draw, then it lifts on a warm game
+  for (let i = 0; i < PREHEAT_FRAMES; i++) preheat(() => gameCanvas.redraw());
+  await runPreheat(PREHEAT_MS);
+  const splash = document.getElementById("splash");
+  if (splash) {
+    splashCopy = splash.cloneNode(true) as HTMLElement;
+    hideSplash(splash);
+  }
+  if (idleShown)
+    void whenDocumentReady()
+      .then(() => totalEarnedOverlay.show(totalIdleIncome))
+      .then(markStartupSettled);
+  else setTimeout(markStartupSettled, 0);
 }
 
 main();

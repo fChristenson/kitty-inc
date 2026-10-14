@@ -183,6 +183,11 @@ export function prepareSoon(task: () => void): void {
   scheduleSoon();
 }
 
+// every warm-up queued so far, now (behind the splash, see shared/preheat)
+export function drainSoon(): void {
+  while (soon.length > 0) soon.shift()!();
+}
+
 // prepareSoon for each item, one task apiece
 export function prepareEachSoon<T>(
   items: readonly T[],

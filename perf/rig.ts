@@ -128,8 +128,10 @@ async function boot(): Promise<void> {
   }
   let queue = readQueue();
   const current = queue[0];
+  // crit-perf names every run with its crit mode: startup has none
+  const startup = current?.split("@")[0] === "startup";
   document.body.classList.toggle("running", Boolean(current));
-  if (current === "startup") start();
+  if (startup) start();
 
   loadFixture({ ...options, ...fixtureOf(current ?? "") });
   await import("../src/boot");
@@ -247,16 +249,16 @@ async function boot(): Promise<void> {
   if (current) {
     // a set queued before expand() could run (a ?run= autorun)
     const expanded = expand([current]);
-    if (expanded.length !== 1 || expanded[0] !== current) {
+    if (!startup && (expanded.length !== 1 || expanded[0] !== current)) {
       queue = [...expanded, ...queue.slice(1)];
       sessionStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
       location.reload();
       return;
     }
     let summary: Summary;
-    if (current === "startup") {
+    if (startup) {
       await sleep(STARTUP_MS);
-      summary = await stop("startup");
+      summary = { ...(await stop("startup")), name: current };
     } else {
       if (!find(parseRunName(current).base)?.cold) await sleep(options.warmup);
       summary = (await runNamed(current)) ?? {

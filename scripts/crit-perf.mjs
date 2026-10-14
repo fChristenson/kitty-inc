@@ -227,8 +227,16 @@ async function launch() {
     ],
     { stdio: "ignore" },
   );
-  for (let i = 0; i < 100 && !fs.existsSync(portFile); i++) await sleep(100);
-  const port = fs.readFileSync(portFile, "utf8").split("\n")[0].trim();
+  // Chrome writes the file after creating it: a read can land mid-write
+  let port = "";
+  for (let i = 0; i < 100 && !port; i++) {
+    try {
+      port = fs.readFileSync(portFile, "utf8").split("\n")[0].trim();
+    } catch {
+      // not there or still locked
+    }
+    if (!port) await sleep(100);
+  }
   const targets = await (
     await fetch(`http://127.0.0.1:${port}/json/list`)
   ).json();

@@ -103,8 +103,8 @@ const AudioContextCtor: typeof AudioContext | undefined =
     .webkitAudioContext;
 let audioCtx: AudioContext | null = null;
 
-// opening the audio device blocks the main thread for 40-450ms, so the context
-// waits for the first tap or key (it can't play before one anyway). Armed at
+// opening the audio device blocks the main thread for 40-450ms, so it opens
+// behind the splash (prepareAudio) or else on the first tap or key. Armed at
 // load: an idle task never runs while the player keeps tapping, which left
 // the game silent from startup
 function createAudioContextOnGesture(): void {
@@ -112,14 +112,20 @@ function createAudioContextOnGesture(): void {
   const create = () => {
     window.removeEventListener("pointerdown", create, true);
     window.removeEventListener("keydown", create, true);
-    // "interactive" asks for the smallest output buffer the device supports, so a
-    // scheduled sound reaches the speakers as soon as possible
-    audioCtx = new AudioContextCtor({ latencyHint: "interactive" });
-    resumeAudioContextOnGesture(audioCtx);
-    decodeAll(audioCtx);
+    prepareAudio();
   };
   window.addEventListener("pointerdown", create, true);
   window.addEventListener("keydown", create, true);
+}
+
+// opens the audio device now (suspended till the first tap resumes it)
+export function prepareAudio(): void {
+  if (audioCtx || !AudioContextCtor) return;
+  // "interactive" asks for the smallest output buffer the device supports, so a
+  // scheduled sound reaches the speakers as soon as possible
+  audioCtx = new AudioContextCtor({ latencyHint: "interactive" });
+  resumeAudioContextOnGesture(audioCtx);
+  decodeAll(audioCtx);
 }
 
 // a touch pointerdown doesn't count as a user activation, so the context can

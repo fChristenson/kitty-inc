@@ -138,6 +138,7 @@ export {
   isUnionEventArmed,
   isVisibleOnFloor,
   loadEventCatalog,
+  loadNextEventPart,
   queueEventParts,
   revealStageTotalMs,
   startBoostEvent,
