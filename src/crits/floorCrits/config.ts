@@ -344,11 +344,6 @@ export const FLOOR_CRIT_CONFIG = {
     collectCrit: {
       chance: 0.03,
     },
-    // a wisp on its own bar's end charging, ripping sparks off every other
-    // bar, then tearing back along its own in a rattle of blasts
-    gatherCrit: {
-      chance: 0.03,
-    },
     // drops of light splashing onto the bars, rings rippling along them,
     // quickening to a downpour, then a huge drop onto its own
     raindropsCrit: {
@@ -361,6 +356,10 @@ export const FLOOR_CRIT_CONFIG = {
     },
     // swipes slashing every bar, then one long cut through them all
     crossCutCrit: {
+      chance: 0.03,
+    },
+    // a nozzle wisp hissing gold mist along each bar until its coat flashes
+    paintJobCrit: {
       chance: 0.03,
     },
     // a gunship circling over the building, raking each bar with tracers,

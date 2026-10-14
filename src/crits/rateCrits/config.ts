@@ -32,10 +32,5 @@ export const RATE_CRIT_CONFIG = {
     woundUpCrit: {
       chance: 0.03,
     },
-    // a wisp ball rolling along every bar, each then paying more with every
-    // payout for a while
-    momentumCrit: {
-      chance: 0.03,
-    },
   } satisfies Record<string, { chance: number }>,
 };

@@ -13,7 +13,6 @@ import { otherFloorsInView, spotsFromFlash } from "../floorCrits/playTargets";
 import {
   bankDoublePayout,
   overclockBar,
-  startMomentum,
   stepBar,
   windUpBar,
 } from "./rateBonus";
@@ -58,9 +57,6 @@ function reward(kind: RateCritKind, target: Floor, step: number): void {
       return;
     case "woundUpCrit":
       windUpBar(target);
-      return;
-    case "momentumCrit":
-      startMomentum(target);
       return;
   }
 }

@@ -8268,6 +8268,15 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 101
+  // slice, free floors: src/crits/animatedCrits/events/cutLooseEvent ("Cut Loose"): swift slashes cut across the dark locked floor of the frozen screen in quick fire, glitter spilling out of every cut; a cross of two long cuts tears through it and it bursts open
+  cutLooseEvent: {
+    chance: 0.01,
+    firstMs: 300, // from the click till the first cut
+    gapsMs: [240, 140] as [number, number], // between the cuts, quickening
+    crossGapMs: 200, // from the last cut till the cross
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // portal, free floors: src/crits/animatedCrits/events/warpGateEvent ("Warp Gate"): twin rings over the locked floor and at the bottom of the frozen screen; wisps fall down through them in loops, faster each time, more joining, until their last falls slam the locked floor open
   warpGateEvent: {
     chance: 0.01,
@@ -8306,15 +8315,6 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 100
-  // assemble, perma tiers: src/crits/animatedCrits/events/starPiecesEvent ("Star Pieces"): ten pieces of a giant gold star fly in turning and lock together one by one, quicker and quicker; it blazes and flies apart, every piece diving onto a worker, a perma tier up
-  starPiecesEvent: {
-    chance: 0.01,
-    assembleMs: 1250, // from the click till the last piece locks in
-    diveMs: 300, // from the blaze till the first dive lands
-    diveGapMs: 55, // between the dives landing
-    holdMs: 500,
-    mergeMs: 0,
-  },
   // batch 99
   // magnet, hires: src/crits/animatedCrits/events/lodestonesEvent ("Lodestones"): two gold poles light up on the frozen screen and the glitter all over it snaps onto them into spiky crusts, quicker and quicker; they yank together and slam, then repel, wisps flung off onto every empty spot in view, each a new worker
   lodestonesEvent: {

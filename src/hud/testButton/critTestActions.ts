@@ -46,6 +46,10 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-cut-loose-event" class="game__button">Cut Loose</button>
+          <button class="game__button" data-lock-crit="housewarmingCrit">Housewarming</button>
+          <button class="game__button" data-income-crit="moneyCircleCrit">Money Circle</button>
+          <button class="game__button" data-floor-crit="paintJobCrit">Paint Job</button>
           <button id="test-warp-gate-event" class="game__button">Warp Gate</button>
           <button id="test-rolling-stone-event" class="game__button">Rolling Stone</button>
           <button class="game__button" data-floor-crit="crossCutCrit">Cross Cut</button>
@@ -53,16 +57,13 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-lock-crit="sweepCleanCrit">Sweep Clean</button>
           <button class="game__button" data-button-crit="halfOffCrit">Half Off</button>
           <button class="game__button" data-rate-crit="woundUpCrit">Wound Up</button>
-          <button class="game__button" data-rate-crit="momentumCrit">Momentum</button>
           <button id="test-groundbreaking-event" class="game__button">Groundbreaking</button>
           <button id="test-monsoon-event" class="game__button">Monsoon</button>
           <button class="game__button" data-floor-crit="rollCallCrit">Roll Call</button>
-          <button class="game__button" data-income-crit="crownJewelCrit">Crown Jewel</button>
           <button class="game__button" data-lock-crit="pullUpCrit">Pull Up</button>
           <button class="game__button" data-button-crit="springLoadedCrit">Spring Loaded</button>
           <button class="game__button" data-rate-crit="shortcutCrit">Shortcut</button>
           <button class="game__button" data-rate-crit="cleanCutCrit">Clean Cut</button>
-          <button id="test-star-pieces-event" class="game__button">Star Pieces</button>
           <button id="test-lodestones-event" class="game__button">Lodestones</button>
           <button class="game__button" data-floor-crit="raindropsCrit">Raindrops</button>
           <button class="game__button" data-income-crit="stickyBallCrit">Sticky Ball</button>
@@ -71,7 +72,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-kick-in-event" class="game__button">Kick In</button>
           <button id="test-springboard-event" class="game__button">Springboard</button>
           <button id="test-gemstone-event" class="game__button">Gemstone</button>
-          <button class="game__button" data-floor-crit="gatherCrit">Gather Crit</button>
           <button class="game__button" data-income-crit="coinSpinCrit">Coin Spin Crit</button>
           <button class="game__button" data-lock-crit="jumpStartCrit">Jump Start</button>
           <button class="game__button" data-rate-crit="overclockCrit">Overclock</button>

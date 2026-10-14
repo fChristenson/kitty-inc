@@ -89,10 +89,10 @@ export const PLAYED_STYLES = {
   beatmapCrit: "experiment",
   moneyWeatherCrit: "money",
   collectCrit: "wisp",
-  gatherCrit: "charge",
   raindropsCrit: "ripple",
   rollCallCrit: "snowball",
   crossCutCrit: "slice",
+  paintJobCrit: "spray",
   // income crits
   windfallCrit: "explosion",
   bulletHoseCrit: "gunfire",
@@ -124,8 +124,8 @@ export const PLAYED_STYLES = {
   moneyGunCrit: "money",
   coinSpinCrit: "charge",
   stickyBallCrit: "snowball",
-  crownJewelCrit: "assemble",
   pennyShowerCrit: "ripple",
+  moneyCircleCrit: "summon",
   // button crits
   sureShotCrit: "wisp",
   autopressCrit: "wisp",
@@ -154,6 +154,7 @@ export const PLAYED_STYLES = {
   conjureCrit: "summon",
   pullUpCrit: "magnet",
   sweepCleanCrit: "clutter",
+  housewarmingCrit: "snowball",
   // rate crits
   overclockCrit: "lightning",
   shiftUpCrit: "race",
@@ -161,5 +162,4 @@ export const PLAYED_STYLES = {
   shortcutCrit: "portal",
   cleanCutCrit: "slice",
   woundUpCrit: "charge",
-  momentumCrit: "snowball",
 };

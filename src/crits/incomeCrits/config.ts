@@ -127,14 +127,14 @@ export const INCOME_CRIT_CONFIG = {
     stickyBallCrit: {
       chance: 0.03,
     },
-    // seven gold pieces of a crown locking in round the total, then flying
-    // apart into it
-    crownJewelCrit: {
-      chance: 0.03,
-    },
     // drops of light splashing onto the total, a drizzle to a downpour, then
     // a huge one
     pennyShowerCrit: {
+      chance: 0.03,
+    },
+    // a magic circle under the total turning faster and faster, a share a
+    // turn, until a pillar of light erupts through it
+    moneyCircleCrit: {
       chance: 0.03,
     },
   },

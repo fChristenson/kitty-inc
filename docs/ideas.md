@@ -84,11 +84,20 @@ New animation styles, each with its own verb and lib in `shared/animationStyles`
    - Each finished bar gives its levels.
    - On its own bar, every tile flips at once from the middle out, into a huge blast.
 
+## List 201: crits for the thin spots ([playground](../tmp/_playground/ideas.html?list=next178))
+
+Each idea fills a gap in `node scripts/crit-dist.mjs`.
+
+1. **Housewarming** (lock, Snowball; lock has no snowball): a ball rolls across the dark locked floor, gathering its dust, bigger and quicker each pass. It bursts the floor open (free floor), and the new bar's first payouts pay double.
+2. **Money Circle** (income, Summon; income has no summon): a magic circle is drawn on the roof under the readout. It turns faster and faster, paying a share every turn, then a pillar of light erupts through the readout.
+3. **Paint Job** (floor, Spray; floor has no spray): a nozzle wisp glides down the side of the building, faster and faster, hissing gold mist along every bar it passes until its coat flashes with levels; then it swoops onto its own bar for a heavy coat and a huge blast.
+4. **Cut Loose** (animated, Slice, free floor; animated has no slice): slashes cut across the dark locked floor in quick fire, glitter spilling out. A final cross tears it open, unlocked free.
+
 ## Built
 
 - **List 200**, eight more crits for the thin spots. Test: New Effects. All hold 59-60fps under the stress test.
   - **Wound Up** (`rateCrits/crits/woundUpCrit`, Charge): payouts `CONFIG.crit.woundUpPayout` times as big for `woundUpMs` (`windUpBar` in `rateCrits/rateBonus.ts`).
-  - **Momentum** (`rateCrits/crits/momentumCrit`, Snowball): for `momentumMs` every payout `momentumStep` bigger than the last, up to `momentumMaxPayout` (`startMomentum`). Rolls with Roll Call's ball, now shared in `floorCrits/critPlayer/barRoll.ts`.
+  - **Momentum** was removed (boring).
   - **Half Off** (`buttonCrits/crits/halfOffCrit`, Drill): `Half N` taps at half price (`addHalfTaps`; `getUpgradeCost` reads half, `payUpgrade` in `floorInteractions` uses one up).
   - **Sweep Clean** (`lockCrits/crits/sweepCleanCrit`, Clutter): opens the floor; the floor then waiting above it costs `CONFIG.crit.sweepCleanPrice` of its price for good.
   - **Penny Shower** (`incomeCrits/crits/pennyShowerCrit`, Ripple): a share a drop, then a huge one.
@@ -101,15 +110,12 @@ New animation styles, each with its own verb and lib in `shared/animationStyles`
   - **Clean Cut** (`rateCrits/crits/cleanCutCrit`, Slice, rarer 0.01): swipes slash each bar, glitter spilling, then the cut welds gold and the bar pays more for good (`floor.payoutMultiplier`, saved; `cleanCutPayout`, its own `cleanCutOwnPayout`). The bars aren't split apart: the game draws them.
   - **Spring Loaded** (`buttonCrits/crits/springLoadedCrit`, Charge): a wisp beside each button charges up and darts into it; each of its next taps also hires a worker (`Hire N`, `addHireTaps`, `CONFIG.crit.springLoadedHires` per multiple, twice on its own).
   - **Pull Up** (`lockCrits/crits/pullUpCrit`, Magnet): two poles snap the locked floor's dust into crusts, yank together and slam it open, the crust flung off; its bar runs `CONFIG.crit.pullUpSpeed` times as fast for good.
-  - **Crown Jewel** (`incomeCrits/crits/crownJewelCrit`, Assemble): seven gold crown pieces lock in under the total, a share each, then blaze and fly apart into it.
+  - **Crown Jewel** was removed (bad).
   - **Roll Call** (`floorCrits/crits/rollCallCrit`, Snowball): a wisp ball rolls along each bar top down, picking up its glitter, levels on each, and bursts on its own.
   - **Groundbreaking** (`animatedCrits/events/groundbreakingEvent`, Summon, free floor, batch 101): a giant circle at the bottom of the frozen screen; its pillar rides up the building and bursts the locked floor open.
   - **Monsoon** (`animatedCrits/events/monsoonEvent`, Ripple, perma tiers, batch 101): drops onto the workers, a drizzle to a downpour, each one's second drop a perma tier; a huge drop into their midst.
   - The night sky's stars (`background/stars`) are hashed once per cell and stamped in one light batch: lock crits pan up to the sky, where the starfield cost the most.
 
-- **Assemble** animation style and **Star Pieces** (animated crit, perma tiers, batch 100), from List 198. Test: New Effects.
-  - `shared/animationStyles/assemble`: `fanPieces`, `planAssemble`, `drawAssembly`.
-  - **Star Pieces** (`animatedCrits/events/starPiecesEvent`): ten pieces of a giant gold star fly in turning and lock in one by one, quicker and quicker; it blazes and flies apart, every piece diving onto a worker that can still climb, a perma tier up.
 
 - **Summon**, **Snowball** and **Ripple** animation styles with **Conjure** (lock crit), **Sticky Ball** (income crit) and **Raindrops** (floor crit), from List 197. Test: New Effects.
   - `shared/animationStyles/summon`: `planSummon`, `summonTurn`, `drawSummon`, `drawSummonPillar`.
@@ -136,7 +142,7 @@ New animation styles, each with its own verb and lib in `shared/animationStyles`
 
 - **Gemstone** (animated crit), **Gather** (floor crit), **Coin Spin** (income crit), **Jump Start** (lock crit), from List 193, all on the Charge look (`shared/animationStyles/charge`, `tickCharge` rumble). Test: New Effects.
   - **Gemstone** (`animatedCrits/events/gemstoneEvent`, Charge + Drawing): glitter all over the frozen screen is sucked into a giant gem that crushes smaller and whiter; it bursts, shards diving onto every bar with levels, the clicked one last a crit tier up.
-  - **Gather** (`floorCrits/crits/gatherCrit`): a wisp on its own bar's end rips sparks off every other bar (levels on each rip) as it charges, then tears back along its own bar in a rattle of blasts.
+  - **Gather** was removed (bad).
   - **Coin Spin** (`incomeCrits/crits/coinSpinCrit`): a gold coin under the total spins up to a blur, then shoots into the readout in a rattle of blasts, a share each.
   - **Jump Start** (`lockCrits/crits/jumpStartCrit`): a wisp in the locked floor sucks in its dust while the lock shudders; it bursts open and its new bar pays `CONFIG.crit.jumpStartPayouts` full payouts per crit multiple at once.
 

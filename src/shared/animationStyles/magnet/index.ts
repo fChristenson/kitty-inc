@@ -2,7 +2,9 @@
 // along bowed field lines, snapping it onto a spiky crust round them, then
 // flinging it all off when they flip. Plan the specks once (planSnaps), then
 // each frame drawFieldLines between the poles and place every speck with
-// snapAt (lying, snapping in, clinging) or, once repelled, flingAt
+// snapAt (lying, snapping in, clinging) or, once repelled, flingAt. Iron
+// filings (scatterFilings, drawFilings) are the other look: glitter lining up
+// along the field in a wave, then rushing onto the poles
 import { COLOR } from "../../../palette";
 import { clamp01 } from "../../easing";
 import { beginLightBatch, endLightBatch } from "../../lightBatch";
@@ -117,6 +119,141 @@ export function flingAt(
   into.x = from.x + Math.cos(snap.angle) * out;
   into.y = from.y + Math.sin(snap.angle) * out;
   return into;
+}
+
+// iron filings: short rows of glitter lying at random angles that turn to
+// line up along the poles' field as a wave spreads, drawing the field's
+// picture, then rush onto their nearest pole. Scatter once (scatterFilings),
+// then drawFilings each frame
+export interface Filing {
+  x: number;
+  y: number;
+  turn: number;
+  len: number;
+}
+
+// a pole of the field: +1 or -1 (lines run from + to -)
+export interface FieldPole {
+  x: number;
+  y: number;
+  charge: number;
+}
+
+// the filings turn as a wave from `at` reaches them, `speed` px a ms, each
+// turning over `turnMs`
+export interface FilingWave {
+  at: Point;
+  startMs: number;
+  speed: number;
+  turnMs: number;
+}
+
+// they rush onto their nearest pole from startMs, the near ones first, the
+// ones `reach` px out landing at endMs
+export interface FilingRush {
+  startMs: number;
+  endMs: number;
+  reach: number;
+}
+
+const RUSH_MS = 220;
+// a filing is FILING_SPECKS glitter specks in a row, its middle one biggest
+const FILING_SPECKS = 3;
+
+export function scatterFilings(
+  count: number,
+  box: { left: number; top: number; right: number; bottom: number },
+  len: number,
+): Filing[] {
+  return Array.from({ length: count }, () => ({
+    x: box.left + Math.random() * (box.right - box.left),
+    y: box.top + Math.random() * (box.bottom - box.top),
+    turn: Math.random() * Math.PI,
+    len: len * (0.7 + 0.6 * Math.random()),
+  }));
+}
+
+// the field's direction at x, y
+export function fieldTurn(x: number, y: number, poles: FieldPole[]): number {
+  let bx = 0;
+  let by = 0;
+  for (const p of poles) {
+    const dx = x - p.x;
+    const dy = y - p.y;
+    const r2 = dx * dx + dy * dy + 1;
+    const k = p.charge / (r2 * Math.sqrt(r2));
+    bx += dx * k;
+    by += dy * k;
+  }
+  return Math.atan2(by, bx);
+}
+
+// `size` is a speck's glitter size
+export function drawFilings(
+  ctx: CanvasRenderingContext2D,
+  filings: Filing[],
+  poles: FieldPole[],
+  ms: number,
+  wave: FilingWave,
+  size: number,
+  rush?: FilingRush,
+): void {
+  const previous = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
+  for (let i = 0; i < filings.length; i++) {
+    const f = filings[i];
+    let x = f.x;
+    let y = f.y;
+    let len = f.len;
+    let turn = f.turn;
+    const d = Math.hypot(f.x - wave.at.x, f.y - wave.at.y);
+    const u = clamp01((ms - wave.startMs - d / wave.speed) / wave.turnMs);
+    if (u > 0) {
+      const delta =
+        ((((fieldTurn(f.x, f.y, poles) - f.turn) % Math.PI) + Math.PI * 1.5) %
+          Math.PI) -
+        Math.PI / 2;
+      turn += delta * u * u * (3 - 2 * u);
+    }
+    if (rush && ms > rush.startMs) {
+      let near = poles[0];
+      let nd = Infinity;
+      for (const p of poles) {
+        const pd = Math.hypot(f.x - p.x, f.y - p.y);
+        if (pd < nd) {
+          nd = pd;
+          near = p;
+        }
+      }
+      const t0 =
+        rush.startMs +
+        clamp01(nd / rush.reach) * (rush.endMs - rush.startMs - RUSH_MS);
+      const v = clamp01((ms - t0) / RUSH_MS) ** 2;
+      if (v >= 1) continue;
+      if (v > 0) {
+        x += (near.x - x) * v;
+        y += (near.y - y) * v;
+        turn = Math.atan2(near.y - f.y, near.x - f.x);
+        len *= 1 + v;
+      }
+    }
+    const cx = Math.cos(turn) * len;
+    const cy = Math.sin(turn) * len;
+    for (let j = 0; j < FILING_SPECKS; j++) {
+      const s = j / (FILING_SPECKS - 1) - 0.5;
+      stampGlimmer(
+        ctx,
+        x + cx * s,
+        y + cy * s,
+        size * (s === 0 ? 1.4 : 1),
+        i * FILING_SPECKS + j,
+        s === 0 ? COLOR.white : COLOR.heavenlyGold,
+      );
+    }
+  }
+  endLightBatch(ctx);
+  ctx.globalCompositeOperation = previous;
 }
 
 // gold field lines bowing between two poles, `lines` of them, glitter

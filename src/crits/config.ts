@@ -71,11 +71,6 @@ export const CRIT_CONFIG = {
     // Wound Up: a bar's payouts this many times as big for woundUpMs
     woundUpPayout: 1.5,
     woundUpMs: 30_000,
-    // Momentum: for momentumMs each payout momentumStep bigger than the last,
-    // up to momentumMaxPayout
-    momentumMs: 30_000,
-    momentumStep: 0.1,
-    momentumMaxPayout: 2,
     // Half Off: half-price taps per the crit's multiple (twice on its own)
     halfOffTaps: 1,
     // Sweep Clean: the next locked floor's price, times this
@@ -84,6 +79,8 @@ export const CRIT_CONFIG = {
     pullUpSpeed: 2,
     // Spring Loaded: hiring taps per the crit's multiple (twice on its own)
     springLoadedHires: 0.5,
+    // Housewarming: the floor it opens pays double this many payouts
+    housewarmingPayouts: 5,
     // gateway roll for the whole "special crit" (chain/boost/bounce/
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
     // ultra, before any of the individual proc chances (badgeCrits/balance, floorCrits/balance) are even

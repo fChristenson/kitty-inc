@@ -2,7 +2,7 @@
 // it from rest, the glitter lying on it sticking on and turning with it; it
 // drops onto each bar below and rolls back, bigger and quicker, each bar hit
 // as it rolls off; on its own bar it bursts, its crust flung off in a rattle
-// of blasts (Roll Call, Momentum)
+// of blasts (Roll Call)
 import {
   drawSnowball,
   planSnowball,

@@ -76,5 +76,10 @@ export const LOCK_CRIT_CONFIG = {
     sweepCleanCrit: {
       chance: 0.03,
     },
+    // a wisp ball rolling the locked floor's dust up, bursting it open, its
+    // new bar's first payouts paying double
+    housewarmingCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };
