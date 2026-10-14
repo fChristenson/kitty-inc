@@ -8282,6 +8282,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
+  // drawing, free floors: src/crits/animatedCrits/events/coronationEvent ("Coronation"): glitter torn off every bar flies up in waves into a giant crown mid-screen, quicker and quicker; it blazes, then drops onto the locked floor and bursts it open
+  coronationEvent: {
+    chance: 0.01,
+    firstMs: 260, // from the click till the first wave flies
+    gapsMs: [360, 110] as [number, number], // between the waves, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // slice, free floors: src/crits/animatedCrits/events/cutLooseEvent ("Cut Loose"): swift slashes cut across the dark locked floor of the frozen screen in quick fire, glitter spilling out of every cut; a cross of two long cuts tears through it and it bursts open
   cutLooseEvent: {
     chance: 0.01,

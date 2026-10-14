@@ -42,5 +42,15 @@ export const RATE_CRIT_CONFIG = {
     compressorCrit: {
       chance: 0.01,
     },
+    // a chain of blasts snaking down the bars, each one it passes running
+    // three times as fast, fading back
+    afterburnCrit: {
+      chance: 0.03,
+    },
+    // a core charging by the bars until a shockwave races over them, each
+    // bar's next payouts three times as big
+    superchargeCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

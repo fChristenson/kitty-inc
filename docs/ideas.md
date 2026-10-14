@@ -116,6 +116,17 @@ One element crushing another (`shared/animationStyles/crush`), shown three ways.
 
 ## Built
 
+- **A drawn batch** (`select-animation-style.mjs`), eight crits. Test: New Effects.
+  - **Stack Up** (`floorCrits/crits/stackUpCrit`, Clutter): glitter round every bar hops in quickening waves onto a stack at its end; the stacks slam down into their bars with levels.
+  - **Splash Zone** (`buttonCrits/crits/splashZoneCrit`, Ripple): `Splash N` taps, each also levelling the floors above and below (`addSplashTaps`, `splashZoneTaps` per multiple, twice on its own).
+  - **Afterburn** (`rateCrits/crits/afterburnCrit`, Explosion): a chain of blasts snaking down the bars, a cluster on its own readout; each bar `afterburnSpeed` times as fast, fading back over `afterburnMs` (`afterburnBar`).
+  - **Crackle Cage** (`lockCrits/crits/crackleCageCrit`, Lightning): arcs wall to wall into a cage that blazes the floor open; its bar then pays `woundUpPayout` times as much for a while (`windUpBar`).
+  - **Coronation** (`animatedCrits/events/coronationEvent`, Drawing, free floor, batch 101): glitter off every bar builds a giant crown that drops onto the locked floor.
+  - **Shred** (`lockCrits/crits/shredCrit`, Slice): slashes cut the locked floor's price into pieces (baked once, drawn from the bake); it opens with `shredTaps` double taps per multiple on its button.
+  - **Wraparound** (`incomeCrits/crits/wraparoundCrit`, Portal): a wisp loops through twin rings either side of the readout, a share a pass.
+  - **Supercharge** (`rateCrits/crits/superchargeCrit`, Charge): a core charges by the bars, then a shockwave turns each readout over; next `superchargePayouts` payouts (own `superchargeOwnPayouts`) `superchargePayout` times as big (`superchargeBar`).
+  - The Crush batch moved from New Effects to its tabs.
+
 - **List 203 and the Crush style**, seven crits. Test: New Effects. All hold 58-60fps under the stress test.
   - `shared/animationStyles/crush`: slams (`planCrush`, `crushAt`, `tickCrush`, `drawCrushContact`, `drawCrushBurst`), a press (`planPress`, `pressAt`, `tickPress`, `pressWarp`, `drawPressGrind`), crumbling (`crumbleFrom`, `crumbleAt`, `drawCrumbleDust`), `drawCrushStrain`, `crusherScale` and `drawSlab`. The crushed elements are wisps and glitter only.
   - **Hydraulic** (`floorCrits/crits/hydraulicCrit`, press): levels on every other bar from the crumble's shock.

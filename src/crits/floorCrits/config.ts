@@ -382,6 +382,11 @@ export const FLOOR_CRIT_CONFIG = {
     stampDownCrit: {
       chance: 0.03,
     },
+    // glitter round every bar hopping in waves onto a stack at its end, the
+    // stacks then slamming down into their bars
+    stackUpCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

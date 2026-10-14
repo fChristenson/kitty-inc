@@ -41,8 +41,16 @@ import {
 } from "../../floors/worker";
 import { CONFIG } from "../../config";
 import { armCritUpgrade } from "../floorCrits/upgradeCrit";
-import { addButtonCharge, addFreeTaps } from "../buttonCrits/buttonBonus";
-import { bankDoublePayout, overclockBar } from "../rateCrits/rateBonus";
+import {
+  addButtonCharge,
+  addDoubleTaps,
+  addFreeTaps,
+} from "../buttonCrits/buttonBonus";
+import {
+  bankDoublePayout,
+  overclockBar,
+  windUpBar,
+} from "../rateCrits/rateBonus";
 import { liveEffect } from "../../shared/detachedJob";
 import { flipUpgradeButton as animateFlip } from "../../floors/upgradeButton";
 
@@ -75,6 +83,8 @@ const OPENS_THEN_REWARDS: readonly LockCritKind[] = [
   "housewarmingCrit",
   "reboundCrit",
   "viceCrit",
+  "crackleCageCrit",
+  "shredCrit",
 ];
 
 // a lock crit playing out from floor's crit onto the locked floor, if it's in
@@ -179,6 +189,13 @@ export function lockCritPlayFor(
           punchIncomeBar(opened, `${CONFIG.crit.overclockSpeed}x Speed`, color);
         } else if (kind === "viceCrit") {
           addButtonCharge(opened, count * CONFIG.crit.viceCharge);
+          flipUpgradeButton(opened);
+        } else if (kind === "crackleCageCrit") {
+          windUpBar(opened);
+          flipIncomeRate(opened);
+          punchIncomeBar(opened, `${CONFIG.crit.woundUpPayout}x Pay`, color);
+        } else if (kind === "shredCrit") {
+          addDoubleTaps(opened, count * CONFIG.crit.shredTaps);
           flipUpgradeButton(opened);
         } else if (kind === "sweepCleanCrit") {
           // the floor now waiting above the one it opened, priced down for

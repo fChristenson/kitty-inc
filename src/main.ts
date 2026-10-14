@@ -2362,6 +2362,7 @@ async function main() {
           "cut-loose": forceOnActive((e) => e.forceCutLooseEvent),
           "boss-rush": forceOnActive((e) => e.forceBossRushEvent),
           "under-pressure": forceOnActive((e) => e.forceUnderPressureEvent),
+          coronation: forceOnActive((e) => e.forceCoronationEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {

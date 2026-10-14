@@ -46,18 +46,20 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-floor-crit="hydraulicCrit">Hydraulic</button>
-          <button class="game__button" data-floor-crit="stampDownCrit">Stamp Down</button>
-          <button class="game__button" data-lock-crit="viceCrit">Vice</button>
-          <button class="game__button" data-income-crit="hardSellCrit">Hard Sell</button>
-          <button class="game__button" data-rate-crit="compressorCrit">Compressor</button>
-          <button class="game__button" data-button-crit="heavyHandCrit">Heavy Hand</button>
-          <button id="test-under-pressure-event" class="game__button">Under Pressure</button>
+          <button class="game__button" data-floor-crit="stackUpCrit">Stack Up</button>
+          <button class="game__button" data-button-crit="splashZoneCrit">Splash Zone</button>
+          <button class="game__button" data-rate-crit="afterburnCrit">Afterburn</button>
+          <button class="game__button" data-lock-crit="crackleCageCrit">Crackle Cage</button>
+          <button id="test-coronation-event" class="game__button">Coronation</button>
+          <button class="game__button" data-lock-crit="shredCrit">Shred</button>
+          <button class="game__button" data-income-crit="wraparoundCrit">Wraparound</button>
+          <button class="game__button" data-rate-crit="superchargeCrit">Supercharge</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Rate Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-rate-crit="compressorCrit">Compressor</button>
           <button class="game__button" data-rate-crit="crosshairsCrit">Crosshairs</button>
           <button class="game__button" data-rate-crit="woundUpCrit">Wound Up</button>
           <button class="game__button" data-rate-crit="shortcutCrit">Shortcut</button>
@@ -70,6 +72,7 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Button Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-button-crit="heavyHandCrit">Heavy Hand</button>
           <button class="game__button" data-button-crit="deepBoreCrit">Deep Bore</button>
           <button class="game__button" data-button-crit="halfOffCrit">Half Off</button>
           <button class="game__button" data-button-crit="springLoadedCrit">Spring Loaded</button>
@@ -87,6 +90,7 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Lock Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-lock-crit="viceCrit">Vice</button>
           <button class="game__button" data-lock-crit="reboundCrit">Rebound</button>
           <button class="game__button" data-lock-crit="housewarmingCrit">Housewarming</button>
           <button class="game__button" data-lock-crit="sweepCleanCrit">Sweep Clean</button>
@@ -109,6 +113,7 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Animated Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-under-pressure-event" class="game__button">Under Pressure</button>
           <button id="test-boss-rush-event" class="game__button">Boss Rush</button>
           <button id="test-cut-loose-event" class="game__button">Cut Loose</button>
           <button id="test-warp-gate-event" class="game__button">Warp Gate</button>
@@ -1399,6 +1404,7 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Income Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-income-crit="hardSellCrit">Hard Sell</button>
           <button class="game__button" data-income-crit="bigCrunchCrit">Big Crunch</button>
           <button class="game__button" data-income-crit="moneyCircleCrit">Money Circle</button>
           <button class="game__button" data-income-crit="pennyShowerCrit">Penny Shower</button>
@@ -1437,6 +1443,8 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Floor Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-floor-crit="hydraulicCrit">Hydraulic</button>
+          <button class="game__button" data-floor-crit="stampDownCrit">Stamp Down</button>
           <button class="game__button" data-floor-crit="drainCrit">Drain</button>
           <button class="game__button" data-floor-crit="threadTheNeedleCrit">Thread The Needle</button>
           <button class="game__button" data-floor-crit="paintJobCrit">Paint Job</button>

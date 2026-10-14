@@ -12,6 +12,7 @@ import { armCritUpgrade } from "../floorCrits/upgradeCrit";
 import {
   addBoreTaps,
   addHeavyTaps,
+  addSplashTaps,
   addButtonCharge,
   addDoubleTaps,
   addFreeTaps,
@@ -133,6 +134,14 @@ function reward(
     case "heavyHandCrit": {
       const taps = Math.max(1, Math.round(count * CONFIG.crit.heavyHandTaps));
       addHeavyTaps(target, own ? taps * 2 : taps);
+      flipUpgradeButton(target);
+      return 0;
+    }
+    // taps that each level the floors above and below too, twice as many on
+    // its own
+    case "splashZoneCrit": {
+      const taps = Math.max(1, Math.round(count * CONFIG.crit.splashZoneTaps));
+      addSplashTaps(target, own ? taps * 2 : taps);
       flipUpgradeButton(target);
       return 0;
     }

@@ -98,6 +98,21 @@ export const CRIT_CONFIG = {
     // compressorOwnSpeed)
     compressorSpeed: 1.2,
     compressorOwnSpeed: 1.4,
+    // Afterburn: a bar afterburnSpeed times as fast, fading back to its own
+    // speed over afterburnMs
+    afterburnSpeed: 3,
+    afterburnMs: 20_000,
+    // Supercharge: a bar's next superchargePayouts payouts (its own
+    // superchargeOwnPayouts) superchargePayout times as big
+    superchargePayout: 3,
+    superchargePayouts: 3,
+    superchargeOwnPayouts: 6,
+    // Splash Zone: taps also levelling the floors above and below, per the
+    // crit's multiple (twice on its own)
+    splashZoneTaps: 0.5,
+    // Shred: the floor it opens gets this many double taps per the crit's
+    // multiple
+    shredTaps: 1,
     // gateway roll for the whole "special crit" (chain/boost/bounce/
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
     // ultra, before any of the individual proc chances (badgeCrits/balance, floorCrits/balance) are even

@@ -64,5 +64,10 @@ export const BUTTON_CRIT_CONFIG = {
     heavyHandCrit: {
       chance: 0.03,
     },
+    // drops of light splashing onto the buttons, quickening to a downpour,
+    // each tap of them then levelling the floors above and below too
+    splashZoneCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

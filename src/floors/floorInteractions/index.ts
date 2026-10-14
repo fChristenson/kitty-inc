@@ -22,6 +22,7 @@ import {
   takeHireTap,
   takeBoreTap,
   takeHeavyTap,
+  takeSplashTap,
   takeHalfTap,
   stickSpentCrit,
   getCritTier,
@@ -430,6 +431,15 @@ function landTapBonuses(
     if (above?.unlocked && !isFloorMaxed(above)) {
       applyUpgradeTick(above, false);
       punchIncomeBar(above, "+1 Lvl", COLOR.heavenlyGold);
+    }
+  }
+  if (takeSplashTap(floor)) {
+    const index = deps.floors.indexOf(floor);
+    for (const near of [index - 1, index + 1]) {
+      const other = deps.floors[near];
+      if (!other?.unlocked || isFloorMaxed(other)) continue;
+      applyUpgradeTick(other, near === 0);
+      punchIncomeBar(other, "+1 Lvl", COLOR.heavenlyGold);
     }
   }
   const linked = takeLinkedFloors(floor);

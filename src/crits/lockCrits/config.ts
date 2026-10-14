@@ -91,5 +91,15 @@ export const LOCK_CRIT_CONFIG = {
     viceCrit: {
       chance: 0.03,
     },
+    // lightning arcing wall to wall across the locked floor into a cage that
+    // blazes it open, its new bar paying more for a while
+    crackleCageCrit: {
+      chance: 0.03,
+    },
+    // slashes cutting the locked floor's price to pieces, the floor opening,
+    // its button's next taps landing double
+    shredCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

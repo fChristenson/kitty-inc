@@ -12,6 +12,19 @@ const doubles = snapshotMap<Floor, number>();
 const windups = snapshotMap<Floor, number>();
 // a Crosshairs' lock: how many times as big the next payout pays
 const aimed = snapshotMap<Floor, number>();
+// an Afterburn's start, and a Supercharge's payouts left
+const afterburns = snapshotMap<Floor, number>();
+const supercharges = snapshotMap<Floor, number>();
+
+// an Afterburn: a burst of speed fading back over afterburnMs
+export function afterburnBar(floor: Floor): void {
+  afterburns.set(floor, Date.now());
+}
+
+// a Supercharge: the next `payouts` payouts superchargePayout times as big
+export function superchargeBar(floor: Floor, payouts: number): void {
+  supercharges.set(floor, (supercharges.get(floor) ?? 0) + payouts);
+}
 
 // a Crosshairs' shot: floor's next payout `times` as big
 export function aimPayout(floor: Floor, times: number): void {
@@ -32,6 +45,7 @@ export function windUpBar(floor: Floor): void {
 export function ratePayoutMultiplier(floor: Floor, now: number): number {
   let payout = doubles.has(floor) ? CONFIG.crit.shortcutPayout : 1;
   payout *= aimed.get(floor) ?? 1;
+  if (supercharges.has(floor)) payout *= CONFIG.crit.superchargePayout;
   const windup = windups.get(floor);
   if (windup !== undefined) {
     if (now < windup) payout *= CONFIG.crit.woundUpPayout;
@@ -56,6 +70,12 @@ export function stepBar(floor: Floor): void {
 // how many times as fast rate crits run floor's bar right now
 export function rateCritSpeed(floor: Floor, now: number): number {
   let speed = 1;
+  const burn = afterburns.get(floor);
+  if (burn !== undefined) {
+    const t = (now - burn) / CONFIG.crit.afterburnMs;
+    if (t < 1) speed *= 1 + (CONFIG.crit.afterburnSpeed - 1) * (1 - t);
+    else afterburns.delete(floor);
+  }
   const overclock = overclocks.get(floor);
   if (overclock !== undefined) {
     if (now < overclock) speed *= CONFIG.crit.overclockSpeed;
@@ -78,6 +98,11 @@ export function noteRatePayout(floor: Floor, now: number): void {
   const run = quicksteps.get(floor);
   if (run && now < run.until) run.steps++;
   aimed.delete(floor);
+  const charged = supercharges.get(floor);
+  if (charged !== undefined) {
+    if (charged > 1) supercharges.set(floor, charged - 1);
+    else supercharges.delete(floor);
+  }
   const banked = doubles.get(floor);
   if (banked === undefined) return;
   if (banked > 1) doubles.set(floor, banked - 1);

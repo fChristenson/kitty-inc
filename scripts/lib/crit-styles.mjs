@@ -97,6 +97,7 @@ export const PLAYED_STYLES = {
   threadTheNeedleCrit: "portal",
   hydraulicCrit: "crush",
   stampDownCrit: "crush",
+  stackUpCrit: "clutter",
   // income crits
   windfallCrit: "explosion",
   bulletHoseCrit: "gunfire",
@@ -132,6 +133,7 @@ export const PLAYED_STYLES = {
   moneyCircleCrit: "summon",
   bigCrunchCrit: "galaxy",
   hardSellCrit: "crush",
+  wraparoundCrit: "portal",
   // button crits
   sureShotCrit: "wisp",
   autopressCrit: "wisp",
@@ -146,6 +148,7 @@ export const PLAYED_STYLES = {
   halfOffCrit: "drill",
   deepBoreCrit: "drill",
   heavyHandCrit: "crush",
+  splashZoneCrit: "ripple",
   // lock crits
   breachCrit: "gunfire",
   twoUpCrit: "explosion",
@@ -165,6 +168,8 @@ export const PLAYED_STYLES = {
   housewarmingCrit: "snowball",
   reboundCrit: "bounce",
   viceCrit: "crush",
+  crackleCageCrit: "lightning",
+  shredCrit: "slice",
   // rate crits
   overclockCrit: "lightning",
   shiftUpCrit: "race",
@@ -174,4 +179,6 @@ export const PLAYED_STYLES = {
   woundUpCrit: "charge",
   crosshairsCrit: "beam",
   compressorCrit: "crush",
+  afterburnCrit: "explosion",
+  superchargeCrit: "charge",
 };

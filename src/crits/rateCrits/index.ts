@@ -11,10 +11,12 @@ import type { RateCritKind } from "../critTypes";
 import type { FloorCritPlay } from "../floorCrits/critPlayer";
 import { otherFloorsInView, spotsFromFlash } from "../floorCrits/playTargets";
 import {
+  afterburnBar,
   aimPayout,
   bankDoublePayout,
   overclockBar,
   stepBar,
+  superchargeBar,
   windUpBar,
 } from "./rateBonus";
 import { CONFIG } from "../../config";
@@ -72,6 +74,17 @@ function reward(kind: RateCritKind, target: Floor, step: number): void {
         step === 2
           ? CONFIG.crit.compressorOwnSpeed
           : CONFIG.crit.compressorSpeed;
+      return;
+    case "afterburnCrit":
+      afterburnBar(target);
+      return;
+    case "superchargeCrit":
+      superchargeBar(
+        target,
+        step === 2
+          ? CONFIG.crit.superchargeOwnPayouts
+          : CONFIG.crit.superchargePayouts,
+      );
       return;
   }
 }
