@@ -6,5 +6,4 @@ export default {
   label: "Fountain Show",
   chance: 0.03,
   style: "money",
-  isNew: true,
 } satisfies CritMeta;

@@ -8,5 +8,4 @@ export default {
   style: "charge",
   // the wisps, each hired onto the floor it opens
   values: { hires: 3 },
-  isNew: true,
 } satisfies CritMeta;

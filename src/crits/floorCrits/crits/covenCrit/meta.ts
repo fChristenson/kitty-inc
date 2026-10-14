@@ -6,5 +6,4 @@ export default {
   label: "Coven",
   chance: 0.03,
   style: "summon",
-  isNew: true,
 } satisfies CritMeta;
