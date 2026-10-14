@@ -1837,6 +1837,8 @@ function floorCritLevels(
   // own lands half
   if (kind === "raindropsCrit")
     return step ? Math.ceil(count / 2) : Math.ceil(count / 7);
+  // a cross cut cuts each bar twice: its own cut, then the long one
+  if (kind === "crossCutCrit") return Math.ceil(count / 2);
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it
   if (kind === "saberCrit" || kind === "freezeRayCrit")
     return Math.ceil(count / 2);

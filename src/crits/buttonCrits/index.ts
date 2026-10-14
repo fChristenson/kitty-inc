@@ -14,6 +14,7 @@ import {
   addDoubleTaps,
   addFreeTaps,
   addHireTaps,
+  addHalfTaps,
   addHotTaps,
   addLinkedTaps,
   addNails,
@@ -109,6 +110,13 @@ function reward(
         Math.round(count * CONFIG.crit.springLoadedHires),
       );
       addHireTaps(target, own ? taps * 2 : taps);
+      flipUpgradeButton(target);
+      return 0;
+    }
+    // taps that each cost half, twice as many on its own
+    case "halfOffCrit": {
+      const taps = Math.max(1, Math.round(count * CONFIG.crit.halfOffTaps));
+      addHalfTaps(target, own ? taps * 2 : taps);
       flipUpgradeButton(target);
       return 0;
     }

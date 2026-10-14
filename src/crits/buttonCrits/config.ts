@@ -50,5 +50,9 @@ export const BUTTON_CRIT_CONFIG = {
     springLoadedCrit: {
       chance: 0.03,
     },
+    // a drill boring into every button, each tap of it then costing half
+    halfOffCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

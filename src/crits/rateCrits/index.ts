@@ -10,7 +10,13 @@ import type { Floor } from "../../gameState";
 import type { RateCritKind } from "../critTypes";
 import type { FloorCritPlay } from "../floorCrits/critPlayer";
 import { otherFloorsInView, spotsFromFlash } from "../floorCrits/playTargets";
-import { bankDoublePayout, overclockBar, stepBar } from "./rateBonus";
+import {
+  bankDoublePayout,
+  overclockBar,
+  startMomentum,
+  stepBar,
+  windUpBar,
+} from "./rateBonus";
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { liveEffect } from "../../shared/detachedJob";
@@ -49,6 +55,12 @@ function reward(kind: RateCritKind, target: Floor, step: number): void {
         (step === 2
           ? CONFIG.crit.cleanCutOwnPayout
           : CONFIG.crit.cleanCutPayout);
+      return;
+    case "woundUpCrit":
+      windUpBar(target);
+      return;
+    case "momentumCrit":
+      startMomentum(target);
       return;
   }
 }

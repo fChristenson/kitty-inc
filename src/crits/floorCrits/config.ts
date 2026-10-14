@@ -359,6 +359,10 @@ export const FLOOR_CRIT_CONFIG = {
     rollCallCrit: {
       chance: 0.03,
     },
+    // swipes slashing every bar, then one long cut through them all
+    crossCutCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

@@ -2332,6 +2332,8 @@ async function main() {
           "star-pieces": forceOnActive((e) => e.forceStarPiecesEvent),
           groundbreaking: forceOnActive((e) => e.forceGroundbreakingEvent),
           monsoon: forceOnActive((e) => e.forceMonsoonEvent),
+  "warp-gate": forceOnActive((e) => e.forceWarpGateEvent),
+  "rolling-stone": forceOnActive((e) => e.forceRollingStoneEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {

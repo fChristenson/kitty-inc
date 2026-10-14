@@ -132,5 +132,10 @@ export const INCOME_CRIT_CONFIG = {
     crownJewelCrit: {
       chance: 0.03,
     },
+    // drops of light splashing onto the total, a drizzle to a downpour, then
+    // a huge one
+    pennyShowerCrit: {
+      chance: 0.03,
+    },
   },
 };

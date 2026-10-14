@@ -94,6 +94,8 @@ export {
   takeLinkedFloors,
   takePayoutTap,
   takeHireTap,
+  takeHalfTap,
+  hasHalfTap,
   stickSpentCrit,
 } from "./buttonCrits/buttonBonus";
 export {

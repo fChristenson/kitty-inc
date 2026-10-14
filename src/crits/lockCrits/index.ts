@@ -70,6 +70,7 @@ const OPENS_THEN_REWARDS: readonly LockCritKind[] = [
   "jumpStartCrit",
   "conjureCrit",
   "pullUpCrit",
+  "sweepCleanCrit",
 ];
 
 // a lock crit playing out from floor's crit onto the locked floor, if it's in
@@ -163,6 +164,17 @@ export function lockCritPlayFor(
           flipIncomeRate(opened);
           opened.incomeIntervalSeconds /= CONFIG.crit.pullUpSpeed;
           punchIncomeBar(opened, `${CONFIG.crit.pullUpSpeed}x Speed`, color);
+        } else if (kind === "sweepCleanCrit") {
+          // the floor now waiting above the one it opened, priced down for
+          // good: its discount too, which the price is rebuilt from on load
+          const next = lockedFloorOf(deps.floors);
+          if (next) {
+            next.priceDiscountMultiplier *= CONFIG.crit.sweepCleanPrice;
+            next.unlockCost = multiply(
+              next.unlockCost,
+              CONFIG.crit.sweepCleanPrice,
+            );
+          }
         } else {
           const spot = MOVE_IN_SPOTS[movedIn++ % MOVE_IN_SPOTS.length];
           const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * spot;

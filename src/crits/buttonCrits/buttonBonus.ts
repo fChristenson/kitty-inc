@@ -17,6 +17,7 @@ const payoutTaps = snapshotMap<Floor, number>();
 const hotTaps = snapshotMap<Floor, number>();
 const linkedTaps = snapshotMap<Floor, number>();
 const hireTaps = snapshotMap<Floor, number>();
+const halfTaps = snapshotMap<Floor, number>();
 // how many taps the next crit landing on a nailed button plays for
 const nails = snapshotMap<Floor, number>();
 // a crit stuck on its button, and how many more times it's armed again
@@ -64,6 +65,20 @@ export function addHireTaps(floor: Floor, taps: number): void {
 // whether a tap on floor's button hires a worker too, using one up
 export function takeHireTap(floor: Floor): boolean {
   return takeTap(hireTaps, floor);
+}
+
+export function addHalfTaps(floor: Floor, taps: number): void {
+  addTaps(halfTaps, floor, taps);
+}
+
+// whether floor's next paid tap costs half
+export function hasHalfTap(floor: Floor): boolean {
+  return halfTaps.has(floor);
+}
+
+// a paid tap on floor's button: a half-price one used up
+export function takeHalfTap(floor: Floor): void {
+  takeTap(halfTaps, floor);
 }
 
 // after floor's crit of `tier` is spent: armed again while it's stuck, or
@@ -152,6 +167,7 @@ const hotLabels = new Map<number, string>();
 const linkedLabels = new Map<number, string>();
 const nailLabels = new Map<number, string>();
 const hireLabels = new Map<number, string>();
+const halfLabels = new Map<number, string>();
 function labelOf(labels: Map<number, string>, n: number, text: string) {
   labels.set(n, text);
   return text;
@@ -182,6 +198,7 @@ export function buttonPerkLabel(floor: Floor): string | null {
     tapsLabel(hotTaps, hotLabels, floor, "Hot") ??
     tapsLabel(linkedTaps, linkedLabels, floor, "Linked") ??
     tapsLabel(hireTaps, hireLabels, floor, "Hire") ??
+    tapsLabel(halfTaps, halfLabels, floor, "Half") ??
     tapsLabel(nails, nailLabels, floor, "Sticky")
   );
 }

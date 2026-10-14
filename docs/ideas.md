@@ -86,6 +86,16 @@ New animation styles, each with its own verb and lib in `shared/animationStyles`
 
 ## Built
 
+- **List 200**, eight more crits for the thin spots. Test: New Effects. All hold 59-60fps under the stress test.
+  - **Wound Up** (`rateCrits/crits/woundUpCrit`, Charge): payouts `CONFIG.crit.woundUpPayout` times as big for `woundUpMs` (`windUpBar` in `rateCrits/rateBonus.ts`).
+  - **Momentum** (`rateCrits/crits/momentumCrit`, Snowball): for `momentumMs` every payout `momentumStep` bigger than the last, up to `momentumMaxPayout` (`startMomentum`). Rolls with Roll Call's ball, now shared in `floorCrits/critPlayer/barRoll.ts`.
+  - **Half Off** (`buttonCrits/crits/halfOffCrit`, Drill): `Half N` taps at half price (`addHalfTaps`; `getUpgradeCost` reads half, `payUpgrade` in `floorInteractions` uses one up).
+  - **Sweep Clean** (`lockCrits/crits/sweepCleanCrit`, Clutter): opens the floor; the floor then waiting above it costs `CONFIG.crit.sweepCleanPrice` of its price for good.
+  - **Penny Shower** (`incomeCrits/crits/pennyShowerCrit`, Ripple): a share a drop, then a huge one.
+  - **Cross Cut** (`floorCrits/crits/crossCutCrit`, Slice): half the levels a cut, each bar cut twice.
+  - **Warp Gate** (`animatedCrits/events/warpGateEvent`, Portal, free floor, batch 101): the top ring sits just over the locked floor, the bottom one at the bottom of the screen.
+  - **Rolling Stone** (`animatedCrits/events/rollingStoneEvent`, Snowball, hires, batch 101): rolls lanes across the screen rather than along the floors.
+
 - **List 199**, eight crits for the thin spots in `crit-dist`. Test: New Effects. All hold 57-60fps under the stress test.
   - **Shortcut** (`rateCrits/crits/shortcutCrit`, Portal): a wisp loops through twin rings over and under each bar's right end, faster each loop; every pass banks one double payout (`bankDoublePayout` in `rateCrits/rateBonus.ts`, `CONFIG.crit.shortcutPayout`, spent one a payout).
   - **Clean Cut** (`rateCrits/crits/cleanCutCrit`, Slice, rarer 0.01): swipes slash each bar, glitter spilling, then the cut welds gold and the bar pays more for good (`floor.payoutMultiplier`, saved; `cleanCutPayout`, its own `cleanCutOwnPayout`). The bars aren't split apart: the game draws them.

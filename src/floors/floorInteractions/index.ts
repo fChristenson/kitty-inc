@@ -20,6 +20,7 @@ import {
   takeLinkedFloors,
   takePayoutTap,
   takeHireTap,
+  takeHalfTap,
   stickSpentCrit,
   getCritTier,
   consumeCritUpgrade,
@@ -275,8 +276,15 @@ export function performAutomatedUpgradeClick(
       false,
     );
   }
-  if (!spendTotalIncome(getUpgradeCost(floor))) return false;
+  if (!payUpgrade(floor)) return false;
   return performAutomatedUpgradeAfterPayment(deps, floor, isGroundFloor, true);
+}
+
+// pays floor's next level, using up a half-price tap if it had one
+function payUpgrade(floor: Floor): boolean {
+  if (!spendTotalIncome(getUpgradeCost(floor))) return false;
+  takeHalfTap(floor);
+  return true;
 }
 
 export function performAutomatedUpgradeAfterPayment(
@@ -296,7 +304,7 @@ export function performAutomatedUpgradeAfterPayment(
     deps.persist();
     return true;
   }
-  if (!paid && !spendTotalIncome(getUpgradeCost(floor))) return false;
+  if (!paid && !payUpgrade(floor)) return false;
   applyUpgradeTick(floor, isGroundFloor, true);
   rollCritUpgrade(floor, false);
   deps.persist();
@@ -720,7 +728,7 @@ export function handleFloorClick(
       playCoinDrop();
       return;
     }
-    if (spendTotalIncome(getUpgradeCost(floor))) {
+    if (payUpgrade(floor)) {
       applyUpgradeTick(floor, isGroundFloor, true);
       landTapBonuses(deps, floor, isGroundFloor);
       rollTapCrit(deps, floor, isGroundFloor);

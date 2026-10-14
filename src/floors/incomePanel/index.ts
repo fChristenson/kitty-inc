@@ -642,7 +642,7 @@ function effectiveIncomeCycle(
     floor,
     currentSpeedMultiplier(floor, now),
   );
-  const payout = ratePayoutMultiplier(floor);
+  const payout = ratePayoutMultiplier(floor, now);
   if (payout !== 1) cycle.amount = multiply(cycle.amount, payout);
   return cycle;
 }
@@ -659,7 +659,7 @@ export function collectDueIncome(floor: Floor, now: number): BigNumber {
     currentSpeedMultiplier(floor, now),
   );
   if (isZero(due)) return due;
-  const payout = ratePayoutMultiplier(floor);
+  const payout = ratePayoutMultiplier(floor, now);
   noteRatePayout(floor, now);
   return payout === 1 ? due : multiply(due, payout);
 }

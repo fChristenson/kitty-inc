@@ -8268,6 +8268,25 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 101
+  // portal, free floors: src/crits/animatedCrits/events/warpGateEvent ("Warp Gate"): twin rings over the locked floor and at the bottom of the frozen screen; wisps fall down through them in loops, faster each time, more joining, until their last falls slam the locked floor open
+  warpGateEvent: {
+    chance: 0.01,
+    firstMs: 380, // from the click till the first wisp falls
+    loopsMs: [560, 420, 320, 250], // each loop's fall, quickening
+    slamMs: 140, // the last fall into the locked floor
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // snowball, hires: src/crits/animatedCrits/events/rollingStoneEvent ("Rolling Stone"): a wisp ball rolls across the frozen screen lane by lane, picking up the glitter, bigger and quicker, then bursts, flinging wisps onto every empty spot, each a new worker
+  rollingStoneEvent: {
+    chance: 0.01,
+    firstMs: 250, // from the click till the ball starts rolling
+    rollsMs: [600, 320] as [number, number], // a lane's roll, quickening
+    hireMs: 360, // from the burst till the first hire lands
+    hireGapMs: 70, // between the hires landing
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // summon, free floors: src/crits/animatedCrits/events/groundbreakingEvent ("Groundbreaking"): a giant magic circle drawn flat at the bottom of the frozen screen turns faster and faster; a pillar of light erupts out of it and rides up the building, a blast at every floor, until it bursts the locked floor open
   groundbreakingEvent: {
     chance: 0.01,

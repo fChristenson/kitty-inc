@@ -27,5 +27,15 @@ export const RATE_CRIT_CONFIG = {
     cleanCutCrit: {
       chance: 0.01,
     },
+    // a wisp charging on every bar's readout until it bursts, each bar then
+    // paying more for a while
+    woundUpCrit: {
+      chance: 0.03,
+    },
+    // a wisp ball rolling along every bar, each then paying more with every
+    // payout for a while
+    momentumCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

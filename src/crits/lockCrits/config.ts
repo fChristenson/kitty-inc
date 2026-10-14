@@ -71,5 +71,10 @@ export const LOCK_CRIT_CONFIG = {
     pullUpCrit: {
       chance: 0.03,
     },
+    // a broom of light sweeping the locked floor's dust into a heap that
+    // bursts it open, the floor above it priced down
+    sweepCleanCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

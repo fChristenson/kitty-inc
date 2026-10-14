@@ -4,7 +4,7 @@
 // stays in this one file instead of being duplicated per event.
 import { smoothstep } from "../../shared/easing";
 import { spawnCoinBurst } from "../coins";
-import { type BigNumber, gte } from "../../shared/bigNumber";
+import { type BigNumber, gte, multiply } from "../../shared/bigNumber";
 import { baseIncomeRatePerSecond } from "../../shared/income";
 import { getTotalIncome } from "../../totalIncome";
 import { isFloorMaxed, type Floor } from "../../gameState";
@@ -13,12 +13,14 @@ import {
   isCritUpgrade,
   getPriceMatchCost,
   hasFreeButtonTap,
+  hasHalfTap,
 } from "../../crits";
 
 import { isFreeClickEventActive } from "../../shared/floorEvents";
 
 export function getUpgradeCost(floor: Floor, now = Date.now()): BigNumber {
-  return getPriceMatchCost(floor, now) ?? floor.upgradeCost;
+  const cost = getPriceMatchCost(floor, now) ?? floor.upgradeCost;
+  return hasHalfTap(floor) ? multiply(cost, 0.5) : cost;
 }
 
 // button placement, bottom-right corner of each floor (mirrors the income panel on the left).
