@@ -122,7 +122,9 @@ export const forceRollingStoneEvent = registerWispEvent(
         const p = clamp01((ms - burstAt) / (s.lands - burstAt)) ** 1.4;
         const u = 1 - p;
         into.x =
-          u * u * burst.x + 2 * u * p * ((burst.x + s.at.x) / 2) + p * p * s.at.x;
+          u * u * burst.x +
+          2 * u * p * ((burst.x + s.at.x) / 2) +
+          p * p * s.at.x;
         into.y = u * u * burst.y + 2 * u * p * top + p * p * s.at.y;
         return into;
       };

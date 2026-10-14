@@ -3,7 +3,10 @@
 // back into one heap in the middle, the dust only moving as the broom
 // reaches it; the heap settles with a jolt and bursts the floor open, and
 // the floor waiting above it is priced down
-import { drawBroom, type BroomState } from "../../../../shared/animationStyles/clutter";
+import {
+  drawBroom,
+  type BroomState,
+} from "../../../../shared/animationStyles/clutter";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 import { stampGlimmer } from "../../../../shared/twinkle";

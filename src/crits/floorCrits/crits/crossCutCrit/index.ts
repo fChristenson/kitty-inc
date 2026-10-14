@@ -17,7 +17,12 @@ import {
   drawText,
   lerp,
 } from "../../critPlayer";
-import { BAR_HALF_H, otherBars, topBarY, bottomBarY } from "../../critPlayer/shared";
+import {
+  BAR_HALF_H,
+  otherBars,
+  topBarY,
+  bottomBarY,
+} from "../../critPlayer/shared";
 
 const IN_MS = 160;
 // a cut across a bar: SLANT past its edges, from AT of its half width left
@@ -103,9 +108,7 @@ registerFloorCrit("crossCutCrit", {
     const swipes = state.cuts.length + 1;
     while (r.kicked < swipes) {
       const s =
-        r.kicked < state.cuts.length
-          ? state.cuts[r.kicked].slash
-          : state.long;
+        r.kicked < state.cuts.length ? state.cuts[r.kicked].slash : state.long;
       if (ms < s.startMs) break;
       r.kicked++;
       playSwoosh();

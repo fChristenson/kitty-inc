@@ -65,10 +65,22 @@ export const forceWarpGateEvent = registerWispEvent(
       let t = firstMs + w * LAG;
       loopsMs.forEach((ms, j) => {
         if (j >= w)
-          legs.push({ from: top, to: bottom, startMs: t, endMs: t + ms, fall: true });
+          legs.push({
+            from: top,
+            to: bottom,
+            startMs: t,
+            endMs: t + ms,
+            fall: true,
+          });
         t += ms;
       });
-      legs.push({ from: top, to: lock, startMs: t, endMs: t + slamMs, fall: true });
+      legs.push({
+        from: top,
+        to: lock,
+        startMs: t,
+        endMs: t + slamMs,
+        fall: true,
+      });
       runners.push(planWarp(legs));
     }
     const slams = runners.map((r) => r.endMs);
