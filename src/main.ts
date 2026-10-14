@@ -20,6 +20,7 @@ import {
   hasBadgeCapsule,
   takeBadgeCapsule,
   loadEventCatalog,
+  loadEventCards,
   loadNextEventPart,
   queueEventParts,
   type EventCatalog,
@@ -710,10 +711,10 @@ async function main() {
   // as soon as the shipped game does; the crit buttons show the badge labels
   if (import.meta.env.MODE !== "production")
     preheat(() =>
-      loadBadgeCatalog().then(() => {
+      Promise.all([loadEventCards(), loadBadgeCatalog()]).then(([events]) => {
         app
           .querySelector(".game")!
-          .insertAdjacentHTML("beforeend", createTestButtonMarkup());
+          .insertAdjacentHTML("beforeend", createTestButtonMarkup(events));
         exposePerfBridge({
           getActiveFloors: () => buildings[activeBuildingIndex],
           floorToClient: gameCanvas.floorToClient,

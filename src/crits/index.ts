@@ -151,6 +151,11 @@ export {
   takeClaimedEventProc,
   triggerSwarmSale,
 } from "./animatedCrits";
+export type { EventCard } from "./animatedCrits/eventMetas";
+// every animated crit's card (its meta.ts), for the test panel; a chunk of its
+// own, loaded after startup
+export const loadEventCards = () =>
+  import("./animatedCrits/eventMetas").then((module) => module.EVENT_CARDS);
 export type {
   EventCatalog,
   OnScreenFloor,
