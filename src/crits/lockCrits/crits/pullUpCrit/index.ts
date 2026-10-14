@@ -10,7 +10,7 @@ import {
   planSnaps,
   snapAt,
   type Snap,
-} from "../../../../shared/animationStyles/magnet";
+} from "../../../../shared/animationStyles/pull";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 import { stampGlimmer } from "../../../../shared/twinkle";

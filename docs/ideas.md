@@ -93,7 +93,30 @@ Each idea fills a gap in `node scripts/crit-dist.mjs`.
 3. **Paint Job** (floor, Spray; floor has no spray): a nozzle wisp glides down the side of the building, faster and faster, hissing gold mist along every bar it passes until its coat flashes with levels; then it swoops onto its own bar for a heavy coat and a huge blast.
 4. **Cut Loose** (animated, Slice, free floor; animated has no slice): slashes cut across the dark locked floor in quick fire, glitter spilling out. A final cross tears it open, unlocked free.
 
+## List 202: drawn styles, all drama ([playground](../tmp/_playground/ideas.html?list=next179))
+
+Groups and styles drawn by `scripts/select-animation-style.mjs`. Each one builds up and ends in a climax.
+
+1. **Crosshairs** (rate, Beam): a turret wisp at its own bar's end scans an aim laser up and down the building, faster and faster, locking a reticle onto every readout. It charges, trembling and glowing, then fires every beam at once: each bar's next payout pays five times, its own ten.
+2. **Big Crunch** (income, Galaxy): a tilted disk of hundreds of stars spins up under the total, faster and faster and shrinking, a flare and a share each time. It crunches to a point and a jet of light shoots up into the readout.
+3. **Deep Bore** (button, Drill): drills bite under every button at once and stall in a rumble, then bore in like pistons round the buttons, faster and faster. They punch through together: each button's taps also level the floor above.
+5. **Rebound** (lock, Bounce): a wisp ricochets round the dark locked floor, faster each hit, splitting into two, then four. They all slam into its middle and burst it open: the new bar runs twice as fast for 30 seconds.
+6. **Drain** (floor, Pull): its own bar's readout opens into a hole that sucks the fill out of every other bar, the green tearing loose as glitter and spiralling in, a trickle then a flood; wisps breaking away are yanked back. The hole swells, swallows the last, collapses to a point and bursts, wisps flying back onto every bar with levels.
+7. **Boss Rush** (animated, Shmup, crit tiers): a giant boss of three wisp rings, each firing its own pattern while the ship peels it off in a rolling chain. The bare core charges and fires a beam the ship dodges, then the ship's beam blows it apart: every bar a crit tier up.
+8. **Thread The Needle** (floor, Portal): rings stand at both ends of every bar. A wisp threads the building, out of each bar's right ring into the next bar's left, round and round, faster each time, levels on every run. It loops its own bar three times flat out, then bursts.
+
 ## Built
+
+- **List 202**, seven crits. Test: New Effects.
+  - **Crosshairs** (`rateCrits/crits/crosshairsCrit`, Beam): each bar's next payout is `CONFIG.crit.crosshairsPayout` times as big, its own `crosshairsOwnPayout` (`aimPayout` in `rateCrits/rateBonus.ts`, spent on the payout).
+  - **Big Crunch** (`incomeCrits/crits/bigCrunchCrit`, Galaxy): a share a flare, then the jet and finale.
+  - **Deep Bore** (`buttonCrits/crits/deepBoreCrit`, Drill): `Bore N` taps, each of which also levels the floor above (`addBoreTaps`, `CONFIG.crit.deepBoreTaps` per multiple, twice on its own; `landTapBonuses`). The drills' sprays gush on each shove and share one budget, so many buttons stay cheap.
+  - **Rebound** (`lockCrits/crits/reboundCrit`, Bounce): opens the floor, then `overclockBar` (2x speed for `overclockMs`).
+  - **Drain** (`floorCrits/crits/drainCrit`, Pull): levels when each wisp lands back. The bars aren't emptied: the game draws them.
+  - **Boss Rush** (`animatedCrits/events/bossRushEvent`, Shmup, crit tiers, batch 101): a flight stage, the player a wisp; every bar in view takes the crit's tier at the landing.
+  - **Thread The Needle** (`floorCrits/crits/threadTheNeedleCrit`, Portal): two rounds of the bars, half the levels per run.
+
+- **List 201**, four crits, the rest removed. Test: New Effects: **Housewarming**, **Money Circle**, **Paint Job** and **Cut Loose**.
 
 - **List 200**, eight more crits for the thin spots. Test: New Effects. All hold 59-60fps under the stress test.
   - **Wound Up** (`rateCrits/crits/woundUpCrit`, Charge): payouts `CONFIG.crit.woundUpPayout` times as big for `woundUpMs` (`windUpBar` in `rateCrits/rateBonus.ts`).

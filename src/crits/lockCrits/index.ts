@@ -42,7 +42,7 @@ import {
 import { CONFIG } from "../../config";
 import { armCritUpgrade } from "../floorCrits/upgradeCrit";
 import { addFreeTaps } from "../buttonCrits/buttonBonus";
-import { bankDoublePayout } from "../rateCrits/rateBonus";
+import { bankDoublePayout, overclockBar } from "../rateCrits/rateBonus";
 import { liveEffect } from "../../shared/detachedJob";
 import { flipUpgradeButton as animateFlip } from "../../floors/upgradeButton";
 
@@ -73,6 +73,7 @@ const OPENS_THEN_REWARDS: readonly LockCritKind[] = [
   "pullUpCrit",
   "sweepCleanCrit",
   "housewarmingCrit",
+  "reboundCrit",
 ];
 
 // a lock crit playing out from floor's crit onto the locked floor, if it's in
@@ -171,6 +172,10 @@ export function lockCritPlayFor(
           bankDoublePayout(opened, payouts);
           flipIncomeRate(opened);
           punchIncomeBar(opened, `2x Pay x${payouts}`, color);
+        } else if (kind === "reboundCrit") {
+          flipIncomeRate(opened);
+          overclockBar(opened);
+          punchIncomeBar(opened, `${CONFIG.crit.overclockSpeed}x Speed`, color);
         } else if (kind === "sweepCleanCrit") {
           // the floor now waiting above the one it opened, priced down for
           // good: its discount too, which the price is rebuilt from on load

@@ -11,6 +11,7 @@ import type { RateCritKind } from "../critTypes";
 import type { FloorCritPlay } from "../floorCrits/critPlayer";
 import { otherFloorsInView, spotsFromFlash } from "../floorCrits/playTargets";
 import {
+  aimPayout,
   bankDoublePayout,
   overclockBar,
   stepBar,
@@ -57,6 +58,14 @@ function reward(kind: RateCritKind, target: Floor, step: number): void {
       return;
     case "woundUpCrit":
       windUpBar(target);
+      return;
+    case "crosshairsCrit":
+      aimPayout(
+        target,
+        step === 2
+          ? CONFIG.crit.crosshairsOwnPayout
+          : CONFIG.crit.crosshairsPayout,
+      );
       return;
   }
 }

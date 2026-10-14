@@ -137,5 +137,10 @@ export const INCOME_CRIT_CONFIG = {
     moneyCircleCrit: {
       chance: 0.03,
     },
+    // a disk of stars under the total spinning up and shrinking, a share a
+    // flare, crunching into a jet up into the readout
+    bigCrunchCrit: {
+      chance: 0.03,
+    },
   },
 };

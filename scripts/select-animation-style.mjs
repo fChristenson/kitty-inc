@@ -37,7 +37,7 @@ const STYLES = [
   "charge",
   "portal",
   "slice",
-  "magnet",
+  "pull",
   "summon",
   "snowball",
   "ripple",

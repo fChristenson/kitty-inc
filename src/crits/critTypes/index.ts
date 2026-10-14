@@ -2178,6 +2178,8 @@ export const FLOOR_CRIT_KINDS = [
   "rollCallCrit",
   "crossCutCrit",
   "paintJobCrit",
+  "drainCrit",
+  "threadTheNeedleCrit",
 ] as const satisfies readonly FloorCritType[];
 export type FloorCritKind = (typeof FLOOR_CRIT_KINDS)[number];
 
@@ -2219,6 +2221,7 @@ export const INCOME_CRIT_KINDS = [
   "stickyBallCrit",
   "pennyShowerCrit",
   "moneyCircleCrit",
+  "bigCrunchCrit",
 ] as const satisfies readonly IncomeCritType[];
 export type IncomeCritKind = (typeof INCOME_CRIT_KINDS)[number];
 
@@ -2240,6 +2243,7 @@ export const BUTTON_CRIT_KINDS = [
   "nailGunCrit",
   "springLoadedCrit",
   "halfOffCrit",
+  "deepBoreCrit",
 ] as const satisfies readonly ButtonCritType[];
 export type ButtonCritKind = (typeof BUTTON_CRIT_KINDS)[number];
 
@@ -2265,6 +2269,7 @@ export const LOCK_CRIT_KINDS = [
   "pullUpCrit",
   "sweepCleanCrit",
   "housewarmingCrit",
+  "reboundCrit",
 ] as const satisfies readonly LockCritType[];
 export type LockCritKind = (typeof LOCK_CRIT_KINDS)[number];
 
@@ -2281,6 +2286,7 @@ export const RATE_CRIT_KINDS = [
   "shortcutCrit",
   "cleanCutCrit",
   "woundUpCrit",
+  "crosshairsCrit",
 ] as const satisfies readonly RateCritType[];
 export type RateCritKind = (typeof RATE_CRIT_KINDS)[number];
 

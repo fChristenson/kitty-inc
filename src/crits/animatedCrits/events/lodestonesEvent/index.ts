@@ -24,7 +24,7 @@ import {
   planSnaps,
   snapAt,
   type Snap,
-} from "../../../../shared/animationStyles/magnet";
+} from "../../../../shared/animationStyles/pull";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import {

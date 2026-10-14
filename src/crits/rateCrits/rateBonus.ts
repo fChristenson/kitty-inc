@@ -10,6 +10,13 @@ const overclocks = snapshotMap<Floor, number>();
 const quicksteps = snapshotMap<Floor, { until: number; steps: number }>();
 const doubles = snapshotMap<Floor, number>();
 const windups = snapshotMap<Floor, number>();
+// a Crosshairs' lock: how many times as big the next payout pays
+const aimed = snapshotMap<Floor, number>();
+
+// a Crosshairs' shot: floor's next payout `times` as big
+export function aimPayout(floor: Floor, times: number): void {
+  aimed.set(floor, (aimed.get(floor) ?? 1) * times);
+}
 
 // a Shortcut's pass: one more payout paying double (a Housewarming's several)
 export function bankDoublePayout(floor: Floor, payouts = 1): void {
@@ -24,6 +31,7 @@ export function windUpBar(floor: Floor): void {
 // how many times as big rate crits make floor's next payout
 export function ratePayoutMultiplier(floor: Floor, now: number): number {
   let payout = doubles.has(floor) ? CONFIG.crit.shortcutPayout : 1;
+  payout *= aimed.get(floor) ?? 1;
   const windup = windups.get(floor);
   if (windup !== undefined) {
     if (now < windup) payout *= CONFIG.crit.woundUpPayout;
@@ -69,6 +77,7 @@ export function rateCritSpeed(floor: Floor, now: number): number {
 export function noteRatePayout(floor: Floor, now: number): void {
   const run = quicksteps.get(floor);
   if (run && now < run.until) run.steps++;
+  aimed.delete(floor);
   const banked = doubles.get(floor);
   if (banked === undefined) return;
   if (banked > 1) doubles.set(floor, banked - 1);

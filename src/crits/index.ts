@@ -94,6 +94,7 @@ export {
   takeLinkedFloors,
   takePayoutTap,
   takeHireTap,
+  takeBoreTap,
   takeHalfTap,
   hasHalfTap,
   stickSpentCrit,

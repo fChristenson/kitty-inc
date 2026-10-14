@@ -10,6 +10,7 @@ import type { FloorCritPlay } from "../floorCrits/critPlayer";
 import { otherFloorsInView, spotsFromFlash } from "../floorCrits/playTargets";
 import { armCritUpgrade } from "../floorCrits/upgradeCrit";
 import {
+  addBoreTaps,
   addButtonCharge,
   addDoubleTaps,
   addFreeTaps,
@@ -117,6 +118,13 @@ function reward(
     case "halfOffCrit": {
       const taps = Math.max(1, Math.round(count * CONFIG.crit.halfOffTaps));
       addHalfTaps(target, own ? taps * 2 : taps);
+      flipUpgradeButton(target);
+      return 0;
+    }
+    // taps that each level the floor above too, twice as many on its own
+    case "deepBoreCrit": {
+      const taps = Math.max(1, Math.round(count * CONFIG.crit.deepBoreTaps));
+      addBoreTaps(target, own ? taps * 2 : taps);
       flipUpgradeButton(target);
       return 0;
     }

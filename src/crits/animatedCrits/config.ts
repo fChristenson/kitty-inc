@@ -8268,6 +8268,13 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 101
+  // shmup, crit tiers: src/crits/animatedCrits/events/bossRushEvent ("Boss Rush"): the floors shrink away into space under one giant boss, three rings of wisps round a core, each ring firing its own pattern while the player's wisp peels it off in a rolling chain of blasts; the bare core charges and fires a beam the wisp swerves from, then the wisp's beam blows it apart; back on the floors every bar in view takes a crit tier up
+  bossRushEvent: {
+    chance: 0.01,
+    enterMs: 450, // the view lifting off the floors
+    flyMs: 5400, // the fight, until the floors rush up
+    tierGapMs: 80, // between the bars' crit tiers, top to bottom
+  },
   // slice, free floors: src/crits/animatedCrits/events/cutLooseEvent ("Cut Loose"): swift slashes cut across the dark locked floor of the frozen screen in quick fire, glitter spilling out of every cut; a cross of two long cuts tears through it and it bursts open
   cutLooseEvent: {
     chance: 0.01,
@@ -8316,7 +8323,7 @@ export const ANIMATED_EVENT_CONFIG = {
   },
   // batch 100
   // batch 99
-  // magnet, hires: src/crits/animatedCrits/events/lodestonesEvent ("Lodestones"): two gold poles light up on the frozen screen and the glitter all over it snaps onto them into spiky crusts, quicker and quicker; they yank together and slam, then repel, wisps flung off onto every empty spot in view, each a new worker
+  // pull, hires: src/crits/animatedCrits/events/lodestonesEvent ("Lodestones"): two gold poles light up on the frozen screen and the glitter all over it snaps onto them into spiky crusts, quicker and quicker; they yank together and slam, then repel, wisps flung off onto every empty spot in view, each a new worker
   lodestonesEvent: {
     chance: 0.01,
     pullMs: 1100, // from the click till the last speck snaps on and the poles yank together

@@ -81,5 +81,10 @@ export const LOCK_CRIT_CONFIG = {
     housewarmingCrit: {
       chance: 0.03,
     },
+    // a wisp ricocheting round the locked floor, splitting in two then four,
+    // slamming it open, its new bar running twice as fast for a while
+    reboundCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

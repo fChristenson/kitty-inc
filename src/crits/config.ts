@@ -81,6 +81,13 @@ export const CRIT_CONFIG = {
     springLoadedHires: 0.5,
     // Housewarming: the floor it opens pays double this many payouts
     housewarmingPayouts: 5,
+    // Crosshairs: a bar's next payout this many times as big (its own
+    // crosshairsOwnPayout)
+    crosshairsPayout: 5,
+    crosshairsOwnPayout: 10,
+    // Deep Bore: taps levelling the floor above per the crit's multiple
+    // (twice on its own)
+    deepBoreTaps: 1,
     // gateway roll for the whole "special crit" (chain/boost/bounce/
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
     // ultra, before any of the individual proc chances (badgeCrits/balance, floorCrits/balance) are even

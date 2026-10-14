@@ -20,6 +20,7 @@ import {
   takeLinkedFloors,
   takePayoutTap,
   takeHireTap,
+  takeBoreTap,
   takeHalfTap,
   stickSpentCrit,
   getCritTier,
@@ -417,6 +418,13 @@ function landTapBonuses(
     const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * Math.random();
     const worker = recruitWorker(floor, x, now);
     if (worker !== null) celebrateWorkerBoost(floor, worker, now);
+  }
+  if (takeBoreTap(floor)) {
+    const above = deps.floors[deps.floors.indexOf(floor) + 1];
+    if (above?.unlocked && !isFloorMaxed(above)) {
+      applyUpgradeTick(above, false);
+      punchIncomeBar(above, "+1 Lvl", COLOR.heavenlyGold);
+    }
   }
   const linked = takeLinkedFloors(floor);
   if (!linked) return;

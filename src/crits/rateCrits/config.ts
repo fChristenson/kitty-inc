@@ -32,5 +32,10 @@ export const RATE_CRIT_CONFIG = {
     woundUpCrit: {
       chance: 0.03,
     },
+    // a turret scanning an aim laser over the bars, locking each, then firing
+    // every beam: each bar's next payout five times as big, its own ten
+    crosshairsCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

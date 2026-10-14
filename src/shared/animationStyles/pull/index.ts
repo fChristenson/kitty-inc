@@ -1,10 +1,10 @@
-// magnets for events and crits: gold poles pulling glitter (or anything) in
-// along bowed field lines, snapping it onto a spiky crust round them, then
-// flinging it all off when they flip. Plan the specks once (planSnaps), then
-// each frame drawFieldLines between the poles and place every speck with
-// snapAt (lying, snapping in, clinging) or, once repelled, flingAt. Iron
-// filings (scatterFilings, drawFilings) are the other look: glitter lining up
-// along the field in a wave, then rushing onto the poles
+// pulling for events and crits: one element sucking glitter (or anything) in
+// along bowed field lines, a trickle then a flood (the gravity hole itself
+// is clutter's drawGravityHole). Plan the specks once (planSnaps), then
+// each frame drawFieldLines and place every speck with snapAt (lying,
+// snapping in, clinging) or, once burst out, flingAt. Iron filings
+// (scatterFilings, drawFilings): glitter lining up along the field in a
+// wave, then rushing in
 import { COLOR } from "../../../palette";
 import { clamp01 } from "../../easing";
 import { beginLightBatch, endLightBatch } from "../../lightBatch";

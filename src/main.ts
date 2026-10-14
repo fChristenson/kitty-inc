@@ -2360,6 +2360,7 @@ async function main() {
           "warp-gate": forceOnActive((e) => e.forceWarpGateEvent),
           "rolling-stone": forceOnActive((e) => e.forceRollingStoneEvent),
           "cut-loose": forceOnActive((e) => e.forceCutLooseEvent),
+          "boss-rush": forceOnActive((e) => e.forceBossRushEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {

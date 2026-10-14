@@ -84,7 +84,7 @@ const BASE_STYLES = [
   "charge",
   "portal",
   "slice",
-  "magnet",
+  "pull",
   "summon",
   "snowball",
   "ripple",
@@ -94,6 +94,7 @@ const BASE_STYLES = [
 // the style words events use, folded onto one name each
 const STYLE_ALIASES = {
   warp: "portal",
+  magnet: "pull",
   blade: "slice",
   "bullet hell": "gunfire",
   "bullet heaven": "gunfire",

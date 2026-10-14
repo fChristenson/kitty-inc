@@ -362,6 +362,16 @@ export const FLOOR_CRIT_CONFIG = {
     paintJobCrit: {
       chance: 0.03,
     },
+    // its own readout a hole sucking the other bars' glitter in until it
+    // bursts, wisps flying back onto every bar
+    drainCrit: {
+      chance: 0.03,
+    },
+    // a wisp warping through rings at the bars' ends, threading the building
+    // faster and faster, then looping its own bar
+    threadTheNeedleCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

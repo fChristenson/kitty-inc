@@ -54,5 +54,10 @@ export const BUTTON_CRIT_CONFIG = {
     halfOffCrit: {
       chance: 0.03,
     },
+    // drills boring up into every button like pistons, each tap of it then
+    // levelling the floor above too
+    deepBoreCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };
