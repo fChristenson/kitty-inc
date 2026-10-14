@@ -1,8 +1,9 @@
 // summoning for events and crits: a magic circle of light drawn on the ground
 // in one stroke, then an inner ring and a star of marks, the rings turning
 // against each other faster and faster with glitter rising off them, until
-// a pillar of light erupts out of it. Plan it once (planSummon), then each
-// frame drawSummon, and drawSummonPillar from the eruption
+// a pillar of light erupts out of it. Plan it once (planSummon, in one of
+// SUMMON_LOOKS or its own), then each frame drawSummon, and drawSummonPillar
+// from the eruption
 import { COLOR } from "../../../palette";
 import { clamp01 } from "../../easing";
 import { beginLightBatch, endLightBatch } from "../../lightBatch";
@@ -22,13 +23,10 @@ const INNER = 0.72;
 const RIM = 0.034;
 const INNER_RIM = 0.024;
 const MARK = 0.019;
-const TICKS = 24;
 const TICK_OUT = 0.94;
 const TICK_IN = 0.8;
-const STAR = 6;
-const STAR_SKIP = 2;
-const STAR_TURN = -1.5;
 const PEN = 0.095;
+const BEAD = 0.07;
 // glitter rising RISE of the radius off the rings, RISE_MS a trip at rest,
 // RISE_FAST times as quick by the eruption
 const RISERS = 18;
@@ -43,6 +41,121 @@ const PILLAR = 0.7;
 const PILLAR_NARROW = 0.6;
 const PILLAR_MS = 500;
 
+// what a circle's marks look like: only rings, ticks, stars and beads of light
+export interface SummonLook {
+  // the star's points, how many points each line skips (1: a polygon), and
+  // how fast it turns against the rings (times their turn)
+  star: number;
+  skip: number;
+  starTurn: number;
+  // a second figure inside the star, `inner` of the radius (0: none), turning
+  // `innerTurn` times the rings' turn
+  inner: number;
+  innerStar: number;
+  innerSkip: number;
+  innerTurn: number;
+  // ticks round the rim
+  ticks: number;
+  // more rings, as shares of the radius
+  rings: readonly number[];
+  // beads of light riding the rim, turning `beadTurn` times the rings
+  beads: number;
+  beadTurn: number;
+}
+
+const CLASSIC: SummonLook = {
+  star: 6,
+  skip: 2,
+  starTurn: -1.5,
+  inner: 0,
+  innerStar: 0,
+  innerSkip: 1,
+  innerTurn: 0,
+  ticks: 24,
+  rings: [],
+  beads: 0,
+  beadTurn: 0,
+};
+
+// the circles to pick from: vary them between crits and between the circles
+// of one crit
+export const SUMMON_LOOKS: readonly SummonLook[] = [
+  CLASSIC,
+  // a pentagram with a pentagon spinning the other way inside it
+  {
+    ...CLASSIC,
+    star: 5,
+    skip: 2,
+    inner: 0.3,
+    innerStar: 5,
+    innerTurn: 2.5,
+    ticks: 20,
+  },
+  // a seven-point star, beads racing round the rim
+  {
+    ...CLASSIC,
+    star: 7,
+    skip: 3,
+    starTurn: -1,
+    ticks: 14,
+    beads: 7,
+    beadTurn: -2,
+  },
+  // an eight-point star round a square, a ring between them
+  {
+    ...CLASSIC,
+    star: 8,
+    skip: 3,
+    inner: 0.4,
+    innerStar: 4,
+    innerTurn: -3,
+    ticks: 32,
+    rings: [0.42],
+  },
+  // triangles: a big one and a small one turning against it, three rings
+  {
+    ...CLASSIC,
+    star: 3,
+    skip: 1,
+    starTurn: 1.2,
+    inner: 0.35,
+    innerStar: 3,
+    innerTurn: -2.5,
+    ticks: 36,
+    rings: [0.86, 0.36],
+  },
+  // a squared star of two squares, a fine comb of ticks and four beads
+  {
+    ...CLASSIC,
+    star: 8,
+    skip: 2,
+    starTurn: -0.8,
+    ticks: 48,
+    beads: 4,
+    beadTurn: 3,
+  },
+  // a hexagon round a hexagram, beads on the rim
+  {
+    ...CLASSIC,
+    star: 6,
+    skip: 1,
+    starTurn: 0.7,
+    inner: 0.62,
+    innerStar: 6,
+    innerSkip: 2,
+    innerTurn: -2,
+    ticks: 12,
+    beads: 6,
+    beadTurn: -1.5,
+  },
+];
+
+// a look from SUMMON_LOOKS by number, wrapping round
+export const summonLook = (n: number): SummonLook =>
+  SUMMON_LOOKS[
+    ((n % SUMMON_LOOKS.length) + SUMMON_LOOKS.length) % SUMMON_LOOKS.length
+  ];
+
 export interface Summon {
   startMs: number;
   innerMs: number;
@@ -51,6 +164,7 @@ export interface Summon {
   turns: number;
   // when each full turn comes round, quicker and quicker: a jolt each
   revs: number[];
+  look: SummonLook;
 }
 
 // a circle drawn from startMs, turning `turns` times till it erupts at eruptMs
@@ -58,13 +172,14 @@ export function planSummon(
   startMs: number,
   eruptMs: number,
   turns = 7,
+  look: SummonLook = CLASSIC,
 ): Summon {
   const innerMs = startMs + OUTER_MS;
   const marksMs = innerMs + INNER_MS;
   const revs: number[] = [];
   for (let k = 1; k < turns; k++)
     revs.push(marksMs + (eruptMs - marksMs) * Math.cbrt(k / turns));
-  return { startMs, innerMs, marksMs, eruptMs, turns, revs };
+  return { startMs, innerMs, marksMs, eruptMs, turns, revs, look };
 }
 
 // radians it has turned by ms: slow, then whipping round
@@ -99,6 +214,24 @@ function ring(
   ctx.stroke();
 }
 
+// a star of `points` points `r` round, each line skipping `skip`, turned `a0`
+function star(
+  ctx: CanvasRenderingContext2D,
+  at: Point,
+  r: number,
+  points: number,
+  skip: number,
+  a0: number,
+): void {
+  for (let i = 0; i < points; i++) {
+    const a = a0 + (i / points) * Math.PI * 2;
+    onRing(at, r, a, p);
+    onRing(at, r, a + (skip / points) * Math.PI * 2, q);
+    ctx.moveTo(p.x, p.y);
+    ctx.lineTo(q.x, q.y);
+  }
+}
+
 // the circle at ms, `radius` px across its middle at `at`
 export function drawSummon(
   ctx: CanvasRenderingContext2D,
@@ -110,6 +243,7 @@ export function drawSummon(
   if (ms < s.startMs) return;
   const fade = 1 - clamp01((ms - s.eruptMs) / FADE_MS);
   if (fade <= 0) return;
+  const { look } = s;
   const turn = summonTurn(s, ms);
   const previous = ctx.globalCompositeOperation;
   const alpha = ctx.globalAlpha;
@@ -117,33 +251,33 @@ export function drawSummon(
   ctx.globalAlpha = alpha * fade;
   const pen = clamp01((ms - s.startMs) / OUTER_MS);
   ring(ctx, at, radius, pen, radius * RIM);
-  ring(
-    ctx,
-    at,
-    radius * INNER,
-    clamp01((ms - s.innerMs) / INNER_MS),
-    radius * INNER_RIM,
-  );
+  const inner = clamp01((ms - s.innerMs) / INNER_MS);
+  ring(ctx, at, radius * INNER, inner, radius * INNER_RIM);
+  for (let i = 0; i < look.rings.length; i++)
+    ring(ctx, at, radius * look.rings[i], inner, radius * INNER_RIM * 0.8);
   const marks = clamp01((ms - s.marksMs) / MARKS_MS);
   if (marks > 0) {
     ctx.globalAlpha = alpha * fade * marks;
     ctx.lineWidth = radius * MARK;
     ctx.strokeStyle = COLOR.heavenlyGold;
     ctx.beginPath();
-    for (let i = 0; i < TICKS; i++) {
-      const a = (i / TICKS) * Math.PI * 2 + turn;
+    for (let i = 0; i < look.ticks; i++) {
+      const a = (i / look.ticks) * Math.PI * 2 + turn;
       onRing(at, radius * TICK_OUT, a, p);
       onRing(at, radius * TICK_IN, a, q);
       ctx.moveTo(p.x, p.y);
       ctx.lineTo(q.x, q.y);
     }
-    for (let i = 0; i < STAR; i++) {
-      const a = turn * STAR_TURN + (i / STAR) * Math.PI * 2;
-      onRing(at, radius * INNER, a, p);
-      onRing(at, radius * INNER, a + (STAR_SKIP / STAR) * Math.PI * 2, q);
-      ctx.moveTo(p.x, p.y);
-      ctx.lineTo(q.x, q.y);
-    }
+    star(ctx, at, radius * INNER, look.star, look.skip, turn * look.starTurn);
+    if (look.inner > 0)
+      star(
+        ctx,
+        at,
+        radius * look.inner,
+        look.innerStar,
+        look.innerSkip,
+        turn * look.innerTurn,
+      );
     ctx.stroke();
   }
   beginLightBatch(ctx);
@@ -152,6 +286,15 @@ export function drawSummon(
     stampGlimmer(ctx, p.x, p.y, radius * PEN, 1, COLOR.white);
   }
   if (marks > 0) {
+    for (let i = 0; i < look.beads; i++) {
+      onRing(
+        at,
+        radius,
+        (i / look.beads) * Math.PI * 2 + turn * look.beadTurn,
+        p,
+      );
+      stampGlimmer(ctx, p.x, p.y, radius * BEAD * marks, i + 40, COLOR.white);
+    }
     const build = clamp01((ms - s.marksMs) / (s.eruptMs - s.marksMs));
     const rate = 1 + (RISE_FAST - 1) * build;
     for (let i = 0; i < RISERS; i++) {

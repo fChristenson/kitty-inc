@@ -6,5 +6,4 @@ export default {
   label: "Twin Bore",
   chance: 0.03,
   style: "drill",
-  isNew: true,
 } satisfies CritMeta;

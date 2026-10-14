@@ -9,6 +9,7 @@ import {
   drawSummon,
   drawSummonPillar,
   planSummon,
+  summonLook,
   type Summon,
 } from "../../../../shared/animationStyles/summon";
 import {
@@ -56,7 +57,12 @@ registerFloorCrit("covenCrit", {
   plan(r, bars, hit) {
     const summons: Summon[] = [];
     ownLast(bars).forEach((bar, k) => {
-      summons[bar] = planSummon(IN_MS, ERUPT_MS + k * ERUPT_GAP_MS, TURNS);
+      summons[bar] = planSummon(
+        IN_MS,
+        ERUPT_MS + k * ERUPT_GAP_MS,
+        TURNS,
+        summonLook(k + 1),
+      );
       hit(bar, summons[bar].eruptMs, bar === 0 ? 2 : 1);
     });
     const bar = getIncomeBarCenter(false);

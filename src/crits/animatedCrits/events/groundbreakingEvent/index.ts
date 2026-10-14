@@ -12,6 +12,7 @@ import {
   drawSummon,
   drawSummonPillar,
   planSummon,
+  summonLook,
 } from "../../../../shared/animationStyles/summon";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { lerp } from "../../../../shared/easing";
@@ -56,7 +57,7 @@ export const forceGroundbreakingEvent = registerWispEvent(
       y: area.bottom - (area.bottom - area.top) * LIFT,
     };
     const radius = (area.right - area.left) * RADIUS;
-    const summon = planSummon(0, eruptMs, TURNS);
+    const summon = planSummon(0, eruptMs, TURNS, summonLook(3));
     const climb = Math.max(FLOOR_H, ground.y - top.y);
     const openAt = eruptMs + riseMs;
     // a blast on every floor's line the pillar passes on its way up

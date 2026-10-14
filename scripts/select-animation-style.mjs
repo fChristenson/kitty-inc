@@ -42,6 +42,7 @@ const STYLES = [
   "snowball",
   "ripple",
   "crush",
+  "tornado",
 ];
 const ANIMATED_ONLY = ["experiment", ...WORLDS];
 const REWARDS = [

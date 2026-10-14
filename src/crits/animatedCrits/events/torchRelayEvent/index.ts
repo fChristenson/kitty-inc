@@ -12,6 +12,7 @@ import {
   drawSummon,
   drawSummonPillar,
   planSummon,
+  summonLook,
   type Summon,
 } from "../../../../shared/animationStyles/summon";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
@@ -70,7 +71,12 @@ export const forceTorchRelayEvent = registerWispEvent(
       const erupt = start + lerp(SPIN_MS, q);
       circles.push({
         at,
-        summon: planSummon(start, erupt, Math.round(lerp(TURNS, q))),
+        summon: planSummon(
+          start,
+          erupt,
+          Math.round(lerp(TURNS, q)),
+          summonLook(k + 4),
+        ),
         height: k < last ? at.y - grounds[k + 1].y : FLOOR_H * 0.9,
       });
       start = erupt;

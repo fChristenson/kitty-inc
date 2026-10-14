@@ -27,6 +27,7 @@ export type CritStyle =
   | "snowball"
   | "ripple"
   | "crush"
+  | "tornado"
   | "blade"
   | "number"
   | "bars"

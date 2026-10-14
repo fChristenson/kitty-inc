@@ -6,5 +6,4 @@ export default {
   label: "Drizzler",
   chance: 0.03,
   style: "ripple",
-  isNew: true,
 } satisfies CritMeta;

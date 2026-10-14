@@ -7,6 +7,7 @@ import {
   drawSummon,
   drawSummonPillar,
   planSummon,
+  summonLook,
   type Summon,
 } from "../../../../shared/animationStyles/summon";
 import {
@@ -53,7 +54,12 @@ const at: Point = { x: 0, y: 0 };
 registerFloorCrit("moneyCircleCrit", {
   plan(r, bars, hit) {
     const to = bars[0];
-    const summon = planSummon(IN_MS + 40, IN_MS + ERUPT_MS, TURNS);
+    const summon = planSummon(
+      IN_MS + 40,
+      IN_MS + ERUPT_MS,
+      TURNS,
+      summonLook(2),
+    );
     const endMs = summon.eruptMs + FIRST_POP_MS + POPS * POP_GAP_MS;
     plans.set(r, {
       summon,

@@ -8,5 +8,4 @@ export default {
   style: "spray",
   // how many times as much the opened floor's bar pays, for how long (ms)
   values: { payout: 2, ms: 60_000 },
-  isNew: true,
 } satisfies CritMeta;

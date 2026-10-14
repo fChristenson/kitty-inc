@@ -10,5 +10,4 @@ export default {
   // how fast a bar runs at first, easing back to normal over ms (its own
   // over ownMs)
   values: { speed: 3, ms: 25_000, ownMs: 50_000 },
-  isNew: true,
 } satisfies CritMeta;
