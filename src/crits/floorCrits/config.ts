@@ -372,6 +372,16 @@ export const FLOOR_CRIT_CONFIG = {
     threadTheNeedleCrit: {
       chance: 0.03,
     },
+    // a slab of light pressing down on stacks of coins on its own bar until
+    // they buckle and crumble
+    hydraulicCrit: {
+      chance: 0.03,
+    },
+    // a slab of light slamming down on a heap of coins on its own bar,
+    // deeper each, until it's crushed flat
+    stampDownCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

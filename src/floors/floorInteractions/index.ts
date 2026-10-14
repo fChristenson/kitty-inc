@@ -21,6 +21,7 @@ import {
   takePayoutTap,
   takeHireTap,
   takeBoreTap,
+  takeHeavyTap,
   takeHalfTap,
   stickSpentCrit,
   getCritTier,
@@ -411,6 +412,11 @@ function landTapBonuses(
   if (!isFloorMaxed(floor) && takeDoubleTap(floor)) {
     applyUpgradeTick(floor, isGroundFloor);
     punchIncomeBar(floor, "+2 Lvl", COLOR.heavenlyGold);
+  }
+  if (!isFloorMaxed(floor) && takeHeavyTap(floor)) {
+    applyUpgradeTick(floor, isGroundFloor);
+    applyUpgradeTick(floor, isGroundFloor);
+    punchIncomeBar(floor, "+3 Lvl", COLOR.heavenlyGold);
   }
   if (takePayoutTap(floor)) paySaleClick(floor, isGroundFloor, 1);
   if (takeHireTap(floor)) {

@@ -105,7 +105,27 @@ Groups and styles drawn by `scripts/select-animation-style.mjs`. Each one builds
 7. **Boss Rush** (animated, Shmup, crit tiers): a giant boss of three wisp rings, each firing its own pattern while the ship peels it off in a rolling chain. The bare core charges and fires a beam the ship dodges, then the ship's beam blows it apart: every bar a crit tier up.
 8. **Thread The Needle** (floor, Portal): rings stand at both ends of every bar. A wisp threads the building, out of each bar's right ring into the next bar's left, round and round, faster each time, levels on every run. It loops its own bar three times flat out, then bursts.
 
+## List 203: the Crush style ([playground](../tmp/_playground/ideas.html?list=next180))
+
+One element crushing another (`shared/animationStyles/crush`), shown three ways.
+
+1. **Stamp Down** (floor, down; was Pile Driver, a name the Piledriver event has): a slab of light slams down on a heap of coins on its own bar, quicker and deeper each, glitter squeezed out, cracks spreading. The last slam crushes it flat, glitter jetting along the bar, the shock landing levels on every bar.
+2. **Vice** (lock, sideways): two slabs close in on a big wisp in the dark locked floor like a vice, squeezing it thinner each slam. The last crushes it to a sliver and it bursts, the floor opening.
+3. **Hard Sell** (income, the amount as the crusher): the green amount slams down on a big wisp under the readout like a press, a share each slam. The last crushes it flat and the amount shoots up into the readout.
+4. **Hydraulic** (floor, a press): a slab of light lowers onto stacks of coins on its own bar and pushes without letting up, trembling harder, glitter oozing out, the stacks giving in jolts closer and closer, levels each, until they crumble into tumbling coins and dust.
+
 ## Built
+
+- **List 203 and the Crush style**, seven crits. Test: New Effects. All hold 58-60fps under the stress test.
+  - `shared/animationStyles/crush`: slams (`planCrush`, `crushAt`, `tickCrush`, `drawCrushContact`, `drawCrushBurst`), a press (`planPress`, `pressAt`, `tickPress`, `pressWarp`, `drawPressGrind`), crumbling (`crumbleFrom`, `crumbleAt`, `drawCrumbleDust`), `drawCrushStrain`, `crusherScale` and `drawSlab`. The crushed elements are wisps and glitter only.
+  - **Hydraulic** (`floorCrits/crits/hydraulicCrit`, press): levels on every other bar from the crumble's shock.
+  - **Stamp Down** (`floorCrits/crits/stampDownCrit`, slams): the same reward, the heap blown out as coins.
+  - **Vice** (`lockCrits/crits/viceCrit`, sideways slams): opens the floor; its button is charged with `CONFIG.crit.viceCharge` levels per multiple.
+  - **Hard Sell** (`incomeCrits/crits/hardSellCrit`, the amount as the crusher): a share a slam, then the finale.
+  - **Compressor** (`rateCrits/crits/compressorCrit`, a sideways press on every bar at once, rarer 0.01): each bar `compressorSpeed` times as fast for good, its own `compressorOwnSpeed`.
+  - **Heavy Hand** (`buttonCrits/crits/heavyHandCrit`, slams in unison): `Heavy N` taps, each landing three levels (`addHeavyTaps`, `heavyHandTaps` per multiple, twice on its own).
+  - **Under Pressure** (`animatedCrits/events/underPressureEvent`, vice then press, perma tiers, batch 101): a wisp out of the rubble onto each worker.
+  - Tested effects moved from New Effects to their tabs (a new Rate Crits tab).
 
 - **List 202**, seven crits. Test: New Effects.
   - **Crosshairs** (`rateCrits/crits/crosshairsCrit`, Beam): each bar's next payout is `CONFIG.crit.crosshairsPayout` times as big, its own `crosshairsOwnPayout` (`aimPayout` in `rateCrits/rateBonus.ts`, spent on the payout).

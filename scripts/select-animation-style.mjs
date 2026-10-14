@@ -41,6 +41,7 @@ const STYLES = [
   "summon",
   "snowball",
   "ripple",
+  "crush",
 ];
 const ANIMATED_ONLY = ["experiment", ...WORLDS];
 const REWARDS = [

@@ -46,41 +46,22 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-floor-crit="hydraulicCrit">Hydraulic</button>
+          <button class="game__button" data-floor-crit="stampDownCrit">Stamp Down</button>
+          <button class="game__button" data-lock-crit="viceCrit">Vice</button>
+          <button class="game__button" data-income-crit="hardSellCrit">Hard Sell</button>
+          <button class="game__button" data-rate-crit="compressorCrit">Compressor</button>
+          <button class="game__button" data-button-crit="heavyHandCrit">Heavy Hand</button>
+          <button id="test-under-pressure-event" class="game__button">Under Pressure</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Rate Crits</summary>
+        <div class="test-actions-dropdown__menu">
           <button class="game__button" data-rate-crit="crosshairsCrit">Crosshairs</button>
-          <button class="game__button" data-income-crit="bigCrunchCrit">Big Crunch</button>
-          <button class="game__button" data-button-crit="deepBoreCrit">Deep Bore</button>
-          <button class="game__button" data-lock-crit="reboundCrit">Rebound</button>
-          <button class="game__button" data-floor-crit="drainCrit">Drain</button>
-          <button id="test-boss-rush-event" class="game__button">Boss Rush</button>
-          <button class="game__button" data-floor-crit="threadTheNeedleCrit">Thread The Needle</button>
-          <button id="test-cut-loose-event" class="game__button">Cut Loose</button>
-          <button class="game__button" data-lock-crit="housewarmingCrit">Housewarming</button>
-          <button class="game__button" data-income-crit="moneyCircleCrit">Money Circle</button>
-          <button class="game__button" data-floor-crit="paintJobCrit">Paint Job</button>
-          <button id="test-warp-gate-event" class="game__button">Warp Gate</button>
-          <button id="test-rolling-stone-event" class="game__button">Rolling Stone</button>
-          <button class="game__button" data-floor-crit="crossCutCrit">Cross Cut</button>
-          <button class="game__button" data-income-crit="pennyShowerCrit">Penny Shower</button>
-          <button class="game__button" data-lock-crit="sweepCleanCrit">Sweep Clean</button>
-          <button class="game__button" data-button-crit="halfOffCrit">Half Off</button>
           <button class="game__button" data-rate-crit="woundUpCrit">Wound Up</button>
-          <button id="test-groundbreaking-event" class="game__button">Groundbreaking</button>
-          <button id="test-monsoon-event" class="game__button">Monsoon</button>
-          <button class="game__button" data-floor-crit="rollCallCrit">Roll Call</button>
-          <button class="game__button" data-lock-crit="pullUpCrit">Pull Up</button>
-          <button class="game__button" data-button-crit="springLoadedCrit">Spring Loaded</button>
           <button class="game__button" data-rate-crit="shortcutCrit">Shortcut</button>
           <button class="game__button" data-rate-crit="cleanCutCrit">Clean Cut</button>
-          <button id="test-lodestones-event" class="game__button">Lodestones</button>
-          <button class="game__button" data-floor-crit="raindropsCrit">Raindrops</button>
-          <button class="game__button" data-income-crit="stickyBallCrit">Sticky Ball</button>
-          <button class="game__button" data-lock-crit="conjureCrit">Conjure</button>
-          <button id="test-night-train-event" class="game__button">Night Train</button>
-          <button id="test-kick-in-event" class="game__button">Kick In</button>
-          <button id="test-springboard-event" class="game__button">Springboard</button>
-          <button id="test-gemstone-event" class="game__button">Gemstone</button>
-          <button class="game__button" data-income-crit="coinSpinCrit">Coin Spin Crit</button>
-          <button class="game__button" data-lock-crit="jumpStartCrit">Jump Start</button>
           <button class="game__button" data-rate-crit="overclockCrit">Overclock</button>
           <button class="game__button" data-rate-crit="shiftUpCrit">Shift Up</button>
           <button class="game__button" data-rate-crit="quickstepCrit">Quickstep</button>
@@ -89,6 +70,9 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Button Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-button-crit="deepBoreCrit">Deep Bore</button>
+          <button class="game__button" data-button-crit="halfOffCrit">Half Off</button>
+          <button class="game__button" data-button-crit="springLoadedCrit">Spring Loaded</button>
           <button class="game__button" data-button-crit="nailGunCrit">Nail Gun</button>
           <button class="game__button" data-button-crit="linkUpCrit">Link Up</button>
           <button class="game__button" data-button-crit="hotButtonCrit">Hot Button</button>
@@ -103,6 +87,12 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Lock Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-lock-crit="reboundCrit">Rebound</button>
+          <button class="game__button" data-lock-crit="housewarmingCrit">Housewarming</button>
+          <button class="game__button" data-lock-crit="sweepCleanCrit">Sweep Clean</button>
+          <button class="game__button" data-lock-crit="pullUpCrit">Pull Up</button>
+          <button class="game__button" data-lock-crit="conjureCrit">Conjure</button>
+          <button class="game__button" data-lock-crit="jumpStartCrit">Jump Start</button>
           <button class="game__button" data-lock-crit="luckyStarCrit">Lucky Star</button>
           <button class="game__button" data-lock-crit="skeletonKeyCrit">Skeleton Key</button>
           <button class="game__button" data-lock-crit="carbonCopyCrit">Carbon Copy</button>
@@ -119,6 +109,17 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Animated Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-boss-rush-event" class="game__button">Boss Rush</button>
+          <button id="test-cut-loose-event" class="game__button">Cut Loose</button>
+          <button id="test-warp-gate-event" class="game__button">Warp Gate</button>
+          <button id="test-rolling-stone-event" class="game__button">Rolling Stone</button>
+          <button id="test-groundbreaking-event" class="game__button">Groundbreaking</button>
+          <button id="test-monsoon-event" class="game__button">Monsoon</button>
+          <button id="test-lodestones-event" class="game__button">Lodestones</button>
+          <button id="test-night-train-event" class="game__button">Night Train</button>
+          <button id="test-kick-in-event" class="game__button">Kick In</button>
+          <button id="test-springboard-event" class="game__button">Springboard</button>
+          <button id="test-gemstone-event" class="game__button">Gemstone</button>
           <button id="test-markdown-event" class="game__button">Markdown</button>
           <button id="test-raise-the-roof-event" class="game__button">Raise the Roof</button>
           <button id="test-lotto-drum-event" class="game__button">Lotto Drum</button>
@@ -1398,6 +1399,11 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Income Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-income-crit="bigCrunchCrit">Big Crunch</button>
+          <button class="game__button" data-income-crit="moneyCircleCrit">Money Circle</button>
+          <button class="game__button" data-income-crit="pennyShowerCrit">Penny Shower</button>
+          <button class="game__button" data-income-crit="stickyBallCrit">Sticky Ball</button>
+          <button class="game__button" data-income-crit="coinSpinCrit">Coin Spin Crit</button>
           <button class="game__button" data-income-crit="moneyGunCrit">Money Gun Crit</button>
           <button class="game__button" data-income-crit="billCounterCrit">Bill Counter Crit</button>
           <button class="game__button" data-income-crit="windfallCrit">Windfall Crit</button>
@@ -1431,6 +1437,12 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Floor Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-floor-crit="drainCrit">Drain</button>
+          <button class="game__button" data-floor-crit="threadTheNeedleCrit">Thread The Needle</button>
+          <button class="game__button" data-floor-crit="paintJobCrit">Paint Job</button>
+          <button class="game__button" data-floor-crit="crossCutCrit">Cross Cut</button>
+          <button class="game__button" data-floor-crit="rollCallCrit">Roll Call</button>
+          <button class="game__button" data-floor-crit="raindropsCrit">Raindrops</button>
           <button class="game__button" data-floor-crit="collectCrit">Collect Crit</button>
           <button class="game__button" data-floor-crit="blockBonkCrit">Block Bonk Crit</button>
           <button class="game__button" data-floor-crit="moneyWeatherCrit">Money Weather Crit</button>

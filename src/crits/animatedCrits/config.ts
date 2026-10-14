@@ -8275,6 +8275,13 @@ export const ANIMATED_EVENT_CONFIG = {
     flyMs: 5400, // the fight, until the floors rush up
     tierGapMs: 80, // between the bars' crit tiers, top to bottom
   },
+  // crush, perma tiers: src/crits/animatedCrits/events/underPressureEvent ("Under Pressure"): glitter scattered over the frozen screen, two slabs slamming in from its sides like a vice packing it into a column, then a third pressing down on the column without letting up till it buckles and crumbles, a wisp flying out of the rubble onto each worker, a perma tier each
+  underPressureEvent: {
+    chance: 0.01,
+    firstMs: 200, // from the click till the glitter scatters
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // slice, free floors: src/crits/animatedCrits/events/cutLooseEvent ("Cut Loose"): swift slashes cut across the dark locked floor of the frozen screen in quick fire, glitter spilling out of every cut; a cross of two long cuts tears through it and it bursts open
   cutLooseEvent: {
     chance: 0.01,

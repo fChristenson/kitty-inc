@@ -142,5 +142,10 @@ export const INCOME_CRIT_CONFIG = {
     bigCrunchCrit: {
       chance: 0.03,
     },
+    // the amount slamming down on a wisp under the total like a press, a
+    // share a slam, until it's crushed flat
+    hardSellCrit: {
+      chance: 0.03,
+    },
   },
 };

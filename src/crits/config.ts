@@ -88,6 +88,16 @@ export const CRIT_CONFIG = {
     // Deep Bore: taps levelling the floor above per the crit's multiple
     // (twice on its own)
     deepBoreTaps: 1,
+    // Heavy Hand: taps landing three levels per the crit's multiple (twice on
+    // its own)
+    heavyHandTaps: 0.5,
+    // Vice: the floor it opens has its button charged with this many levels
+    // per the crit's multiple
+    viceCharge: 2,
+    // Compressor: a bar this many times as fast for good (its own
+    // compressorOwnSpeed)
+    compressorSpeed: 1.2,
+    compressorOwnSpeed: 1.4,
     // gateway roll for the whole "special crit" (chain/boost/bounce/
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
     // ultra, before any of the individual proc chances (badgeCrits/balance, floorCrits/balance) are even

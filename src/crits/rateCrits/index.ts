@@ -67,6 +67,12 @@ function reward(kind: RateCritKind, target: Floor, step: number): void {
           : CONFIG.crit.crosshairsPayout,
       );
       return;
+    case "compressorCrit":
+      target.incomeIntervalSeconds /=
+        step === 2
+          ? CONFIG.crit.compressorOwnSpeed
+          : CONFIG.crit.compressorSpeed;
+      return;
   }
 }
 
@@ -102,7 +108,12 @@ export function rateCritPlayFor(
       flipIncomeRate(target);
       reward(kind, target, step);
       punchIncomeBar(target, null, COLOR.heavenlyGold);
-      if (kind === "shiftUpCrit" || kind === "cleanCutCrit") deps.persist();
+      if (
+        kind === "shiftUpCrit" ||
+        kind === "cleanCutCrit" ||
+        kind === "compressorCrit"
+      )
+        deps.persist();
       const box = getIncomeBarBox(isGround(target));
       spawnCoinBurst(
         target,

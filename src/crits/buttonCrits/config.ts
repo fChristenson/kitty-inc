@@ -59,5 +59,10 @@ export const BUTTON_CRIT_CONFIG = {
     deepBoreCrit: {
       chance: 0.03,
     },
+    // slabs slamming in unison on a wisp over every button, each tap of it
+    // then landing three levels
+    heavyHandCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

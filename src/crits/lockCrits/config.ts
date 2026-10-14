@@ -86,5 +86,10 @@ export const LOCK_CRIT_CONFIG = {
     reboundCrit: {
       chance: 0.03,
     },
+    // two slabs closing in on a wisp in the locked floor like a vice until it
+    // bursts, the floor opening, its button charged with levels
+    viceCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

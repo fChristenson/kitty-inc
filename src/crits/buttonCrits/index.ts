@@ -11,6 +11,7 @@ import { otherFloorsInView, spotsFromFlash } from "../floorCrits/playTargets";
 import { armCritUpgrade } from "../floorCrits/upgradeCrit";
 import {
   addBoreTaps,
+  addHeavyTaps,
   addButtonCharge,
   addDoubleTaps,
   addFreeTaps,
@@ -125,6 +126,13 @@ function reward(
     case "deepBoreCrit": {
       const taps = Math.max(1, Math.round(count * CONFIG.crit.deepBoreTaps));
       addBoreTaps(target, own ? taps * 2 : taps);
+      flipUpgradeButton(target);
+      return 0;
+    }
+    // taps that each land three levels, twice as many on its own
+    case "heavyHandCrit": {
+      const taps = Math.max(1, Math.round(count * CONFIG.crit.heavyHandTaps));
+      addHeavyTaps(target, own ? taps * 2 : taps);
       flipUpgradeButton(target);
       return 0;
     }

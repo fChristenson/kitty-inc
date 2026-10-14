@@ -37,5 +37,10 @@ export const RATE_CRIT_CONFIG = {
     crosshairsCrit: {
       chance: 0.03,
     },
+    // a slab pressing on a wisp at every bar's end until they crumble, each
+    // bar then faster for good; rarer, being for good
+    compressorCrit: {
+      chance: 0.01,
+    },
   } satisfies Record<string, { chance: number }>,
 };

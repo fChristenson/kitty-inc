@@ -331,6 +331,7 @@ const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
   pennyShowerCrit: () => import("../../incomeCrits/crits/pennyShowerCrit"),
   moneyCircleCrit: () => import("../../incomeCrits/crits/moneyCircleCrit"),
   bigCrunchCrit: () => import("../../incomeCrits/crits/bigCrunchCrit"),
+  hardSellCrit: () => import("../../incomeCrits/crits/hardSellCrit"),
   sureShotCrit: () => import("../../buttonCrits/crits/sureShotCrit"),
   autopressCrit: () => import("../../buttonCrits/crits/autopressCrit"),
   freeTapsCrit: () => import("../../buttonCrits/crits/freeTapsCrit"),
@@ -343,6 +344,7 @@ const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
   springLoadedCrit: () => import("../../buttonCrits/crits/springLoadedCrit"),
   halfOffCrit: () => import("../../buttonCrits/crits/halfOffCrit"),
   deepBoreCrit: () => import("../../buttonCrits/crits/deepBoreCrit"),
+  heavyHandCrit: () => import("../../buttonCrits/crits/heavyHandCrit"),
   breachCrit: () => import("../../lockCrits/crits/breachCrit"),
   twoUpCrit: () => import("../../lockCrits/crits/twoUpCrit"),
   clearanceCrit: () => import("../../lockCrits/crits/clearanceCrit"),
@@ -360,6 +362,7 @@ const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
   sweepCleanCrit: () => import("../../lockCrits/crits/sweepCleanCrit"),
   housewarmingCrit: () => import("../../lockCrits/crits/housewarmingCrit"),
   reboundCrit: () => import("../../lockCrits/crits/reboundCrit"),
+  viceCrit: () => import("../../lockCrits/crits/viceCrit"),
   overclockCrit: () => import("../../rateCrits/crits/overclockCrit"),
   shiftUpCrit: () => import("../../rateCrits/crits/shiftUpCrit"),
   quickstepCrit: () => import("../../rateCrits/crits/quickstepCrit"),
@@ -367,6 +370,7 @@ const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
   cleanCutCrit: () => import("../../rateCrits/crits/cleanCutCrit"),
   woundUpCrit: () => import("../../rateCrits/crits/woundUpCrit"),
   crosshairsCrit: () => import("../../rateCrits/crits/crosshairsCrit"),
+  compressorCrit: () => import("../../rateCrits/crits/compressorCrit"),
   rapidFireCrit: () => import("../crits/rapidFireCrit"),
   pinballCrit: () => import("../crits/pinballCrit"),
   snowballCrit: () => import("../crits/snowballCrit"),
@@ -458,6 +462,8 @@ const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
   paintJobCrit: () => import("../crits/paintJobCrit"),
   drainCrit: () => import("../crits/drainCrit"),
   threadTheNeedleCrit: () => import("../crits/threadTheNeedleCrit"),
+  hydraulicCrit: () => import("../crits/hydraulicCrit"),
+  stampDownCrit: () => import("../crits/stampDownCrit"),
 };
 const loading = new Map<CritPlayKind, Promise<unknown>>();
 
