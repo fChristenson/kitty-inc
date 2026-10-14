@@ -1,8 +1,12 @@
 import {
+  CRIT_GROUPS,
   CRIT_PROC_KINDS,
   CRIT_PROC_INFO,
   CRIT_TIER_ORDER,
   CRIT_TIER_CONFIG,
+  PLAYED_CRITS,
+  type CritGroup,
+  type CritMeta,
   type CritProcKind,
   type CritTier,
 } from "../../crits";
@@ -39,6 +43,19 @@ export function createTestButtonMarkup(): string {
         `<button class="game__button" data-crit-kind="${kind}">${label(kind)}</button>`,
     )
     .join("");
+  // the played crits' buttons, from their meta.ts: each group's under its
+  // tab, the untested ones (isNew) under New Effects (group null)
+  const playedButtons = (group: CritGroup | null) =>
+    CRIT_GROUPS.flatMap((of) =>
+      (Object.entries(PLAYED_CRITS[of]) as [string, CritMeta][])
+        .filter(([, meta]) =>
+          group === null ? meta.isNew : of === group && !meta.isNew,
+        )
+        .map(
+          ([kind, meta]) =>
+            `<button class="game__button" data-${of}-crit="${kind}">${meta.label}</button>`,
+        ),
+    ).join("");
   return `
     <div class="test-actions-bar">
       <input type="search" id="test-actions-filter" class="test-actions-filter" placeholder="Filter actions" autocomplete="off" />
@@ -46,68 +63,25 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
+          ${playedButtons(null)}
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Rate Crits</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-rate-crit="doubleTimeCrit">Double Time</button>
-          <button class="game__button" data-rate-crit="afterburnCrit">Afterburn</button>
-          <button class="game__button" data-rate-crit="superchargeCrit">Supercharge</button>
-          <button class="game__button" data-rate-crit="compressorCrit">Compressor</button>
-          <button class="game__button" data-rate-crit="crosshairsCrit">Crosshairs</button>
-          <button class="game__button" data-rate-crit="woundUpCrit">Wound Up</button>
-          <button class="game__button" data-rate-crit="shortcutCrit">Shortcut</button>
-          <button class="game__button" data-rate-crit="cleanCutCrit">Clean Cut</button>
-          <button class="game__button" data-rate-crit="overclockCrit">Overclock</button>
-          <button class="game__button" data-rate-crit="shiftUpCrit">Shift Up</button>
-          <button class="game__button" data-rate-crit="quickstepCrit">Quickstep</button>
+          ${playedButtons("rate")}
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Button Crits</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-button-crit="trickleDownCrit">Trickle Down</button>
-          <button class="game__button" data-button-crit="splashZoneCrit">Splash Zone</button>
-          <button class="game__button" data-button-crit="heavyHandCrit">Heavy Hand</button>
-          <button class="game__button" data-button-crit="deepBoreCrit">Deep Bore</button>
-          <button class="game__button" data-button-crit="halfOffCrit">Half Off</button>
-          <button class="game__button" data-button-crit="springLoadedCrit">Spring Loaded</button>
-          <button class="game__button" data-button-crit="nailGunCrit">Nail Gun</button>
-          <button class="game__button" data-button-crit="linkUpCrit">Link Up</button>
-          <button class="game__button" data-button-crit="hotButtonCrit">Hot Button</button>
-          <button class="game__button" data-button-crit="gildedCrit">Gilded</button>
-          <button class="game__button" data-button-crit="blastingCapsCrit">Blasting Caps</button>
-          <button class="game__button" data-button-crit="sureShotCrit">Sure Shot</button>
-          <button class="game__button" data-button-crit="autopressCrit">Autopress</button>
-          <button class="game__button" data-button-crit="freeTapsCrit">Free Taps</button>
-          <button class="game__button" data-button-crit="overchargeCrit">Overcharge</button>
+          ${playedButtons("button")}
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Lock Crits</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-lock-crit="burnThroughCrit">Burn Through</button>
-          <button class="game__button" data-lock-crit="crackleCageCrit">Crackle Cage</button>
-          <button class="game__button" data-lock-crit="shredCrit">Shred</button>
-          <button class="game__button" data-lock-crit="viceCrit">Vice</button>
-          <button class="game__button" data-lock-crit="reboundCrit">Rebound</button>
-          <button class="game__button" data-lock-crit="housewarmingCrit">Housewarming</button>
-          <button class="game__button" data-lock-crit="sweepCleanCrit">Sweep Clean</button>
-          <button class="game__button" data-lock-crit="pullUpCrit">Pull Up</button>
-          <button class="game__button" data-lock-crit="conjureCrit">Conjure</button>
-          <button class="game__button" data-lock-crit="jumpStartCrit">Jump Start</button>
-          <button class="game__button" data-lock-crit="luckyStarCrit">Lucky Star</button>
-          <button class="game__button" data-lock-crit="skeletonKeyCrit">Skeleton Key</button>
-          <button class="game__button" data-lock-crit="carbonCopyCrit">Carbon Copy</button>
-          <button class="game__button" data-lock-crit="freshPaintCrit">Fresh Paint</button>
-          <button class="game__button" data-lock-crit="hotLapCrit">Hot Lap</button>
-          <button class="game__button" data-lock-crit="boltCutterCrit">Bolt Cutter</button>
-          <button class="game__button" data-lock-crit="moveInCrit">Move In</button>
-          <button class="game__button" data-lock-crit="breachCrit">Breach</button>
-          <button class="game__button" data-lock-crit="twoUpCrit">Two Up</button>
-          <button class="game__button" data-lock-crit="clearanceCrit">Clearance</button>
-          <button class="game__button" data-lock-crit="lockpickCrit">Lockpick</button>
+          ${playedButtons("lock")}
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -1407,146 +1381,16 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Income Crits</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-income-crit="moneyTrailCrit">Money Trail</button>
-          <button class="game__button" data-income-crit="wraparoundCrit">Wraparound</button>
-          <button class="game__button" data-income-crit="hardSellCrit">Hard Sell</button>
-          <button class="game__button" data-income-crit="bigCrunchCrit">Big Crunch</button>
-          <button class="game__button" data-income-crit="moneyCircleCrit">Money Circle</button>
-          <button class="game__button" data-income-crit="pennyShowerCrit">Penny Shower</button>
-          <button class="game__button" data-income-crit="stickyBallCrit">Sticky Ball</button>
-          <button class="game__button" data-income-crit="coinSpinCrit">Coin Spin Crit</button>
-          <button class="game__button" data-income-crit="moneyGunCrit">Money Gun Crit</button>
-          <button class="game__button" data-income-crit="billCounterCrit">Bill Counter Crit</button>
-          <button class="game__button" data-income-crit="windfallCrit">Windfall Crit</button>
-          <button class="game__button" data-income-crit="bulletHoseCrit">Bullet Hose Crit</button>
-          <button class="game__button" data-income-crit="boltMagnetCrit">Bolt Magnet Crit</button>
-          <button class="game__button" data-income-crit="bombLobCrit">Bomb Lob Crit</button>
-          <button class="game__button" data-income-crit="haloDiveCrit">Halo Dive Crit</button>
-          <button class="game__button" data-income-crit="victoryLapCrit">Victory Lap Crit</button>
-          <button class="game__button" data-income-crit="ceilingBounceCrit">Ceiling Bounce Crit</button>
-          <button class="game__button" data-income-crit="drillBitCrit">Drill Bit Crit</button>
-          <button class="game__button" data-income-crit="goldCoatCrit">Gold Coat Crit</button>
-          <button class="game__button" data-income-crit="pegboardCrit">Pegboard Crit</button>
-          <button class="game__button" data-income-crit="starFlingCrit">Star Fling Crit</button>
-          <button class="game__button" data-income-crit="moneySpoutCrit">Money Spout Crit</button>
-          <button class="game__button" data-income-crit="salvoCrit">Salvo Crit</button>
-          <button class="game__button" data-income-crit="lightPillarsCrit">Light Pillars Crit</button>
-          <button class="game__button" data-income-crit="bankShotCrit">Bank Shot Crit</button>
-          <button class="game__button" data-income-crit="bombletsCrit">Bomblets Crit</button>
-          <button class="game__button" data-income-crit="mortarsCrit">Mortars Crit</button>
-          <button class="game__button" data-income-crit="arcChainCrit">Arc Chain Crit</button>
-          <button class="game__button" data-income-crit="sweepUpCrit">Sweep Up Crit</button>
-          <button class="game__button" data-income-crit="corkPopCrit">Cork Pop Crit</button>
-          <button class="game__button" data-income-crit="homingMissilesCrit">Homing Missiles Crit</button>
-          <button class="game__button" data-income-crit="skyrocketsCrit">Skyrockets Crit</button>
-          <button class="game__button" data-income-crit="wreckingSwingCrit">Wrecking Swing Crit</button>
-          <button class="game__button" data-income-crit="dronesCrit">Drones Crit</button>
-          <button class="game__button" data-income-crit="stickyDartsCrit">Sticky Darts Crit</button>
-          <button class="game__button" data-income-crit="stormBallCrit">Storm Ball Crit</button>
+          ${playedButtons("income")}
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Floor Crits</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-floor-crit="drillDownCrit">Drill Down</button>
-          <button class="game__button" data-floor-crit="lapRecordCrit">Lap Record</button>
-          <button class="game__button" data-floor-crit="stackUpCrit">Stack Up</button>
-          <button class="game__button" data-floor-crit="hydraulicCrit">Hydraulic</button>
-          <button class="game__button" data-floor-crit="stampDownCrit">Stamp Down</button>
-          <button class="game__button" data-floor-crit="drainCrit">Drain</button>
-          <button class="game__button" data-floor-crit="threadTheNeedleCrit">Thread The Needle</button>
-          <button class="game__button" data-floor-crit="paintJobCrit">Paint Job</button>
-          <button class="game__button" data-floor-crit="crossCutCrit">Cross Cut</button>
-          <button class="game__button" data-floor-crit="rollCallCrit">Roll Call</button>
-          <button class="game__button" data-floor-crit="raindropsCrit">Raindrops</button>
-          <button class="game__button" data-floor-crit="collectCrit">Collect Crit</button>
-          <button class="game__button" data-floor-crit="blockBonkCrit">Block Bonk Crit</button>
-          <button class="game__button" data-floor-crit="moneyWeatherCrit">Money Weather Crit</button>
-          <button class="game__button" data-floor-crit="yoYoCrit">Yo-yo Crit</button>
-          <button class="game__button" data-floor-crit="harpoonsCrit">Harpoons Crit</button>
-          <button class="game__button" data-floor-crit="bolasCrit">Bolas Crit</button>
+          ${playedButtons("floor")}
           <button class="game__button" data-crit-up-down="up">Crit Up</button>
           <button class="game__button" data-crit-up-down="down">Crit Down</button>
           <button id="test-merge-crit" class="game__button">Merge Crit</button>
-          <button class="game__button" data-floor-crit="rapidFireCrit">Rapid Fire Crit</button>
-          <button class="game__button" data-floor-crit="pinballCrit">Pinball Crit</button>
-          <button class="game__button" data-floor-crit="snowballCrit">Snowball Crit</button>
-          <button class="game__button" data-floor-crit="juggleCrit">Juggle Crit</button>
-          <button class="game__button" data-floor-crit="stompCrit">Stomp Crit</button>
-          <button class="game__button" data-floor-crit="rainCrit">Rain Crit</button>
-          <button class="game__button" data-floor-crit="stampCrit">Stamp Crit</button>
-          <button class="game__button" data-floor-crit="catapultCrit">Catapult Crit</button>
-          <button class="game__button" data-floor-crit="orbitCrit">Orbit Crit</button>
-          <button class="game__button" data-floor-crit="trainCrit">Train Crit</button>
-          <button class="game__button" data-floor-crit="bubbleCrit">Bubble Crit</button>
-          <button class="game__button" data-floor-crit="lightningCrit">Lightning Crit</button>
-          <button class="game__button" data-floor-crit="meteorCrit">Meteor Crit</button>
-          <button class="game__button" data-floor-crit="blackHoleCrit">Black Hole Crit</button>
-          <button class="game__button" data-floor-crit="dominoCrit">Domino Crit</button>
-          <button class="game__button" data-floor-crit="meteorShowerCrit">Meteor Shower Crit</button>
-          <button class="game__button" data-floor-crit="volcanoCrit">Volcano Crit</button>
-          <button class="game__button" data-floor-crit="supernovaCrit">Supernova Crit</button>
-          <button class="game__button" data-floor-crit="galaxyCrit">Galaxy Crit</button>
-          <button class="game__button" data-floor-crit="binaryStarCrit">Binary Star Crit</button>
-          <button class="game__button" data-floor-crit="pearlsCrit">Pearls Crit</button>
-          <button class="game__button" data-floor-crit="starBirthCrit">Star Birth Crit</button>
-          <button class="game__button" data-floor-crit="laserCrit">Laser Crit</button>
-          <button class="game__button" data-floor-crit="drillCrit">Drill Crit</button>
-          <button class="game__button" data-floor-crit="quakeCrit">Quake Crit</button>
-          <button class="game__button" data-floor-crit="fireworksCrit">Fireworks Crit</button>
-          <button class="game__button" data-floor-crit="shatterCrit">Shatter Crit</button>
-          <button class="game__button" data-floor-crit="railgunCrit">Railgun Crit</button>
-          <button class="game__button" data-floor-crit="buzzsawCrit">Buzzsaw Crit</button>
-          <button class="game__button" data-floor-crit="tractorBeamCrit">Tractor Beam Crit</button>
-          <button class="game__button" data-floor-crit="orbitalStrikeCrit">Orbital Strike Crit</button>
-          <button class="game__button" data-floor-crit="nukeCrit">Nuke Crit</button>
-          <button class="game__button" data-floor-crit="ricochetLaserCrit">Ricochet Laser Crit</button>
-          <button class="game__button" data-floor-crit="plasmaBallCrit">Plasma Ball Crit</button>
-          <button class="game__button" data-floor-crit="portalCrit">Portal Crit</button>
-          <button class="game__button" data-floor-crit="bunkerBusterCrit">Bunker Buster Crit</button>
-          <button class="game__button" data-floor-crit="airstrikeCrit">Airstrike Crit</button>
-          <button class="game__button" data-floor-crit="hyperspaceCrit">Hyperspace Crit</button>
-          <button class="game__button" data-floor-crit="missileSwarmCrit">Missile Swarm Crit</button>
-          <button class="game__button" data-floor-crit="clusterBombCrit">Cluster Bomb Crit</button>
-          <button class="game__button" data-floor-crit="missileDefenseCrit">Missile Defense Crit</button>
-          <button class="game__button" data-floor-crit="icbmCrit">ICBM Crit</button>
-          <button class="game__button" data-floor-crit="artilleryBarrageCrit">Artillery Barrage Crit</button>
-          <button class="game__button" data-floor-crit="crashLandingCrit">Crash Landing Crit</button>
-          <button class="game__button" data-floor-crit="saberCrit">Saber Crit</button>
-          <button class="game__button" data-floor-crit="liftoffCrit">Liftoff Crit</button>
-          <button class="game__button" data-floor-crit="gunshipCrit">Gunship Crit</button>
-          <button class="game__button" data-floor-crit="freezeRayCrit">Freeze Ray Crit</button>
-          <button class="game__button" data-floor-crit="missileTangleCrit">Missile Tangle Crit</button>
-          <button class="game__button" data-floor-crit="windmillCrit">Windmill Crit</button>
-          <button class="game__button" data-floor-crit="saturnCrit">Saturn Crit</button>
-          <button class="game__button" data-floor-crit="beatmapCrit">Beatmap Crit</button>
-          <button class="game__button" data-floor-crit="meltdownCrit">Meltdown Crit</button>
-          <button class="game__button" data-floor-crit="crunchCrit">Crunch Crit</button>
-          <button class="game__button" data-floor-crit="atomsCrit">Atoms Crit</button>
-          <button class="game__button" data-floor-crit="reactorCrit">Reactor Crit</button>
-          <button class="game__button" data-floor-crit="staticCrit">Static Crit</button>
-          <button class="game__button" data-floor-crit="empCrit">EMP Crit</button>
-          <button class="game__button" data-floor-crit="inspiralCrit">Inspiral Crit</button>
-          <button class="game__button" data-floor-crit="thunderstormCrit">Thunderstorm Crit</button>
-          <button class="game__button" data-floor-crit="shotgunCrit">Shotgun Crit</button>
-          <button class="game__button" data-floor-crit="solarFlareCrit">Solar Flare Crit</button>
-          <button class="game__button" data-floor-crit="flakCrit">Flak Crit</button>
-          <button class="game__button" data-floor-crit="revolverCrit">Revolver Crit</button>
-          <button class="game__button" data-floor-crit="geysersCrit">Geysers Crit</button>
-          <button class="game__button" data-floor-crit="plasmaCannonCrit">Plasma Cannon Crit</button>
-          <button class="game__button" data-floor-crit="grenadesCrit">Grenades Crit</button>
-          <button class="game__button" data-floor-crit="rocketPodsCrit">Rocket Pods Crit</button>
-          <button class="game__button" data-floor-crit="bankShotsCrit">Bank Shots Crit</button>
-          <button class="game__button" data-floor-crit="minigunCrit">Minigun Crit</button>
-          <button class="game__button" data-floor-crit="claymoresCrit">Claymores Crit</button>
-          <button class="game__button" data-floor-crit="strafeCrit">Strafe Crit</button>
-          <button class="game__button" data-floor-crit="coinShotCrit">Coin Shot Crit</button>
-          <button class="game__button" data-floor-crit="rodsCrit">Rods Crit</button>
-          <button class="game__button" data-floor-crit="ionCannonCrit">Ion Cannon Crit</button>
-          <button class="game__button" data-floor-crit="boltWhipCrit">Bolt Whip Crit</button>
-          <button class="game__button" data-floor-crit="designatorCrit">Designator Crit</button>
-          <button class="game__button" data-floor-crit="beamSplitterCrit">Beam Splitter Crit</button>
-          <button class="game__button" data-floor-crit="teslaCannonCrit">Tesla Cannon Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

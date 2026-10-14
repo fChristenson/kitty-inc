@@ -32,6 +32,8 @@ const lightningSky = (r: Running, bars: Point[], top: number) => ({
 });
 
 registerFloorCrit("lightningCrit", {
+  // each strike pays its bar out too
+  payouts: () => 2,
   plan(r, bars, hit) {
     // from the sky onto the top bar, then bar to bar down the building
     const order = byHeight(bars);

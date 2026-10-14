@@ -23,7 +23,9 @@ import {
   glowStops,
 } from "../../../floorCrits/critPlayer";
 import { holeHash } from "../../../floorCrits/critPlayer/shared";
-import { MOVE_IN_SPOTS } from "../..";
+
+// where its cats land across the floor it opens, 0..1 of its walk
+const MOVE_IN_SPOTS = [0.15, 0.5, 0.85];
 
 const POP_MS = 100;
 const POP_BLAST = 120;
@@ -90,6 +92,8 @@ function bounce(a: Point, b: Point, lift: number, u: number, into: Point) {
 }
 
 registerFloorCrit("moveInCrit", {
+  // its cats hired across the floor it opened
+  reward: (t) => t.hire(MOVE_IN_SPOTS[t.index % MOVE_IN_SPOTS.length]),
   plan(r, bars, hit) {
     const state: State = { bars, movers: [], open: 0 };
     const lock = getLockCenter();

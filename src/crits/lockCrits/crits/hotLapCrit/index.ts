@@ -3,6 +3,7 @@
 // length, braking hard into the hairpins at its ends; they cross the line,
 // the floor bursts open, and three wisps drop in onto its chairs, supplies
 // and manager
+import { type Floor } from "../../../../gameState";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { smoothstep } from "../../../../shared/easing";
 import { planRace, type RaceCorner } from "../../../../shared/animationStyles/race";
@@ -87,7 +88,15 @@ function trackAt(s: number): Point {
   return { x: -HALF + Math.cos(a) * RAD, y: Math.sin(a) * RAD };
 }
 
+// its drops, one each, onto the floor it opens
+const FURNISH = [
+  (floor: Floor) => (floor.hasOfficeChairs = true),
+  (floor: Floor) => (floor.hasOfficeSupplies = true),
+  (floor: Floor) => (floor.hasManager = true),
+];
+
 registerFloorCrit("hotLapCrit", {
+  reward: (t) => FURNISH[t.index % FURNISH.length](t.floor),
   plan(r, bars, hit) {
     const straight = HALF * 2;
     const bend = Math.PI * RAD;

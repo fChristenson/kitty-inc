@@ -86,6 +86,7 @@ function shellPath(r: Running, bars: Point[], s: number) {
 }
 
 registerFloorCrit("fireworksCrit", {
+  levels: (count) => Math.ceil(count / 6),
   plan(_r, bars, hit) {
     for (const shell of SHELLS)
       for (let i = 0; i < copiesOf(shell, bars.length); i++)

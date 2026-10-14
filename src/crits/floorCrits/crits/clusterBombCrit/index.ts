@@ -87,6 +87,7 @@ const popsAt = (lands: number, j: number) =>
   lands + CLUSTER_POP_DELAY_MS + j * CLUSTER_POP_EVERY_MS;
 
 registerFloorCrit("clusterBombCrit", {
+  levels: (count) => Math.ceil(count / 2),
   plan(r, bars, hit) {
     const order = byHeight(bars);
     for (let i = 0; i < countOf(bars.length); i++) {

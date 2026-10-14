@@ -55,6 +55,8 @@ const ground = (r: Running, bars: Point[]): Point => ({
 });
 
 registerFloorCrit("bunkerBusterCrit", {
+  // its eruption lands them, not its impact and thuds
+  levels: (count, step) => (step ? count : 0),
   plan(_r, bars, hit) {
     const order = byHeight(bars);
     order.forEach((bar, k) => hit(bar, thudsAt(k)));

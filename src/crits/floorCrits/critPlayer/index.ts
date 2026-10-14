@@ -5,7 +5,9 @@
 // its own module under ../crits (../../<group>Crits/crits), loaded when its
 // crit is armed or played; every hit calls back so the floors or the total
 // can jolt and land their reward
-import { coolDownFloorCrits, type CritPlayKind } from "../../critTypes";
+import { coolDownFloorCrits } from "../../critTypes";
+import { loadCritModule, type CritPlayKind } from "../../critKit";
+import type { CritTarget } from "../../critKit/target";
 import { fadeStops, type FadeStops } from "../../../shared/glowSprite";
 import type { Bolt } from "../../../shared/animationStyles/lightning";
 import type { Disk, Orbit } from "../../../shared/animationStyles/galaxy";
@@ -287,204 +289,44 @@ export interface FloorCritDef {
   tailMs?: number;
   // the shake a hit kicks, by its step
   shake?: (step: number) => number;
+  // its reward, which its group's player lands on each hit:
+  // floor crits: the levels a hit lands on another bar (default the crit's
+  // multiple) and on its own (default none: it has the crit's already), and
+  // the full payouts it pays its bar (default none)
+  levels?: (count: number, step: number) => number;
+  ownLevels?: (count: number, step: number) => number;
+  payouts?: (step: number) => number;
+  // button, rate and lock crits: what a reward hit (step 1, or 2 on its own
+  // floor) gives the floor it lands on; a lock crit's lands on its step 2
+  // hits, on the floor its step 1 hit opened
+  reward?: (t: CritTarget) => void;
+  // lock crits: a step 1 hit on the locked floor before it opens; false
+  // leaves it locked
+  beforeOpen?: (t: CritTarget) => boolean | void;
+  // lock crits: it opens the floor above the locked one too, while there's
+  // room (its bar 1)
+  twoFloors?: boolean;
 }
 
 const DEFS: Partial<Record<CritPlayKind, FloorCritDef>> = {};
+
+// kind's def, once its module has loaded
+export function getFloorCritDef(kind: CritPlayKind): FloorCritDef | undefined {
+  return DEFS[kind];
+}
 
 // each kind's module calls this once it loads
 export function registerFloorCrit(kind: CritPlayKind, def: FloorCritDef): void {
   DEFS[kind] = def;
 }
 
-const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
-  windfallCrit: () => import("../../incomeCrits/crits/windfallCrit"),
-  bulletHoseCrit: () => import("../../incomeCrits/crits/bulletHoseCrit"),
-  boltMagnetCrit: () => import("../../incomeCrits/crits/boltMagnetCrit"),
-  bombLobCrit: () => import("../../incomeCrits/crits/bombLobCrit"),
-  haloDiveCrit: () => import("../../incomeCrits/crits/haloDiveCrit"),
-  victoryLapCrit: () => import("../../incomeCrits/crits/victoryLapCrit"),
-  ceilingBounceCrit: () => import("../../incomeCrits/crits/ceilingBounceCrit"),
-  drillBitCrit: () => import("../../incomeCrits/crits/drillBitCrit"),
-  goldCoatCrit: () => import("../../incomeCrits/crits/goldCoatCrit"),
-  pegboardCrit: () => import("../../incomeCrits/crits/pegboardCrit"),
-  starFlingCrit: () => import("../../incomeCrits/crits/starFlingCrit"),
-  moneySpoutCrit: () => import("../../incomeCrits/crits/moneySpoutCrit"),
-  salvoCrit: () => import("../../incomeCrits/crits/salvoCrit"),
-  lightPillarsCrit: () => import("../../incomeCrits/crits/lightPillarsCrit"),
-  bankShotCrit: () => import("../../incomeCrits/crits/bankShotCrit"),
-  bombletsCrit: () => import("../../incomeCrits/crits/bombletsCrit"),
-  mortarsCrit: () => import("../../incomeCrits/crits/mortarsCrit"),
-  arcChainCrit: () => import("../../incomeCrits/crits/arcChainCrit"),
-  sweepUpCrit: () => import("../../incomeCrits/crits/sweepUpCrit"),
-  corkPopCrit: () => import("../../incomeCrits/crits/corkPopCrit"),
-  homingMissilesCrit: () =>
-    import("../../incomeCrits/crits/homingMissilesCrit"),
-  skyrocketsCrit: () => import("../../incomeCrits/crits/skyrocketsCrit"),
-  wreckingSwingCrit: () => import("../../incomeCrits/crits/wreckingSwingCrit"),
-  dronesCrit: () => import("../../incomeCrits/crits/dronesCrit"),
-  stickyDartsCrit: () => import("../../incomeCrits/crits/stickyDartsCrit"),
-  stormBallCrit: () => import("../../incomeCrits/crits/stormBallCrit"),
-  billCounterCrit: () => import("../../incomeCrits/crits/billCounterCrit"),
-  moneyGunCrit: () => import("../../incomeCrits/crits/moneyGunCrit"),
-  coinSpinCrit: () => import("../../incomeCrits/crits/coinSpinCrit"),
-  stickyBallCrit: () => import("../../incomeCrits/crits/stickyBallCrit"),
-  pennyShowerCrit: () => import("../../incomeCrits/crits/pennyShowerCrit"),
-  moneyCircleCrit: () => import("../../incomeCrits/crits/moneyCircleCrit"),
-  bigCrunchCrit: () => import("../../incomeCrits/crits/bigCrunchCrit"),
-  hardSellCrit: () => import("../../incomeCrits/crits/hardSellCrit"),
-  wraparoundCrit: () => import("../../incomeCrits/crits/wraparoundCrit"),
-  moneyTrailCrit: () => import("../../incomeCrits/crits/moneyTrailCrit"),
-  sureShotCrit: () => import("../../buttonCrits/crits/sureShotCrit"),
-  autopressCrit: () => import("../../buttonCrits/crits/autopressCrit"),
-  freeTapsCrit: () => import("../../buttonCrits/crits/freeTapsCrit"),
-  overchargeCrit: () => import("../../buttonCrits/crits/overchargeCrit"),
-  gildedCrit: () => import("../../buttonCrits/crits/gildedCrit"),
-  blastingCapsCrit: () => import("../../buttonCrits/crits/blastingCapsCrit"),
-  linkUpCrit: () => import("../../buttonCrits/crits/linkUpCrit"),
-  hotButtonCrit: () => import("../../buttonCrits/crits/hotButtonCrit"),
-  nailGunCrit: () => import("../../buttonCrits/crits/nailGunCrit"),
-  springLoadedCrit: () => import("../../buttonCrits/crits/springLoadedCrit"),
-  halfOffCrit: () => import("../../buttonCrits/crits/halfOffCrit"),
-  deepBoreCrit: () => import("../../buttonCrits/crits/deepBoreCrit"),
-  heavyHandCrit: () => import("../../buttonCrits/crits/heavyHandCrit"),
-  splashZoneCrit: () => import("../../buttonCrits/crits/splashZoneCrit"),
-  trickleDownCrit: () => import("../../buttonCrits/crits/trickleDownCrit"),
-  breachCrit: () => import("../../lockCrits/crits/breachCrit"),
-  twoUpCrit: () => import("../../lockCrits/crits/twoUpCrit"),
-  clearanceCrit: () => import("../../lockCrits/crits/clearanceCrit"),
-  lockpickCrit: () => import("../../lockCrits/crits/lockpickCrit"),
-  boltCutterCrit: () => import("../../lockCrits/crits/boltCutterCrit"),
-  moveInCrit: () => import("../../lockCrits/crits/moveInCrit"),
-  hotLapCrit: () => import("../../lockCrits/crits/hotLapCrit"),
-  carbonCopyCrit: () => import("../../lockCrits/crits/carbonCopyCrit"),
-  freshPaintCrit: () => import("../../lockCrits/crits/freshPaintCrit"),
-  luckyStarCrit: () => import("../../lockCrits/crits/luckyStarCrit"),
-  skeletonKeyCrit: () => import("../../lockCrits/crits/skeletonKeyCrit"),
-  jumpStartCrit: () => import("../../lockCrits/crits/jumpStartCrit"),
-  conjureCrit: () => import("../../lockCrits/crits/conjureCrit"),
-  pullUpCrit: () => import("../../lockCrits/crits/pullUpCrit"),
-  sweepCleanCrit: () => import("../../lockCrits/crits/sweepCleanCrit"),
-  housewarmingCrit: () => import("../../lockCrits/crits/housewarmingCrit"),
-  reboundCrit: () => import("../../lockCrits/crits/reboundCrit"),
-  viceCrit: () => import("../../lockCrits/crits/viceCrit"),
-  crackleCageCrit: () => import("../../lockCrits/crits/crackleCageCrit"),
-  shredCrit: () => import("../../lockCrits/crits/shredCrit"),
-  burnThroughCrit: () => import("../../lockCrits/crits/burnThroughCrit"),
-  overclockCrit: () => import("../../rateCrits/crits/overclockCrit"),
-  shiftUpCrit: () => import("../../rateCrits/crits/shiftUpCrit"),
-  quickstepCrit: () => import("../../rateCrits/crits/quickstepCrit"),
-  shortcutCrit: () => import("../../rateCrits/crits/shortcutCrit"),
-  cleanCutCrit: () => import("../../rateCrits/crits/cleanCutCrit"),
-  woundUpCrit: () => import("../../rateCrits/crits/woundUpCrit"),
-  crosshairsCrit: () => import("../../rateCrits/crits/crosshairsCrit"),
-  compressorCrit: () => import("../../rateCrits/crits/compressorCrit"),
-  afterburnCrit: () => import("../../rateCrits/crits/afterburnCrit"),
-  superchargeCrit: () => import("../../rateCrits/crits/superchargeCrit"),
-  doubleTimeCrit: () => import("../../rateCrits/crits/doubleTimeCrit"),
-  rapidFireCrit: () => import("../crits/rapidFireCrit"),
-  pinballCrit: () => import("../crits/pinballCrit"),
-  snowballCrit: () => import("../crits/snowballCrit"),
-  juggleCrit: () => import("../crits/juggleCrit"),
-  stompCrit: () => import("../crits/stompCrit"),
-  rainCrit: () => import("../crits/rainCrit"),
-  stampCrit: () => import("../crits/stampCrit"),
-  catapultCrit: () => import("../crits/catapultCrit"),
-  orbitCrit: () => import("../crits/orbitCrit"),
-  trainCrit: () => import("../crits/trainCrit"),
-  bubbleCrit: () => import("../crits/bubbleCrit"),
-  lightningCrit: () => import("../crits/lightningCrit"),
-  meteorCrit: () => import("../crits/meteorCrit"),
-  blackHoleCrit: () => import("../crits/blackHoleCrit"),
-  dominoCrit: () => import("../crits/dominoCrit"),
-  meteorShowerCrit: () => import("../crits/meteorShowerCrit"),
-  volcanoCrit: () => import("../crits/volcanoCrit"),
-  supernovaCrit: () => import("../crits/supernovaCrit"),
-  galaxyCrit: () => import("../crits/galaxyCrit"),
-  binaryStarCrit: () => import("../crits/binaryStarCrit"),
-  pearlsCrit: () => import("../crits/pearlsCrit"),
-  starBirthCrit: () => import("../crits/starBirthCrit"),
-  laserCrit: () => import("../crits/laserCrit"),
-  drillCrit: () => import("../crits/drillCrit"),
-  quakeCrit: () => import("../crits/quakeCrit"),
-  fireworksCrit: () => import("../crits/fireworksCrit"),
-  shatterCrit: () => import("../crits/shatterCrit"),
-  railgunCrit: () => import("../crits/railgunCrit"),
-  buzzsawCrit: () => import("../crits/buzzsawCrit"),
-  tractorBeamCrit: () => import("../crits/tractorBeamCrit"),
-  orbitalStrikeCrit: () => import("../crits/orbitalStrikeCrit"),
-  nukeCrit: () => import("../crits/nukeCrit"),
-  ricochetLaserCrit: () => import("../crits/ricochetLaserCrit"),
-  plasmaBallCrit: () => import("../crits/plasmaBallCrit"),
-  portalCrit: () => import("../crits/portalCrit"),
-  bunkerBusterCrit: () => import("../crits/bunkerBusterCrit"),
-  airstrikeCrit: () => import("../crits/airstrikeCrit"),
-  hyperspaceCrit: () => import("../crits/hyperspaceCrit"),
-  missileSwarmCrit: () => import("../crits/missileSwarmCrit"),
-  clusterBombCrit: () => import("../crits/clusterBombCrit"),
-  missileDefenseCrit: () => import("../crits/missileDefenseCrit"),
-  icbmCrit: () => import("../crits/icbmCrit"),
-  artilleryBarrageCrit: () => import("../crits/artilleryBarrageCrit"),
-  crashLandingCrit: () => import("../crits/crashLandingCrit"),
-  saberCrit: () => import("../crits/saberCrit"),
-  liftoffCrit: () => import("../crits/liftoffCrit"),
-  gunshipCrit: () => import("../crits/gunshipCrit"),
-  freezeRayCrit: () => import("../crits/freezeRayCrit"),
-  missileTangleCrit: () => import("../crits/missileTangleCrit"),
-  windmillCrit: () => import("../crits/windmillCrit"),
-  saturnCrit: () => import("../crits/saturnCrit"),
-  beatmapCrit: () => import("../crits/beatmapCrit"),
-  meltdownCrit: () => import("../crits/meltdownCrit"),
-  crunchCrit: () => import("../crits/crunchCrit"),
-  atomsCrit: () => import("../crits/atomsCrit"),
-  reactorCrit: () => import("../crits/reactorCrit"),
-  staticCrit: () => import("../crits/staticCrit"),
-  empCrit: () => import("../crits/empCrit"),
-  inspiralCrit: () => import("../crits/inspiralCrit"),
-  thunderstormCrit: () => import("../crits/thunderstormCrit"),
-  shotgunCrit: () => import("../crits/shotgunCrit"),
-  solarFlareCrit: () => import("../crits/solarFlareCrit"),
-  flakCrit: () => import("../crits/flakCrit"),
-  revolverCrit: () => import("../crits/revolverCrit"),
-  geysersCrit: () => import("../crits/geysersCrit"),
-  plasmaCannonCrit: () => import("../crits/plasmaCannonCrit"),
-  grenadesCrit: () => import("../crits/grenadesCrit"),
-  rocketPodsCrit: () => import("../crits/rocketPodsCrit"),
-  bankShotsCrit: () => import("../crits/bankShotsCrit"),
-  minigunCrit: () => import("../crits/minigunCrit"),
-  claymoresCrit: () => import("../crits/claymoresCrit"),
-  strafeCrit: () => import("../crits/strafeCrit"),
-  coinShotCrit: () => import("../crits/coinShotCrit"),
-  rodsCrit: () => import("../crits/rodsCrit"),
-  ionCannonCrit: () => import("../crits/ionCannonCrit"),
-  boltWhipCrit: () => import("../crits/boltWhipCrit"),
-  designatorCrit: () => import("../crits/designatorCrit"),
-  beamSplitterCrit: () => import("../crits/beamSplitterCrit"),
-  teslaCannonCrit: () => import("../crits/teslaCannonCrit"),
-  yoYoCrit: () => import("../crits/yoYoCrit"),
-  harpoonsCrit: () => import("../crits/harpoonsCrit"),
-  bolasCrit: () => import("../crits/bolasCrit"),
-  blockBonkCrit: () => import("../crits/blockBonkCrit"),
-  moneyWeatherCrit: () => import("../crits/moneyWeatherCrit"),
-  collectCrit: () => import("../crits/collectCrit"),
-  raindropsCrit: () => import("../crits/raindropsCrit"),
-  rollCallCrit: () => import("../crits/rollCallCrit"),
-  crossCutCrit: () => import("../crits/crossCutCrit"),
-  paintJobCrit: () => import("../crits/paintJobCrit"),
-  drainCrit: () => import("../crits/drainCrit"),
-  threadTheNeedleCrit: () => import("../crits/threadTheNeedleCrit"),
-  hydraulicCrit: () => import("../crits/hydraulicCrit"),
-  stampDownCrit: () => import("../crits/stampDownCrit"),
-  stackUpCrit: () => import("../crits/stackUpCrit"),
-  drillDownCrit: () => import("../crits/drillDownCrit"),
-  lapRecordCrit: () => import("../crits/lapRecordCrit"),
-};
 const loading = new Map<CritPlayKind, Promise<unknown>>();
 
 // loads kind's module (once)
 function preloadFloorCrit(kind: CritPlayKind): Promise<unknown> {
   let promise = loading.get(kind);
   if (!promise) {
-    promise = LOADERS[kind]().catch(() => loading.delete(kind));
+    promise = loadCritModule(kind).catch(() => loading.delete(kind));
     loading.set(kind, promise);
   }
   return promise;

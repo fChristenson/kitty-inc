@@ -109,6 +109,8 @@ function bitSpot(
 }
 
 registerFloorCrit("flakCrit", {
+  // about fifteen bits of shrapnel a bar
+  levels: (count) => Math.ceil(count / 15),
   plan(r, bars, hit) {
     const shells = planShells(bars);
     salvos.set(r, shells);

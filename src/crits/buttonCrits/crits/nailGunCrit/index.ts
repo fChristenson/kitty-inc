@@ -3,6 +3,8 @@
 // each, then hops on to the next, quicker each volley, the crit's own last in
 // the heaviest volley: the next crit landing on a nailed button sticks there
 // for a few taps
+import { addNails } from "../../buttonBonus";
+import { CONFIG } from "../../../../config";
 import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
@@ -63,6 +65,12 @@ const states = new WeakMap<Running, State>();
 const spot: Point = { x: 0, y: 0 };
 
 registerFloorCrit("nailGunCrit", {
+  // its next crit sticks for a few taps, twice as many on its own
+  reward(t) {
+    const taps = CONFIG.crit.nailGunTaps;
+    addNails(t.floor, t.own ? taps * 2 : taps);
+    t.flipButton();
+  },
   plan(r, bars, hit) {
     const order = ownLast(bars);
     const state: State = { bars, nails: [], volleys: [], gun: () => null };

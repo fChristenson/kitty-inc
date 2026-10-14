@@ -38,6 +38,12 @@ export type {
   CritTier,
 } from "./critTypes";
 export {
+  CRIT_GROUPS,
+  PLAYED_CRITS,
+  type CritGroup,
+  type CritMeta,
+} from "./critKit";
+export {
   createCritTextSprite,
   critFont,
   drawCritFlash,
@@ -87,20 +93,14 @@ export {
   buttonFreeLabel,
   buttonPerkLabel,
   hasFreeButtonTap,
+  landTapPerks,
   takeButtonCharge,
-  takeDoubleTap,
   takeFreeTap,
   takeHotTap,
-  takeLinkedFloors,
-  takePayoutTap,
-  takeHireTap,
-  takeBoreTap,
-  takeHeavyTap,
-  takeSplashTap,
-  takeTideTap,
   takeHalfTap,
   hasHalfTap,
   stickSpentCrit,
+  type TapPerkContext,
 } from "./buttonCrits/buttonBonus";
 export {
   noteRatePayout,

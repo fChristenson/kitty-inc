@@ -85,6 +85,8 @@ function meteor(r: Running, bars: Point[], order: number[], i: number) {
 }
 
 registerFloorCrit("missileDefenseCrit", {
+  // its debris lands three bits a meteor
+  levels: (count) => Math.ceil(count / 3),
   plan(_r, bars, hit) {
     const order = byHeight(bars);
     for (let i = 0; i < DEFENSE_METEORS; i++)

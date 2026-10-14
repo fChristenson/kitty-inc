@@ -91,6 +91,8 @@ const crossing = (c: Cut, bar: Point) =>
   clamp01((bar.y - c.a.y) / (c.b.y - c.a.y));
 
 registerFloorCrit("saberCrit", {
+  // it cuts through each bar twice
+  levels: (count) => Math.ceil(count / 2),
   plan(r, bars, hit) {
     const all = cuts(r, bars);
     for (let k = 0; k < 2; k++)

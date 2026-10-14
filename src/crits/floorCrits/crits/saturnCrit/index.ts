@@ -130,6 +130,8 @@ const spot: Point = { x: 0, y: 0 };
 const planet: Point = { x: 0, y: 0 };
 
 registerFloorCrit("saturnCrit", {
+  // its ring cuts each bar about ten times, then its shards land
+  levels: (count, step) => Math.ceil(count / (step ? 3 : 10)),
   plan(r, bars, hit) {
     for (const c of planOf(r, bars).cuts) hit(c.bar, c.ms);
     for (const s of shards(r, bars)) hit(s.bar, s.lands, 1);

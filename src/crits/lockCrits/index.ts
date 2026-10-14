@@ -6,16 +6,16 @@
 // that open it first land on the floor they opened)
 import type { FloorActionsDeps } from "../../floors/floorInteractions";
 import type { Floor } from "../../gameState";
-import { FLOOR_H, FLOOR_X_MAX, FLOOR_X_MIN } from "../../floors/constants";
+import { FLOOR_H } from "../../floors/constants";
+import type { CritTier, LockCritKind } from "../critTypes";
 import {
-  type CritTier,
-  type LockCritKind,
-  pickHigherCritTier,
-} from "../critTypes";
-import type { FloorCritPlay, Point } from "../floorCrits/critPlayer";
+  getFloorCritDef,
+  type FloorCritPlay,
+  type Point,
+} from "../floorCrits/critPlayer";
 import { spotsFromFlash } from "../floorCrits/playTargets";
+import { critTarget } from "../critKit/target";
 import { lockedFloorInView, lockedFloorOf } from "./lockedFloor";
-import { multiply } from "../../shared/bigNumber";
 import { playBarExplosion } from "../../shared/explosionBang";
 import {
   drawFloorLockPrice,
@@ -23,71 +23,6 @@ import {
   MAX_FLOORS_PER_BUILDING,
   setFloorLockPriceHidden,
 } from "../../floors/floorLock";
-import {
-  currentPayoutAmount,
-  flipIncomeRate,
-  getIncomeBarCenter,
-  increaseIncomeRateBy,
-  punchIncomeBar,
-} from "../../floors/incomePanel";
-import { spawnHomingCoinBurst as animateHomingCoins } from "../../floors/coins";
-import { addTotalIncome } from "../../totalIncome";
-import { pulseHudTotalFlash } from "../../shared/totalIncomeCoins";
-import {
-  celebrateWorkerBoost,
-  getRenderedWorkerCount,
-  promoteWorkerPermaTier,
-  recruitWorker,
-} from "../../floors/worker";
-import { CONFIG } from "../../config";
-import { armCritUpgrade } from "../floorCrits/upgradeCrit";
-import {
-  addButtonCharge,
-  addDoubleTaps,
-  addFreeTaps,
-  addHalfTaps,
-} from "../buttonCrits/buttonBonus";
-import {
-  bankDoublePayout,
-  overclockBar,
-  windUpBar,
-} from "../rateCrits/rateBonus";
-import { liveEffect } from "../../shared/detachedJob";
-import { flipUpgradeButton as animateFlip } from "../../floors/upgradeButton";
-
-const flipUpgradeButton = liveEffect(animateFlip);
-const spawnHomingCoinBurst = liveEffect(animateHomingCoins);
-
-// where Move In's cats land across the floor they open, 0..1 of its walk
-export const MOVE_IN_SPOTS = [0.15, 0.5, 0.85];
-
-// Hot Lap's drops, one each, onto the floor it opens
-const FURNISH = [
-  (floor: Floor) => (floor.hasOfficeChairs = true),
-  (floor: Floor) => (floor.hasOfficeSupplies = true),
-  (floor: Floor) => (floor.hasManager = true),
-];
-
-// the kinds that open the floor on their step 1 hit, then reward it on step 2
-const OPENS_THEN_REWARDS: readonly LockCritKind[] = [
-  "boltCutterCrit",
-  "moveInCrit",
-  "hotLapCrit",
-  "carbonCopyCrit",
-  "freshPaintCrit",
-  "luckyStarCrit",
-  "skeletonKeyCrit",
-  "jumpStartCrit",
-  "conjureCrit",
-  "pullUpCrit",
-  "sweepCleanCrit",
-  "housewarmingCrit",
-  "reboundCrit",
-  "viceCrit",
-  "crackleCageCrit",
-  "shredCrit",
-  "burnThroughCrit",
-];
 
 // a lock crit playing out from floor's crit onto the locked floor, if it's in
 // view; unlockFree opens a floor for free
@@ -104,26 +39,27 @@ export function lockCritPlayFor(
     return null;
   const spot = spotsFromFlash(deps, floor, [locked], getLockCenter);
   // Two Up's second floor sits a floor's pitch above, while there's room
+  // (decided on the first frame it plays, its module loaded by then)
   const below = deps.floors[deps.floors.length - 2];
-  const twoUp =
-    kind === "twoUpCrit" && deps.floors.length < MAX_FLOORS_PER_BUILDING;
+  let twoFloors: boolean | undefined;
   const pitch = () => {
     const under = deps.getFloorRect?.(below)?.top;
     const top = deps.getFloorRect?.(locked)?.top;
     return under !== undefined && top !== undefined ? under - top : FLOOR_H;
   };
-  const bars = twoUp
-    ? (): Point[] => {
-        const [at] = spot();
-        return [at, { x: at.x, y: at.y - pitch() }];
-      }
-    : spot;
-  const opensThenRewards = OPENS_THEN_REWARDS.includes(kind);
+  const bars = (): Point[] => {
+    twoFloors ??=
+      !!getFloorCritDef(kind)?.twoFloors &&
+      deps.floors.length < MAX_FLOORS_PER_BUILDING;
+    if (!twoFloors) return spot();
+    const [at] = spot();
+    return [at, { x: at.x, y: at.y - pitch() }];
+  };
   let opened: Floor | null = null;
   // what the floor it opened would have cost
   let price: Floor["unlockCost"] | null = null;
-  let movedIn = 0;
-  let furnished = 0;
+  // the reward hits it has landed
+  let rewarded = 0;
   return {
     kind,
     barHalfWidth: getLockCenter().x,
@@ -131,94 +67,26 @@ export function lockCritPlayFor(
     onHit: (_bar, step, color) => {
       playBarExplosion(1 + step * 0.08);
       if (step === 0) return;
-      if (opensThenRewards && step === 2) {
+      // its own reward and opening (FloorCritDef's), its module loaded by
+      // its first hit
+      const def = getFloorCritDef(kind);
+      const hit = (on: Floor) =>
+        critTarget({
+          floor: on,
+          ownFloor: floor,
+          floors: deps.floors,
+          step,
+          tier,
+          count,
+          color,
+          price,
+          index: rewarded,
+        });
+      // a crit with a reward lands it on the floor it opened on its step 2 hits
+      if (def?.reward && step === 2) {
         if (!opened) return;
-        const now = Date.now();
-        if (kind === "boltCutterCrit") {
-          const levels = count * CONFIG.crit.boltCutterLevels;
-          increaseIncomeRateBy(opened, levels);
-          punchIncomeBar(opened, `+${levels} Lvl`, color);
-        } else if (kind === "hotLapCrit") {
-          FURNISH[furnished++ % FURNISH.length](opened);
-        } else if (kind === "carbonCopyCrit") {
-          // up from a free floor's share to the whole level of the one below
-          const below = deps.floors[deps.floors.indexOf(opened) - 1];
-          const levels = below ? below.upgradeCount - opened.upgradeCount : 0;
-          if (levels > 0) {
-            increaseIncomeRateBy(opened, levels);
-            punchIncomeBar(opened, `+${levels} Lvl`, color);
-          }
-        } else if (kind === "freshPaintCrit") {
-          for (let i = 0; i < getRenderedWorkerCount(opened); i++) {
-            promoteWorkerPermaTier(opened, i);
-            celebrateWorkerBoost(opened, i, now);
-          }
-        } else if (kind === "luckyStarCrit") {
-          armCritUpgrade(opened, tier);
-          flipUpgradeButton(opened);
-        } else if (kind === "skeletonKeyCrit") {
-          addFreeTaps(opened, count * 2);
-          flipUpgradeButton(opened);
-        } else if (kind === "jumpStartCrit") {
-          const payouts = count * CONFIG.crit.jumpStartPayouts;
-          addTotalIncome(multiply(currentPayoutAmount(opened, now), payouts));
-          const bar = getIncomeBarCenter(false);
-          spawnHomingCoinBurst(opened, bar.x, bar.y, {
-            onEachArrive: pulseHudTotalFlash,
-          });
-          punchIncomeBar(opened, `x${payouts} Payout`, color);
-        } else if (kind === "conjureCrit") {
-          if (price) {
-            addTotalIncome(multiply(price, CONFIG.crit.conjurePriceBack));
-            const bar = getIncomeBarCenter(false);
-            spawnHomingCoinBurst(opened, bar.x, bar.y, {
-              onEachArrive: pulseHudTotalFlash,
-            });
-            punchIncomeBar(opened, "Price Back", color);
-          }
-        } else if (kind === "pullUpCrit") {
-          flipIncomeRate(opened);
-          opened.incomeIntervalSeconds /= CONFIG.crit.pullUpSpeed;
-          punchIncomeBar(opened, `${CONFIG.crit.pullUpSpeed}x Speed`, color);
-        } else if (kind === "housewarmingCrit") {
-          const payouts = CONFIG.crit.housewarmingPayouts;
-          bankDoublePayout(opened, payouts);
-          flipIncomeRate(opened);
-          punchIncomeBar(opened, `2x Pay x${payouts}`, color);
-        } else if (kind === "reboundCrit") {
-          flipIncomeRate(opened);
-          overclockBar(opened);
-          punchIncomeBar(opened, `${CONFIG.crit.overclockSpeed}x Speed`, color);
-        } else if (kind === "viceCrit") {
-          addButtonCharge(opened, count * CONFIG.crit.viceCharge);
-          flipUpgradeButton(opened);
-        } else if (kind === "crackleCageCrit") {
-          windUpBar(opened);
-          flipIncomeRate(opened);
-          punchIncomeBar(opened, `${CONFIG.crit.woundUpPayout}x Pay`, color);
-        } else if (kind === "shredCrit") {
-          addDoubleTaps(opened, count * CONFIG.crit.shredTaps);
-          flipUpgradeButton(opened);
-        } else if (kind === "burnThroughCrit") {
-          addHalfTaps(opened, count * CONFIG.crit.burnThroughTaps);
-          flipUpgradeButton(opened);
-        } else if (kind === "sweepCleanCrit") {
-          // the floor now waiting above the one it opened, priced down for
-          // good: its discount too, which the price is rebuilt from on load
-          const next = lockedFloorOf(deps.floors);
-          if (next) {
-            next.priceDiscountMultiplier *= CONFIG.crit.sweepCleanPrice;
-            next.unlockCost = multiply(
-              next.unlockCost,
-              CONFIG.crit.sweepCleanPrice,
-            );
-          }
-        } else {
-          const spot = MOVE_IN_SPOTS[movedIn++ % MOVE_IN_SPOTS.length];
-          const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * spot;
-          const worker = recruitWorker(opened, x, now);
-          if (worker !== null) celebrateWorkerBoost(opened, worker, now);
-        }
+        def.reward(hit(opened));
+        rewarded++;
         deps.persist();
         return;
       }
@@ -226,18 +94,10 @@ export function lockCritPlayFor(
       // first opening queued
       const target = lockedFloorOf(deps.floors);
       if (!target) return;
-      if (kind === "clearanceCrit") {
-        // its discount too, which the price is rebuilt from on every load
-        target.priceDiscountMultiplier /= count;
-        target.unlockCost = multiply(target.unlockCost, 1 / count);
+      if (def?.beforeOpen?.(hit(target)) === false) {
         deps.persist();
         return;
       }
-      if (kind === "lockpickCrit")
-        target.critMultiplierTier = pickHigherCritTier(
-          target.critMultiplierTier,
-          tier,
-        );
       price = target.unlockCost;
       unlockFree(target);
       opened = target;

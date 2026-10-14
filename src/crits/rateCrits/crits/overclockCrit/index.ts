@@ -2,6 +2,7 @@
 // just over it, quicker each, the crit's own last, and crackles along it to
 // the far end, where the bar's readout turns over onto twice its rate; the
 // bolt keeps flickering along it while the crit plays out
+import { overclockBar } from "../../barEffects";
 import {
   createBolt,
   drawBolt,
@@ -50,6 +51,8 @@ const left: Point = { x: 0, y: 0 };
 const right: Point = { x: 0, y: 0 };
 
 registerFloorCrit("overclockCrit", {
+  // twice as fast for a while
+  reward: (t) => overclockBar(t.floor),
   plan(r, bars, hit) {
     const order = [...byHeight(bars).filter((bar) => bar !== 0), 0];
     const strikes: number[] = [];

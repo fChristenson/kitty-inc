@@ -118,6 +118,8 @@ const hidden = new WeakSet<Running>();
 const orders = new WeakMap<Running, number[]>();
 
 registerFloorCrit("inspiralCrit", {
+  // its waves only stretch a bar; its runs land them
+  levels: (count, step) => (step ? Math.ceil(count / 5) : 0),
   plan(r, bars, hit) {
     const order = outward(bars);
     orders.set(r, order);

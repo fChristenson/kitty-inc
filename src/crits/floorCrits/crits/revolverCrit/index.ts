@@ -70,6 +70,8 @@ function planShots(bars: Point[]): Shot[] {
 }
 
 registerFloorCrit("revolverCrit", {
+  // about three shots a bar
+  levels: (count) => Math.ceil(count / 3),
   plan(r, bars, hit) {
     const shots = planShots(bars);
     cylinders.set(r, shots);

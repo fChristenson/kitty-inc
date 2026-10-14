@@ -76,6 +76,8 @@ const runSpot = (r: Running, bars: Point[], bar: number, j: number) =>
   along(r, bars, bar, (j / (runOf(bar) - 1)) * 2 - 1);
 
 registerFloorCrit("empCrit", {
+  // its short only jolts a bar; its runs land them
+  levels: (count, step) => (step ? Math.ceil(count / 5) : 0),
   plan(r, bars, hit, _lift, _crumble, _rocket, _heat, short) {
     const p = planPulse(bars);
     pulses.set(r, p);

@@ -2,6 +2,7 @@
 // button in view in a blink, each left crackling, charged with the levels
 // its next tap lands; then a giant bolt cracks down from the sky into the
 // crit's own
+import { addButtonCharge } from "../../buttonBonus";
 import {
   createBolt,
   drawBolt,
@@ -50,6 +51,8 @@ const skyOf = (r: Running, at: Point, out: Point) => {
 };
 
 registerFloorCrit("overchargeCrit", {
+  // its next tap lands the crit's multiple in levels, thrice on its own
+  reward: (t) => addButtonCharge(t.floor, t.own ? t.count * 3 : t.count),
   plan(r, bars, hit) {
     const order = byHeight(bars).filter((bar) => bar !== 0);
     order.forEach((bar, k) => hit(bar, strikeAt(k), 1));

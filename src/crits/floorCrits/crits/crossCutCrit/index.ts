@@ -62,6 +62,8 @@ const states = new WeakMap<Running, State>();
 const spot: Point = { x: 0, y: 0 };
 
 registerFloorCrit("crossCutCrit", {
+  // it cuts each bar twice: its own cut, then the long one
+  levels: (count) => Math.ceil(count / 2),
   plan(r, bars, hit) {
     const half = r.play.barHalfWidth;
     const tall = BAR_HALF_H + SLANT;

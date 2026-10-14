@@ -3,6 +3,8 @@
 // ring and a star of marks; the rings turn against each other quicker and
 // quicker, a jolt every turn, glitter rising off them, until a pillar of
 // light erupts out of it: the floor opens free and its price pays back
+import { CONFIG } from "../../../../config";
+import { multiply } from "../../../../shared/bigNumber";
 import {
   drawSummon,
   drawSummonPillar,
@@ -52,6 +54,12 @@ const states = new WeakMap<Running, State>();
 const at: Point = { x: 0, y: 0 };
 
 registerFloorCrit("conjureCrit", {
+  // the price of the floor it opened, back
+  reward(t) {
+    if (!t.price) return;
+    t.pay(multiply(t.price, CONFIG.crit.conjurePriceBack));
+    t.punch("Price Back");
+  },
   plan(r, _bars, hit) {
     const lock = getLockCenter();
     const summon = planSummon(ARC_MS, ERUPT_MS, TURNS);

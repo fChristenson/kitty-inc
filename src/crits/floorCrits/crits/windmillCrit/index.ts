@@ -120,6 +120,8 @@ const boomAt = () =>
   WINDMILL_DROP_MS;
 
 registerFloorCrit("windmillCrit", {
+  // it sweeps each bar about twenty times, then a blade slams it
+  levels: (count, step) => Math.ceil(count / (step ? 2 : 20)),
   plan(r, bars, hit) {
     for (const s of sweeps(r, bars)) hit(s.bar, s.ms);
     for (const f of flights(r, bars)) hit(f.bar, f.lands, 1);

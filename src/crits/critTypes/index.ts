@@ -20,6 +20,25 @@ import type { ImageName } from "../../loadAssets";
 import type { BigNumber } from "../../shared/bigNumber";
 import { CONFIG } from "../../config";
 import { critRandom } from "./critRandom";
+import {
+  PLAYED_CRITS,
+  FLOOR_CRIT_KINDS,
+  INCOME_CRIT_KINDS,
+  BUTTON_CRIT_KINDS,
+  LOCK_CRIT_KINDS,
+  RATE_CRIT_KINDS,
+  isFloorCritKind,
+  isIncomeCritKind,
+  isButtonCritKind,
+  isLockCritKind,
+  isRateCritKind,
+  type FloorCritKind,
+  type IncomeCritKind,
+  type ButtonCritKind,
+  type LockCritKind,
+  type RateCritKind,
+  type CritPlayKind,
+} from "../critKit";
 import { COLOR } from "../../palette";
 import {
   recordCritProcLanded,
@@ -2064,262 +2083,42 @@ type SpecialCritType = keyof typeof CONFIG.specialCrits;
 const SPECIAL_CRIT_TYPES = Object.keys(
   CONFIG.specialCrits,
 ) as SpecialCritType[];
-type FloorCritType = keyof typeof CONFIG.floorCrits;
-const FLOOR_CRIT_TYPES = Object.keys(CONFIG.floorCrits) as FloorCritType[];
-type IncomeCritType = keyof typeof CONFIG.incomeCrits;
-const INCOME_CRIT_TYPES = Object.keys(CONFIG.incomeCrits) as IncomeCritType[];
-type ButtonCritType = keyof typeof CONFIG.buttonCrits;
-const BUTTON_CRIT_TYPES = Object.keys(CONFIG.buttonCrits) as ButtonCritType[];
-type LockCritType = keyof typeof CONFIG.lockCrits;
-const LOCK_CRIT_TYPES = Object.keys(CONFIG.lockCrits) as LockCritType[];
-type RateCritType = keyof typeof CONFIG.rateCrits;
-const RATE_CRIT_TYPES = Object.keys(CONFIG.rateCrits) as RateCritType[];
+// the floor slot's own kinds (a crit up or down, a merge) and its floor crits
+type FloorSlotType = keyof typeof CONFIG.floorCrits | FloorCritKind;
+const FLOOR_SLOT_CHANCES: Record<FloorSlotType, { chance: number }> = {
+  ...CONFIG.floorCrits,
+  ...PLAYED_CRITS.floor,
+};
+const FLOOR_SLOT_TYPES = Object.keys(FLOOR_SLOT_CHANCES) as FloorSlotType[];
 // the special slots the floor crits' player plays
 type PlayedSlotType = "floorCrit" | "buttonCrit" | "lockCrit" | "rateCrit";
 // what a special slot ends up carrying: a played slot is one of its group's
 // kinds
 type SlotType =
   | Exclude<SpecialCritType, PlayedSlotType>
-  | FloorCritType
-  | IncomeCritType
-  | ButtonCritType
-  | LockCritType
-  | RateCritType;
+  | FloorSlotType
+  | CritPlayKind;
 
-// the floor crits whose number plays out onto the bars (floorCrits'
-// critPlayer)
-export const FLOOR_CRIT_KINDS = [
-  "rapidFireCrit",
-  "pinballCrit",
-  "snowballCrit",
-  "juggleCrit",
-  "stompCrit",
-  "rainCrit",
-  "stampCrit",
-  "catapultCrit",
-  "orbitCrit",
-  "trainCrit",
-  "bubbleCrit",
-  "lightningCrit",
-  "meteorCrit",
-  "blackHoleCrit",
-  "dominoCrit",
-  "meteorShowerCrit",
-  "volcanoCrit",
-  "supernovaCrit",
-  "galaxyCrit",
-  "binaryStarCrit",
-  "pearlsCrit",
-  "starBirthCrit",
-  "laserCrit",
-  "drillCrit",
-  "quakeCrit",
-  "fireworksCrit",
-  "shatterCrit",
-  "railgunCrit",
-  "buzzsawCrit",
-  "tractorBeamCrit",
-  "orbitalStrikeCrit",
-  "nukeCrit",
-  "ricochetLaserCrit",
-  "plasmaBallCrit",
-  "portalCrit",
-  "bunkerBusterCrit",
-  "airstrikeCrit",
-  "hyperspaceCrit",
-  "missileSwarmCrit",
-  "clusterBombCrit",
-  "missileDefenseCrit",
-  "icbmCrit",
-  "artilleryBarrageCrit",
-  "crashLandingCrit",
-  "saberCrit",
-  "liftoffCrit",
-  "meltdownCrit",
-  "crunchCrit",
-  "atomsCrit",
-  "reactorCrit",
-  "staticCrit",
-  "empCrit",
-  "inspiralCrit",
-  "thunderstormCrit",
-  "shotgunCrit",
-  "solarFlareCrit",
-  "flakCrit",
-  "revolverCrit",
-  "geysersCrit",
-  "plasmaCannonCrit",
-  "grenadesCrit",
-  "rocketPodsCrit",
-  "bankShotsCrit",
-  "minigunCrit",
-  "claymoresCrit",
-  "strafeCrit",
-  "coinShotCrit",
-  "rodsCrit",
-  "ionCannonCrit",
-  "boltWhipCrit",
-  "designatorCrit",
-  "beamSplitterCrit",
-  "teslaCannonCrit",
-  "yoYoCrit",
-  "harpoonsCrit",
-  "bolasCrit",
-  "blockBonkCrit",
-  "gunshipCrit",
-  "freezeRayCrit",
-  "missileTangleCrit",
-  "windmillCrit",
-  "saturnCrit",
-  "beatmapCrit",
-  "moneyWeatherCrit",
-  "collectCrit",
-  "raindropsCrit",
-  "rollCallCrit",
-  "crossCutCrit",
-  "paintJobCrit",
-  "drainCrit",
-  "threadTheNeedleCrit",
-  "hydraulicCrit",
-  "stampDownCrit",
-  "stackUpCrit",
-  "drillDownCrit",
-  "lapRecordCrit",
-] as const satisfies readonly FloorCritType[];
-export type FloorCritKind = (typeof FLOOR_CRIT_KINDS)[number];
-
-export function isFloorCritKind(type: string | null): type is FloorCritKind {
-  return (FLOOR_CRIT_KINDS as readonly string[]).includes(type ?? "");
-}
-
-// the income crits whose number plays out onto the total income (incomeCrits)
-export const INCOME_CRIT_KINDS = [
-  "windfallCrit",
-  "bulletHoseCrit",
-  "boltMagnetCrit",
-  "bombLobCrit",
-  "haloDiveCrit",
-  "victoryLapCrit",
-  "ceilingBounceCrit",
-  "drillBitCrit",
-  "goldCoatCrit",
-  "pegboardCrit",
-  "starFlingCrit",
-  "moneySpoutCrit",
-  "salvoCrit",
-  "lightPillarsCrit",
-  "bankShotCrit",
-  "bombletsCrit",
-  "mortarsCrit",
-  "arcChainCrit",
-  "sweepUpCrit",
-  "corkPopCrit",
-  "homingMissilesCrit",
-  "skyrocketsCrit",
-  "wreckingSwingCrit",
-  "dronesCrit",
-  "stickyDartsCrit",
-  "stormBallCrit",
-  "billCounterCrit",
-  "moneyGunCrit",
-  "coinSpinCrit",
-  "stickyBallCrit",
-  "pennyShowerCrit",
-  "moneyCircleCrit",
-  "bigCrunchCrit",
-  "hardSellCrit",
-  "wraparoundCrit",
-  "moneyTrailCrit",
-] as const satisfies readonly IncomeCritType[];
-export type IncomeCritKind = (typeof INCOME_CRIT_KINDS)[number];
-
-export function isIncomeCritKind(type: string | null): type is IncomeCritKind {
-  return (INCOME_CRIT_KINDS as readonly string[]).includes(type ?? "");
-}
-
-// the button crits whose number plays out onto the upgrade buttons
-// (buttonCrits)
-export const BUTTON_CRIT_KINDS = [
-  "sureShotCrit",
-  "autopressCrit",
-  "freeTapsCrit",
-  "overchargeCrit",
-  "gildedCrit",
-  "blastingCapsCrit",
-  "linkUpCrit",
-  "hotButtonCrit",
-  "nailGunCrit",
-  "springLoadedCrit",
-  "halfOffCrit",
-  "deepBoreCrit",
-  "heavyHandCrit",
-  "splashZoneCrit",
-  "trickleDownCrit",
-] as const satisfies readonly ButtonCritType[];
-export type ButtonCritKind = (typeof BUTTON_CRIT_KINDS)[number];
-
-export function isButtonCritKind(type: string | null): type is ButtonCritKind {
-  return (BUTTON_CRIT_KINDS as readonly string[]).includes(type ?? "");
-}
-
-// the lock crits whose number plays out onto the locked floor (lockCrits)
-export const LOCK_CRIT_KINDS = [
-  "breachCrit",
-  "twoUpCrit",
-  "clearanceCrit",
-  "lockpickCrit",
-  "boltCutterCrit",
-  "moveInCrit",
-  "hotLapCrit",
-  "carbonCopyCrit",
-  "freshPaintCrit",
-  "luckyStarCrit",
-  "skeletonKeyCrit",
-  "jumpStartCrit",
-  "conjureCrit",
-  "pullUpCrit",
-  "sweepCleanCrit",
-  "housewarmingCrit",
-  "reboundCrit",
-  "viceCrit",
-  "crackleCageCrit",
-  "shredCrit",
-  "burnThroughCrit",
-] as const satisfies readonly LockCritType[];
-export type LockCritKind = (typeof LOCK_CRIT_KINDS)[number];
-
-export function isLockCritKind(type: string | null): type is LockCritKind {
-  return (LOCK_CRIT_KINDS as readonly string[]).includes(type ?? "");
-}
-
-// the rate crits whose number plays out onto the income bars' rates
-// (rateCrits)
-export const RATE_CRIT_KINDS = [
-  "overclockCrit",
-  "shiftUpCrit",
-  "quickstepCrit",
-  "shortcutCrit",
-  "cleanCutCrit",
-  "woundUpCrit",
-  "crosshairsCrit",
-  "compressorCrit",
-  "afterburnCrit",
-  "superchargeCrit",
-  "doubleTimeCrit",
-] as const satisfies readonly RateCritType[];
-export type RateCritKind = (typeof RATE_CRIT_KINDS)[number];
-
-export function isRateCritKind(type: string | null): type is RateCritKind {
-  return (RATE_CRIT_KINDS as readonly string[]).includes(type ?? "");
-}
-
-// what the crit player plays: a floor, income, button, lock or rate crit
-export type CritPlayKind =
-  | FloorCritKind
-  | IncomeCritKind
-  | ButtonCritKind
-  | LockCritKind
-  | RateCritKind;
+// the played crits (floor, income, button, lock and rate crits) are each
+// their own folder, collected by critKit
+export {
+  FLOOR_CRIT_KINDS,
+  INCOME_CRIT_KINDS,
+  BUTTON_CRIT_KINDS,
+  LOCK_CRIT_KINDS,
+  RATE_CRIT_KINDS,
+  isFloorCritKind,
+  isIncomeCritKind,
+  isButtonCritKind,
+  isLockCritKind,
+  isRateCritKind,
+  type FloorCritKind,
+  type IncomeCritKind,
+  type ButtonCritKind,
+  type LockCritKind,
+  type RateCritKind,
+  type CritPlayKind,
+};
 
 // one of `types`, each weighted by its chance in `table`
 function pickByChance<K extends string>(
@@ -2383,14 +2182,14 @@ function pickSpecialCrit(
     return "badgeCrit";
   coolDown(type);
   if (type === "buttonCrit")
-    return pickByChance(CONFIG.buttonCrits, BUTTON_CRIT_TYPES);
+    return pickByChance(PLAYED_CRITS.button, BUTTON_CRIT_KINDS);
   if (type === "lockCrit")
-    return pickByChance(CONFIG.lockCrits, LOCK_CRIT_TYPES);
+    return pickByChance(PLAYED_CRITS.lock, LOCK_CRIT_KINDS);
   if (type === "rateCrit")
-    return pickByChance(CONFIG.rateCrits, RATE_CRIT_TYPES);
+    return pickByChance(PLAYED_CRITS.rate, RATE_CRIT_KINDS);
   return cash
-    ? pickByChance(CONFIG.incomeCrits, INCOME_CRIT_TYPES)
-    : pickByChance(CONFIG.floorCrits, FLOOR_CRIT_TYPES);
+    ? pickByChance(PLAYED_CRITS.income, INCOME_CRIT_KINDS)
+    : pickByChance(FLOOR_SLOT_CHANCES, FLOOR_SLOT_TYPES);
 }
 
 // always lands a tier, weighted by each tier's own relative chance

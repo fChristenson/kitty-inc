@@ -3,6 +3,8 @@
 // splits in two, then four, the room filling with criss-crossing trails;
 // all four slam into its middle and burst it open, its new bar running
 // twice as fast for a while
+import { CONFIG } from "../../../../config";
+import { overclockBar } from "../../../rateCrits/barEffects";
 import {
   drawBounceSplash,
   ricochet,
@@ -86,6 +88,12 @@ function split(
 }
 
 registerFloorCrit("reboundCrit", {
+  // the floor it opened overclocked
+  reward(t) {
+    t.flipRate();
+    overclockBar(t.floor);
+    t.punch(`${CONFIG.crit.overclockSpeed}x Speed`);
+  },
   plan(r, _bars, hit) {
     const lock = getLockCenter();
     const halfW = (FLOOR_X_MAX - FLOOR_X_MIN) / 2 - WALL_IN;

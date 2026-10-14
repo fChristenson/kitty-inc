@@ -42,6 +42,7 @@ const volcanoStarts = (i: number) =>
   (i % (VOLCANO_BLOBS / 2)) * VOLCANO_EVERY_MS;
 
 registerFloorCrit("volcanoCrit", {
+  levels: (count) => Math.ceil(count / 3),
   plan(_r, bars, hit) {
     for (let i = 0; i < VOLCANO_BLOBS; i++)
       hit(i % bars.length, volcanoStarts(i) + VOLCANO_FLY_MS);

@@ -65,6 +65,8 @@ const reachesAt = (i: number) => RICO_FIRE_MS + i * RICO_LEG_MS;
 const blowsAt = (bars: number) => reachesAt(bars + 1) + RICO_BURN_MS;
 
 registerFloorCrit("ricochetLaserCrit", {
+  // its bounces land them, not its blow-up
+  levels: (count, step) => (step ? 0 : count),
   plan(_r, bars, hit) {
     const blows = blowsAt(bars.length);
     byHeight(bars).forEach((bar, k) => {

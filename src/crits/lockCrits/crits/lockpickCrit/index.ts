@@ -2,6 +2,7 @@
 // into a drill that bites up into it, stalls rumbling, then bores in shove
 // by shove, sparks gushing out both sides, until it punches through and the
 // floor bursts open at the crit's tier
+import { pickHigherCritTier } from "../../../critTypes";
 import { drawDrillHead, drawDrillSpray } from "../../../../shared/animationStyles/drill";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
@@ -59,6 +60,13 @@ const states = new WeakMap<
 const start: Point = { x: 0, y: 0 };
 
 registerFloorCrit("lockpickCrit", {
+  // the locked floor opening at the crit's tier
+  beforeOpen(t) {
+    t.floor.critMultiplierTier = pickHigherCritTier(
+      t.floor.critMultiplierTier,
+      t.tier,
+    );
+  },
   plan(r, bars, hit) {
     for (let k = 0; k < SHOVES; k++) hit(0, shoveAt(k), 0);
     hit(0, THROUGH, 1);

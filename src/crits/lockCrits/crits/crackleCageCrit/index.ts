@@ -4,6 +4,8 @@
 // crackling until the floor is caught in a cage of lightning; the whole cage
 // blazes, a huge bolt splits the floor across and it bursts open: its new
 // bar's payouts half as big again for a while
+import { CONFIG } from "../../../../config";
+import { windUpBar } from "../../../rateCrits/barEffects";
 import {
   createBolt,
   drawBolt,
@@ -68,6 +70,12 @@ const states = new WeakMap<Running, State>();
 const room: Point = { x: 0, y: 0 };
 
 registerFloorCrit("crackleCageCrit", {
+  // the floor it opened wound up
+  reward(t) {
+    windUpBar(t.floor);
+    t.flipRate();
+    t.punch(`${CONFIG.crit.woundUpPayout}x Pay`);
+  },
   plan(r, _bars, hit) {
     const lock = getLockCenter();
     const w = (FLOOR_X_MAX - FLOOR_X_MIN) / 2 - WALL_IN;

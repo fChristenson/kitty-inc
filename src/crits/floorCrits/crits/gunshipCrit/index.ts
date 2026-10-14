@@ -89,6 +89,8 @@ const rakeSide = (k: number, i: number) =>
   (k % 2 ? 1 : -1) * lerp(-GUN_RAKE, GUN_RAKE, i / Math.max(1, ROUNDS - 1));
 
 registerFloorCrit("gunshipCrit", {
+  // its burst hits each bar thrice
+  levels: (count) => Math.ceil(count / 3),
   plan(_r, bars, hit) {
     raked(bars).forEach((bar, k) => {
       for (const u of GUN_HITS)

@@ -120,6 +120,8 @@ function planHarpoons(bars: Point[]): Harpoons {
 }
 
 registerFloorCrit("harpoonsCrit", {
+  // they thunk into and yank each bar about four times
+  levels: (count) => Math.ceil(count / 4),
   plan(r, bars, hit) {
     const h = planHarpoons(bars);
     volleys.set(r, h);

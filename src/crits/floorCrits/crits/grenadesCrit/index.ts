@@ -130,6 +130,8 @@ function planNades(bars: Point[]): Nade[] {
 }
 
 registerFloorCrit("grenadesCrit", {
+  // they touch each bar about eight times
+  levels: (count) => Math.ceil(count / 8),
   plan(r, bars, hit) {
     const nades = planNades(bars);
     throws.set(r, nades);

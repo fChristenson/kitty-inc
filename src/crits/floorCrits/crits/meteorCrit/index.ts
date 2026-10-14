@@ -31,6 +31,8 @@ const METEOR_CLUSTER_SHAKE = 0.8;
 const METEOR_TAIL_MS = 900;
 
 registerFloorCrit("meteorCrit", {
+  // each meteor pays its bar out too
+  payouts: () => 5,
   plan(_r, bars, hit) {
     // any bar in view but its own, if there's one
     hit(

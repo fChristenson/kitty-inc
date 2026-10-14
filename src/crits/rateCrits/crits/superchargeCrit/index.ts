@@ -4,6 +4,8 @@
 // the rumble rising; at the climax it bursts into a shockwave ring racing
 // out over the building, faster and faster, every readout turning over as
 // it passes: its next payouts three times as big, its own the most
+import { defineBarEffect, countDown } from "../../rateBonus";
+import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   chargeAt,
@@ -67,7 +69,20 @@ const shiver: Point = { x: 0, y: 0 };
 const head: Point = { x: 0, y: 0 };
 const atHead = () => head;
 
+// payouts left at superchargePayout times as big
+const supercharges = defineBarEffect<number>({
+  payout: () => CONFIG.crit.superchargePayout,
+  onPayout: countDown,
+});
+
 registerFloorCrit("superchargeCrit", {
+  // its next payouts bigger, its own more of them
+  reward(t) {
+    const payouts = t.own
+      ? CONFIG.crit.superchargeOwnPayouts
+      : CONFIG.crit.superchargePayouts;
+    supercharges.set(t.floor, (supercharges.get(t.floor) ?? 0) + payouts);
+  },
   plan(r, bars, hit) {
     const charge = planCharge(CHARGE_FROM, CHARGE_MS, {
       climaxShake: CLIMAX_SHAKE,

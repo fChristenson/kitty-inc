@@ -2,6 +2,8 @@
 // along it to the right, each hop quicker and shorter, the crit's own last;
 // every landing a tick that turns the bar's readout over a step faster, and
 // for a while after, each of its payouts comes quicker than the last
+import { defineBarEffect } from "../../rateBonus";
+import { CONFIG } from "../../../../config";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawBounceSplash,
@@ -51,7 +53,31 @@ interface State {
 const states = new WeakMap<Running, State>();
 const splash: Bounce = { at: { x: 0, y: 0 }, ms: 0, normal: -Math.PI / 2 };
 
+// a run of quickening: each landing and payout in it a step faster
+const quicksteps = defineBarEffect<{ until: number; steps: number }>({
+  speed: (run) =>
+    Math.min(
+      CONFIG.crit.quickstepMaxSpeed,
+      1 + CONFIG.crit.quickstepStep * run.steps,
+    ),
+  onPayout: (run) => {
+    run.steps++;
+    return run;
+  },
+  ended: (run, now) => now >= run.until,
+});
+
 registerFloorCrit("quickstepCrit", {
+  // a step, starting a run if none is on
+  reward(t) {
+    const run = quicksteps.get(t.floor);
+    if (run && t.now < run.until) run.steps++;
+    else
+      quicksteps.set(t.floor, {
+        until: t.now + CONFIG.crit.quickstepMs,
+        steps: 1,
+      });
+  },
   plan(r, bars, hit) {
     const half = r.play.barHalfWidth - INSET;
     const top = -getIncomeBarBox(false).height / 2;

@@ -161,6 +161,8 @@ const spotOf = (r: Running, bars: Point[], round: Round): Point => {
 };
 
 registerFloorCrit("minigunCrit", {
+  // its stream blasts each bar about eight times
+  levels: (count) => Math.ceil(count / 8),
   plan(r, bars, hit) {
     const hosing = planHosing(bars);
     hosings.set(r, hosing);

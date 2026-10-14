@@ -18,6 +18,7 @@ function drop(i: number, barCount: number, viewportWidth: number) {
 }
 
 registerFloorCrit("rainCrit", {
+  levels: (count) => Math.ceil(count / 6),
   plan(r, bars, hit) {
     for (let i = 0; i < DROPS; i++) {
       const d = drop(i, bars.length, r.viewportWidth);

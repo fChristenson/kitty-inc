@@ -64,6 +64,8 @@ const lockAt = (k: number) => RC_FIRST_LOCK_MS + k * RC_LOCK_MS;
 const criticalAt = (bars: Point[]) => lockAt(bars.length - 1) + RC_CHARGE_MS;
 
 registerFloorCrit("reactorCrit", {
+  // it only charges a bar up; its blasts land them
+  levels: (count, step) => (step ? Math.ceil(count / 3) : 0),
   plan(_r, bars, hit) {
     const critical = criticalAt(bars);
     ownLast(bars).forEach((bar, k) => {

@@ -3,6 +3,7 @@
 // quicker, the rumble building, until it bursts with a bang and the readout
 // turns over: every payout half as big again for a while; quicker bar by
 // bar, its own last and biggest
+import { windUpBar } from "../../barEffects";
 import {
   chargeAt,
   drawChargeGlow,
@@ -55,6 +56,8 @@ const shiver: Point = { x: 0, y: 0 };
 const wisp: Point = { x: 0, y: 0 };
 
 registerFloorCrit("woundUpCrit", {
+  // payouts bigger for a while
+  reward: (t) => windUpBar(t.floor),
   plan(r, bars, hit) {
     const order = ownLast(bars);
     const ups: Windup[] = [];

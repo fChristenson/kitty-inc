@@ -3,6 +3,8 @@
 // price's pieces sliding apart along every cut; a cross of two long cuts
 // tears through it, the pieces fly apart and the floor bursts open: its
 // button's next taps land double
+import { CONFIG } from "../../../../config";
+import { doubleTaps } from "../../../buttonCrits/tapPerks";
 import {
   drawSlash,
   drawSliceSpill,
@@ -99,6 +101,11 @@ const PIECES: Piece[] = Array.from({ length: COLS * ROWS }, (_, i) => {
 const off: Point = { x: 0, y: 0 };
 
 registerFloorCrit("shredCrit", {
+  // double taps on the floor it opened
+  reward(t) {
+    doubleTaps.add(t.floor, t.count * CONFIG.crit.shredTaps);
+    t.flipButton();
+  },
   plan(r, _bars, hit) {
     let t = FIRST_MS;
     const slashes = CUTS.map(([ax, ay, bx, by], k) => {

@@ -3,6 +3,7 @@
 // one, quicker each, a knot of stars is slung off along the disk onto a
 // button, which glows hot, its next taps rolling crits more often; the core
 // dives onto the crit's own last, the biggest
+import { addHotTaps } from "../../buttonBonus";
 import { COLOR } from "../../../../palette";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
@@ -72,6 +73,11 @@ const landsAt = (release: number, i: number) =>
   release + holeHash(i, 142) * STREAM_MS + FLY_MS;
 
 registerFloorCrit("hotButtonCrit", {
+  // taps that each roll the next crit hot, twice as many on its own
+  reward(t) {
+    addHotTaps(t.floor, t.own ? t.count * 2 : t.count);
+    t.flipButton();
+  },
   plan(r, bars, hit) {
     const centre = { x: 0, y: -UP };
     const disk = planDisk(centre, {

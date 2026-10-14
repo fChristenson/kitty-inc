@@ -78,6 +78,7 @@ function missile(r: Running, bars: Point[], order: number[], i: number) {
 }
 
 registerFloorCrit("missileSwarmCrit", {
+  levels: (count) => Math.ceil(count / 2),
   plan(r, bars, hit) {
     const order = byHeight(bars);
     for (let i = 0; i < countOf(bars.length); i++)

@@ -217,6 +217,8 @@ function planBlockBonk(r: Running, bars: Point[]): BlockBonk {
 }
 
 registerFloorCrit("blockBonkCrit", {
+  // it bonks each bar twice (its own is ground-pounded too)
+  levels: (count) => Math.ceil(count / 3),
   plan(r, bars, hit, lift) {
     const s = planBlockBonk(r, bars);
     bonkers.set(r, s);

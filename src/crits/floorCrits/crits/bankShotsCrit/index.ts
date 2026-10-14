@@ -151,6 +151,8 @@ function planVolley(r: Running, bars: Point[], playBar: number): Volley {
 }
 
 registerFloorCrit("bankShotsCrit", {
+  // they cross each bar about five times
+  levels: (count) => Math.ceil(count / 5),
   plan(r, bars, hit) {
     const volley = planVolley(r, bars, r.play.barHalfWidth);
     volleys.set(r, volley);

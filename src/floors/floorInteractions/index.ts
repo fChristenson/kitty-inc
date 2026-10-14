@@ -14,16 +14,10 @@ import {
   getLockCrit,
   getRateCrit,
   takeButtonCharge,
-  takeDoubleTap,
   takeFreeTap,
   takeHotTap,
-  takeLinkedFloors,
-  takePayoutTap,
-  takeHireTap,
-  takeBoreTap,
-  takeHeavyTap,
-  takeSplashTap,
-  takeTideTap,
+  landTapPerks,
+  type TapPerkContext,
   takeHalfTap,
   stickSpentCrit,
   getCritTier,
@@ -403,64 +397,38 @@ export function paySaleClick(
   });
 }
 
-// what a button crit left on floor's button for a tap that just landed: a
-// second level, its bar's payout into the total and a level on every
-// button linked to it
+// what a button crit left on floor's button for a tap that just landed: its
+// tap perks, each landing its own bonus (crits/buttonCrits' defineTapPerk)
 function landTapBonuses(
   deps: FloorActionsDeps,
   floor: Floor,
   isGroundFloor: boolean,
 ): void {
-  if (!isFloorMaxed(floor) && takeDoubleTap(floor)) {
-    applyUpgradeTick(floor, isGroundFloor);
-    punchIncomeBar(floor, "+2 Lvl", COLOR.heavenlyGold);
-  }
-  if (!isFloorMaxed(floor) && takeHeavyTap(floor)) {
-    applyUpgradeTick(floor, isGroundFloor);
-    applyUpgradeTick(floor, isGroundFloor);
-    punchIncomeBar(floor, "+3 Lvl", COLOR.heavenlyGold);
-  }
-  if (takePayoutTap(floor)) paySaleClick(floor, isGroundFloor, 1);
-  if (takeHireTap(floor)) {
-    const now = Date.now();
-    const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * Math.random();
-    const worker = recruitWorker(floor, x, now);
-    if (worker !== null) celebrateWorkerBoost(floor, worker, now);
-  }
-  if (takeBoreTap(floor)) {
-    const above = deps.floors[deps.floors.indexOf(floor) + 1];
-    if (above?.unlocked && !isFloorMaxed(above)) {
-      applyUpgradeTick(above, false);
-      punchIncomeBar(above, "+1 Lvl", COLOR.heavenlyGold);
-    }
-  }
-  if (takeSplashTap(floor)) {
-    const index = deps.floors.indexOf(floor);
-    for (const near of [index - 1, index + 1]) {
-      const other = deps.floors[near];
-      if (!other?.unlocked || isFloorMaxed(other)) continue;
-      applyUpgradeTick(other, near === 0);
-      punchIncomeBar(other, "+1 Lvl", COLOR.heavenlyGold);
-    }
-  }
-  if (takeTideTap(floor)) {
-    const index = deps.floors.indexOf(floor);
-    const last = Math.max(0, index - CONFIG.crit.trickleDownFloors);
-    for (let below = index - 1; below >= last; below--) {
-      const other = deps.floors[below];
-      if (!other.unlocked || isFloorMaxed(other)) continue;
-      applyUpgradeTick(other, below === 0);
-      punchIncomeBar(other, "+1 Lvl", COLOR.heavenlyGold);
-    }
-  }
-  const linked = takeLinkedFloors(floor);
-  if (!linked) return;
-  for (const other of linked) {
-    const index = deps.floors.indexOf(other);
-    if (index < 0 || !other.unlocked || isFloorMaxed(other)) continue;
-    applyUpgradeTick(other, index === 0);
-    triggerButtonPress(other);
-  }
+  const { floors } = deps;
+  const context: TapPerkContext = {
+    floor,
+    floors,
+    levelUp: (on, levels, label) => {
+      if (!on.unlocked || isFloorMaxed(on)) return;
+      const isGround = on === floor ? isGroundFloor : floors.indexOf(on) === 0;
+      for (let i = 0; i < levels; i++) applyUpgradeTick(on, isGround);
+      if (label) punchIncomeBar(on, label, COLOR.heavenlyGold);
+    },
+    payout: (on, payouts) =>
+      paySaleClick(
+        on,
+        on === floor ? isGroundFloor : floors.indexOf(on) === 0,
+        payouts,
+      ),
+    hire: (on) => {
+      const now = Date.now();
+      const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * Math.random();
+      const worker = recruitWorker(on, x, now);
+      if (worker !== null) celebrateWorkerBoost(on, worker, now);
+    },
+    press: triggerButtonPress,
+  };
+  landTapPerks(context, isFloorMaxed(floor));
 }
 
 // rolls the crit a landed tap arms next; a hot tap rolls again till one lands

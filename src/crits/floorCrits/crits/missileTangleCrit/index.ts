@@ -89,6 +89,8 @@ function missile(r: Running, bars: Point[], i: number) {
 }
 
 registerFloorCrit("missileTangleCrit", {
+  // eight missiles on each bar
+  levels: (count) => Math.ceil(count / 8),
   plan(r, bars, hit) {
     for (let i = 0; i < countOf(bars); i++) {
       const m = missile(r, bars, i);

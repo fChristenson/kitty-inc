@@ -3,6 +3,9 @@
 // back into one heap in the middle, the dust only moving as the broom
 // reaches it; the heap settles with a jolt and bursts the floor open, and
 // the floor waiting above it is priced down
+import { CONFIG } from "../../../../config";
+import { multiply } from "../../../../shared/bigNumber";
+import { lockedFloorOf } from "../../lockedFloor";
 import {
   drawBroom,
   type BroomState,
@@ -74,6 +77,14 @@ const broomX = (s: State["strokes"][number], ms: number) =>
   lerp(s.from, s.to, 1 - (1 - clamp01((ms - s.start) / s.ms)) ** EASE);
 
 registerFloorCrit("sweepCleanCrit", {
+  // the floor now waiting above the one it opened, priced down for good:
+  // its discount too, which the price is rebuilt from on load
+  reward(t) {
+    const next = lockedFloorOf(t.floors);
+    if (!next) return;
+    next.priceDiscountMultiplier *= CONFIG.crit.sweepCleanPrice;
+    next.unlockCost = multiply(next.unlockCost, CONFIG.crit.sweepCleanPrice);
+  },
   plan(r, _bars, hit) {
     const lock = getLockCenter();
     const width = FLOOR_X_MAX - FLOOR_X_MIN;

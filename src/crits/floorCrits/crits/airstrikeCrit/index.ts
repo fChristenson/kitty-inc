@@ -68,6 +68,7 @@ function bombs(r: Running, bars: Point[]) {
 }
 
 registerFloorCrit("airstrikeCrit", {
+  levels: (count) => Math.ceil(count / 2),
   plan(r, bars, hit) {
     for (const b of bombs(r, bars)) hit(b.bar, b.drop + b.fall);
   },

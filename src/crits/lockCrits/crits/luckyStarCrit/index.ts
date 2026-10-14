@@ -2,6 +2,7 @@
 // into a tilted disk of stars turning inside it; they spiral in onto the
 // core, quicker and quicker, until it collapses and blows the floor open,
 // one star leaping onto its button: a sure crit at the crit's tier
+import { armCritUpgrade } from "../../../floorCrits/upgradeCrit";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawGlow } from "../../../../shared/glowSprite";
 import {
@@ -72,6 +73,11 @@ const star: Point = { x: 0, y: 0 };
 const spot: Point = { x: 0, y: 0 };
 
 registerFloorCrit("luckyStarCrit", {
+  // the crit's tier armed on the floor it opened
+  reward(t) {
+    armCritUpgrade(t.floor, t.tier);
+    t.flipButton();
+  },
   plan(r, bars, hit) {
     const disk = planDisk(
       { x: bars[0].x, y: bars[0].y },

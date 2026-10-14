@@ -77,6 +77,8 @@ function planStrikes(bars: Point[]): Strike[] {
 }
 
 registerFloorCrit("thunderstormCrit", {
+  // it strikes each bar about four times
+  levels: (count) => Math.ceil(count / 4),
   plan(r, bars, hit) {
     const strikes = planStrikes(bars);
     storms.set(r, strikes);

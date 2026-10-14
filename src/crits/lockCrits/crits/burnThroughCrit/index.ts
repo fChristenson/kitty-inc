@@ -4,6 +4,8 @@
 // hotter each lap; it burns into the middle, trembling and charging, and
 // the cut-out disc blasts out of the floor, which bursts open: its button's
 // next taps cost half
+import { CONFIG } from "../../../../config";
+import { addHalfTaps } from "../../../buttonCrits/buttonBonus";
 import { COLOR } from "../../../../palette";
 import {
   drawAimLaser,
@@ -76,6 +78,11 @@ const end: Point = { x: 0, y: 0 };
 const atEmitter = () => emitter;
 
 registerFloorCrit("burnThroughCrit", {
+  // half-price taps on the floor it opened
+  reward(t) {
+    addHalfTaps(t.floor, t.count * CONFIG.crit.burnThroughTaps);
+    t.flipButton();
+  },
   plan(r, _bars, hit) {
     const lock = getLockCenter();
     const laps: number[] = [];

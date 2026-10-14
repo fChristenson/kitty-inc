@@ -3,6 +3,8 @@
 // quicker, the rumble building, until it bursts with a bang and darts into
 // the button, which turns over gold: each of its next taps also hires a
 // worker; quicker button by button, its own last and biggest
+import { defineTapPerk } from "../../buttonBonus";
+import { CONFIG } from "../../../../config";
 import {
   chargeAt,
   drawChargeGlow,
@@ -66,7 +68,16 @@ const shiver: Point = { x: 0, y: 0 };
 const wisp: Point = { x: 0, y: 0 };
 const spot: Point = { x: 0, y: 0 };
 
+// each tap hiring a worker too
+const hireTaps = defineTapPerk("Hire", (t) => t.hire(t.floor));
+
 registerFloorCrit("springLoadedCrit", {
+  // hiring taps, twice as many on its own
+  reward(t) {
+    const taps = Math.max(1, Math.round(t.count * CONFIG.crit.springLoadedHires));
+    hireTaps.add(t.floor, t.own ? taps * 2 : taps);
+    t.flipButton();
+  },
   plan(r, bars, hit) {
     const order = ownLast(bars);
     const springs: Spring[] = [];

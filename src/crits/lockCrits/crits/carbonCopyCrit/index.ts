@@ -60,6 +60,11 @@ const GOLD = glowStops(COLOR.heavenlyGold);
 const spot: Point = { x: 0, y: 0 };
 
 registerFloorCrit("carbonCopyCrit", {
+  // up from a free floor's share to the whole level of the one below
+  reward(t) {
+    const below = t.floors[t.floors.indexOf(t.floor) - 1];
+    t.levelUp(below ? below.upgradeCount - t.floor.upgradeCount : 0);
+  },
   plan(r, bars, hit) {
     const box = getIncomeBarBox(false);
     const lock = getLockCenter();

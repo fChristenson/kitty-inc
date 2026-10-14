@@ -2,6 +2,7 @@
 // the screen's sides from button to button, quicker each leg, every strike
 // stamping a button with the taps it now gives free; the last strike slams
 // the crit's own
+import { addFreeTaps } from "../../buttonBonus";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
@@ -42,6 +43,11 @@ const ORIGIN: Point = { x: 0, y: 0 };
 const offset: Point = { x: 0, y: 0 };
 
 registerFloorCrit("freeTapsCrit", {
+  // free taps, twice the crit's multiple on its own button
+  reward(t) {
+    addFreeTaps(t.floor, t.own ? t.count * 2 : t.count);
+    t.flipButton();
+  },
   plan(r, bars, hit) {
     const order = ownLast(bars);
     const wall = (r.viewportWidth / 2) * WALL;

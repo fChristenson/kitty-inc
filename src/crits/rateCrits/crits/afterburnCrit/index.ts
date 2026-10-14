@@ -4,6 +4,8 @@
 // bar below and runs back the other way, snaking down the building faster
 // and faster, its own readout bursting in a cluster: every bar it passes
 // runs three times as fast, fading back over a while
+import { defineBarEffect } from "../../rateBonus";
+import { CONFIG } from "../../../../config";
 import {
   DETONATION_MS,
   drawDetonation,
@@ -62,7 +64,17 @@ const from: Point = { x: 0, y: 0 };
 const to: Point = { x: 0, y: 0 };
 const atFuse = () => at;
 
+// a burst of speed from its start, fading back over afterburnMs
+const afterburns = defineBarEffect<number>({
+  speed: (start, now) =>
+    1 +
+    (CONFIG.crit.afterburnSpeed - 1) *
+      (1 - (now - start) / CONFIG.crit.afterburnMs),
+  ended: (start, now) => now - start >= CONFIG.crit.afterburnMs,
+});
+
 registerFloorCrit("afterburnCrit", {
+  reward: (t) => afterburns.set(t.floor, t.now),
   plan(r, bars, hit) {
     const half = r.play.barHalfWidth - INSET;
     const order = bars.map((_, i) => i).sort((a, b) => bars[a].y - bars[b].y);

@@ -151,6 +151,8 @@ function planRun(r: Running, bars: Point[]): Run {
 }
 
 registerFloorCrit("strafeCrit", {
+  // about six blasts along each bar
+  levels: (count) => Math.ceil(count / 6),
   plan(r, bars, hit) {
     const run = planRun(r, bars);
     runs.set(r, run);

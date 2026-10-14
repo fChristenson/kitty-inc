@@ -72,6 +72,8 @@ function planSalvo(bars: Point[]): Rocket[] {
 }
 
 registerFloorCrit("rocketPodsCrit", {
+  // they hit each bar about five times
+  levels: (count) => Math.ceil(count / 5),
   plan(r, bars, hit) {
     const salvo = planSalvo(bars);
     salvos.set(r, salvo);

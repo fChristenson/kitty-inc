@@ -3,6 +3,8 @@
 // bore in like engine pistons, one after another round the buttons, faster
 // and faster, sparks gushing; they punch through together, a jet of sparks
 // shooting up from each: its next taps also level the floor above
+import { defineTapPerk } from "../../buttonBonus";
+import { CONFIG } from "../../../../config";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
 import {
   drawDrillHead,
@@ -84,7 +86,19 @@ const tip: Point = { x: 0, y: 0 };
 const jetFrom: Point = { x: 0, y: 0 };
 const jetTo: Point = { x: 0, y: 0 };
 
+// each tap levelling the floor above too
+const boreTaps = defineTapPerk("Bore", (t) => {
+  const above = t.floors[t.floors.indexOf(t.floor) + 1];
+  if (above) t.levelUp(above, 1, "+1 Lvl");
+});
+
 registerFloorCrit("deepBoreCrit", {
+  // boring taps, twice as many on its own
+  reward(t) {
+    const taps = Math.max(1, Math.round(t.count * CONFIG.crit.deepBoreTaps));
+    boreTaps.add(t.floor, t.own ? taps * 2 : taps);
+    t.flipButton();
+  },
   plan(r, bars, hit) {
     const order = ownLast(bars);
     const bite = IN_MS + RISE_MS;

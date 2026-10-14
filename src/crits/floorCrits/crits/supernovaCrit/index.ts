@@ -19,6 +19,7 @@ const NOVA_TAIL_MS = 600;
 const novaHits = (i: number) => NOVA_SWELL_MS + NOVA_FLY_MS + (i % 3) * 30;
 
 registerFloorCrit("supernovaCrit", {
+  levels: (count) => Math.ceil(count / 2),
   plan(_r, bars, hit) {
     for (let i = 0; i < bars.length * NOVA_SHARDS_PER_BAR; i++)
       hit(i % bars.length, novaHits(i));

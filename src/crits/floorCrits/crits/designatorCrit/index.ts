@@ -107,6 +107,8 @@ function dotAt(r: Running, bars: Point[], d: Designation, ms: number): Point {
 const sky = { x: 0, y: 0 };
 
 registerFloorCrit("designatorCrit", {
+  // its pillars land on each bar about four times
+  levels: (count) => Math.ceil(count / 4),
   plan(r, bars, hit) {
     const d = planMarks(bars);
     designations.set(r, d);

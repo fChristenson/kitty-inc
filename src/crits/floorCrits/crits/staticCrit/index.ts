@@ -127,6 +127,8 @@ function placeEnd(
 }
 
 registerFloorCrit("staticCrit", {
+  // it only charges a bar up; its blasts land them
+  levels: (count, step) => (step ? count : 0),
   plan(r, bars, hit) {
     const arcs = planArcs(bars);
     charges.set(r, {

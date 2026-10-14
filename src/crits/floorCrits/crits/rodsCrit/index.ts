@@ -97,6 +97,8 @@ const top = { x: 0, y: 0 };
 const tip = { x: 0, y: 0 };
 
 registerFloorCrit("rodsCrit", {
+  // they punch through each bar about ten times
+  levels: (count) => Math.ceil(count / 10),
   plan(r, bars, hit) {
     const drop = planDrop(r, bars);
     drops.set(r, drop);

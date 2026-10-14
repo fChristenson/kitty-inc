@@ -74,6 +74,8 @@ const from: Point = { x: 0, y: 0 };
 const cursor: Point = { x: 0, y: 0 };
 
 registerFloorCrit("beatmapCrit", {
+  // it hits each bar about four times, then its spinner blows
+  levels: (count, step) => Math.ceil(count / (step ? 2 : 4)),
   plan(r, bars, hit) {
     const notes = notesOf(r, bars);
     for (const n of notes) hit(n.bar, n.ms);

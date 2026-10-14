@@ -24,6 +24,7 @@ function bubble(i: number, barCount: number) {
 }
 
 registerFloorCrit("bubbleCrit", {
+  levels: (count) => Math.ceil(count / 2),
   plan(_r, bars, hit) {
     for (let i = 0; i < bars.length * BUBBLES_PER_BAR; i++) {
       const b = bubble(i, bars.length);

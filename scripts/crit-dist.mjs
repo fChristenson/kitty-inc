@@ -3,13 +3,13 @@
 // group, with each style's share of its group's odds, so the thin spots show.
 // Event tags come from the comment over their CONFIG entry ("explosion,
 // levels: src/...") or, failing that, their module's header ("event (style;
-// reward)"); played crits' styles from scripts/lib/crit-styles.mjs.
+// reward)"); played crits' styles and chances from their meta.ts.
 // Usage: node scripts/crit-dist.mjs [--style <style>] [--reward <reward>]
 //          [--untagged] [--json]
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { PLAYED_STYLES } from "./lib/crit-styles.mjs";
+import { readCrits } from "./crit-registry.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => fs.readFileSync(path.join(ROOT, file), "utf8");
@@ -21,14 +21,6 @@ const option = (name) => {
 
 // ---------- the crits ----------
 
-const types = read("src/crits/critTypes/index.ts");
-const kindsOf = (name) => {
-  const list = types.match(
-    new RegExp(`export const ${name} = \\[([\\s\\S]*?)\\]`),
-  );
-  if (!list) throw new Error(`critTypes: no ${name}`);
-  return [...list[1].matchAll(/"(\w+)"/g)].map((m) => m[1]);
-};
 const chancesIn = (file) =>
   new Map(
     [...read(file).matchAll(/^ {2,4}(\w+): \{\s*chance: ([\d.e-]+)/gm)].map(
@@ -36,32 +28,27 @@ const chancesIn = (file) =>
     ),
   );
 
+// each played group's reward
 const PLAYED = [
-  ["floor", "FLOOR_CRIT_KINDS", "src/crits/floorCrits/config.ts", "levels"],
-  ["income", "INCOME_CRIT_KINDS", "src/crits/incomeCrits/config.ts", "cash"],
-  [
-    "button",
-    "BUTTON_CRIT_KINDS",
-    "src/crits/buttonCrits/config.ts",
-    "button perks",
-  ],
-  ["lock", "LOCK_CRIT_KINDS", "src/crits/lockCrits/config.ts", "free floors"],
-  ["rate", "RATE_CRIT_KINDS", "src/crits/rateCrits/config.ts", "bar rate"],
+  ["floor", "levels"],
+  ["income", "cash"],
+  ["button", "button perks"],
+  ["lock", "free floors"],
+  ["rate", "bar rate"],
 ];
 const GROUPS = ["animated", ...PLAYED.map(([group]) => group)];
 
 const crits = [];
-for (const [group, list, config, reward] of PLAYED) {
-  const chances = chancesIn(config);
-  for (const kind of kindsOf(list))
+const played = readCrits();
+for (const [group, reward] of PLAYED)
+  for (const { kind, meta } of played[group])
     crits.push({
       group,
       kind,
-      styles: [PLAYED_STYLES[kind] ?? "untagged"],
+      styles: [/style: "([\w ]+)"/.exec(meta)?.[1] ?? "untagged"],
       rewards: [reward],
-      chance: chances.get(kind) ?? 0,
+      chance: Number(/chance: ([\d._e-]+)/.exec(meta)?.[1] ?? 0),
     });
-}
 
 // the styles: every base style, and the screen-game worlds only animated crits
 // can use (they stop the game)

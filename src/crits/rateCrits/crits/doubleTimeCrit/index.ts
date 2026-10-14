@@ -3,6 +3,8 @@
 // dots; it blazes, then bursts into streams of glitter racing onto every
 // bar's readout, each turning over: the bar runs three times as fast for
 // its next payouts, its own for twice as many
+import { defineBarEffect, countDown } from "../../rateBonus";
+import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   drawDots,
@@ -72,7 +74,20 @@ const head: Point = { x: 0, y: 0 };
 const spot: Point = { x: 0, y: 0 };
 const atHead = () => head;
 
+// payouts left at doubleTimeSpeed times as fast
+const doubleTimes = defineBarEffect<number>({
+  speed: () => CONFIG.crit.doubleTimeSpeed,
+  onPayout: countDown,
+});
+
 registerFloorCrit("doubleTimeCrit", {
+  // faster for its next payouts, its own more
+  reward(t) {
+    const payouts = t.own
+      ? CONFIG.crit.doubleTimeOwnPayouts
+      : CONFIG.crit.doubleTimePayouts;
+    doubleTimes.set(t.floor, (doubleTimes.get(t.floor) ?? 0) + payouts);
+  },
   plan(r, bars, hit) {
     hit(0, DRAWN, 0);
     const dotBar = SIGN.map((_, k) => k % bars.length);

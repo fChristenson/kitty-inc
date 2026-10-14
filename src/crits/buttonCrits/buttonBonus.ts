@@ -1,9 +1,9 @@
 // what button crits leave on an upgrade button: free taps (each a free
-// upgrade), a charge (levels its next tap lands, free), double taps (each
-// landing two levels), payout taps (each paying its bar's payout too), hot
-// taps (each rolling its next crit more often), linked taps (each landing
-// a level on every button linked to it too) and nails (its next crit landing
-// again on the taps after it). Read by the button's draw and its tap
+// upgrade), a charge (levels its next tap lands, free), half-price taps, hot
+// taps (each rolling its next crit more often) and nails (its next crit
+// landing again on the taps after it), which change how a tap works; and
+// tap perks, each landing something on top of a tap (defineTapPerk: a crit
+// defines its own). Read by the button's draw and its tap
 // (floors/upgradeButton, floors/floorInteractions)
 import { snapshotMap } from "../../shared/snapshotState";
 import type { Floor } from "../../gameState";
@@ -12,22 +12,12 @@ import { armCritUpgrade } from "../floorCrits/upgradeCrit";
 
 const freeTaps = snapshotMap<Floor, number>();
 const charges = snapshotMap<Floor, number>();
-const doubleTaps = snapshotMap<Floor, number>();
-const payoutTaps = snapshotMap<Floor, number>();
 const hotTaps = snapshotMap<Floor, number>();
-const linkedTaps = snapshotMap<Floor, number>();
-const hireTaps = snapshotMap<Floor, number>();
 const halfTaps = snapshotMap<Floor, number>();
-const boreTaps = snapshotMap<Floor, number>();
-const heavyTaps = snapshotMap<Floor, number>();
-const splashTaps = snapshotMap<Floor, number>();
-const tideTaps = snapshotMap<Floor, number>();
 // how many taps the next crit landing on a nailed button plays for
 const nails = snapshotMap<Floor, number>();
 // a crit stuck on its button, and how many more times it's armed again
 const stuck = snapshotMap<Floor, { tier: CritTier; left: number }>();
-// not a snapshotMap: a snapshot would deep-copy the linked floors themselves
-const links = new WeakMap<Floor, Floor[]>();
 
 function addTaps(taps: WeakMap<Floor, number>, floor: Floor, n: number): void {
   taps.set(floor, (taps.get(floor) ?? 0) + n);
@@ -46,66 +36,12 @@ export function addFreeTaps(floor: Floor, taps: number): void {
   addTaps(freeTaps, floor, taps);
 }
 
-export function addDoubleTaps(floor: Floor, taps: number): void {
-  addTaps(doubleTaps, floor, taps);
-}
-
-export function addPayoutTaps(floor: Floor, taps: number): void {
-  addTaps(payoutTaps, floor, taps);
-}
-
 export function addHotTaps(floor: Floor, taps: number): void {
   addTaps(hotTaps, floor, taps);
 }
 
 export function addNails(floor: Floor, taps: number): void {
   addTaps(nails, floor, taps);
-}
-
-export function addHireTaps(floor: Floor, taps: number): void {
-  addTaps(hireTaps, floor, taps);
-}
-
-// whether a tap on floor's button hires a worker too, using one up
-export function takeHireTap(floor: Floor): boolean {
-  return takeTap(hireTaps, floor);
-}
-
-export function addBoreTaps(floor: Floor, taps: number): void {
-  addTaps(boreTaps, floor, taps);
-}
-
-// whether a tap on floor's button levels the floor above too, using one up
-export function takeBoreTap(floor: Floor): boolean {
-  return takeTap(boreTaps, floor);
-}
-
-export function addHeavyTaps(floor: Floor, taps: number): void {
-  addTaps(heavyTaps, floor, taps);
-}
-
-// whether a tap on floor's button lands three levels, using one up
-export function takeHeavyTap(floor: Floor): boolean {
-  return takeTap(heavyTaps, floor);
-}
-
-export function addSplashTaps(floor: Floor, taps: number): void {
-  addTaps(splashTaps, floor, taps);
-}
-
-// whether a tap on floor's button levels the floors above and below too,
-// using one up
-export function takeSplashTap(floor: Floor): boolean {
-  return takeTap(splashTaps, floor);
-}
-
-export function addTideTaps(floor: Floor, taps: number): void {
-  addTaps(tideTaps, floor, taps);
-}
-
-// whether a tap on floor's button levels the floors below too, using one up
-export function takeTideTap(floor: Floor): boolean {
-  return takeTap(tideTaps, floor);
 }
 
 export function addHalfTaps(floor: Floor, taps: number): void {
@@ -139,18 +75,6 @@ export function stickSpentCrit(floor: Floor, tier: CritTier): void {
   if (taps > 1) armCritUpgrade(floor, tier);
 }
 
-// links `linked`'s button to floor's, for floor's linked taps
-export function linkButton(floor: Floor, linked: Floor): void {
-  const floors = links.get(floor);
-  if (!floors) links.set(floor, [linked]);
-  else if (!floors.includes(linked)) floors.push(linked);
-}
-
-// floor's taps that press its linked buttons too, if it has any
-export function addLinkedTaps(floor: Floor, taps: number): void {
-  if (links.has(floor)) addTaps(linkedTaps, floor, taps);
-}
-
 export function addButtonCharge(floor: Floor, levels: number): void {
   charges.set(floor, (charges.get(floor) ?? 0) + levels);
 }
@@ -167,28 +91,9 @@ export function takeFreeTap(floor: Floor): boolean {
   return takeTap(freeTaps, floor);
 }
 
-// whether a tap on floor's button lands a second level, using one up
-export function takeDoubleTap(floor: Floor): boolean {
-  return takeTap(doubleTaps, floor);
-}
-
-// whether a tap on floor's button pays its bar's payout too, using one up
-export function takePayoutTap(floor: Floor): boolean {
-  return takeTap(payoutTaps, floor);
-}
-
 // whether a tap on floor's button rolls its next crit hot, using one up
 export function takeHotTap(floor: Floor): boolean {
   return takeTap(hotTaps, floor);
-}
-
-// the buttons a tap on floor's presses too, using up a linked tap (null if
-// none); the links go with the last one
-export function takeLinkedFloors(floor: Floor): Floor[] | null {
-  if (!takeTap(linkedTaps, floor)) return null;
-  const floors = links.get(floor) ?? null;
-  if (!linkedTaps.has(floor)) links.delete(floor);
-  return floors;
 }
 
 // whether floor's next tap is free (a charge or a free tap): the only bonuses
@@ -198,21 +103,13 @@ export function hasFreeButtonTap(floor: Floor): boolean {
 }
 
 // a free tap's label in place of the price, "+30 Lvl" or "Free 7", and a
-// perk's tag shown over the button, "Double 7", "Payout 7", "Hot 7",
-// "Linked 7" or "Sticky 3"; made once per number
+// perk's tag shown over the button, "Double 7" or "Sticky 3"; made once per
+// number
 const chargeLabels = new Map<number, string>();
 const tapLabels = new Map<number, string>();
-const doubleLabels = new Map<number, string>();
-const payoutLabels = new Map<number, string>();
 const hotLabels = new Map<number, string>();
-const linkedLabels = new Map<number, string>();
 const nailLabels = new Map<number, string>();
-const hireLabels = new Map<number, string>();
 const halfLabels = new Map<number, string>();
-const boreLabels = new Map<number, string>();
-const heavyLabels = new Map<number, string>();
-const splashLabels = new Map<number, string>();
-const tideLabels = new Map<number, string>();
 function labelOf(labels: Map<number, string>, n: number, text: string) {
   labels.set(n, text);
   return text;
@@ -237,17 +134,70 @@ export function buttonFreeLabel(floor: Floor): string | null {
   return tapsLabel(freeTaps, tapLabels, floor, "Free");
 }
 export function buttonPerkLabel(floor: Floor): string | null {
+  for (const perk of perks) {
+    const label = tapsLabel(perk.taps, perk.labels, floor, perk.word);
+    if (label) return label;
+  }
   return (
-    tapsLabel(doubleTaps, doubleLabels, floor, "Double") ??
-    tapsLabel(payoutTaps, payoutLabels, floor, "Payout") ??
     tapsLabel(hotTaps, hotLabels, floor, "Hot") ??
-    tapsLabel(linkedTaps, linkedLabels, floor, "Linked") ??
-    tapsLabel(hireTaps, hireLabels, floor, "Hire") ??
     tapsLabel(halfTaps, halfLabels, floor, "Half") ??
-    tapsLabel(boreTaps, boreLabels, floor, "Bore") ??
-    tapsLabel(heavyTaps, heavyLabels, floor, "Heavy") ??
-    tapsLabel(splashTaps, splashLabels, floor, "Splash") ??
-    tapsLabel(tideTaps, tideLabels, floor, "Tide") ??
     tapsLabel(nails, nailLabels, floor, "Sticky")
   );
+}
+
+// what a tap perk lands with: the tapped floor and the building's, and the
+// reward landing on screen
+export interface TapPerkContext {
+  floor: Floor;
+  floors: Floor[];
+  // levels on a floor (each a tap's worth), its bar popping label if given;
+  // nothing on a locked or maxed one
+  levelUp(on: Floor, levels: number, label?: string): void;
+  // a floor's payout into the total, coins flying from its button
+  payout(on: Floor, payouts: number): void;
+  // a worker hired on a floor
+  hire(on: Floor): void;
+  // a floor's upgrade button pressing in
+  press(on: Floor): void;
+}
+
+// taps a crit leaves on a button, each landing `land` on top of the tap's
+// own level (`left` taps still to come); shown over it as "<word> N"
+export interface TapPerk {
+  add(floor: Floor, taps: number): void;
+  has(floor: Floor): boolean;
+}
+
+interface PerkEntry {
+  word: string;
+  taps: WeakMap<Floor, number>;
+  labels: Map<number, string>;
+  land: (t: TapPerkContext, left: number) => void;
+  // its taps wait while the tapped floor is maxed (it only levels it)
+  levelsOwn: boolean;
+}
+const perks: PerkEntry[] = [];
+
+// a crit's tap perk, made once when its module loads
+export function defineTapPerk(
+  word: string,
+  land: (t: TapPerkContext, left: number) => void,
+  levelsOwn = false,
+): TapPerk {
+  const taps = snapshotMap<Floor, number>();
+  perks.push({ word, taps, labels: new Map(), land, levelsOwn });
+  return {
+    add: (floor, n) => addTaps(taps, floor, n),
+    has: (floor) => taps.has(floor),
+  };
+}
+
+// a tap that just landed on t.floor's button: one of each of its perks used
+// up and landed
+export function landTapPerks(t: TapPerkContext, maxed: boolean): void {
+  for (const perk of perks) {
+    if (perk.levelsOwn && maxed) continue;
+    if (!takeTap(perk.taps, t.floor)) continue;
+    perk.land(t, perk.taps.get(t.floor) ?? 0);
+  }
 }

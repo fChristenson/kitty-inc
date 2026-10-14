@@ -55,6 +55,7 @@ const ORIGIN: Point = { x: 0, y: 0 };
 const spot: Point = { x: 0, y: 0 };
 
 registerFloorCrit("twoUpCrit", {
+  twoFloors: true,
   plan(r, bars, hit) {
     const state: State = { bars, bombs: [], opens: [] };
     const perFloor = bars.length > 1 ? 4 : 6;

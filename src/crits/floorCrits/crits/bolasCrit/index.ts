@@ -133,6 +133,8 @@ function planThrow(bars: Point[]): Throw {
 }
 
 registerFloorCrit("bolasCrit", {
+  // they land, wrap and blow on each bar about eight times
+  levels: (count) => Math.ceil(count / 8),
   plan(r, bars, hit) {
     const t = planThrow(bars);
     throws.set(r, t);

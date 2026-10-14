@@ -123,6 +123,8 @@ const landSpot = (
 };
 
 registerFloorCrit("crunchCrit", {
+  // crunching in only jolts a bar; its three landing blasts land them
+  levels: (count, step) => (step ? Math.ceil(count / 3) : 0),
   plan(r, bars, hit) {
     const c = planCrunch(bars);
     crunches.set(r, c);

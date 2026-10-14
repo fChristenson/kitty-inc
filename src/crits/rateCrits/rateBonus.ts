@@ -1,122 +1,83 @@
-// what rate crits leave on an income bar: an Overclock's run of extra speed,
-// a Quickstep's quickening (each landing and payout a step faster), a
-// Shortcut's banked double payouts and a Wound Up's bigger payouts. Read by
-// the income panel's speed and payouts (floors/incomePanel); not persisted
+// what rate crits leave on an income bar: bar effects, each a value per
+// floor that runs the bar faster, makes its payouts bigger or both, until it
+// runs out or its payouts use it up. A crit defines its own (defineBarEffect,
+// once when its module loads; ones more than one crit leaves are in
+// ./barEffects). Read by the income panel's speed and payouts
+// (floors/incomePanel); not persisted
 import { snapshotMap } from "../../shared/snapshotState";
-import { CONFIG } from "../../config";
 import type { Floor } from "../../gameState";
 
-const overclocks = snapshotMap<Floor, number>();
-const quicksteps = snapshotMap<Floor, { until: number; steps: number }>();
-const doubles = snapshotMap<Floor, number>();
-const windups = snapshotMap<Floor, number>();
-// a Crosshairs' lock: how many times as big the next payout pays
-const aimed = snapshotMap<Floor, number>();
-// an Afterburn's start, and a Supercharge's payouts left
-const afterburns = snapshotMap<Floor, number>();
-const supercharges = snapshotMap<Floor, number>();
-// a Double Time's payouts left at its speed
-const doubleTimes = snapshotMap<Floor, number>();
-
-// a Double Time: the bar doubleTimeSpeed times as fast for its next payouts
-export function doubleTimeBar(floor: Floor, payouts: number): void {
-  doubleTimes.set(floor, (doubleTimes.get(floor) ?? 0) + payouts);
+export interface BarEffectDef<T> {
+  // how many times as fast it runs its bar right now
+  speed?: (value: T, now: number) => number;
+  // how many times as big it makes its bar's next payout
+  payout?: (value: T, now: number) => number;
+  // a payout landing on its bar: what's left of it (undefined: used up)
+  onPayout?: (value: T, now: number) => T | undefined;
+  // whether it has run out by now
+  ended?: (value: T, now: number) => boolean;
 }
 
-// an Afterburn: a burst of speed fading back over afterburnMs
-export function afterburnBar(floor: Floor): void {
-  afterburns.set(floor, Date.now());
+interface Effect {
+  values: WeakMap<Floor, unknown>;
+  def: BarEffectDef<unknown>;
+}
+const speeds: Effect[] = [];
+const payouts: Effect[] = [];
+const payoutHooks: Effect[] = [];
+
+// a bar effect's values, by floor: set one to put it on a bar
+export function defineBarEffect<T>(def: BarEffectDef<T>): WeakMap<Floor, T> {
+  const values = snapshotMap<Floor, T>();
+  const effect = { values, def } as Effect;
+  if (def.speed) speeds.push(effect);
+  if (def.payout) payouts.push(effect);
+  if (def.onPayout) payoutHooks.push(effect);
+  return values;
 }
 
-// a Supercharge: the next `payouts` payouts superchargePayout times as big
-export function superchargeBar(floor: Floor, payouts: number): void {
-  supercharges.set(floor, (supercharges.get(floor) ?? 0) + payouts);
-}
-
-// a Crosshairs' shot: floor's next payout `times` as big
-export function aimPayout(floor: Floor, times: number): void {
-  aimed.set(floor, (aimed.get(floor) ?? 1) * times);
-}
-
-// a Shortcut's pass: one more payout paying double (a Housewarming's several)
-export function bankDoublePayout(floor: Floor, payouts = 1): void {
-  doubles.set(floor, (doubles.get(floor) ?? 0) + payouts);
-}
-
-// a Wound Up: payouts bigger for woundUpMs
-export function windUpBar(floor: Floor): void {
-  windups.set(floor, Date.now() + CONFIG.crit.woundUpMs);
+// effect's value on floor, if it's on and hasn't run out
+function live(effect: Effect, floor: Floor, now: number): unknown {
+  const value = effect.values.get(floor);
+  if (value === undefined) return undefined;
+  if (effect.def.ended?.(value, now)) {
+    effect.values.delete(floor);
+    return undefined;
+  }
+  return value;
 }
 
 // how many times as big rate crits make floor's next payout
 export function ratePayoutMultiplier(floor: Floor, now: number): number {
-  let payout = doubles.has(floor) ? CONFIG.crit.shortcutPayout : 1;
-  payout *= aimed.get(floor) ?? 1;
-  if (supercharges.has(floor)) payout *= CONFIG.crit.superchargePayout;
-  const windup = windups.get(floor);
-  if (windup !== undefined) {
-    if (now < windup) payout *= CONFIG.crit.woundUpPayout;
-    else windups.delete(floor);
+  let payout = 1;
+  for (const effect of payouts) {
+    const value = live(effect, floor, now);
+    if (value !== undefined) payout *= effect.def.payout!(value, now);
   }
   return payout;
 }
 
-export function overclockBar(floor: Floor): void {
-  overclocks.set(floor, Date.now() + CONFIG.crit.overclockMs);
-}
-
-// a Quickstep's step: starts its run if none is on
-export function stepBar(floor: Floor): void {
-  const now = Date.now();
-  const run = quicksteps.get(floor);
-  if (run && now < run.until) run.steps++;
-  else
-    quicksteps.set(floor, { until: now + CONFIG.crit.quickstepMs, steps: 1 });
-}
-
 // how many times as fast rate crits run floor's bar right now
 export function rateCritSpeed(floor: Floor, now: number): number {
-  let speed = doubleTimes.has(floor) ? CONFIG.crit.doubleTimeSpeed : 1;
-  const burn = afterburns.get(floor);
-  if (burn !== undefined) {
-    const t = (now - burn) / CONFIG.crit.afterburnMs;
-    if (t < 1) speed *= 1 + (CONFIG.crit.afterburnSpeed - 1) * (1 - t);
-    else afterburns.delete(floor);
-  }
-  const overclock = overclocks.get(floor);
-  if (overclock !== undefined) {
-    if (now < overclock) speed *= CONFIG.crit.overclockSpeed;
-    else overclocks.delete(floor);
-  }
-  const run = quicksteps.get(floor);
-  if (run) {
-    if (now < run.until)
-      speed *= Math.min(
-        CONFIG.crit.quickstepMaxSpeed,
-        1 + CONFIG.crit.quickstepStep * run.steps,
-      );
-    else quicksteps.delete(floor);
+  let speed = 1;
+  for (const effect of speeds) {
+    const value = live(effect, floor, now);
+    if (value !== undefined) speed *= effect.def.speed!(value, now);
   }
   return speed;
 }
 
-// a payout landing on floor's bar: a Quickstep's step, a banked double spent
+// a payout landing on floor's bar: each effect's onPayout
 export function noteRatePayout(floor: Floor, now: number): void {
-  const run = quicksteps.get(floor);
-  if (run && now < run.until) run.steps++;
-  aimed.delete(floor);
-  const charged = supercharges.get(floor);
-  if (charged !== undefined) {
-    if (charged > 1) supercharges.set(floor, charged - 1);
-    else supercharges.delete(floor);
+  for (const effect of payoutHooks) {
+    const value = live(effect, floor, now);
+    if (value === undefined) continue;
+    const left = effect.def.onPayout!(value, now);
+    if (left === undefined) effect.values.delete(floor);
+    else effect.values.set(floor, left);
   }
-  const timed = doubleTimes.get(floor);
-  if (timed !== undefined) {
-    if (timed > 1) doubleTimes.set(floor, timed - 1);
-    else doubleTimes.delete(floor);
-  }
-  const banked = doubles.get(floor);
-  if (banked === undefined) return;
-  if (banked > 1) doubles.set(floor, banked - 1);
-  else doubles.delete(floor);
 }
+
+// a count used up one a payout
+export const countDown = (left: number): number | undefined =>
+  left > 1 ? left - 1 : undefined;

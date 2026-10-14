@@ -3,6 +3,7 @@
 // of the upper one at once, keeping its speed, faster each loop, a pop and a
 // jolt at every pass, each pass banking one double payout on the bar; bar by
 // bar, its own last with more loops, then the wisp bursts onto its readout
+import { bankDoublePayout } from "../../barEffects";
 import {
   drawPortal,
   drawPortalPass,
@@ -70,6 +71,8 @@ const ringAt = (s: State, bar: number, side: -1 | 1, into: Point): Point => {
 };
 
 registerFloorCrit("shortcutCrit", {
+  // each pass banks a double payout
+  reward: (t) => bankDoublePayout(t.floor),
   plan(r, bars, hit) {
     const state: State = {
       bars,

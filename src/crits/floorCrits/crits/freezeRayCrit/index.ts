@@ -153,6 +153,8 @@ function drawShards(
 }
 
 registerFloorCrit("freezeRayCrit", {
+  // it ices each bar, then shatters it
+  levels: (count) => Math.ceil(count / 2),
   plan(_r, bars, hit) {
     const order = byHeight(bars);
     order.forEach((bar, k) => {

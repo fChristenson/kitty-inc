@@ -4,10 +4,6 @@
 import { BADGE_CRIT_BALANCE } from "./badgeCrits/balance";
 import { PROC_CRIT_BALANCE } from "./floorCrits/balance";
 import { FLOOR_CRIT_CONFIG } from "./floorCrits/config";
-import { INCOME_CRIT_CONFIG } from "./incomeCrits/config";
-import { BUTTON_CRIT_CONFIG } from "./buttonCrits/config";
-import { LOCK_CRIT_CONFIG } from "./lockCrits/config";
-import { RATE_CRIT_CONFIG } from "./rateCrits/config";
 import { ANIMATED_EVENT_CONFIG } from "./animatedCrits/config";
 
 export const CRIT_CONFIG = {
@@ -144,8 +140,8 @@ export const CRIT_CONFIG = {
     badgeCrit: {
       chance: 0.46,
     },
-    // a floor crit (one of floorCrits below, by their chances) on a
-    // multiplier crit, an income crit (one of incomeCrits) on a cash crit;
+    // a floor crit (by their meta.ts chances, beside floorCrits below) on a
+    // multiplier crit, an income crit on a cash crit;
     // neither can land again until cooldownMs after the last one was picked
     // and after it played out (they share one player)
     floorCrit: {
@@ -184,20 +180,9 @@ export const CRIT_CONFIG = {
     },
   },
 
-  // the floor crits a floorCrit slot picks from (floorCrits/config.ts)
+  // the floor slot's own kinds (floorCrits/config.ts); the played crits'
+  // chances are in their meta.ts (crits/critKit)
   ...FLOOR_CRIT_CONFIG,
-
-  // the income crits an incomeCrit slot picks from (incomeCrits/config.ts)
-  ...INCOME_CRIT_CONFIG,
-
-  // the button crits a buttonCrit slot picks from (buttonCrits/config.ts)
-  ...BUTTON_CRIT_CONFIG,
-
-  // the lock crits a lockCrit slot picks from (lockCrits/config.ts)
-  ...LOCK_CRIT_CONFIG,
-
-  // the rate crits a rateCrit slot picks from (rateCrits/config.ts)
-  ...RATE_CRIT_CONFIG,
 
   // badgeCrits/badgeCapsule — the mystery badge capsule a building earns once
   // every floor is at the level cap with every upgrade bought, opened from its

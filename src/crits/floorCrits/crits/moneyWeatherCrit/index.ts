@@ -125,6 +125,8 @@ function planWeather(bars: Point[]): Weather {
 }
 
 registerFloorCrit("moneyWeatherCrit", {
+  // about four heavy coins slam into each bar
+  levels: (count) => Math.ceil(count / 4),
   plan(r, bars, hit) {
     const weather = planWeather(bars);
     weathers.set(r, weather);

@@ -60,6 +60,8 @@ const crossAt = (g: Geyser, y: number, ground: number, sky: number) =>
   g.at + ((ground - y) / (ground - sky)) * GY_RISE_MS;
 
 registerFloorCrit("geysersCrit", {
+  // seven geysers blast up through each bar
+  levels: (count) => Math.ceil(count / 7),
   plan(r, bars, hit) {
     const geysers = Array.from({ length: GY_GEYSERS }, (_, i) => {
       const last = i === GY_GEYSERS - 1;

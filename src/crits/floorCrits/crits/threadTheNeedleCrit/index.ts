@@ -61,6 +61,8 @@ const ORIGIN: Point = { x: 0, y: 0 };
 const into: Point = { x: 0, y: 0 };
 
 registerFloorCrit("threadTheNeedleCrit", {
+  // it runs each bar twice
+  levels: (count) => Math.ceil(count / 2),
   plan(r, bars, hit) {
     const reach = r.play.barHalfWidth + PAST;
     const state: State = {

@@ -35,6 +35,8 @@ const dominoAt = (k: number) => {
 };
 
 registerFloorCrit("dominoCrit", {
+  // a step more payout with every bar it knocks
+  payouts: (step) => step + 1,
   plan(_r, bars, hit) {
     // bottom to top; step is how many it has knocked before
     byHeight(bars)

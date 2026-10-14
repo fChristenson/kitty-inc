@@ -57,6 +57,8 @@ function dipOf(presses: number[], ms: number): number {
 }
 
 registerFloorCrit("autopressCrit", {
+  // levels every press, the closing slam the crit's multiple
+  reward: (t) => t.levelUp(t.step === 2 ? t.count : Math.ceil(t.count / 4)),
   plan(r, bars, hit) {
     const state: State = { bars, pressers: [], slam: 0 };
     const arrive = POP_MS + FLY_MS;

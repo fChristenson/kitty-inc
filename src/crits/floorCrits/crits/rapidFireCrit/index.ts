@@ -11,6 +11,7 @@ const RAPID_STAGGER_MS = 80;
 const RAPID_SPREAD = 130;
 
 registerFloorCrit("rapidFireCrit", {
+  levels: () => 0,
   plan(r, _bars, hit) {
     const count = r.label.length;
     for (let i = 0; i < count; i++) hit(0, RAPID_FLY_MS + i * RAPID_STAGGER_MS);

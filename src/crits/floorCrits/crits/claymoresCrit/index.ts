@@ -108,6 +108,8 @@ function planField(bars: Point[]): Field {
 }
 
 registerFloorCrit("claymoresCrit", {
+  // about fourteen blasts along each bar
+  levels: (count) => Math.ceil(count / 14),
   plan(r, bars, hit) {
     const field = planField(bars);
     fields.set(r, field);

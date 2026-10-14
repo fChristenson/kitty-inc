@@ -13,6 +13,9 @@ const SNOW_LEG_MS = 170;
 const SNOW_HOP = 120;
 
 registerFloorCrit("snowballCrit", {
+  // a step more on every bar it rolls down
+  levels: (count, step) => count + step,
+  ownLevels: (_count, step) => step,
   plan(_r, bars, hit) {
     byHeight(bars).forEach((bar, i) =>
       hit(bar, SNOW_FIRST_MS + i * SNOW_LEG_MS, i),

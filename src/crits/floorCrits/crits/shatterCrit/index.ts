@@ -44,6 +44,8 @@ const shardTo = (r: Running, bars: Point[], i: number) =>
   along(r, bars, i % bars.length, holeHash(i, 51) * 2 - 1);
 
 registerFloorCrit("shatterCrit", {
+  // its shards land their levels as they detonate, not as they embed
+  levels: (count, step) => (step ? Math.ceil(count / 3) : 0),
   plan(_r, bars, hit) {
     for (let i = 0; i < shardsOf(bars.length); i++) {
       hit(i % bars.length, embedsAt(i));

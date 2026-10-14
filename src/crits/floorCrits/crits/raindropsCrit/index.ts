@@ -65,6 +65,9 @@ const rains = new WeakMap<Running, Rain>();
 const spot: Point = { x: 0, y: 0 };
 
 registerFloorCrit("raindropsCrit", {
+  // about seven drops splash onto each bar; the huge one onto its own
+  // lands half
+  levels: (count, step) => Math.ceil(count / (step ? 2 : 7)),
   plan(r, bars, hit) {
     const others = otherBars(bars);
     const times = rainTimes(DROPS, IN_MS, GAPS);

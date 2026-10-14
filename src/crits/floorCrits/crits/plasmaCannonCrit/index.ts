@@ -83,6 +83,8 @@ function planShots(bars: Point[]): Shot[] {
 }
 
 registerFloorCrit("plasmaCannonCrit", {
+  // two shots hit each bar, three blasts a shot
+  levels: (count) => Math.ceil(count / 6),
   plan(r, bars, hit) {
     const shots = planShots(bars);
     cannons.set(r, shots);

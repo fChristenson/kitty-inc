@@ -133,6 +133,8 @@ const placeCoin = (r: Running, bars: Point[], c: Coin): void => {
 const fade = (t: number, ms: number) => (t >= 0 && t < ms ? 1 - t / ms : 0);
 
 registerFloorCrit("coinShotCrit", {
+  // its ricochets hit each bar about four times
+  levels: (count) => Math.ceil(count / 4),
   plan(r, bars, hit) {
     const chain = planChain(bars);
     chains.set(r, chain);

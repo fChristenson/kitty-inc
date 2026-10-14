@@ -140,6 +140,10 @@ const landAt = (r: Running, bars: Point[], p: Pellet): Point => {
 };
 
 registerFloorCrit("shotgunCrit", {
+  // a shot lands its pellets on a bar as one hit: about ten a bar, half
+  // of them on each of two, the double barrel's all on its own
+  levels: (count, step) =>
+    step === 2 ? count : Math.ceil(count / (step === 1 ? 10 : 2)),
   plan(r, bars, hit) {
     const g = planShots(r, bars);
     guns.set(r, g);

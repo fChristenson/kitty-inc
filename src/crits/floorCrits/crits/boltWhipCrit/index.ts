@@ -117,6 +117,8 @@ function planWhip(bars: Point[]): Whip {
 }
 
 registerFloorCrit("boltWhipCrit", {
+  // it lashes each bar about eight times
+  levels: (count) => Math.ceil(count / 8),
   plan(r, bars, hit) {
     const whip = planWhip(bars);
     whips.set(r, whip);

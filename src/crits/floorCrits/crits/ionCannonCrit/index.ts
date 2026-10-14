@@ -115,6 +115,8 @@ function footAt(r: Running, bars: Point[], cuts: Cut[], ms: number): Point {
 const sky = { x: 0, y: 0 };
 
 registerFloorCrit("ionCannonCrit", {
+  // its cut blasts each bar about six times
+  levels: (count) => Math.ceil(count / 6),
   plan(r, bars, hit) {
     const cannon = planCannon(bars);
     cannons.set(r, cannon);

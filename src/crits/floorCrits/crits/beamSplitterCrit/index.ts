@@ -99,6 +99,8 @@ const top = { x: 0, y: 0 };
 const end = { x: 0, y: 0 };
 
 registerFloorCrit("beamSplitterCrit", {
+  // its fan lands about five hits on each bar
+  levels: (count) => Math.ceil(count / 5),
   plan(r, bars, hit) {
     const crossings = planCrossings(r, bars);
     fans.set(r, crossings);

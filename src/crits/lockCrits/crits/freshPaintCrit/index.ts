@@ -2,6 +2,7 @@
 // turns into a nozzle wisp sweeping back and forth along its top, hissing
 // gold mist down over it, quicker each pass, until its coat flashes and it
 // bursts open; its cats step out gold, each a perma tier up
+import { celebrateWorkerBoost, getRenderedWorkerCount, promoteWorkerPermaTier } from "../../../../floors/worker";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawSpray,
@@ -59,6 +60,13 @@ const states = new WeakMap<Running, State>();
 const land: Point = { x: 0, y: 0 };
 
 registerFloorCrit("freshPaintCrit", {
+  // every worker on the floor it opened up a perma tier
+  reward(t) {
+    for (let i = 0; i < getRenderedWorkerCount(t.floor); i++) {
+      promoteWorkerPermaTier(t.floor, i);
+      celebrateWorkerBoost(t.floor, i, t.now);
+    }
+  },
   plan(r, bars, hit) {
     const halfW = r.play.barHalfWidth * SWEEP;
     const start = ARC_MS;

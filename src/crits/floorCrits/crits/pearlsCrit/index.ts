@@ -37,6 +37,7 @@ const pearlBar = (bars: Point[], k: number) => {
 };
 
 registerFloorCrit("pearlsCrit", {
+  levels: (count) => Math.ceil(count / 2),
   plan(_r, bars, hit) {
     for (let k = 0; k < bars.length * PEARLS_PER_BAR; k++)
       hit(pearlBar(bars, k), pearlStarts(k) + PEARL_FALL_MS, k);

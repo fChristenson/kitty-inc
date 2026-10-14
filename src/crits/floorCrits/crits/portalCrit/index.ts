@@ -89,6 +89,8 @@ function drawPortal(
 }
 
 registerFloorCrit("portalCrit", {
+  // it falls through each bar three times
+  levels: (count) => Math.ceil(count / 3),
   plan(r, bars, hit) {
     const { passes } = portals(r, bars);
     PORTAL_FALLS_MS.forEach((_, k) =>

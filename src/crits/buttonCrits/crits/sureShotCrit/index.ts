@@ -1,6 +1,7 @@
 // Sure Shot, a button crit: the number bursts into wisps that dive onto
 // every button in view, quicker and quicker, each blasting it into a sure
 // crit; its own button last, the biggest
+import { armCritUpgrade } from "../../../floorCrits/upgradeCrit";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
@@ -40,6 +41,11 @@ const states = new WeakMap<Running, State>();
 const ORIGIN: Point = { x: 0, y: 0 };
 
 registerFloorCrit("sureShotCrit", {
+  // a sure crit: the crit's own tier on its own button, a crit on the rest
+  reward(t) {
+    armCritUpgrade(t.floor, t.own ? t.tier : "crit");
+    t.flipButton();
+  },
   plan(r, bars, hit) {
     const order = ownLast(bars);
     const state: State = { bars, shots: [] };

@@ -4,6 +4,7 @@
 // above and below, giving in jolts closer and closer; they crumble, the
 // pressure blasting along every bar, and each readout turns over: the bar
 // runs faster for good, its own the most
+import { CONFIG } from "../../../../config";
 import {
   crumbleAt,
   crumbleBits,
@@ -117,6 +118,12 @@ const to: Point = { x: 0, y: 0 };
 const atHead = () => head;
 
 registerFloorCrit("compressorCrit", {
+  // faster for good, its own more
+  reward(t) {
+    t.floor.incomeIntervalSeconds /= t.own
+      ? CONFIG.crit.compressorOwnSpeed
+      : CONFIG.crit.compressorSpeed;
+  },
   plan(r, bars, hit) {
     const press = planPress(IN_MS + SLIDE_MS, PRESS_MS, GIVES, {
       depth: 1,

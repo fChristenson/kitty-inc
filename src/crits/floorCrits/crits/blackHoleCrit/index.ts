@@ -69,6 +69,8 @@ const holeCoins: CoinBurstSprite[] = Array.from(
 );
 
 registerFloorCrit("blackHoleCrit", {
+  // it pays each bar out too
+  payouts: () => 2,
   plan(_r, bars, hit) {
     bars.forEach((_, bar) => hit(bar, HOLE_RETURNED_MS));
   },

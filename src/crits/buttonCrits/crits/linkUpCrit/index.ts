@@ -3,6 +3,8 @@
 // by one, quicker each, each linked button lit; the own button taps itself
 // and pulses race down the beams, then it slams: its next taps each land a
 // level on every linked button too
+import { defineTapPerk } from "../../buttonBonus";
+import { isFloorMaxed, type Floor } from "../../../../gameState";
 import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
@@ -52,7 +54,34 @@ interface State {
 
 const states = new WeakMap<Running, State>();
 
+// the buttons linked to each own one (not a snapshotMap: a snapshot would
+// deep-copy the linked floors themselves)
+const links = new WeakMap<Floor, Floor[]>();
+// each tap pressing every button linked to it too; the links go with the last
+const linkedTaps = defineTapPerk("Linked", (t, left) => {
+  const linked = links.get(t.floor);
+  if (!left) links.delete(t.floor);
+  for (const other of linked ?? []) {
+    if (!t.floors.includes(other) || !other.unlocked || isFloorMaxed(other))
+      continue;
+    t.levelUp(other, 1);
+    t.press(other);
+  }
+});
+
 registerFloorCrit("linkUpCrit", {
+  // every other button linked to the own one, whose taps (the crit's
+  // multiple) then level them all
+  reward(t) {
+    if (t.own) {
+      if (links.has(t.floor)) linkedTaps.add(t.floor, t.count);
+    } else {
+      const linked = links.get(t.ownFloor);
+      if (!linked) links.set(t.ownFloor, [t.floor]);
+      else if (!linked.includes(t.floor)) linked.push(t.floor);
+    }
+    t.flipButton();
+  },
   plan(r, bars, hit) {
     const order = bars
       .map((_, i) => i)

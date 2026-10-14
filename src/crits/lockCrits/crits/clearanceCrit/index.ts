@@ -2,6 +2,7 @@
 // becomes a scanner beam sweeping the floor and its unlock price back and
 // forth, quicker each pass, the price flaring white as it's crossed; then the
 // price flips over and shatters down to a fraction of it
+import { multiply } from "../../../../shared/bigNumber";
 import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawGlow } from "../../../../shared/glowSprite";
@@ -67,6 +68,13 @@ function beamX(ends: number[], ms: number): number | null {
 }
 
 registerFloorCrit("clearanceCrit", {
+  // the locked floor's price cut to a fraction (its discount too, which
+  // the price is rebuilt from on load), left locked
+  beforeOpen(t) {
+    t.floor.priceDiscountMultiplier /= t.count;
+    t.floor.unlockCost = multiply(t.floor.unlockCost, 1 / t.count);
+    return false;
+  },
   plan(r, bars, hit) {
     const ends: number[] = [];
     let t = ARC_MS;

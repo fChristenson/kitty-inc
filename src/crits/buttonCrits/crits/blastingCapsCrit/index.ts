@@ -3,6 +3,7 @@
 // on to set off the next, top to bottom, each button left gold, its taps
 // then landing two levels each; the crit's own blows into a cluster of
 // bomblets round it, then the biggest blast
+import { doubleTaps } from "../../tapPerks";
 import { drawDetonation, drawLitFuse } from "../../../../shared/animationStyles/explosion";
 import { drawWisp, drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
@@ -70,6 +71,11 @@ const clusterSpot = (own: Point, k: number, into: Point) => {
 };
 
 registerFloorCrit("blastingCapsCrit", {
+  // taps that each land two levels, twice as many on its own
+  reward(t) {
+    doubleTaps.add(t.floor, t.own ? t.count * 2 : t.count);
+    t.flipButton();
+  },
   plan(r, bars, hit) {
     const order = ownLast(bars);
     const state: State = {

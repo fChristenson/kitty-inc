@@ -185,6 +185,9 @@ function orbAt(o: Orb, ms: number, sky: number): Point | null {
 }
 
 registerFloorCrit("collectCrit", {
+  // it picks about three orbs off each bar; its dive onto its own bar
+  // lands the lot
+  levels: (count, step) => (step === 2 ? count : Math.ceil(count / 3)),
   plan(r, bars, hit) {
     const plan = planCollect(r, bars);
     collects.set(r, plan);

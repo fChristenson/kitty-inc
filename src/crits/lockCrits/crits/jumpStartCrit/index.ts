@@ -2,6 +2,7 @@
 // wisp and charges, the dust in the room sucked into it while the lock
 // shudders harder and harder; at the climax the floor bursts open and the
 // wisp leaps onto its new bar and races along it, which pays out at once
+import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   chargeAt,
@@ -87,6 +88,12 @@ const shiver: Point = { x: 0, y: 0 };
 const spot: Point = { x: 0, y: 0 };
 
 registerFloorCrit("jumpStartCrit", {
+  // payouts from the floor it opened
+  reward(t) {
+    const payouts = t.count * CONFIG.crit.jumpStartPayouts;
+    t.payPayouts(payouts);
+    t.punch(`x${payouts} Payout`);
+  },
   plan(r, bars, hit) {
     const lock = getLockCenter();
     const box = getIncomeBarBox(false);

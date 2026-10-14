@@ -88,6 +88,8 @@ const guns = (r: Running, bars: Point[]): Point => ({
 });
 
 registerFloorCrit("artilleryBarrageCrit", {
+  // three shells a bar, then its salvo
+  levels: (count) => Math.ceil(count / 4),
   plan(r, bars, hit) {
     for (const s of shells(r, bars)) hit(s.bar, s.lands, s.salvo ? 1 : 0);
   },

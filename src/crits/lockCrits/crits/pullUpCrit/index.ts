@@ -4,6 +4,7 @@
 // spiky crusts, a trickle then a flood, a click every few; the poles yank
 // together and slam it open, then flip, the crust flung off onto its new
 // bar, which runs a gear up for good
+import { CONFIG } from "../../../../config";
 import {
   drawFieldLines,
   flingAt,
@@ -79,6 +80,12 @@ const northOff: Point = { x: 0, y: 0 };
 const southOff: Point = { x: 0, y: 0 };
 
 registerFloorCrit("pullUpCrit", {
+  // the floor it opened faster for good
+  reward(t) {
+    t.flipRate();
+    t.floor.incomeIntervalSeconds /= CONFIG.crit.pullUpSpeed;
+    t.punch(`${CONFIG.crit.pullUpSpeed}x Speed`);
+  },
   plan(r, _bars, hit) {
     const lock = getLockCenter();
     const width = FLOOR_X_MAX - FLOOR_X_MIN;

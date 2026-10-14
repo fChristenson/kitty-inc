@@ -99,6 +99,8 @@ function planFlare(bars: Point[]): Flare {
 }
 
 registerFloorCrit("solarFlareCrit", {
+  // its lashes land about nine blasts a bar
+  levels: (count) => Math.ceil(count / 9),
   plan(r, bars, hit) {
     const f = planFlare(bars);
     flares.set(r, f);

@@ -1,15 +1,26 @@
 import fs from "node:fs";
 import { defineConfig, type Plugin } from "vite";
 import { writeCritKinds } from "./scripts/crit-kinds.mjs";
+import { writeCritRegistry } from "./scripts/crit-registry.mjs";
 
-// critData/kinds.ts follows the badge crit catalog: written on start and
-// whenever a critData file changes
+// critData/kinds.ts follows the badge crit catalog and critKit/registry.gen.ts
+// the played crits' folders: written on start and whenever one changes
 const critKinds: Plugin = {
   name: "crit-kinds",
-  config: () => void writeCritKinds(),
+  config: () => {
+    writeCritKinds();
+    writeCritRegistry();
+  },
   configureServer(server) {
     server.watcher.on("all", (_event, file) => {
       if (/critData[\\/](?!kinds\.ts)\w+\.ts$/.test(file)) writeCritKinds();
+      // a crit folder made before its meta.ts: written once that lands
+      if (/Crits[\\/]crits[\\/]\w+([\\/]meta\.ts)?$/.test(file))
+        try {
+          writeCritRegistry();
+        } catch (error) {
+          server.config.logger.warn(String(error));
+        }
     });
   },
 };

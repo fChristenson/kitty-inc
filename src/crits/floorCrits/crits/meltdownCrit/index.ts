@@ -98,6 +98,8 @@ function numberAt(r: Running, bars: Point[], order: number[], ms: number) {
 }
 
 registerFloorCrit("meltdownCrit", {
+  // its touch only heats a bar; its run of six blasts lands them
+  levels: (count, step) => (step ? Math.ceil(count / 6) : 0),
   plan(_r, bars, hit, _lift, _crumble, _rocket, heat) {
     const order = ownLast(bars);
     const last = order.length - 1;

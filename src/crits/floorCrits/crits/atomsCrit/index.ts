@@ -75,6 +75,8 @@ const runSpot = (
 ) => along(r, bars, bar, (j / (n - 1)) * 2 - 1);
 
 registerFloorCrit("atomsCrit", {
+  // they only charge a bar up; their blasts land them
+  levels: (count, step) => (step ? Math.ceil(count / 5) : 0),
   plan(_r, bars, hit) {
     const order = ownLast(bars);
     order.forEach((bar, k) => {

@@ -1,6 +1,7 @@
 // Skeleton Key, a lock crit: the number arcs into the locked floor and
 // sprays dots that build a giant key over it, faster and faster; it blazes,
 // then snaps into the floor, which bursts open, its button left with free taps
+import { addFreeTaps } from "../../../buttonCrits/buttonBonus";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { SHAPES, shapeOutline } from "../../../../shared/animationStyles/drawing";
@@ -61,6 +62,11 @@ const GOLD = glowStops(COLOR.heavenlyGold);
 const spot: Point = { x: 0, y: 0 };
 
 registerFloorCrit("skeletonKeyCrit", {
+  // free taps on the floor it opened, twice the crit's multiple
+  reward(t) {
+    addFreeTaps(t.floor, t.count * 2);
+    t.flipButton();
+  },
   plan(r, bars, hit) {
     const dots = shapeOutline(SHAPES.key, DOTS, { x: 0, y: 0 }, SIZE);
     const fired: number[] = [];

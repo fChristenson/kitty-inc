@@ -138,6 +138,8 @@ function drawFork(
 }
 
 registerFloorCrit("teslaCannonCrit", {
+  // its forks strike each bar about six times
+  levels: (count) => Math.ceil(count / 6),
   plan(r, bars, hit) {
     const cannon = planCannon(bars);
     cannons.set(r, cannon);

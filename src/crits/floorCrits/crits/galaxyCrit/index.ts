@@ -46,6 +46,7 @@ const comet: Point = { x: 0, y: 0 };
 const cometFrom: Point = { x: 0, y: 0 };
 
 registerFloorCrit("galaxyCrit", {
+  levels: (count) => Math.ceil(count / 2),
   plan(r, bars, hit) {
     const w = r.viewportWidth;
     const disk = planDisk(

@@ -2,6 +2,7 @@
 // button to button, hissing gold mist over each, quicker each, until its coat
 // flashes and it flips over gilded, each tap of it then paying its bar's
 // payout too; the crit's own last in the biggest blast
+import { defineTapPerk } from "../../buttonBonus";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {
@@ -61,7 +62,15 @@ const states = new WeakMap<Running, State>();
 const ORIGIN: Point = { x: 0, y: 0 };
 const AIM = Math.atan2(-NOZZLE.y, -NOZZLE.x);
 
+// each tap paying its bar's payout too
+const payoutTaps = defineTapPerk("Payout", (t) => t.payout(t.floor, 1));
+
 registerFloorCrit("gildedCrit", {
+  // payout taps, twice as many on its own
+  reward(t) {
+    payoutTaps.add(t.floor, t.own ? t.count * 2 : t.count);
+    t.flipButton();
+  },
   plan(r, bars, hit) {
     const order = ownLast(bars);
     const state: State = { bars, coats: [], nozzle: () => null };

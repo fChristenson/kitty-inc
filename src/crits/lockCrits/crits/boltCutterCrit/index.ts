@@ -2,6 +2,7 @@
 // bolts crack down onto it all over, quicker and quicker, each a flash and a
 // jolt, the floor glowing hotter; a giant bolt splits it open down the
 // middle, then its bar fills crackling with the crit's levels
+import { CONFIG } from "../../../../config";
 import {
   createBolt,
   drawBolt,
@@ -83,6 +84,8 @@ const skyOver = (r: Running, mid: Point) => {
 };
 
 registerFloorCrit("boltCutterCrit", {
+  // levels on the floor it opened
+  reward: (t) => t.levelUp(t.count * CONFIG.crit.boltCutterLevels),
   plan(r, bars, hit) {
     const mid = bars[0];
     const halfW = r.play.barHalfWidth * SPREAD_X;

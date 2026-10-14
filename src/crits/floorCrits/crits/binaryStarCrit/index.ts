@@ -28,6 +28,7 @@ const binaryAngle = (ms: number) => {
 const binaryHits = (i: number) => BINARY_MS + BINARY_FLY_MS + (i % 3) * 40;
 
 registerFloorCrit("binaryStarCrit", {
+  levels: (count) => Math.ceil(count / 2),
   plan(_r, bars, hit) {
     for (let i = 0; i < bars.length * BINARY_BLOBS_PER_BAR; i++)
       hit(i % bars.length, binaryHits(i));

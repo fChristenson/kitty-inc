@@ -59,6 +59,9 @@ const showerMeteor = (r: Running, bars: Point[], i: number) => {
 };
 
 registerFloorCrit("meteorShowerCrit", {
+  levels: (count) => Math.ceil(count / 6),
+  // its huge last meteor pays like a meteor
+  payouts: (step) => (step ? 5 : 0),
   plan(_r, bars, hit) {
     for (let i = 0; i < SHOWER_METEORS; i++) {
       const last = i === SHOWER_METEORS - 1;

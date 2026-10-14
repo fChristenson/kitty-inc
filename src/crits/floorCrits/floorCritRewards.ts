@@ -70,7 +70,7 @@ import {
 import { formatPrice } from "../../utils";
 
 import type { EventProcContext } from "../animatedCrits/eventProcs";
-import type { FloorCritPlay } from "./critPlayer";
+import { getFloorCritDef, type FloorCritPlay } from "./critPlayer";
 import { incomeCritBonus, incomeCritPlayFor } from "../incomeCrits";
 import { buttonCritPlayFor } from "../buttonCrits";
 import { lockCritPlayFor } from "../lockCrits";
@@ -1703,160 +1703,15 @@ function playFor(
       count,
       (locked) => unlockFloorFree(deps, locked),
     );
-  if (result.rateCrit) return rateCritPlayFor(deps, floor, result.rateCrit);
+  if (result.rateCrit)
+    return rateCritPlayFor(deps, floor, result.rateCrit, result.tier, count);
   return null;
 }
 
-// the levels a floor crit's hit lands on a bar: its own floor already has
-// the crit's, so only a snowball's growth adds to it
 const COIN_SPILL_SCALE = 0.7;
 // a floor crit lands dozens of hits in a second or two: full bursts on each
 // filled the coin pool and swelled like a held button
 const COIN_SPILL: [number, number] = [14, 24];
-// full payouts a floor crit's hit pays its bar on top of its levels
-const FLOOR_CRIT_PAYOUT: Partial<Record<FloorCritKind, number>> = {
-  lightningCrit: 2,
-  meteorCrit: 5,
-  blackHoleCrit: 2,
-};
-function floorCritLevels(
-  kind: FloorCritKind,
-  own: boolean,
-  count: number,
-  step: number,
-): number {
-  if (kind === "rapidFireCrit") return 0;
-  if (kind === "snowballCrit") return own ? step : count + step;
-  if (own) return 0;
-  if (
-    kind === "bubbleCrit" ||
-    kind === "supernovaCrit" ||
-    kind === "galaxyCrit" ||
-    kind === "binaryStarCrit" ||
-    kind === "pearlsCrit"
-  )
-    return Math.ceil(count / 2);
-  if (kind === "volcanoCrit") return Math.ceil(count / 3);
-  // a shatter's shards land their levels as they detonate, not as they embed
-  if (kind === "shatterCrit") return step ? Math.ceil(count / 3) : 0;
-  // a ricochet laser's bounces land them, not its blow-up
-  if (kind === "ricochetLaserCrit") return step ? 0 : count;
-  // a bunker buster's eruption lands them, not its impact and thuds
-  if (kind === "bunkerBusterCrit") return step ? count : 0;
-  // a portal falls through each bar three times, a missile defense's debris
-  // lands three bits a meteor, and a gunship's burst hits each bar thrice
-  if (
-    kind === "portalCrit" ||
-    kind === "missileDefenseCrit" ||
-    kind === "gunshipCrit"
-  )
-    return Math.ceil(count / 3);
-  // a missile tangle rains eight missiles on each bar
-  if (kind === "missileTangleCrit") return Math.ceil(count / 8);
-  // a windmill sweeps each bar about twenty times, then a blade slams it
-  if (kind === "windmillCrit")
-    return step ? Math.ceil(count / 2) : Math.ceil(count / 20);
-  // a saturn's ring cuts each bar about ten times, then its shards land
-  if (kind === "saturnCrit")
-    return step ? Math.ceil(count / 3) : Math.ceil(count / 10);
-  // a beatmap hits each bar about four times, then its spinner blows
-  if (kind === "beatmapCrit")
-    return step ? Math.ceil(count / 2) : Math.ceil(count / 4);
-  // an artillery barrage lands three shells a bar, then its salvo
-  if (kind === "artilleryBarrageCrit") return Math.ceil(count / 4);
-  // a meltdown's touch only heats a bar; its run of six blasts lands them
-  if (kind === "meltdownCrit") return step ? Math.ceil(count / 6) : 0;
-  // a crunch's crunching in only jolts a bar; its three landing blasts land them
-  if (kind === "crunchCrit") return step ? Math.ceil(count / 3) : 0;
-  // atoms, a reactor and static only charge a bar up; their blasts land them
-  if (kind === "atomsCrit") return step ? Math.ceil(count / 5) : 0;
-  if (kind === "reactorCrit") return step ? Math.ceil(count / 3) : 0;
-  if (kind === "staticCrit") return step ? count : 0;
-  // an EMP's short only jolts a bar; its runs land them
-  if (kind === "empCrit") return step ? Math.ceil(count / 5) : 0;
-  // an inspiral's waves only stretch a bar; its runs land them
-  if (kind === "inspiralCrit") return step ? Math.ceil(count / 5) : 0;
-  // a thunderstorm strikes each bar about four times, a shotgun peppers
-  // each with about ten pellets
-  if (kind === "thunderstormCrit") return Math.ceil(count / 4);
-  // a shotgun's shot lands its pellets on a bar as one hit: half the
-  // pellets on each of two bars, the double barrel's all on its own
-  if (kind === "shotgunCrit")
-    return step === 2
-      ? count
-      : step === 1
-        ? Math.ceil(count / 10)
-        : Math.ceil(count / 2);
-  // a solar flare's lashes land about nine blasts a bar, flak about fifteen
-  // bits of shrapnel, a revolver about three shots
-  if (kind === "solarFlareCrit") return Math.ceil(count / 9);
-  if (kind === "flakCrit") return Math.ceil(count / 15);
-  if (kind === "revolverCrit") return Math.ceil(count / 3);
-  // seven geysers blast up through each bar; two plasma shots hit each, three
-  // blasts a shot
-  if (kind === "geysersCrit") return Math.ceil(count / 7);
-  if (kind === "plasmaCannonCrit") return Math.ceil(count / 6);
-  // grenades touch each bar about eight times, rocket pods hit each about
-  // five times, bank shots cross each about five times and a minigun's
-  // stream blasts each about eight times
-  if (kind === "grenadesCrit" || kind === "minigunCrit")
-    return Math.ceil(count / 8);
-  if (kind === "rocketPodsCrit" || kind === "bankShotsCrit")
-    return Math.ceil(count / 5);
-  // claymores rattle about fourteen blasts along each bar, a strafe about six
-  // and a coin shot's ricochets about four
-  if (kind === "claymoresCrit") return Math.ceil(count / 14);
-  if (kind === "strafeCrit") return Math.ceil(count / 6);
-  if (kind === "coinShotCrit") return Math.ceil(count / 4);
-  // rods punch through each bar about ten times, an ion cannon's cut blasts
-  // each about six times and a bolt whip lashes each about eight
-  if (kind === "rodsCrit") return Math.ceil(count / 10);
-  if (kind === "ionCannonCrit") return Math.ceil(count / 6);
-  if (kind === "boltWhipCrit") return Math.ceil(count / 8);
-  // a designator's pillars land on each bar about four times, a beam
-  // splitter's fan lands about five hits on each and a tesla cannon's forks
-  // strike each about six
-  if (kind === "designatorCrit") return Math.ceil(count / 4);
-  if (kind === "beamSplitterCrit") return Math.ceil(count / 5);
-  if (kind === "teslaCannonCrit") return Math.ceil(count / 6);
-  // a yo-yo slams each bar three times, harpoons thunk into and yank each
-  // about four times and bolas land, wrap and blow on each about eight
-  if (kind === "yoYoCrit") return Math.ceil(count / 3);
-  if (kind === "harpoonsCrit") return Math.ceil(count / 4);
-  if (kind === "bolasCrit") return Math.ceil(count / 8);
-  // a block bonk bonks each bar twice (its own is ground-pounded too)
-  if (kind === "blockBonkCrit") return Math.ceil(count / 3);
-  // money weather slams about four heavy coins into each bar
-  if (kind === "moneyWeatherCrit") return Math.ceil(count / 4);
-  // a collect picks about three orbs off each bar; its dive onto its own
-  // bar lands the lot
-  if (kind === "collectCrit") return step === 2 ? count : Math.ceil(count / 3);
-  // raindrops splash about seven drops onto each bar; the huge one onto its
-  // own lands half
-  if (kind === "raindropsCrit")
-    return step ? Math.ceil(count / 2) : Math.ceil(count / 7);
-  // a cross cut cuts each bar twice: its own cut, then the long one
-  if (kind === "crossCutCrit") return Math.ceil(count / 2);
-  // a thread the needle runs each bar twice
-  if (kind === "threadTheNeedleCrit") return Math.ceil(count / 2);
-  // a saber cuts through each bar twice, and a freeze ray ices then shatters it
-  if (kind === "saberCrit" || kind === "freezeRayCrit")
-    return Math.ceil(count / 2);
-  if (
-    kind === "airstrikeCrit" ||
-    kind === "missileSwarmCrit" ||
-    kind === "clusterBombCrit"
-  )
-    return Math.ceil(count / 2);
-  if (
-    kind === "rainCrit" ||
-    kind === "meteorShowerCrit" ||
-    kind === "fireworksCrit"
-  )
-    return Math.ceil(count / 6);
-  return count;
-}
-
 // a floor crit playing out from floor's crit onto the income bars in view:
 // its own floor's first, then every other open, not yet maxed floor's
 function floorCritPlayFor(
@@ -1905,7 +1760,13 @@ function floorCritPlayFor(
       const target = targets[bar];
       // a snowball bangs a step higher with every bar
       playBarExplosion(1 + step * 0.08);
-      const levels = floorCritLevels(kind, bar === 0, count, step);
+      // its own levels and payouts (see FloorCritDef), its module loaded
+      // by its first hit
+      const def = getFloorCritDef(kind);
+      const levels =
+        bar === 0
+          ? (def?.ownLevels?.(count, step) ?? 0)
+          : (def?.levels?.(count, step) ?? count);
       if (levels > 0) {
         increaseIncomeRateBy(target, levels);
         given.set(target, (given.get(target) ?? 0) + levels);
@@ -1918,15 +1779,7 @@ function floorCritPlayFor(
         fresh && given.has(target) ? `+${given.get(target)} Lvl` : null,
         color,
       );
-      // a lightning strike, meteor or black hole pays its bar out too; a
-      // domino a step more with every bar it knocks; a meteor shower's huge
-      // last meteor like a meteor
-      const payout =
-        kind === "dominoCrit"
-          ? step + 1
-          : kind === "meteorShowerCrit"
-            ? step && FLOOR_CRIT_PAYOUT.meteorCrit
-            : FLOOR_CRIT_PAYOUT[kind];
+      const payout = def?.payouts?.(step);
       if (payout) paySaleClick(target, isGround(target), payout);
       // the hit knocks coins off the bar
       const box = getIncomeBarBox(isGround(target));
