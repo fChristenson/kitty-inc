@@ -149,7 +149,9 @@ registerFloorCrit("housewarmingCrit", {
       r.shake(CLICK_SHAKE);
     }
     while (state.wall < state.walls.length && ms >= state.walls[state.wall]) {
-      r.shake(lerp(...WALL_SHAKE, state.wall / Math.max(1, state.walls.length - 1)));
+      r.shake(
+        lerp(...WALL_SHAKE, state.wall / Math.max(1, state.walls.length - 1)),
+      );
       state.wall++;
     }
     if (ms < state.openAt) {
@@ -165,14 +167,14 @@ registerFloorCrit("housewarmingCrit", {
       ctx.restore();
       drawSnowball(ctx, state.ball, ms, head, radius, SPECK, rolling);
       if (rolling)
-      drawWispHead(
-        ctx,
-        () => head,
-        ms,
-        now,
-        WISP_SIZE * (1 + radius / 70),
-        clamp01(stuck / DUST),
-      );
+        drawWispHead(
+          ctx,
+          () => head,
+          ms,
+          now,
+          WISP_SIZE * (1 + radius / 70),
+          clamp01(stuck / DUST),
+        );
       ctx.restore();
     }
     drawDetonation(ctx, at, ms - state.openAt, OPEN_BLAST, now);

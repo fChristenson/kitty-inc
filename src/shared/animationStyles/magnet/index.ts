@@ -55,7 +55,9 @@ export function planSnaps(
   const snaps: Snap[] = [];
   for (let i = 0; i < count; i++) {
     const landMs =
-      startMs + SNAP_MS + (endMs - startMs - SNAP_MS) * Math.sqrt((i + 1) / count);
+      startMs +
+      SNAP_MS +
+      (endMs - startMs - SNAP_MS) * Math.sqrt((i + 1) / count);
     snaps.push({
       pole: i % poles,
       from: {
@@ -92,7 +94,8 @@ export function snapAt(
     const dx = cx - snap.from.x;
     const dy = cy - snap.from.y;
     const d = Math.hypot(dx, dy) || 1;
-    const tug = size * TUG * (0.5 + 0.5 * Math.sin(ms * TUG_RATE + snap.angle * 7));
+    const tug =
+      size * TUG * (0.5 + 0.5 * Math.sin(ms * TUG_RATE + snap.angle * 7));
     into.x = snap.from.x + (dx / d) * tug;
     into.y = snap.from.y + (dy / d) * tug;
     return into;

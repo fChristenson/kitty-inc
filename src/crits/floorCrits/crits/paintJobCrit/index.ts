@@ -163,7 +163,12 @@ registerFloorCrit("paintJobCrit", {
       if (ms < ownAt) {
         bottom.x = side();
         bottom.y = glideY(glideEnd);
-        return swoop(bottom, side(), state.bars[0].y, (ms - glideEnd) / SWOOP_MS);
+        return swoop(
+          bottom,
+          side(),
+          state.bars[0].y,
+          (ms - glideEnd) / SWOOP_MS,
+        );
       }
       nozzle.x = side();
       nozzle.y = state.bars[0].y;

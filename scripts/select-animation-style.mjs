@@ -52,9 +52,13 @@ const REWARDS = [
   "free floors",
 ];
 
-execFileSync(process.execPath, [path.join(ROOT, "scripts/crit-dist.mjs"), "--json"], {
-  stdio: "ignore",
-});
+execFileSync(
+  process.execPath,
+  [path.join(ROOT, "scripts/crit-dist.mjs"), "--json"],
+  {
+    stdio: "ignore",
+  },
+);
 const crits = JSON.parse(
   fs.readFileSync(path.join(ROOT, "tmp/_crit-dist.json"), "utf8"),
 );
@@ -69,7 +73,9 @@ const pick = (weighted) => {
 
 // every group once, the rest at random, shuffled
 const slots = Array.from({ length: count }, (_, i) =>
-  i < GROUPS.length ? GROUPS[i] : GROUPS[Math.floor(Math.random() * GROUPS.length)],
+  i < GROUPS.length
+    ? GROUPS[i]
+    : GROUPS[Math.floor(Math.random() * GROUPS.length)],
 ).sort(() => Math.random() - 0.5);
 
 const used = new Set();
