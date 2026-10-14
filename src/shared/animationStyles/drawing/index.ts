@@ -1,9 +1,9 @@
 // pictures for events, drawn out of dots: the outline or the filled body of
 // a picture (a star, a heart, a coin, a crown, a gem, a cat's head, a
-// lightning bolt, a key), as hundreds of points to land wisps, bullets or glitter
-// on, scaled onto the screen once at arm. Build the dots with shapeOutline
-// or shapeFill, order them with penOrder for a pen wisp to trace them in one
-// stroke, and stamp the ones that have landed with drawDots
+// lightning bolt, a key, fast forward), as hundreds of points to land wisps,
+// bullets or glitter on, scaled onto the screen once at arm. Build the dots
+// with shapeOutline or shapeFill, order them with penOrder for a pen wisp to
+// trace them in one stroke, and stamp the ones that have landed with drawDots
 import { COLOR } from "../../../palette";
 import { stampGlimmer } from "../../twinkle";
 import type { Point } from "../../wisp";
@@ -108,6 +108,19 @@ export const SHAPES = {
       { x: 0.42, y: 0.1 },
     ],
     ring(0.2, 24).map((p) => ({ x: p.x - 0.55, y: p.y })),
+  ],
+  // fast forward: two arrowheads pointing right
+  forward: [
+    [
+      { x: -1, y: -0.8 },
+      { x: 0, y: 0 },
+      { x: -1, y: 0.8 },
+    ],
+    [
+      { x: 0, y: -0.8 },
+      { x: 1, y: 0 },
+      { x: 0, y: 0.8 },
+    ],
   ],
 } satisfies Record<string, Shape>;
 export type ShapeName = keyof typeof SHAPES;

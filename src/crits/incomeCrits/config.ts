@@ -152,5 +152,10 @@ export const INCOME_CRIT_CONFIG = {
     wraparoundCrit: {
       chance: 0.03,
     },
+    // a wisp looping under the total trailing a river of cash, which pours
+    // in after it
+    moneyTrailCrit: {
+      chance: 0.03,
+    },
   },
 };

@@ -97,6 +97,7 @@ export {
   takeBoreTap,
   takeHeavyTap,
   takeSplashTap,
+  takeTideTap,
   takeHalfTap,
   hasHalfTap,
   stickSpentCrit,

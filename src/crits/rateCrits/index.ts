@@ -14,6 +14,7 @@ import {
   afterburnBar,
   aimPayout,
   bankDoublePayout,
+  doubleTimeBar,
   overclockBar,
   stepBar,
   superchargeBar,
@@ -77,6 +78,14 @@ function reward(kind: RateCritKind, target: Floor, step: number): void {
       return;
     case "afterburnCrit":
       afterburnBar(target);
+      return;
+    case "doubleTimeCrit":
+      doubleTimeBar(
+        target,
+        step === 2
+          ? CONFIG.crit.doubleTimeOwnPayouts
+          : CONFIG.crit.doubleTimePayouts,
+      );
       return;
     case "superchargeCrit":
       superchargeBar(

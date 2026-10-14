@@ -15,6 +15,13 @@ const aimed = snapshotMap<Floor, number>();
 // an Afterburn's start, and a Supercharge's payouts left
 const afterburns = snapshotMap<Floor, number>();
 const supercharges = snapshotMap<Floor, number>();
+// a Double Time's payouts left at its speed
+const doubleTimes = snapshotMap<Floor, number>();
+
+// a Double Time: the bar doubleTimeSpeed times as fast for its next payouts
+export function doubleTimeBar(floor: Floor, payouts: number): void {
+  doubleTimes.set(floor, (doubleTimes.get(floor) ?? 0) + payouts);
+}
 
 // an Afterburn: a burst of speed fading back over afterburnMs
 export function afterburnBar(floor: Floor): void {
@@ -69,7 +76,7 @@ export function stepBar(floor: Floor): void {
 
 // how many times as fast rate crits run floor's bar right now
 export function rateCritSpeed(floor: Floor, now: number): number {
-  let speed = 1;
+  let speed = doubleTimes.has(floor) ? CONFIG.crit.doubleTimeSpeed : 1;
   const burn = afterburns.get(floor);
   if (burn !== undefined) {
     const t = (now - burn) / CONFIG.crit.afterburnMs;
@@ -102,6 +109,11 @@ export function noteRatePayout(floor: Floor, now: number): void {
   if (charged !== undefined) {
     if (charged > 1) supercharges.set(floor, charged - 1);
     else supercharges.delete(floor);
+  }
+  const timed = doubleTimes.get(floor);
+  if (timed !== undefined) {
+    if (timed > 1) doubleTimes.set(floor, timed - 1);
+    else doubleTimes.delete(floor);
   }
   const banked = doubles.get(floor);
   if (banked === undefined) return;

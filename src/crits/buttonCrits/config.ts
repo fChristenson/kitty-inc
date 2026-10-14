@@ -69,5 +69,10 @@ export const BUTTON_CRIT_CONFIG = {
     splashZoneCrit: {
       chance: 0.03,
     },
+    // drops of light trickling down the buttons, each tap of them then
+    // levelling the floors below too
+    trickleDownCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

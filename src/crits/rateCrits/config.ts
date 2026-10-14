@@ -52,5 +52,10 @@ export const RATE_CRIT_CONFIG = {
     superchargeCrit: {
       chance: 0.03,
     },
+    // a pen drawing a giant fast-forward sign that streams onto the bars,
+    // each then faster for its next payouts
+    doubleTimeCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

@@ -116,6 +116,17 @@ One element crushing another (`shared/animationStyles/crush`), shown three ways.
 
 ## Built
 
+- **Another drawn batch**, eight crits. Test: their tabs.
+  - **Torch Relay** (`animatedCrits/events/torchRelayEvent`, Summon, free floor, batch 101): circles on the floors' grounds relay pillars up the building, quicker each, the last bursting the locked floor open.
+  - **Drill Down** (`floorCrits/crits/drillDownCrit`, Drill): bores down through the bars top to bottom, the first the full grind, quicker each, levels on each.
+  - **Money Trail** (`incomeCrits/crits/moneyTrailCrit`, Mix): a wisp loops under the total trailing a river of coins, which pours in after it, a share every few coins.
+  - **Double Time** (`rateCrits/crits/doubleTimeCrit`, Drawing): a pen draws a giant fast-forward sign (`SHAPES.forward`) that streams onto the readouts; each bar `doubleTimeSpeed` times as fast for its next `doubleTimePayouts` payouts, its own `doubleTimeOwnPayouts` (`doubleTimeBar`).
+  - **Trickle Down** (`buttonCrits/crits/trickleDownCrit`, Ripple): drops drip down the buttons, quicker each trickle; `Tide N` taps each also level up to `trickleDownFloors` floors below (`addTideTaps`).
+  - **Lap Record** (`floorCrits/crits/lapRecordCrit`, Race): two wisps race a slalom down the bars into a finish blast, levels on every bar.
+  - **Burn Through** (`lockCrits/crits/burnThroughCrit`, Beam): a beam cuts a ring into the locked floor, lap by lap, until the disc blasts out; `burnThroughTaps` half-price taps per multiple on its button.
+  - **Ring Hop** (`animatedCrits/events/ringHopEvent`, Portal, free floor, batch 101): a wisp hops pairs of rings up the screen into the locked floor.
+  - The last batch moved from New Effects to its tabs.
+
 - **A drawn batch** (`select-animation-style.mjs`), eight crits. Test: New Effects.
   - **Stack Up** (`floorCrits/crits/stackUpCrit`, Clutter): glitter round every bar hops in quickening waves onto a stack at its end; the stacks slam down into their bars with levels.
   - **Splash Zone** (`buttonCrits/crits/splashZoneCrit`, Ripple): `Splash N` taps, each also levelling the floors above and below (`addSplashTaps`, `splashZoneTaps` per multiple, twice on its own).

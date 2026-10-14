@@ -13,6 +13,7 @@ import {
   addBoreTaps,
   addHeavyTaps,
   addSplashTaps,
+  addTideTaps,
   addButtonCharge,
   addDoubleTaps,
   addFreeTaps,
@@ -142,6 +143,13 @@ function reward(
     case "splashZoneCrit": {
       const taps = Math.max(1, Math.round(count * CONFIG.crit.splashZoneTaps));
       addSplashTaps(target, own ? taps * 2 : taps);
+      flipUpgradeButton(target);
+      return 0;
+    }
+    // taps that each level the floors below too, twice as many on its own
+    case "trickleDownCrit": {
+      const taps = Math.max(1, Math.round(count * CONFIG.crit.trickleDownTaps));
+      addTideTaps(target, own ? taps * 2 : taps);
       flipUpgradeButton(target);
       return 0;
     }

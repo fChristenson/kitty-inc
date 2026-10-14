@@ -387,6 +387,14 @@ export const FLOOR_CRIT_CONFIG = {
     stackUpCrit: {
       chance: 0.03,
     },
+    // a drill boring down through the bars top to bottom, quicker each
+    drillDownCrit: {
+      chance: 0.03,
+    },
+    // two wisps racing a slalom down the bars into a finish blast
+    lapRecordCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

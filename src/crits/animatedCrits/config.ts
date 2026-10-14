@@ -8290,6 +8290,20 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
+  // summon, free floors: src/crits/animatedCrits/events/torchRelayEvent ("Torch Relay"): magic circles on the floors' grounds relaying pillars of light up the building, each spinning up quicker, the last bursting the locked floor open
+  torchRelayEvent: {
+    chance: 0.01,
+    firstMs: 240, // from the click till the first circle is drawn
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // portal, free floors: src/crits/animatedCrits/events/ringHopEvent ("Ring Hop"): a wisp hopping through pairs of rings zigzagging up the screen, faster each pass, the last twin shooting it up into the locked floor
+  ringHopEvent: {
+    chance: 0.01,
+    firstMs: 260, // from the click till the wisp sets off
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // slice, free floors: src/crits/animatedCrits/events/cutLooseEvent ("Cut Loose"): swift slashes cut across the dark locked floor of the frozen screen in quick fire, glitter spilling out of every cut; a cross of two long cuts tears through it and it bursts open
   cutLooseEvent: {
     chance: 0.01,

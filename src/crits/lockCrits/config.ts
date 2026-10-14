@@ -101,5 +101,10 @@ export const LOCK_CRIT_CONFIG = {
     shredCrit: {
       chance: 0.03,
     },
+    // a beam cutting a ring into the locked floor until the disc blasts out,
+    // its button's next taps costing half
+    burnThroughCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

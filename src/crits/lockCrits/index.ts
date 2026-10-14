@@ -45,6 +45,7 @@ import {
   addButtonCharge,
   addDoubleTaps,
   addFreeTaps,
+  addHalfTaps,
 } from "../buttonCrits/buttonBonus";
 import {
   bankDoublePayout,
@@ -85,6 +86,7 @@ const OPENS_THEN_REWARDS: readonly LockCritKind[] = [
   "viceCrit",
   "crackleCageCrit",
   "shredCrit",
+  "burnThroughCrit",
 ];
 
 // a lock crit playing out from floor's crit onto the locked floor, if it's in
@@ -196,6 +198,9 @@ export function lockCritPlayFor(
           punchIncomeBar(opened, `${CONFIG.crit.woundUpPayout}x Pay`, color);
         } else if (kind === "shredCrit") {
           addDoubleTaps(opened, count * CONFIG.crit.shredTaps);
+          flipUpgradeButton(opened);
+        } else if (kind === "burnThroughCrit") {
+          addHalfTaps(opened, count * CONFIG.crit.burnThroughTaps);
           flipUpgradeButton(opened);
         } else if (kind === "sweepCleanCrit") {
           // the floor now waiting above the one it opened, priced down for

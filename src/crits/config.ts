@@ -113,6 +113,18 @@ export const CRIT_CONFIG = {
     // Shred: the floor it opens gets this many double taps per the crit's
     // multiple
     shredTaps: 1,
+    // Double Time: a bar doubleTimeSpeed times as fast for its next
+    // doubleTimePayouts payouts (its own doubleTimeOwnPayouts)
+    doubleTimeSpeed: 3,
+    doubleTimePayouts: 4,
+    doubleTimeOwnPayouts: 8,
+    // Trickle Down: taps also levelling up to trickleDownFloors floors below,
+    // per the crit's multiple (twice on its own)
+    trickleDownTaps: 0.5,
+    trickleDownFloors: 3,
+    // Burn Through: the floor it opens gets this many half-price taps per
+    // the crit's multiple
+    burnThroughTaps: 2,
     // gateway roll for the whole "special crit" (chain/boost/bounce/
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
     // ultra, before any of the individual proc chances (badgeCrits/balance, floorCrits/balance) are even
