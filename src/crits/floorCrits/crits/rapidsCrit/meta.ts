@@ -6,5 +6,4 @@ export default {
   label: "Rapids",
   chance: 0.03,
   style: "mix",
-  isNew: true,
 } satisfies CritMeta;
