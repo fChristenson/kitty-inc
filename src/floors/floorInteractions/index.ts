@@ -19,6 +19,7 @@ import {
   takeHotTap,
   takeLinkedFloors,
   takePayoutTap,
+  takeHireTap,
   stickSpentCrit,
   getCritTier,
   consumeCritUpgrade,
@@ -56,7 +57,13 @@ import {
   isFloorLocked,
   liveEffect,
 } from "../../shared/detachedJob";
-import { hitTestWorkers, clickWorker } from "../worker";
+import {
+  hitTestWorkers,
+  clickWorker,
+  recruitWorker,
+  celebrateWorkerBoost,
+} from "../worker";
+import { FLOOR_X_MAX, FLOOR_X_MIN } from "../constants";
 import {
   hitTestUpgradeButton,
   getButtonCenter,
@@ -397,6 +404,12 @@ function landTapBonuses(
     punchIncomeBar(floor, "+2 Lvl", COLOR.heavenlyGold);
   }
   if (takePayoutTap(floor)) paySaleClick(floor, isGroundFloor, 1);
+  if (takeHireTap(floor)) {
+    const now = Date.now();
+    const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * Math.random();
+    const worker = recruitWorker(floor, x, now);
+    if (worker !== null) celebrateWorkerBoost(floor, worker, now);
+  }
   const linked = takeLinkedFloors(floor);
   if (!linked) return;
   for (const other of linked) {

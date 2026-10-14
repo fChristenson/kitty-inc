@@ -46,6 +46,14 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-groundbreaking-event" class="game__button">Groundbreaking</button>
+          <button id="test-monsoon-event" class="game__button">Monsoon</button>
+          <button class="game__button" data-floor-crit="rollCallCrit">Roll Call</button>
+          <button class="game__button" data-income-crit="crownJewelCrit">Crown Jewel</button>
+          <button class="game__button" data-lock-crit="pullUpCrit">Pull Up</button>
+          <button class="game__button" data-button-crit="springLoadedCrit">Spring Loaded</button>
+          <button class="game__button" data-rate-crit="shortcutCrit">Shortcut</button>
+          <button class="game__button" data-rate-crit="cleanCutCrit">Clean Cut</button>
           <button id="test-star-pieces-event" class="game__button">Star Pieces</button>
           <button id="test-lodestones-event" class="game__button">Lodestones</button>
           <button class="game__button" data-floor-crit="raindropsCrit">Raindrops</button>

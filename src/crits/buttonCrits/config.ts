@@ -45,5 +45,10 @@ export const BUTTON_CRIT_CONFIG = {
     nailGunCrit: {
       chance: 0.03,
     },
+    // a wisp charging up on every bar's end and darting into its button,
+    // each tap of it then hiring a worker
+    springLoadedCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

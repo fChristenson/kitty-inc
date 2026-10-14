@@ -13,6 +13,7 @@ import {
   addButtonCharge,
   addDoubleTaps,
   addFreeTaps,
+  addHireTaps,
   addHotTaps,
   addLinkedTaps,
   addNails,
@@ -101,6 +102,16 @@ function reward(
       );
       flipUpgradeButton(target);
       return 0;
+    // taps that each hire a worker too, twice as many on its own
+    case "springLoadedCrit": {
+      const taps = Math.max(
+        1,
+        Math.round(count * CONFIG.crit.springLoadedHires),
+      );
+      addHireTaps(target, own ? taps * 2 : taps);
+      flipUpgradeButton(target);
+      return 0;
+    }
   }
 }
 

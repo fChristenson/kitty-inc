@@ -1,24 +1,24 @@
 // twinkling starfield, visible only above a global altitude threshold (see
 // gameCanvas.ts's STAR_START_ALTITUDE). Same deterministic-seeded-hash + vertical
-// cell-tiling technique as ../clouds, so it needs no stored state and redraws
-// identically every frame without an rAF loop of its own — the twinkle itself is
-// purely a function of `now`, not any per-star animation state.
+// cell-tiling technique as ../clouds: each cell's stars are hashed once and
+// kept, and the twinkle itself is purely a function of `now`
+import {
+  beginLightBatch,
+  endLightBatch,
+  queueLight,
+} from "../../shared/lightBatch";
 
 const CELL_H = 300; // world units; the vertical tile repeats every this many units
 const STARS_PER_UNIT_WIDTH = 1 / 90; // keeps density roughly constant as the world grows
+const DOT = 16;
 
 // deterministic pseudo-random in [0,1), so a given (seed, salt) always yields the
-// same star position/size/twinkle across frames without keeping any array state
+// same star position/size/twinkle across frames
 function rand(seed: number, salt: number): number {
   const x = Math.sin(seed * 12.9898 + salt * 78.233) * 43758.5453;
   return x - Math.floor(x);
 }
 
-// draws every star currently within [visibleLeft, visibleRight] x [visibleTop,
-// visibleBottom] (world units) at its current twinkle brightness. Each star's x/y is a
-// fixed position derived from its (cell, i) seed — the whole starfield is one
-// continuous field spanning the literal world width, same as ../clouds, not a
-// per-building repeat. Vertically, CELL_H-tall cells repeat forever upward.
 // per cell: x, y, radius, twinkle speed, phase for each star
 const STRIDE = 5;
 const cells = new Map<number, Float32Array>();
@@ -28,11 +28,11 @@ let dot: HTMLCanvasElement | null = null;
 function starDot(): HTMLCanvasElement {
   if (dot) return dot;
   dot = document.createElement("canvas");
-  dot.width = dot.height = 16;
+  dot.width = dot.height = DOT;
   const c = dot.getContext("2d")!;
   c.fillStyle = "#fff";
   c.beginPath();
-  c.arc(8, 8, 8, 0, Math.PI * 2);
+  c.arc(DOT / 2, DOT / 2, DOT / 2, 0, Math.PI * 2);
   c.fill();
   return dot;
 }
@@ -60,6 +60,7 @@ function cellStars(cell: number, worldWidth: number): Float32Array {
   return stars;
 }
 
+// every star within the visible world rect at its current twinkle
 export function drawStars(
   ctx: CanvasRenderingContext2D,
   worldWidth: number,
@@ -74,6 +75,10 @@ export function drawStars(
   const cellMax = Math.ceil(visibleBottom / CELL_H) + 1;
   const sprite = starDot();
   const alpha = ctx.globalAlpha;
+  // white on the dark sky: added light looks the same, and goes in one pass
+  const previous = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
 
   for (let cell = cellMin; cell <= cellMax; cell++) {
     const stars = cellStars(cell, worldWidth);
@@ -84,9 +89,29 @@ export function drawStars(
       if (x < visibleLeft || x > visibleRight) continue;
       const radius = stars[o + 2];
       const twinkle = 0.5 + 0.5 * Math.sin(now * stars[o + 3] + stars[o + 4]);
-      ctx.globalAlpha = alpha * (0.25 + twinkle * 0.75);
-      ctx.drawImage(sprite, x - radius, y - radius, radius * 2, radius * 2);
+      const a = alpha * (0.25 + twinkle * 0.75);
+      const d = radius * 2;
+      if (
+        !queueLight(
+          ctx,
+          sprite,
+          0,
+          0,
+          DOT,
+          DOT,
+          x - radius,
+          y - radius,
+          d,
+          d,
+          a,
+        )
+      ) {
+        ctx.globalAlpha = a;
+        ctx.drawImage(sprite, x - radius, y - radius, d, d);
+      }
     }
   }
+  endLightBatch(ctx);
+  ctx.globalCompositeOperation = previous;
   ctx.globalAlpha = alpha;
 }

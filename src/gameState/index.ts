@@ -98,6 +98,8 @@ export interface Floor {
   bgIndex: number; // which loaded shop background this floor draws (floors/index.ts)
   incomeAmount: BigNumber;
   incomeIntervalSeconds: number;
+  // what each payout is multiplied by for good (Clean Cut); 1 if unset
+  payoutMultiplier?: number;
   upgradeCost: BigNumber; // $ needed to buy this floor's next upgrade; doubles per purchase
   rateStep: BigNumber; // $ added to incomeAmount per upgrade click
   upgradeCount: number; // how many upgrades have been bought on this floor
@@ -477,6 +479,7 @@ export function reconcileBoostedAwayIncome(
 interface SavedFloor {
   incomeAmount: SerializedBigNumber;
   incomeIntervalSeconds: number;
+  payoutMultiplier?: number;
   upgradeCost: SerializedBigNumber;
   upgradeCostGrowth?: number;
   upgradeEconomyVersion?: number;
@@ -524,6 +527,7 @@ function toSavedFloor(floor: Floor): SavedFloor {
   return {
     incomeAmount: floor.incomeAmount,
     incomeIntervalSeconds: floor.incomeIntervalSeconds,
+    payoutMultiplier: floor.payoutMultiplier,
     upgradeCost: floor.upgradeCost,
     upgradeEconomyVersion: UPGRADE_ECONOMY_VERSION,
     rateStep: floor.rateStep,
@@ -671,6 +675,7 @@ function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
         )
       : multiply(toBigNumber(sf.incomeAmount), payoutStretch),
     incomeIntervalSeconds: savedInterval * stretch,
+    payoutMultiplier: sf.payoutMultiplier,
     upgradeCost,
     rateStep,
     upgradeCount: sf.upgradeCount,

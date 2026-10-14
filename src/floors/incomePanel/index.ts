@@ -26,6 +26,7 @@ import {
   drawPoppingCritText,
   noteRatePayout,
   rateCritSpeed,
+  ratePayoutMultiplier,
 } from "../../crits";
 import { getWiggleRotation } from "../../shared/wiggle";
 
@@ -637,7 +638,13 @@ function effectiveIncomeCycle(
   floor: Floor,
   now: number,
 ): { intervalSeconds: number; amount: BigNumber; overspeed: boolean } {
-  return sharedEffectiveIncomeCycle(floor, currentSpeedMultiplier(floor, now));
+  const cycle = sharedEffectiveIncomeCycle(
+    floor,
+    currentSpeedMultiplier(floor, now),
+  );
+  const payout = ratePayoutMultiplier(floor);
+  if (payout !== 1) cycle.amount = multiply(cycle.amount, payout);
+  return cycle;
 }
 
 // advances a floor's fill cycle by however many full intervals have elapsed since it was last
@@ -651,8 +658,10 @@ export function collectDueIncome(floor: Floor, now: number): BigNumber {
     now,
     currentSpeedMultiplier(floor, now),
   );
-  if (!isZero(due)) noteRatePayout(floor, now);
-  return due;
+  if (isZero(due)) return due;
+  const payout = ratePayoutMultiplier(floor);
+  noteRatePayout(floor, now);
+  return payout === 1 ? due : multiply(due, payout);
 }
 
 // same math as collectDueIncome, but read-only — doesn't advance

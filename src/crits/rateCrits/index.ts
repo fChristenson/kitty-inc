@@ -10,7 +10,7 @@ import type { Floor } from "../../gameState";
 import type { RateCritKind } from "../critTypes";
 import type { FloorCritPlay } from "../floorCrits/critPlayer";
 import { otherFloorsInView, spotsFromFlash } from "../floorCrits/playTargets";
-import { overclockBar, stepBar } from "./rateBonus";
+import { bankDoublePayout, overclockBar, stepBar } from "./rateBonus";
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { liveEffect } from "../../shared/detachedJob";
@@ -28,7 +28,8 @@ const spawnCoinBurst = liveEffect(animateCoinBurst);
 // a reward hit knocks this many coins off its bar
 const COIN_SPILL: [number, number] = [8, 14];
 
-function reward(kind: RateCritKind, target: Floor): void {
+// step 2 is the crit's own bar
+function reward(kind: RateCritKind, target: Floor, step: number): void {
   switch (kind) {
     case "overclockCrit":
       overclockBar(target);
@@ -38,6 +39,16 @@ function reward(kind: RateCritKind, target: Floor): void {
       return;
     case "quickstepCrit":
       stepBar(target);
+      return;
+    case "shortcutCrit":
+      bankDoublePayout(target);
+      return;
+    case "cleanCutCrit":
+      target.payoutMultiplier =
+        (target.payoutMultiplier ?? 1) *
+        (step === 2
+          ? CONFIG.crit.cleanCutOwnPayout
+          : CONFIG.crit.cleanCutPayout);
       return;
   }
 }
@@ -72,9 +83,9 @@ export function rateCritPlayFor(
       }
       // turned over from what it read before the reward
       flipIncomeRate(target);
-      reward(kind, target);
+      reward(kind, target, step);
       punchIncomeBar(target, null, COLOR.heavenlyGold);
-      if (kind === "shiftUpCrit") deps.persist();
+      if (kind === "shiftUpCrit" || kind === "cleanCutCrit") deps.persist();
       const box = getIncomeBarBox(isGround(target));
       spawnCoinBurst(
         target,

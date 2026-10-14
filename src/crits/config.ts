@@ -62,6 +62,16 @@ export const CRIT_CONFIG = {
     quickstepMs: 30_000,
     quickstepStep: 0.1,
     quickstepMaxSpeed: 3,
+    // Shortcut: each pass banks one payout this many times as big
+    shortcutPayout: 2,
+    // Clean Cut: a bar's payouts this many times as big for good (its own
+    // cleanCutOwnPayout)
+    cleanCutPayout: 1.25,
+    cleanCutOwnPayout: 1.5,
+    // Pull Up: the floor it opens this many times as fast for good
+    pullUpSpeed: 2,
+    // Spring Loaded: hiring taps per the crit's multiple (twice on its own)
+    springLoadedHires: 0.5,
     // gateway roll for the whole "special crit" (chain/boost/bounce/
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
     // ultra, before any of the individual proc chances (badgeCrits/balance, floorCrits/balance) are even

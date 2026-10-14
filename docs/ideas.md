@@ -86,6 +86,17 @@ New animation styles, each with its own verb and lib in `shared/animationStyles`
 
 ## Built
 
+- **List 199**, eight crits for the thin spots in `crit-dist`. Test: New Effects. All hold 57-60fps under the stress test.
+  - **Shortcut** (`rateCrits/crits/shortcutCrit`, Portal): a wisp loops through twin rings over and under each bar's right end, faster each loop; every pass banks one double payout (`bankDoublePayout` in `rateCrits/rateBonus.ts`, `CONFIG.crit.shortcutPayout`, spent one a payout).
+  - **Clean Cut** (`rateCrits/crits/cleanCutCrit`, Slice, rarer 0.01): swipes slash each bar, glitter spilling, then the cut welds gold and the bar pays more for good (`floor.payoutMultiplier`, saved; `cleanCutPayout`, its own `cleanCutOwnPayout`). The bars aren't split apart: the game draws them.
+  - **Spring Loaded** (`buttonCrits/crits/springLoadedCrit`, Charge): a wisp beside each button charges up and darts into it; each of its next taps also hires a worker (`Hire N`, `addHireTaps`, `CONFIG.crit.springLoadedHires` per multiple, twice on its own).
+  - **Pull Up** (`lockCrits/crits/pullUpCrit`, Magnet): two poles snap the locked floor's dust into crusts, yank together and slam it open, the crust flung off; its bar runs `CONFIG.crit.pullUpSpeed` times as fast for good.
+  - **Crown Jewel** (`incomeCrits/crits/crownJewelCrit`, Assemble): seven gold crown pieces lock in under the total, a share each, then blaze and fly apart into it.
+  - **Roll Call** (`floorCrits/crits/rollCallCrit`, Snowball): a wisp ball rolls along each bar top down, picking up its glitter, levels on each, and bursts on its own.
+  - **Groundbreaking** (`animatedCrits/events/groundbreakingEvent`, Summon, free floor, batch 101): a giant circle at the bottom of the frozen screen; its pillar rides up the building and bursts the locked floor open.
+  - **Monsoon** (`animatedCrits/events/monsoonEvent`, Ripple, perma tiers, batch 101): drops onto the workers, a drizzle to a downpour, each one's second drop a perma tier; a huge drop into their midst.
+  - The night sky's stars (`background/stars`) are hashed once per cell and stamped in one light batch: lock crits pan up to the sky, where the starfield cost the most.
+
 - **Assemble** animation style and **Star Pieces** (animated crit, perma tiers, batch 100), from List 198. Test: New Effects.
   - `shared/animationStyles/assemble`: `fanPieces`, `planAssemble`, `drawAssembly`.
   - **Star Pieces** (`animatedCrits/events/starPiecesEvent`): ten pieces of a giant gold star fly in turning and lock in one by one, quicker and quicker; it blazes and flies apart, every piece diving onto a worker that can still climb, a perma tier up.

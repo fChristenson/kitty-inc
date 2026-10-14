@@ -8267,6 +8267,25 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 101
+  // summon, free floors: src/crits/animatedCrits/events/groundbreakingEvent ("Groundbreaking"): a giant magic circle drawn flat at the bottom of the frozen screen turns faster and faster; a pillar of light erupts out of it and rides up the building, a blast at every floor, until it bursts the locked floor open
+  groundbreakingEvent: {
+    chance: 0.01,
+    eruptMs: 1400, // from the click till the pillar erupts
+    riseMs: 320, // the pillar riding up to the locked floor
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // ripple, perma tiers: src/crits/animatedCrits/events/monsoonEvent ("Monsoon"): drops of light fall onto the workers, each a splash and a flat ring, a drizzle quickening to a downpour, a worker's second drop a perma tier up; then one huge drop into their midst
+  monsoonEvent: {
+    chance: 0.01,
+    firstMs: 250, // from the click till the first drop lands
+    gapsMs: [170, 35] as [number, number], // between drops, closing to a downpour
+    bigGapMs: 300, // from the last drop till the huge one lands
+    bigFallMs: 420, // the huge drop's fall
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 100
   // assemble, perma tiers: src/crits/animatedCrits/events/starPiecesEvent ("Star Pieces"): ten pieces of a giant gold star fly in turning and lock together one by one, quicker and quicker; it blazes and flies apart, every piece diving onto a worker, a perma tier up
   starPiecesEvent: {

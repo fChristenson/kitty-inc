@@ -49,13 +49,16 @@ export function effectiveIncomeCycle(
   speedMultiplier: number,
 ): EffectiveIncomeCycle {
   const uncappedIntervalSeconds = floor.incomeIntervalSeconds / speedMultiplier;
-  const base =
+  const maxed =
     floor.upgradeCount >= CONFIG.incomePanel.maxFloorLevel
       ? multiply(
           floor.incomeAmount,
           CONFIG.incomePanel.maxedFloorIncomeMultiplier,
         )
       : floor.incomeAmount;
+  const base = floor.payoutMultiplier
+    ? multiply(maxed, floor.payoutMultiplier)
+    : maxed;
 
   if (uncappedIntervalSeconds > MIN_INCOME_INTERVAL_SECONDS) {
     return {

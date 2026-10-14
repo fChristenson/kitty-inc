@@ -66,5 +66,10 @@ export const LOCK_CRIT_CONFIG = {
     conjureCrit: {
       chance: 0.03,
     },
+    // two gold poles snapping the locked floor's dust into crusts, yanking
+    // together to slam it open, its new bar a gear up for good
+    pullUpCrit: {
+      chance: 0.03,
+    },
   } satisfies Record<string, { chance: number }>,
 };

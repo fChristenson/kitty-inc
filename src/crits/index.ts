@@ -93,9 +93,14 @@ export {
   takeHotTap,
   takeLinkedFloors,
   takePayoutTap,
+  takeHireTap,
   stickSpentCrit,
 } from "./buttonCrits/buttonBonus";
-export { noteRatePayout, rateCritSpeed } from "./rateCrits/rateBonus";
+export {
+  noteRatePayout,
+  rateCritSpeed,
+  ratePayoutMultiplier,
+} from "./rateCrits/rateBonus";
 export {
   BADGE_GLITTER_AT,
   BADGE_SHIMMER_AT,

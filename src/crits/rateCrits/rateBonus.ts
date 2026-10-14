@@ -1,12 +1,24 @@
-// what rate crits leave on an income bar: an Overclock's run of extra speed
-// and a Quickstep's quickening (each landing and payout a step faster). Read
-// by the income panel's speed and payouts (floors/incomePanel); not persisted
+// what rate crits leave on an income bar: an Overclock's run of extra speed,
+// a Quickstep's quickening (each landing and payout a step faster) and a
+// Shortcut's banked double payouts. Read by the income panel's speed and
+// payouts (floors/incomePanel); not persisted
 import { snapshotMap } from "../../shared/snapshotState";
 import { CONFIG } from "../../config";
 import type { Floor } from "../../gameState";
 
 const overclocks = snapshotMap<Floor, number>();
 const quicksteps = snapshotMap<Floor, { until: number; steps: number }>();
+const doubles = snapshotMap<Floor, number>();
+
+// a Shortcut's pass: one more payout paying double
+export function bankDoublePayout(floor: Floor): void {
+  doubles.set(floor, (doubles.get(floor) ?? 0) + 1);
+}
+
+// how many times as big rate crits make floor's next payout
+export function ratePayoutMultiplier(floor: Floor): number {
+  return doubles.has(floor) ? CONFIG.crit.shortcutPayout : 1;
+}
 
 export function overclockBar(floor: Floor): void {
   overclocks.set(floor, Date.now() + CONFIG.crit.overclockMs);
@@ -17,7 +29,8 @@ export function stepBar(floor: Floor): void {
   const now = Date.now();
   const run = quicksteps.get(floor);
   if (run && now < run.until) run.steps++;
-  else quicksteps.set(floor, { until: now + CONFIG.crit.quickstepMs, steps: 1 });
+  else
+    quicksteps.set(floor, { until: now + CONFIG.crit.quickstepMs, steps: 1 });
 }
 
 // how many times as fast rate crits run floor's bar right now
@@ -40,8 +53,12 @@ export function rateCritSpeed(floor: Floor, now: number): number {
   return speed;
 }
 
-// a payout landing on floor's bar: a Quickstep's step
+// a payout landing on floor's bar: a Quickstep's step, a banked double spent
 export function noteRatePayout(floor: Floor, now: number): void {
   const run = quicksteps.get(floor);
   if (run && now < run.until) run.steps++;
+  const banked = doubles.get(floor);
+  if (banked === undefined) return;
+  if (banked > 1) doubles.set(floor, banked - 1);
+  else doubles.delete(floor);
 }

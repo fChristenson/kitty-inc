@@ -25,6 +25,7 @@ import {
 } from "../../floors/floorLock";
 import {
   currentPayoutAmount,
+  flipIncomeRate,
   getIncomeBarCenter,
   increaseIncomeRateBy,
   punchIncomeBar,
@@ -68,6 +69,7 @@ const OPENS_THEN_REWARDS: readonly LockCritKind[] = [
   "skeletonKeyCrit",
   "jumpStartCrit",
   "conjureCrit",
+  "pullUpCrit",
 ];
 
 // a lock crit playing out from floor's crit onto the locked floor, if it's in
@@ -157,6 +159,10 @@ export function lockCritPlayFor(
             });
             punchIncomeBar(opened, "Price Back", color);
           }
+        } else if (kind === "pullUpCrit") {
+          flipIncomeRate(opened);
+          opened.incomeIntervalSeconds /= CONFIG.crit.pullUpSpeed;
+          punchIncomeBar(opened, `${CONFIG.crit.pullUpSpeed}x Speed`, color);
         } else {
           const spot = MOVE_IN_SPOTS[movedIn++ % MOVE_IN_SPOTS.length];
           const x = FLOOR_X_MIN + (FLOOR_X_MAX - FLOOR_X_MIN) * spot;

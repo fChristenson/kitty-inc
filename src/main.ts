@@ -2330,6 +2330,8 @@ async function main() {
           springboard: forceOnActive((e) => e.forceSpringboardEvent),
           lodestones: forceOnActive((e) => e.forceLodestonesEvent),
           "star-pieces": forceOnActive((e) => e.forceStarPiecesEvent),
+          groundbreaking: forceOnActive((e) => e.forceGroundbreakingEvent),
+          monsoon: forceOnActive((e) => e.forceMonsoonEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "gold-switch": later(() => {

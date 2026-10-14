@@ -17,5 +17,15 @@ export const RATE_CRIT_CONFIG = {
     quickstepCrit: {
       chance: 0.03,
     },
+    // a wisp looping through twin rings over and under every bar, each pass
+    // banking a double payout
+    shortcutCrit: {
+      chance: 0.03,
+    },
+    // swipes slashing every bar in two, welded back gold, each then paying
+    // more for good; rarer, being for good
+    cleanCutCrit: {
+      chance: 0.01,
+    },
   } satisfies Record<string, { chance: number }>,
 };

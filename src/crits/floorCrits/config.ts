@@ -354,6 +354,11 @@ export const FLOOR_CRIT_CONFIG = {
     raindropsCrit: {
       chance: 0.03,
     },
+    // a wisp ball rolling along each bar picking up its glitter, dropping
+    // to the next, bigger and quicker, then bursting on its own
+    rollCallCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {
