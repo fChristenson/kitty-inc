@@ -8,5 +8,4 @@ export default {
   style: "crush",
   // how many payouts the opened bar's first payout pays at once
   values: { payout: 8 },
-  isNew: true,
 } satisfies CritMeta;

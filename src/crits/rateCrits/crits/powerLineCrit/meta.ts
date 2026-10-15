@@ -9,5 +9,4 @@ export default {
   // each payout runs a bar `step` faster again, for `payouts` payouts (its
   // own twice as many)
   values: { step: 0.25, payouts: 6 },
-  isNew: true,
 } satisfies CritMeta;

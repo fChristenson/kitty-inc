@@ -102,11 +102,24 @@ registerFloorCrit("wateringCanCrit", {
       const a = { x: x - dir * half, y };
       const b = { x: x + dir * half, y };
       const prev = legs[legs.length - 1];
-      legs.push({ a: prev ? prev.b : { x: a.x - dir * IN_FROM, y: a.y - IN_FROM / 2 }, b: a, t0: t, t1: t + DIVE_MS });
+      legs.push({
+        a: prev ? prev.b : { x: a.x - dir * IN_FROM, y: a.y - IN_FROM / 2 },
+        b: a,
+        t0: t,
+        t1: t + DIVE_MS,
+      });
       t += DIVE_MS;
-      const ms = own ? OWN_SWEEP_MS : lerp(SWEEP_MS[0], SWEEP_MS[1], k / Math.max(1, order.length - 2));
+      const ms = own
+        ? OWN_SWEEP_MS
+        : lerp(SWEEP_MS[0], SWEEP_MS[1], k / Math.max(1, order.length - 2));
       legs.push({ a, b, t0: t, t1: t + ms });
-      const perMs = own ? OWN_PER_MS : lerp(COINS_PER_MS[0], COINS_PER_MS[1], k / Math.max(1, order.length - 2));
+      const perMs = own
+        ? OWN_PER_MS
+        : lerp(
+            COINS_PER_MS[0],
+            COINS_PER_MS[1],
+            k / Math.max(1, order.length - 2),
+          );
       const count = Math.round(ms * perMs);
       for (let i = 0; i < count; i++, n++) {
         const u = i / count;
@@ -159,9 +172,17 @@ registerFloorCrit("wateringCanCrit", {
     state.offset.y = base.y;
     const { pours, coins } = state;
     if (ms < IN_MS)
-      drawText(ctx, r.glyphs, r.label, 0, 0, r.flashFont * (1 + 0.4 * (ms / IN_MS)), {
-        alpha: 1 - ms / IN_MS,
-      });
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        0,
+        0,
+        r.flashFont * (1 + 0.4 * (ms / IN_MS)),
+        {
+          alpha: 1 - ms / IN_MS,
+        },
+      );
     // a whoosh as it tears into each bar
     while (r.kicked < pours.length && ms >= pours[r.kicked].start) {
       playSwoosh();
@@ -173,7 +194,13 @@ registerFloorCrit("wateringCanCrit", {
       spot.x = bar.x;
       spot.y = bar.y;
       if (ms >= p.start && ms < p.landed)
-        drawChargeGlow(ctx, spot, clamp01((ms - p.start) / (p.landed - p.start)), p.own ? OWN_GLOW : GLOW, now);
+        drawChargeGlow(
+          ctx,
+          spot,
+          clamp01((ms - p.start) / (p.landed - p.start)),
+          p.own ? OWN_GLOW : GLOW,
+          now,
+        );
       drawDetonation(ctx, spot, ms - p.landed, p.own ? OWN_BLAST : BLAST, now);
     }
     const transform = ctx.getTransform();
@@ -194,7 +221,15 @@ registerFloorCrit("wateringCanCrit", {
     }
     endCoinBatch(ctx);
     const last = pours[pours.length - 1];
-    if (ms <= last.end) drawWisp(ctx, state.wisp, ms, now, WISP, Math.min(1, (r.kicked + 1) / pours.length));
+    if (ms <= last.end)
+      drawWisp(
+        ctx,
+        state.wisp,
+        ms,
+        now,
+        WISP,
+        Math.min(1, (r.kicked + 1) / pours.length),
+      );
   },
   tailMs: DETONATION_MS,
   shake: (step) => SHAKES[step] ?? SHAKES[0],

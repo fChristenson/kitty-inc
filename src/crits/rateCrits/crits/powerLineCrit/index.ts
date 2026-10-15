@@ -80,7 +80,10 @@ const ratchets = defineBarEffect<{ left: number; k: number }>({
 registerFloorCrit("powerLineCrit", {
   reward(t) {
     t.flipRate();
-    ratchets.set(t.floor, { left: meta.values.payouts * (t.own ? 2 : 1), k: 1 });
+    ratchets.set(t.floor, {
+      left: meta.values.payouts * (t.own ? 2 : 1),
+      k: 1,
+    });
     t.punch(`+${Math.round(meta.values.step * 100)}% Speed a Payout`);
   },
   plan(r, bars, hit) {
@@ -95,7 +98,14 @@ registerFloorCrit("powerLineCrit", {
     order.forEach((bar, k) => {
       const to: Point = { x: 0, y: 0 };
       if (k === 0) from = { x: 0, y: 0 };
-      links.push({ bar, from, to, reachAt: t - REACH_MS, strikeAt: t, bolt: createBolt(from, to, 2) });
+      links.push({
+        bar,
+        from,
+        to,
+        reachAt: t - REACH_MS,
+        strikeAt: t,
+        bolt: createBolt(from, to, 2),
+      });
       hit(bar, t, 1);
       from = to;
       t += lerp(GAPS_MS[0], GAPS_MS[1], k / Math.max(1, order.length - 1));
@@ -114,9 +124,17 @@ registerFloorCrit("powerLineCrit", {
     const half = r.play.barHalfWidth;
     const { links, own, sky, giantAt } = state;
     if (ms < IN_MS)
-      drawText(ctx, r.glyphs, r.label, 0, 0, r.flashFont * (1 - 0.5 * (ms / IN_MS)), {
-        alpha: 1 - ms / IN_MS,
-      });
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        0,
+        0,
+        r.flashFont * (1 - 0.5 * (ms / IN_MS)),
+        {
+          alpha: 1 - ms / IN_MS,
+        },
+      );
     for (let k = 0; k < links.length; k++) {
       const link = links[k];
       const bar = bars[link.bar];
@@ -142,7 +160,16 @@ registerFloorCrit("powerLineCrit", {
       const link = links[k];
       if (ms < link.reachAt || fade <= 0) continue;
       const reach = clamp01((ms - link.reachAt) / REACH_MS);
-      drawLightningArc(ctx, link.from, link.to, fade, ARC * flare, now, k, reach);
+      drawLightningArc(
+        ctx,
+        link.from,
+        link.to,
+        fade,
+        ARC * flare,
+        now,
+        k,
+        reach,
+      );
     }
     endLightBatch(ctx);
     ctx.globalCompositeOperation = previous;

@@ -6,5 +6,4 @@ export default {
   label: "Swing Shift",
   chance: 0.03,
   style: "swarm",
-  isNew: true,
 } satisfies CritMeta;
