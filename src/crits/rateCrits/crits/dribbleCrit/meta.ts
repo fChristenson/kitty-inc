@@ -15,5 +15,4 @@ export default {
     ms: 12_000,
     ownMs: 24_000,
   },
-  isNew: true,
 } satisfies CritMeta;

@@ -6,5 +6,4 @@ export default {
   label: "Lightning Tree",
   chance: 0.03,
   style: "lightning",
-  isNew: true,
 } satisfies CritMeta;

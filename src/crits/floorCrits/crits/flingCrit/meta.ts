@@ -7,5 +7,4 @@ export default {
   label: "Fling",
   chance: 0.03,
   style: "portal",
-  isNew: true,
 } satisfies CritMeta;

@@ -9,5 +9,4 @@ export default {
   style: "mix",
   // cannon taps on the opened floor's button
   values: { taps: 5 },
-  isNew: true,
 } satisfies CritMeta;

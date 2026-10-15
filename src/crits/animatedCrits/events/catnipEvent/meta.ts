@@ -19,5 +19,4 @@ export default {
     holdMs: 500,
     mergeMs: 0,
   },
-  isNew: true,
 } as const satisfies EventMeta;
