@@ -10,5 +10,4 @@ export default {
   // how many times as fast a bar runs at first, tapering evenly towards
   // normal over its next payouts (its own over ownPayouts)
   values: { speed: 4, payouts: 6, ownPayouts: 12 },
-  isNew: true,
 } satisfies CritMeta;

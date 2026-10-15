@@ -514,8 +514,9 @@ export function drawFloorCrit(
   try {
     def.draw(ctx, r, ms, bars);
   } finally {
-    // a throw must never leave every later light queued and undrawn
+    // a throw must never leave every later light queued and undrawn, nor
+    // this crit's canvas state on everything drawn after it
     flushLights(ctx);
+    ctx.restore();
   }
-  ctx.restore();
 }

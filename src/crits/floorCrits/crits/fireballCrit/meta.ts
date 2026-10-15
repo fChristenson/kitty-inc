@@ -6,5 +6,4 @@ export default {
   label: "Fireball",
   chance: 0.03,
   style: "charge",
-  isNew: true,
 } satisfies CritMeta;

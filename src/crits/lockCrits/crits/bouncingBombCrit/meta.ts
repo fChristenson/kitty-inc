@@ -9,5 +9,4 @@ export default {
   style: "bounce",
   // levels on the floor below the opened one, times the crit's multiple
   values: { levels: 4 },
-  isNew: true,
 } satisfies CritMeta;
