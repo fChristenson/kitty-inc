@@ -303,7 +303,8 @@ function startSkyChase(floor: Floor, context: EventProcContext): void {
   const screenZ = flown(enterMs) + SCREEN_AHEAD;
   const sill = CAM_Y - (SCREEN_W * aspect) / 2;
   const land = fpsOpeningLanding(FOCAL, screenZ, SCREEN_W, sill, aspect);
-  const landing = (ms: number) => smoothstep(clamp01((ms - enterMs) / arriveMs));
+  const landing = (ms: number) =>
+    smoothstep(clamp01((ms - enterMs) / arriveMs));
   const ship = { x: 0, z: 0, hover: 0 };
   const shipAt = (ms: number) => {
     const t = Math.max(0, ms);
@@ -638,7 +639,15 @@ function startSkyChase(floor: Floor, context: EventProcContext): void {
         drawGlow(ctx, AURA_GOLD, a.x, a.y, AURA * s * (1 + 1.5 * lock));
         ctx.globalAlpha = 1;
         ctx.globalCompositeOperation = previous;
-        drawWisp(ctx, banditPath, ms, now, BANDIT * s * (1 + 0.5 * lock), 1, hidden);
+        drawWisp(
+          ctx,
+          banditPath,
+          ms,
+          now,
+          BANDIT * s * (1 + 0.5 * lock),
+          1,
+          hidden,
+        );
       }
     }
     for (let d = 0; d < dodgeMs.length; d++)
@@ -676,8 +685,12 @@ function startSkyChase(floor: Floor, context: EventProcContext): void {
         ms >= m.fire ? COLOR.white : COLOR.fullHouseCrimson,
       );
     }
-    if (ms >= lockAtMs && ms < finalMs && sightInto(fps, b.x, b.y, b.z, a) > 0) {
-      const r = AURA * (fps.lens.focal * view.w) / (b.z - cz);
+    if (
+      ms >= lockAtMs &&
+      ms < finalMs &&
+      sightInto(fps, b.x, b.y, b.z, a) > 0
+    ) {
+      const r = (AURA * (fps.lens.focal * view.w)) / (b.z - cz);
       const blink = lock < 1 ? (ms - lockAtMs) % (90 - 50 * lock) < 30 : true;
       drawBrackets(
         ctx,
@@ -690,7 +703,16 @@ function startSkyChase(floor: Floor, context: EventProcContext): void {
     // the shots
     for (let k = 0; k < mines.length; k++) {
       const m = mines[k];
-      drawWispBetween(ctx, m.shotPath, ms, now, WISP_SIZE * SHOT, 1, m.fire, m.hit);
+      drawWispBetween(
+        ctx,
+        m.shotPath,
+        ms,
+        now,
+        WISP_SIZE * SHOT,
+        1,
+        m.fire,
+        m.hit,
+      );
     }
     for (let k = 0; k < volleys.length; k++) {
       const v = volleys[k];
@@ -724,7 +746,13 @@ function startSkyChase(floor: Floor, context: EventProcContext): void {
       const carried = CARRY * (flownNow - flown(v.hit));
       const s = sightInto(fps, v.to.x, v.to.y, v.to.z + carried, a);
       if (s === 0) continue;
-      drawDetonation(ctx, a, since, (last ? FINAL_BLAST : VOLLEY_BLAST) * s, now);
+      drawDetonation(
+        ctx,
+        a,
+        since,
+        (last ? FINAL_BLAST : VOLLEY_BLAST) * s,
+        now,
+      );
       if (since < BURST_MS * (last ? 2 : 1))
         drawWhiteBurst(
           ctx,
@@ -760,7 +788,13 @@ function startSkyChase(floor: Floor, context: EventProcContext): void {
     if (finalLabel && sinceFinal >= 0 && sinceFinal < LABEL_MS * 2) {
       const carried = flownNow - flown(finalMs);
       if (
-        sightInto(fps, finalSpot.x, finalSpot.y + 0.35, finalSpot.z + carried, a) > 0
+        sightInto(
+          fps,
+          finalSpot.x,
+          finalSpot.y + 0.35,
+          finalSpot.z + carried,
+          a,
+        ) > 0
       ) {
         ctx.globalAlpha =
           1 - smoothstep(clamp01((sinceFinal / (LABEL_MS * 2) - 0.6) / 0.4));

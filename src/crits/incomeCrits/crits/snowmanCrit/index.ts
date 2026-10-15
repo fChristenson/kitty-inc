@@ -252,8 +252,7 @@ registerFloorCrit("snowmanCrit", {
     for (let k = 0; k < BALLS.length; k++) {
       const ball = planBall(k, r, to, seats[k]);
       if (k > 0)
-        seats[k].y =
-          seats[k - 1].y - (balls[k - 1].size + ball.size) * OVERLAP;
+        seats[k].y = seats[k - 1].y - (balls[k - 1].size + ball.size) * OVERLAP;
       balls.push(ball);
     }
     const ends: number[] = [];
@@ -395,7 +394,11 @@ registerFloorCrit("snowmanCrit", {
       const e = ms - head.land - EYES_MS;
       if (e >= 0) {
         const open =
-          e < 60 ? e / 60 : e >= 200 && e < 260 ? Math.abs(1 - (e - 200) / 30) : 1;
+          e < 60
+            ? e / 60
+            : e >= 200 && e < 260
+              ? Math.abs(1 - (e - 200) / 30)
+              : 1;
         const hr = rs[balls.length - 1];
         const hx = head.seat.x + shiver.x;
         const hy = ys[balls.length - 1] + shiver.y + hr * EYE_Y * sy;
@@ -434,7 +437,14 @@ registerFloorCrit("snowmanCrit", {
       const f = 1 - since / FLASH_MS;
       const y = k === 0 ? s.ground : balls[k].seat.y + balls[k].size;
       ctx.globalAlpha = alpha * f;
-      drawGlow(ctx, GOLD, balls[k].seat.x, y, THUD_FLASH * (1.6 - 0.6 * f), 0.5);
+      drawGlow(
+        ctx,
+        GOLD,
+        balls[k].seat.x,
+        y,
+        THUD_FLASH * (1.6 - 0.6 * f),
+        0.5,
+      );
       drawGlow(ctx, WHITE, balls[k].seat.x, y, THUD_FLASH * 0.6 * f);
     }
     // each share landing on the readout in a green flash

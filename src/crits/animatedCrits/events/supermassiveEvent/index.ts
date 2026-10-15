@@ -121,15 +121,8 @@ export const forceSupermassiveEvent = registerWispEvent(
   "Supermassive",
   () => meta.chance,
   (floor, context, area) => {
-    const {
-      firstMs,
-      pullMs,
-      collapseMs,
-      silenceMs,
-      ringMs,
-      holdMs,
-      mergeMs,
-    } = meta.values;
+    const { firstMs, pullMs, collapseMs, silenceMs, ringMs, holdMs, mergeMs } =
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     getSunSprite();

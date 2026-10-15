@@ -288,7 +288,8 @@ registerFloorCrit("rabbitHoleCrit", {
       ends[b].y = bars[b].y;
     }
     // its own hole swelling and trembling as the pops close in on it
-    const charge = n > 1 ? clamp01((ms - popMs[0]) / (popMs[last] - popMs[0])) : 0;
+    const charge =
+      n > 1 ? clamp01((ms - popMs[0]) / (popMs[last] - popMs[0])) : 0;
     for (let i = 0; i < n; i++) {
       const b = bars[order[i]];
       if (!b) continue;
@@ -351,7 +352,8 @@ registerFloorCrit("rabbitHoleCrit", {
       beginLightBatch(ctx);
       for (let i = 0; i < GLITTER; i++) {
         const p = burst / state.glitterMs[i];
-        const fade = p > 1 ? 1 - (burst - state.glitterMs[i]) / GLITTER_FADE_MS : 1;
+        const fade =
+          p > 1 ? 1 - (burst - state.glitterMs[i]) / GLITTER_FADE_MS : 1;
         if (fade <= 0) continue;
         const q = Math.min(1, p);
         ctx.globalAlpha = base * fade;

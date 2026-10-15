@@ -195,8 +195,7 @@ function setPays(set: SequinSet): number {
 // a sequinned bar's next `left` payouts paying more for each bar in its set
 const sequinned = defineBarEffect<{ set: SequinSet; left: number }>({
   payout: (v) => setPays(v.set),
-  onPayout: (v) =>
-    v.left > 1 ? { set: v.set, left: v.left - 1 } : undefined,
+  onPayout: (v) => (v.left > 1 ? { set: v.set, left: v.left - 1 } : undefined),
 });
 
 const wrap = (a: number) => a - TAU * Math.round(a / TAU);
@@ -229,8 +228,12 @@ registerFloorCrit("sequinsCrit", {
     const zipAt = new Float32Array(n);
     const zipMs = new Float32Array(n);
     const landAt = new Float32Array(n);
-    const kicks: { at: number; shake: number; tick: number; swoosh: boolean }[] =
-      [{ at: BLOW_MS, shake: BLOW_UP.shake, tick: 0, swoosh: false }];
+    const kicks: {
+      at: number;
+      shake: number;
+      tick: number;
+      swoosh: boolean;
+    }[] = [{ at: BLOW_MS, shake: BLOW_UP.shake, tick: 0, swoosh: false }];
     // the bars tidying, quickening, fitted into SPAN; its own last
     let total = 0;
     for (let k = 0; k < n - 2; k++)
@@ -439,7 +442,17 @@ registerFloorCrit("sequinsCrit", {
         lightArgs[9] = s.tiltC[i];
         lightArgs[10] = s.tiltS[i];
         if (!queueLightArgs(ctx, atlas))
-          ctx.drawImage(atlas, c * CELL, 0, CELL, CELL, x - w / 2, y - SEQ / 2, w, SEQ);
+          ctx.drawImage(
+            atlas,
+            c * CELL,
+            0,
+            CELL,
+            CELL,
+            x - w / 2,
+            y - SEQ / 2,
+            w,
+            SEQ,
+          );
         if (flip > GLINT_AT)
           stampGlimmer(
             ctx,
@@ -465,7 +478,14 @@ registerFloorCrit("sequinsCrit", {
             COLOR.white,
           );
         if (b > 0 && climax > 0)
-          stampGlimmer(ctx, ox, oy, RING_FLASH * climax, b + 300, COLOR.heavenlyGold);
+          stampGlimmer(
+            ctx,
+            ox,
+            oy,
+            RING_FLASH * climax,
+            b + 300,
+            COLOR.heavenlyGold,
+          );
       }
       if (charge > 0)
         stampGlimmer(

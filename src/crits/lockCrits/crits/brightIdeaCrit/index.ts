@@ -187,8 +187,7 @@ const brightTaps = defineTapPerk("Bright", (t) => {
   const { reach } = meta.values;
   const from = Math.max(0, at - reach);
   const to = Math.min(t.floors.length - 1, at + reach);
-  for (let i = from; i <= to; i++)
-    if (i !== at) t.levelUp(t.floors[i], 1);
+  for (let i = from; i <= to; i++) if (i !== at) t.levelUp(t.floors[i], 1);
 });
 
 registerFloorCrit("brightIdeaCrit", {
@@ -237,8 +236,7 @@ registerFloorCrit("brightIdeaCrit", {
       s.tx[k] = p.x;
       s.ty[k] = p.y;
       s.part[k] = k < glassEnd ? 0 : k < baseEnd ? 1 : 2;
-      const a =
-        Math.atan2(p.y - GLASS_Y, p.x) + (Math.random() - 0.5) * 0.9;
+      const a = Math.atan2(p.y - GLASS_Y, p.x) + (Math.random() - 0.5) * 0.9;
       const far = lerp(SPAWN[0], SPAWN[1], Math.random());
       s.sx[k] = Math.cos(a) * far;
       s.sy[k] = GLASS_Y + Math.sin(a) * far;
@@ -322,13 +320,25 @@ registerFloorCrit("brightIdeaCrit", {
       const by = c.y + amp * 0.6 * Math.sin(ms * 0.137 + 1);
       if (light > 0) {
         ctx.globalAlpha = 0.25 + 0.5 * light;
-        drawGlow(ctx, GOLD, bx, by + GLASS_Y, lerp(GLOW[0], GLOW[1], light * prog));
+        drawGlow(
+          ctx,
+          GOLD,
+          bx,
+          by + GLASS_Y,
+          lerp(GLOW[0], GLOW[1], light * prog),
+        );
         ctx.globalAlpha = light;
         drawGlow(ctx, WHITE, bx, by - 40, CORE * (0.6 + 0.6 * light));
       }
       if (blaze > 0) {
         ctx.globalAlpha = blaze;
-        drawGlow(ctx, WHITE, bx, by + GLASS_Y, BLAZE_GLOW * (0.4 + 0.6 * blaze));
+        drawGlow(
+          ctx,
+          WHITE,
+          bx,
+          by + GLASS_Y,
+          BLAZE_GLOW * (0.4 + 0.6 * blaze),
+        );
       }
       ctx.globalAlpha = 1;
       beginLightBatch(ctx);
@@ -352,8 +362,22 @@ registerFloorCrit("brightIdeaCrit", {
           const rem2 = 1 - back * back;
           const x = c.x + s.tx[k];
           const y = c.y + s.ty[k];
-          stampGlimmer(ctx, x + rx * rem2, y + ry * rem2, DOT[part] * 0.7, k + 7, COLOR.heavenlyGold);
-          stampGlimmer(ctx, x + rx * rem, y + ry * rem, DOT[part], k, COLOR.white);
+          stampGlimmer(
+            ctx,
+            x + rx * rem2,
+            y + ry * rem2,
+            DOT[part] * 0.7,
+            k + 7,
+            COLOR.heavenlyGold,
+          );
+          stampGlimmer(
+            ctx,
+            x + rx * rem,
+            y + ry * rem,
+            DOT[part],
+            k,
+            COLOR.white,
+          );
           continue;
         }
         const pop = Math.max(0, 1 - (ms - land) / LAND_POP_MS);
@@ -401,7 +425,14 @@ registerFloorCrit("brightIdeaCrit", {
         const u2 = (ms - s.rainAt - s.stagger[k]) / RAIN_MS;
         if (u2 >= 1) continue;
         if (u2 <= 0) {
-          stampGlimmer(ctx, px, py, RAIN_DOT * (1.4 - 0.4 * e1), k, COLOR.white);
+          stampGlimmer(
+            ctx,
+            px,
+            py,
+            RAIN_DOT * (1.4 - 0.4 * e1),
+            k,
+            COLOR.white,
+          );
           continue;
         }
         const e2 = u2 * u2;

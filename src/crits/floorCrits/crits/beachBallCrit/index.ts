@@ -428,16 +428,7 @@ registerFloorCrit("beachBallCrit", {
 
     if (ms >= IN_MS * 0.5 && ms < end + WISP_TRAIL_MS)
       drawWispTrail(ctx, trailAt, ms, now, TRAIL_SIZE);
-    drawWispBetween(
-      ctx,
-      spikerAt,
-      ms,
-      now,
-      SPIKER_SIZE,
-      charge,
-      hangFrom,
-      end,
-    );
+    drawWispBetween(ctx, spikerAt, ms, now, SPIKER_SIZE, charge, hangFrom, end);
 
     // the ball: spun, squashed against what it last hit (stretched as it's
     // spiked, flattened and popping on its own bar)
