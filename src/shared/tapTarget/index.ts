@@ -76,3 +76,35 @@ export function swipeHits(
     distanceToSegment(at.x, at.y, x0, y0, x1, y1) <= radius + fingerReach()
   );
 }
+
+// whether a swipe from (x0, y0) to (x1, y1) passes over a box (clipped
+// against the box grown by a fingertip)
+export function swipeHitsBox(
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  left: number,
+  top: number,
+  right: number,
+  bottom: number,
+): boolean {
+  const reach = fingerReach();
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  let t0 = 0;
+  let t1 = 1;
+  const clip = (p: number, q: number): boolean => {
+    if (p === 0) return q >= 0;
+    const t = q / p;
+    if (p < 0) t0 = Math.max(t0, t);
+    else t1 = Math.min(t1, t);
+    return t0 <= t1;
+  };
+  return (
+    clip(-dx, x0 - (left - reach)) &&
+    clip(dx, right + reach - x0) &&
+    clip(-dy, y0 - (top - reach)) &&
+    clip(dy, bottom + reach - y0)
+  );
+}

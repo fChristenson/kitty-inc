@@ -38,6 +38,7 @@ import {
 } from "../../shared/eventEndSlam";
 import { runWhenIdle } from "../../shared/idle";
 import { urgentBlink } from "../../shared/urgentBlink";
+import { swipeHitsBox } from "../../shared/tapTarget";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { mergeFlashWhite } from "../../shared/mergeFlash";
 import { drawBoostBubbles } from "../coinFloat";
@@ -908,6 +909,38 @@ export function hitTestWorkers(x: number, y: number, floor: Floor): number[] {
   state.walkers.forEach((w, i) => {
     if (x >= w.x - HIT_HALF_WIDTH && x <= w.x + HIT_HALF_WIDTH) indexes.push(i);
   });
+  return indexes;
+}
+
+// every one of a floor's rendered workers a swipe from floor-local (x0, y0)
+// to (x1, y1) passes over
+export function swipeHitWorkers(
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  floor: Floor,
+): number[] {
+  if (!floor.unlocked) return [];
+  const walkers = floorWorkers.get(floor)?.walkers;
+  if (!walkers) return [];
+  const indexes: number[] = [];
+  for (let i = 0; i < walkers.length; i++) {
+    const x = walkers[i].x;
+    if (
+      swipeHitsBox(
+        x0,
+        y0,
+        x1,
+        y1,
+        x - HIT_HALF_WIDTH,
+        WORKER_FEET_Y - HIT_TOP,
+        x + HIT_HALF_WIDTH,
+        WORKER_FEET_Y + HIT_BOTTOM,
+      )
+    )
+      indexes.push(i);
+  }
   return indexes;
 }
 

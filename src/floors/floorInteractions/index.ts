@@ -55,6 +55,7 @@ import {
 } from "../../shared/detachedJob";
 import {
   hitTestWorkers,
+  swipeHitWorkers,
   clickWorker,
   recruitWorker,
   celebrateWorkerBoost,
@@ -733,7 +734,34 @@ export function handleFloorClick(
   }
 
   // a click on overlapping cats hits every one of them, not just the frontmost
-  for (const workerIndex of hitTestWorkers(x, y, floor)) {
+  boostWorkers(floor, hitTestWorkers(x, y, floor), persist);
+}
+
+// a swipe from floor-local (x0, y0) to (x1, y1) boosts every worker it
+// passes over, same as tapping each
+export function sweepFloorWorkers(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+): void {
+  if (
+    isScreenFrozen() ||
+    isFloorLocked(floor) ||
+    (isDetachedJobPending() && !isDetachedJobRunning())
+  )
+    return;
+  boostWorkers(floor, swipeHitWorkers(x0, y0, x1, y1, floor), deps.persist);
+}
+
+function boostWorkers(
+  floor: Floor,
+  workerIndexes: number[],
+  persist: () => void,
+): void {
+  for (const workerIndex of workerIndexes) {
     // Date.now()-based (not performance.now()) so it matches drawWorker's
     // Date.now()-based `now`, which is what clickedAt actually gets compared
     // against to time the click-bounce/jump-sprite reaction

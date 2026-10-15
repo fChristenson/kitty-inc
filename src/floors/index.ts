@@ -386,6 +386,7 @@ export {
 export {
   hitTestFloorHover,
   handleFloorClick,
+  sweepFloorWorkers,
   performAutomatedUpgradeClick,
   performAutomatedUpgradeAfterPayment,
   performAutomatedFloorUnlock,
@@ -408,6 +409,7 @@ export {
   wiggleWorkerBoost,
   getBoostEventCandidates,
   getWorkerCenter,
+  hitTestWorkers,
   promoteWorkerPermaTier,
   MAX_RENDERED_WORKERS,
   WALK_SPEED,

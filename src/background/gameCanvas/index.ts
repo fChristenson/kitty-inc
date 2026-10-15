@@ -19,6 +19,8 @@ import {
   hitTestUpgradeButton,
   hitTestUpgradeStar,
   handleFloorClick,
+  hitTestWorkers,
+  sweepFloorWorkers,
   type FloorActionsDeps,
   startButtonHoldAnim,
   stopButtonHoldAnim,
@@ -906,6 +908,12 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   let spawnDown = false;
   let sweepX = 0;
   let sweepY = 0;
+  // the last drag point over the floors, in world units (the floors scroll
+  // under the finger); null while it's over the HUD
+  let workerSweep: { x: number; y: number } | null = null;
+  // true for the whole gesture if it started on a worker: it sweeps workers,
+  // never scrolls
+  let workerDown = false;
 
   function stopMomentum(): void {
     if (momentumFrame !== null) {
@@ -994,6 +1002,29 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
   wireSpawnGames(floorActionsDeps);
 
+  // a drag boosts every worker it passes over, same as tapping each
+  function sweepWorkersTo(x: number, y: number): void {
+    const from = workerSweep;
+    workerSweep = y < hudBottomY ? null : { x, y: y + viewportTopY() };
+    const to = workerSweep;
+    if (!from || !to) return;
+    const minY = Math.min(from.y, to.y);
+    const maxY = Math.max(from.y, to.y);
+    let deps: FloorActionsDeps | null = null;
+    for (let i = 0; i < activeFloors.length; i++) {
+      const { top, bottom } = floorWorldY(i);
+      if (maxY < top || minY >= bottom) continue;
+      sweepFloorWorkers(
+        (deps ??= floorActionsDeps()),
+        activeFloors[i],
+        from.x - GUTTER_W,
+        from.y - top,
+        to.x - GUTTER_W,
+        to.y - top,
+      );
+    }
+  }
+
   // fires the upgrade button's click logic once (same overlapping-mouse-critter
   // courtesy a normal tap gets); called once on pointerdown, then again every
   // auto-repeat tick via fireHandleFloorClick alone (skipping the extra
@@ -1044,6 +1075,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     const p = canvasPoint(event);
     sweepX = p.x;
     sweepY = p.y;
+    workerSweep = null;
+    workerDown = false;
+    sweepWorkersTo(p.x, p.y);
     // spawns float over everything, the HUD too
     spawnDown = pressSpawnGames(p.x, p.y, performance.now());
     if (spawnDown) return;
@@ -1071,6 +1105,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         if (button?.floor === hit.floor) button.fire();
         else fireHandleFloorClick(hit);
       }, LONG_PRESS_TICK_MS);
+    } else if (
+      hit &&
+      hitTestWorkers(hit.localX, hit.localY, hit.floor).length
+    ) {
+      workerDown = true;
     }
   }
 
@@ -1137,8 +1176,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     sweepSpawnGames(sweepX, sweepY, swipe.x, swipe.y);
     sweepX = swipe.x;
     sweepY = swipe.y;
-    // a swipe that started on a sweeping spawn sweeps, never scrolls
-    if (spawnDown) return;
+    // a swipe that started on a sweeping spawn or a worker sweeps, never scrolls
+    if (spawnDown || workerDown) {
+      sweepWorkersTo(swipe.x, swipe.y);
+      return;
+    }
 
     const dy = event.clientY - lastY;
     const now = performance.now();
@@ -1148,7 +1190,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     if (!dragging) {
       const totalDx = event.clientX - dragStartX;
       const totalDy = event.clientY - dragStartY;
-      if (Math.hypot(totalDx, totalDy) < DRAG_THRESHOLD_PX) return;
+      if (Math.hypot(totalDx, totalDy) < DRAG_THRESHOLD_PX) {
+        sweepWorkersTo(swipe.x, swipe.y);
+        return;
+      }
       dragging = true;
       didDrag = true;
     }
@@ -1157,6 +1202,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     velocityY = dy / scale / dt;
     clampCamera();
     lastY = event.clientY;
+    sweepWorkersTo(swipe.x, swipe.y);
   }
 
   function onPointerUp(event: PointerEvent): void {
