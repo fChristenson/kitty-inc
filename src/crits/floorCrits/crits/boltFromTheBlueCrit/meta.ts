@@ -6,5 +6,4 @@ export default {
   label: "Bolt From the Blue",
   chance: 0.03,
   style: "drawing",
-  isNew: true,
 } satisfies CritMeta;

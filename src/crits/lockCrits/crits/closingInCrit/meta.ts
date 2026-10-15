@@ -7,5 +7,4 @@ export default {
   label: "Closing In",
   chance: 0.03,
   style: "bounce",
-  isNew: true,
 } satisfies CritMeta;
