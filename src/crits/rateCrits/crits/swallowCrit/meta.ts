@@ -9,5 +9,4 @@ export default {
   // how many times as much a bar pays at first, fading to normal over ms
   // (its own ownMs)
   values: { payout: 3, ms: 30_000, ownMs: 60_000 },
-  isNew: true,
 } satisfies CritMeta;

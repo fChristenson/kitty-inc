@@ -6,5 +6,4 @@ export default {
   label: "Short Fuse",
   chance: 0.03,
   style: "explosion",
-  isNew: true,
 } satisfies CritMeta;

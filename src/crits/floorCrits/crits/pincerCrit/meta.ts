@@ -6,5 +6,4 @@ export default {
   label: "Pincer",
   chance: 0.03,
   style: "gunfire",
-  isNew: true,
 } satisfies CritMeta;
