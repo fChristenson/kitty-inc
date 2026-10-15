@@ -35,8 +35,7 @@ export const forceSimonSaysEvent = registerWispEvent(
   "Simon Says",
   () => meta.chance,
   (floor, context, area) => {
-    const { lightMs, beatsMs, roundGapMs, holdMs, mergeMs } =
-      meta.values;
+    const { lightMs, beatsMs, roundGapMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const w = area.right - area.left;
@@ -67,6 +66,7 @@ export const forceSimonSaysEvent = registerWispEvent(
     const last = rounds[rounds.length - 1];
     const endAt = last.done;
     const center: Point = { x: area.left + w / 2, y: area.top + h / 2 };
+    const lit = new Float32Array(pads.length);
 
     const flashing = createBeats(
       flashes,
@@ -110,24 +110,25 @@ export const forceSimonSaysEvent = registerWispEvent(
             (ms > endAt ? Math.max(0, 1 - (ms - endAt) / 400) : 1);
           if (on <= 0) return;
           ctx.globalCompositeOperation = "lighter";
+          lit.fill(ms >= endAt ? 1 : 0);
+          for (let i = 0; i < flashes.length; i++) {
+            const f = flashes[i];
+            const t = (ms - f.at) / (f.beat * FLASH);
+            if (t < 0) break;
+            if (t < 1) lit[f.pad] = Math.max(lit[f.pad], 1 - t);
+          }
           for (let p = 0; p < pads.length; p++) {
-            let lit = 0;
-            for (const f of flashes) {
-              if (f.pad !== p) continue;
-              const t = (ms - f.at) / (f.beat * FLASH);
-              if (t >= 0 && t < 1) lit = Math.max(lit, 1 - t);
-            }
-            if (ms >= endAt) lit = 1;
-            ctx.globalAlpha = on * (IDLE + (1 - IDLE) * lit);
+            const glow = lit[p];
+            ctx.globalAlpha = on * (IDLE + (1 - IDLE) * glow);
             drawGlow(
               ctx,
               PAD_GLOW,
               pads[p].x,
               pads[p].y,
-              radius * (1 + 0.1 * lit),
+              radius * (1 + 0.1 * glow),
             );
-            if (lit > 0) {
-              ctx.globalAlpha = on * lit * 0.8;
+            if (glow > 0) {
+              ctx.globalAlpha = on * glow * 0.8;
               drawGlow(ctx, FLARE_GLOW, pads[p].x, pads[p].y, radius * 0.6);
             }
           }

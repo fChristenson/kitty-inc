@@ -555,6 +555,33 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     dimmed: { image: HTMLCanvasElement; alpha: number } | null;
     soft: HTMLCanvasElement | null;
   } | null = null;
+  // full-screen canvases reused by every freeze: a new set per event churns
+  // phone memory and GPU uploads
+  const freezeCanvases = {
+    image: document.createElement("canvas"),
+    dimmed: document.createElement("canvas"),
+    soft: document.createElement("canvas"),
+  };
+
+  // `from` laid over `into` (sized to w x h) as is, nothing of before left
+  function copyInto(
+    into: HTMLCanvasElement,
+    from: HTMLCanvasElement,
+    w: number,
+    h: number,
+  ): CanvasRenderingContext2D {
+    if (into.width !== w || into.height !== h) {
+      into.width = w;
+      into.height = h;
+    }
+    const c = into.getContext("2d")!;
+    c.imageSmoothingQuality = "high";
+    c.globalCompositeOperation = "copy";
+    c.globalAlpha = 1;
+    c.drawImage(from, 0, 0, w, h);
+    c.globalCompositeOperation = "source-over";
+    return c;
+  }
 
   // the frozen frame shrunk this many times, so stretching it back blurs it
   const SOFT_FRAME_SCALE = 6;
@@ -563,12 +590,13 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     soft: HTMLCanvasElement | null;
   }): HTMLCanvasElement {
     if (frame.soft) return frame.soft;
-    const soft = document.createElement("canvas");
-    soft.width = Math.max(1, Math.ceil(frame.image.width / SOFT_FRAME_SCALE));
-    soft.height = Math.max(1, Math.ceil(frame.image.height / SOFT_FRAME_SCALE));
-    const sctx = soft.getContext("2d")!;
-    sctx.imageSmoothingQuality = "high";
-    sctx.drawImage(frame.image, 0, 0, soft.width, soft.height);
+    const soft = freezeCanvases.soft;
+    copyInto(
+      soft,
+      frame.image,
+      Math.max(1, Math.ceil(frame.image.width / SOFT_FRAME_SCALE)),
+      Math.max(1, Math.ceil(frame.image.height / SOFT_FRAME_SCALE)),
+    );
     frame.soft = soft;
     return soft;
   }
@@ -608,10 +636,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       // a spotlit total is drawn live on top instead of frozen under the dim;
       // the crit flash too, so it never rattles along with the frozen frame
       drawLiveFrame(isTotalSpotlit(), true);
-      const image = document.createElement("canvas");
-      image.width = canvas.width;
-      image.height = canvas.height;
-      image.getContext("2d")!.drawImage(canvas, 0, 0);
+      const image = freezeCanvases.image;
+      copyInto(image, canvas, canvas.width, canvas.height);
       frozenFrame = {
         image,
         viewportTop: viewportTopY(),
@@ -637,14 +663,17 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // clearing, drawing the frame and washing it every frame
     if (still && dim > 0 && dim === frozenFrame.lastDim) {
       if (frozenFrame.dimmed?.alpha !== dim) {
-        const dimmed = document.createElement("canvas");
-        dimmed.width = canvas.width;
-        dimmed.height = canvas.height;
-        const dctx = dimmed.getContext("2d")!;
-        dctx.drawImage(frozenFrame.image, 0, 0);
+        const dimmed = freezeCanvases.dimmed;
+        const dctx = copyInto(
+          dimmed,
+          frozenFrame.image,
+          canvas.width,
+          canvas.height,
+        );
         dctx.globalAlpha = dim;
         dctx.fillStyle = COLOR.black;
         dctx.fillRect(0, 0, canvas.width, canvas.height);
+        dctx.globalAlpha = 1;
         frozenFrame.dimmed = { image: dimmed, alpha: dim };
       }
       const x = Math.round(shake.x * dpr);
