@@ -29,3 +29,13 @@ export const easeOutBack = (t: number): number =>
 // how far (0..1) through [from, from + span] ms is
 export const progress = (ms: number, from: number, span: number): number =>
   clamp01((ms - from) / span);
+
+// the share of a run done t (0..1) of the way through, off at `start` of its
+// average speed (never from rest) and accelerating to 2 - start of it
+export const quicken = (t: number, start = 0.5): number =>
+  start * t + (1 - start) * t * t;
+
+// when (0..1) quicken reaches `share` of the run
+export const quickenAt = (share: number, start = 0.5): number =>
+  (-start + Math.sqrt(start * start + 4 * (1 - start) * share)) /
+  (2 * (1 - start));

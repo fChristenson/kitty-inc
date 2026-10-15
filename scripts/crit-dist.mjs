@@ -77,6 +77,7 @@ const BASE_STYLES = [
   "ripple",
   "crush",
   "tornado",
+  "swarm",
   "experiment",
   ...WORLDS,
 ];

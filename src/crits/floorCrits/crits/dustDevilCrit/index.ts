@@ -19,6 +19,7 @@ import {
 } from "../../../../shared/animationStyles/explosion";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 import { stampGlimmer } from "../../../../shared/twinkle";
+import { quicken, quickenAt } from "../../../../shared/easing";
 import { COLOR } from "../../../../palette";
 import {
   registerFloorCrit,
@@ -31,10 +32,9 @@ import { BAR_HALF_H, holeHash } from "../../critPlayer/shared";
 
 const IN_MS = 160;
 // the foot's path: along each bar END in from its ends, down to the next,
-// over RUN_MS, speeding up as u^RUSH
+// over RUN_MS, off at a run and accelerating
 const END = 0.85;
-const RUN_MS = 2000;
-const RUSH = 1.5;
+const RUN_MS = 1600;
 // the funnel
 const HEIGHT = 520;
 const FOOT = 26;
@@ -107,10 +107,10 @@ registerFloorCrit("dustDevilCrit", {
     add(0, BAR_HALF_H);
     const length = along[along.length - 1] || 1;
     const endMs = IN_MS + RUN_MS;
-    const msAt = (s: number) => IN_MS + RUN_MS * (s / length) ** (1 / RUSH);
+    const msAt = (s: number) => IN_MS + RUN_MS * quickenAt(s / length);
     const foot = (ms: number, into: Point): Point => {
       const u = Math.min(1, Math.max(0, (ms - IN_MS) / RUN_MS));
-      const s = length * u ** RUSH;
+      const s = length * quicken(u);
       let k = 0;
       while (k < line.length - 2 && along[k + 1] < s) k++;
       const a = line[k];

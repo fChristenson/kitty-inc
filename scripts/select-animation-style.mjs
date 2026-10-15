@@ -43,6 +43,7 @@ const STYLES = [
   "ripple",
   "crush",
   "tornado",
+  "swarm",
 ];
 const ANIMATED_ONLY = ["experiment", ...WORLDS];
 const REWARDS = [

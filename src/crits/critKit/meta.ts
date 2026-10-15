@@ -28,6 +28,7 @@ export type CritStyle =
   | "ripple"
   | "crush"
   | "tornado"
+  | "swarm"
   | "blade"
   | "number"
   | "bars"
