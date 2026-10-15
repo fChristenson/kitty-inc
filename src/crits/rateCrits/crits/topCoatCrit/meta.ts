@@ -10,5 +10,4 @@ export default {
   // the coated payouts, on each bar and on its own; the most times over a
   // payout gets (it's always at least x2)
   values: { payouts: 3, ownPayouts: 5, cap: 1000 },
-  isNew: true,
 } satisfies CritMeta;

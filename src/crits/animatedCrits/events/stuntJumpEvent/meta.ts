@@ -21,5 +21,4 @@ export default {
     mergeMs: 700, // the car shooting into the gate's window, the floors filling the screen
     promoteGapMs: 60, // between the workers' boosts once back on the floors
   },
-  isNew: true,
 } as const satisfies EventMeta;

@@ -10,5 +10,4 @@ export default {
   // payouts put away (on each bar, on its own), each paying `hold` times;
   // then one paying 1 + all held back + `bonus` per payout put away
   values: { held: 3, ownHeld: 5, hold: 0.5, bonus: 1 },
-  isNew: true,
 } satisfies CritMeta;

@@ -5,5 +5,4 @@ export default {
   label: "Tunnel Meet",
   chance: 0.03,
   style: "drill",
-  isNew: true,
 } satisfies CritMeta;

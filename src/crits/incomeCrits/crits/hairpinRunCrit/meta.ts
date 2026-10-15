@@ -7,5 +7,4 @@ export default {
   label: "Hairpin Run",
   chance: 0.03,
   style: "race",
-  isNew: true,
 } satisfies CritMeta;

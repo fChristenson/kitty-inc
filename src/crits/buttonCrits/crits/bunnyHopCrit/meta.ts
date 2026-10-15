@@ -9,5 +9,4 @@ export default {
   style: "bounce",
   // hop taps on each button, twice as many on its own
   values: { taps: 4 },
-  isNew: true,
 } satisfies CritMeta;
