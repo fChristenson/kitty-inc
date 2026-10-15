@@ -13,5 +13,4 @@ export default {
     leaps: 4,
     ownLeaps: 8,
   },
-  isNew: true,
 } satisfies CritMeta;

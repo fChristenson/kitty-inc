@@ -6,5 +6,4 @@ export default {
   label: "Katana",
   chance: 0.03,
   style: "slice",
-  isNew: true,
 } satisfies CritMeta;

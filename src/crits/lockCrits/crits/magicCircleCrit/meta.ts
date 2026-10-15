@@ -11,5 +11,4 @@ export default {
     // the perma tiers the summoned cat arrives with
     permaTiers: 2,
   },
-  isNew: true,
 } satisfies CritMeta;

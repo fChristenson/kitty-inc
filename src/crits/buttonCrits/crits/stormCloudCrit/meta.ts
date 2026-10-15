@@ -10,5 +10,4 @@ export default {
   // strike taps on each button, twice as many on its own; open floors below
   // each strike pays out
   values: { taps: 3, floors: 4 },
-  isNew: true,
 } satisfies CritMeta;

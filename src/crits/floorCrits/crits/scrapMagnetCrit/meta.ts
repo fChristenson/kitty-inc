@@ -6,5 +6,4 @@ export default {
   label: "Scrap Magnet",
   chance: 0.03,
   style: "clutter",
-  isNew: true,
 } satisfies CritMeta;
