@@ -86,8 +86,7 @@ const from: Point = { x: 0, y: 0 };
 const to: Point = { x: 0, y: 0 };
 const lock: Point = { x: 0, y: 0 };
 
-const sweepStart = (k: number) =>
-  k < 2 ? CAGE_CHARGE_END_MS : lockAt[k - 2];
+const sweepStart = (k: number) => (k < 2 ? CAGE_CHARGE_END_MS : lockAt[k - 2]);
 
 function tremble(ms: number): number {
   if (ms >= climaxAt) return 0;
@@ -154,9 +153,17 @@ registerFloorCrit("laserCageCrit", {
     }
     if (ms < CAGE_IN_MS) {
       const p = smoothstep(ms / CAGE_IN_MS);
-      drawText(ctx, r.glyphs, r.label, 0, lerp(0, midY, p), r.flashFont * (1 - p), {
-        alpha: 1 - p,
-      });
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        0,
+        lerp(0, midY, p),
+        r.flashFont * (1 - p),
+        {
+          alpha: 1 - p,
+        },
+      );
     }
     const charge = clamp01(
       (ms - CAGE_IN_MS) / (CAGE_CHARGE_END_MS - CAGE_IN_MS),
@@ -166,7 +173,9 @@ registerFloorCrit("laserCageCrit", {
     );
     const since = ms - climaxAt;
     const fade = since < 0 ? 1 : 1 - clamp01(since / CAGE_FADE_MS);
-    const tight = smoothstep(clamp01((ms - climaxAt + CAGE_SNAP_MS) / CAGE_SNAP_MS));
+    const tight = smoothstep(
+      clamp01((ms - climaxAt + CAGE_SNAP_MS) / CAGE_SNAP_MS),
+    );
     const hum = 0.85 + 0.15 * Math.sin(now / 16);
 
     const previous = ctx.globalCompositeOperation;
@@ -193,7 +202,8 @@ registerFloorCrit("laserCageCrit", {
           const e = spots[i];
           for (let s = 0; s < CAGE_STREAKS; s++) {
             const life =
-              ((ms - CAGE_IN_MS) * CAGE_STREAK_SPEED + holeHash(s, 1401 + i)) % 1;
+              ((ms - CAGE_IN_MS) * CAGE_STREAK_SPEED + holeHash(s, 1401 + i)) %
+              1;
             const a = holeHash(s, 1403 + i) * Math.PI * 2;
             const reach = CAGE_STREAK_REACH * (1 - life);
             stampGlimmer(
@@ -279,7 +289,13 @@ registerFloorCrit("laserCageCrit", {
       ctx.globalCompositeOperation = "lighter";
       ctx.globalAlpha = 1 - t;
       for (let bar = 0; bar < bars.length; bar++)
-        drawGlow(ctx, WHITE, bars[bar].x, bars[bar].y, halfW * CAGE_FLASH * (1 - 0.5 * t));
+        drawGlow(
+          ctx,
+          WHITE,
+          bars[bar].x,
+          bars[bar].y,
+          halfW * CAGE_FLASH * (1 - 0.5 * t),
+        );
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = previous;
     }
@@ -287,7 +303,11 @@ registerFloorCrit("laserCageCrit", {
   },
   tailMs: CAGE_TAIL_MS,
   shake: (step) =>
-    step === 1 ? CAGE_CLIMAX_SHAKE : step === 2 ? CAGE_TIGHTEN_SHAKE : CAGE_LOCK_SHAKE,
+    step === 1
+      ? CAGE_CLIMAX_SHAKE
+      : step === 2
+        ? CAGE_TIGHTEN_SHAKE
+        : CAGE_LOCK_SHAKE,
   // a lock levels its bar; the cage snapping tight adds a quarter more
   levels: (count, step) => (step === 2 ? Math.ceil(count / 4) : count),
 });

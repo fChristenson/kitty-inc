@@ -8,11 +8,7 @@
 // all of them flashing in a huge blast with the last hire. Then the crit's
 // tier pays out
 import meta from "./meta";
-import {
-  playBloop,
-  playBoostEventStream,
-  playSwoosh,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -220,7 +216,10 @@ export const forcePerfumeEvent = registerWispEvent(
       area.bottom - 90,
       Math.max(area.top - NOZZLE_Y * SCALE + 30, midY - NOZZLE_Y * SCALE),
     );
-    const nozzle: Point = { x: bx + NOZZLE_X * SCALE, y: by + NOZZLE_Y * SCALE };
+    const nozzle: Point = {
+      x: bx + NOZZLE_X * SCALE,
+      y: by + NOZZLE_Y * SCALE,
+    };
     const coatX = (area.left + nozzle.x) / 2;
     const coatW = nozzle.x - area.left;
     const planMist = (
@@ -233,11 +232,13 @@ export const forcePerfumeEvent = registerWispEvent(
       const farX = area.left + 80;
       const reach = Math.hypot(farX - nozzle.x, coatY - nozzle.y);
       const aim = Math.atan2(coatY - nozzle.y - reach * DROOP, farX - nozzle.x);
-      return planSpray(
-        nozzle,
-        (ms) => aim + SWAY * Math.sin(ms * 0.03),
-        { startMs, endMs, reach, spread, flightMs },
-      );
+      return planSpray(nozzle, (ms) => aim + SWAY * Math.sin(ms * 0.03), {
+        startMs,
+        endMs,
+        reach,
+        spread,
+        flightMs,
+      });
     };
 
     // a squeeze for each hire but the last, top floor first, quickening
@@ -340,7 +341,8 @@ export const forcePerfumeEvent = registerWispEvent(
           for (let k = 0; k < squeezes.length; k++) {
             const s = squeezes[k];
             if (ms < s.starts || ms > finalAt) continue;
-            const flash = ms > s.hits ? 1 - clamp01((ms - s.hits) / FLASH_MS) : 0;
+            const flash =
+              ms > s.hits ? 1 - clamp01((ms - s.hits) / FLASH_MS) : 0;
             const coverage =
               ms <= s.hits
                 ? clamp01((ms - s.starts - 80) / (s.hits - s.starts - 80))
@@ -357,7 +359,14 @@ export const forcePerfumeEvent = registerWispEvent(
               ms <= finalAt ? clamp01((ms - burstAt) / burstMs) : flash;
             for (let k = 0; k < mists.length; k++) {
               const m = mists[k];
-              drawSprayCoat(ctx, m.coat, coatW * 1.1, COAT_H * 1.3, coverage, flash);
+              drawSprayCoat(
+                ctx,
+                m.coat,
+                coatW * 1.1,
+                COAT_H * 1.3,
+                coverage,
+                flash,
+              );
               if (ms > finalAt) continue;
               drawSpray(ctx, m.spray, ms, now, BIG_DROPLET);
               drawSprayMist(ctx, m.coat, ms - burstAt, 1, MIST * 1.4, now);
@@ -386,7 +395,10 @@ export const forcePerfumeEvent = registerWispEvent(
           }
           const tremble = 1 + 3 * heat + 6 * windUp * windUp;
           const x =
-            bx + SWING_FROM * swing + 10 * kick + Math.sin(now * 0.09) * tremble;
+            bx +
+            SWING_FROM * swing +
+            10 * kick +
+            Math.sin(now * 0.09) * tremble;
           const y = by + Math.cos(now * 0.113) * tremble * 0.6;
           const rot = SWING_TILT * swing + 0.07 * kick;
           const swell = 1 + 0.15 * heat + 0.55 * windUp * windUp;

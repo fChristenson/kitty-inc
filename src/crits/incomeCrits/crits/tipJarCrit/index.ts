@@ -369,15 +369,7 @@ registerFloorCrit("tipJarCrit", {
     }
     spot.x = jx;
     spot.y = jy + MOUTH * s;
-    drawRipple(
-      ctx,
-      spot,
-      sinceBig,
-      BIG_RIPPLE,
-      BIG_RIPPLE_W,
-      2,
-      BIG_RIPPLE_MS,
-    );
+    drawRipple(ctx, spot, sinceBig, BIG_RIPPLE, BIG_RIPPLE_W, 2, BIG_RIPPLE_MS);
     beginLightBatch(ctx);
     for (let k = 0; k < DROPS; k++) {
       const since = ms - times[k];

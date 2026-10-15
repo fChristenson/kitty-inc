@@ -348,15 +348,14 @@ registerFloorCrit("kettleCrit", {
         face,
         0,
         grow,
-        bounce * RATTLE * (0.25 + 0.75 * c) / S,
+        (bounce * RATTLE * (0.25 + 0.75 * c)) / S,
         LID_TILT * (0.3 + 0.7 * c) * Math.sin(u * RATTLES * 1.3),
         HOT * c,
         true,
       );
       // steam puffing from the spout, harder as it heats
       ctx.globalCompositeOperation = "lighter";
-      const phase =
-        (ms - ARC_MS) * lerp(PUFF_RATE[0], PUFF_RATE[1], c);
+      const phase = (ms - ARC_MS) * lerp(PUFF_RATE[0], PUFF_RATE[1], c);
       const sx = core.x + (SPOUT.x - MID.x) * S * face;
       const sy = core.y + (SPOUT.y - MID.y) * S;
       for (let i = 0; i < PUFFS; i++) {

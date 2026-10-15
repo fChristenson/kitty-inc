@@ -621,7 +621,15 @@ function startServerRoom(floor: Floor, context: EventProcContext): void {
         if (ms < e.shot - ERR_LEAD || e.z < near) continue;
         if (ms < e.hit !== (pass === 0)) continue;
         const z0 = e.z - ERR_W / 2;
-        addWallQuad(ctx, fps, e.x, e.y - ERR_H / 2, e.y + ERR_H / 2, z0, z0 + ERR_W);
+        addWallQuad(
+          ctx,
+          fps,
+          e.x,
+          e.y - ERR_H / 2,
+          e.y + ERR_H / 2,
+          z0,
+          z0 + ERR_W,
+        );
       }
       ctx.fillStyle = pass === 0 ? COLOR.red : COLOR.moneyGreen;
       ctx.fill();
@@ -640,7 +648,10 @@ function startServerRoom(floor: Floor, context: EventProcContext): void {
         const ty = Math.cos(now * 0.17 + e.seed) * TREMBLE * k;
         if (!sight(fps, e.x, e.y + ty, e.z + tx)) continue;
         const r =
-          PS * ERR_GLOW * (0.3 + 0.7 * k) * (1 + 0.2 * Math.sin(now * 0.06 + e.seed));
+          PS *
+          ERR_GLOW *
+          (0.3 + 0.7 * k) *
+          (1 + 0.2 * Math.sin(now * 0.06 + e.seed));
         ctx.globalAlpha = 0.4 + 0.6 * k;
         drawGlow(ctx, RED, PX, PY, r);
         drawGlow(ctx, WHITE, PX, PY, r * 0.35 * k);
@@ -710,7 +721,9 @@ function startServerRoom(floor: Floor, context: EventProcContext): void {
       cam.x = Math.sin(ms * SWAY_RATE) * SWAY;
       cam.y = EYE + Math.abs(Math.sin(cam.z * STRIDE)) * STEP;
       speed =
-        ms < runMs ? (runSpan * (1.5 - Math.max(0, ms) / runMs)) / runMs : endSpeed;
+        ms < runMs
+          ? (runSpan * (1.5 - Math.max(0, ms) / runMs)) / runMs
+          : endSpeed;
     } else {
       // the rush through the opening, at speed from the start
       const r = clamp01((ms - enterMs) / diveMs);

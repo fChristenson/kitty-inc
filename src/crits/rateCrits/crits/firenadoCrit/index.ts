@@ -139,10 +139,7 @@ function readoutOf(s: State, b: number, into: Point): Point {
 
 // where it touches down, beside the first bar it sets off for
 function besideOf(s: State, into: Point): Point {
-  into.x = Math.max(
-    -s.viewportWidth / 2 + EDGE,
-    s.bars[0].x - s.half - GAP,
-  );
+  into.x = Math.max(-s.viewportWidth / 2 + EDGE, s.bars[0].x - s.half - GAP);
   into.y = s.bars[s.legBar[0]].y + CONTACT_Y + FOOT_DY;
   return into;
 }
@@ -179,7 +176,7 @@ interface Flare {
 function flareAt(v: Flare, now: number): number {
   const { start, peak, rise } = meta.values;
   const u = clamp01((now - v.from) / (v.until - v.from));
-  if (u < rise) return lerp(start, peak, Math.sin((u / rise) * Math.PI / 2));
+  if (u < rise) return lerp(start, peak, Math.sin(((u / rise) * Math.PI) / 2));
   const d = (u - rise) / (1 - rise);
   return lerp(peak, 1, d * d * (3 - 2 * d));
 }
@@ -260,7 +257,11 @@ registerFloorCrit("firenadoCrit", {
     const rumble = new Float32Array(kicks.length + 1);
     for (let k = 0; k < kicks.length; k++) {
       rumbleMs[k] = kicks[k];
-      rumble[k] = lerp(RUMBLE[0], RUMBLE[1], (kicks[k] - IN_MS) / (climaxMs - IN_MS));
+      rumble[k] = lerp(
+        RUMBLE[0],
+        RUMBLE[1],
+        (kicks[k] - IN_MS) / (climaxMs - IN_MS),
+      );
     }
     rumbleMs[kicks.length] = climaxMs;
     rumble[kicks.length] = CLIMAX_SHAKE;

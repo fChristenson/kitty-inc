@@ -166,7 +166,12 @@ registerFloorCrit("pinkingShearsCrit", {
       const legs: Slash[] = [];
       for (let i = 0; i < ZIGS; i++)
         legs.push(
-          planSlash(pts[i], pts[i + 1], t + (SNIP_MS * i) / ZIGS, SNIP_MS / ZIGS),
+          planSlash(
+            pts[i],
+            pts[i + 1],
+            t + (SNIP_MS * i) / ZIGS,
+            SNIP_MS / ZIGS,
+          ),
         );
       snipAt.push(t);
       snipBar.push(bar);
@@ -433,7 +438,9 @@ function shears(s: State, ms: number, into: Point): number {
   const lastEnd = snipAt[n - 1] + SNIP_MS;
   if (k === n - 1 && ms > lastEnd) {
     const from = bars[snipBar[k]];
-    const e = easeOut(clamp01((ms - lastEnd) / ((s.longStart - lastEnd) * 0.7)));
+    const e = easeOut(
+      clamp01((ms - lastEnd) / ((s.longStart - lastEnd) * 0.7)),
+    );
     into.x = lerp(from.x - AWAY, longX, e);
     into.y = lerp(from.y + snipY[k], s.top - PAST, e);
     return OPEN * 1.25 + TREMBLE * 2 * Math.sin(ms * 0.11);
@@ -447,7 +454,9 @@ function shears(s: State, ms: number, into: Point): number {
   const shutAt = k < 0 ? IN_MS : snipAt[k] + SNIP_MS;
   if (k >= 0 && k + 1 < n) {
     const next = bars[snipBar[k + 1]];
-    const e = easeOut(clamp01((ms - shutAt) / ((snipAt[k + 1] - shutAt) * 0.75)));
+    const e = easeOut(
+      clamp01((ms - shutAt) / ((snipAt[k + 1] - shutAt) * 0.75)),
+    );
     into.x = lerp(into.x, next.x - AWAY, e);
     into.y = lerp(into.y, next.y + snipY[k + 1], e);
   }

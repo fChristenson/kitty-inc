@@ -29,7 +29,10 @@ import {
   DETONATION_MS,
   drawDetonation,
 } from "../../../../shared/animationStyles/explosion";
-import { shotHeat, type ShipShot } from "../../../../shared/animationStyles/shmup";
+import {
+  shotHeat,
+  type ShipShot,
+} from "../../../../shared/animationStyles/shmup";
 import { createBeats, type Beats } from "../../../../shared/eventBeats";
 import { drawWhiteBurst } from "../../../../shared/eventFx";
 import {
@@ -499,7 +502,8 @@ function startCanyonRun(floor: Floor, context: EventProcContext): void {
       for (let j = 0; j < STRATA; j++) {
         const seed = Math.round(u0 * 10) * 31 + j * 2 + side;
         const u = u0 + (u1 - u0) * hash01(seed, 1);
-        const sx = x + w * (edgeAt(side, u) + side * (0.05 + 0.2 * hash01(seed, 2)));
+        const sx =
+          x + w * (edgeAt(side, u) + side * (0.05 + 0.2 * hash01(seed, 2)));
         strata.moveTo(sx, -u * h);
         strata.lineTo(sx + side * 0.05 * w, -(u + 0.025) * h);
       }
@@ -512,7 +516,10 @@ function startCanyonRun(floor: Floor, context: EventProcContext): void {
   const buildCracks = (half: number, bar: number): Float32Array => {
     const cracks = new Float32Array(CRACKS * (CRACK_SEGS + 1) * 2);
     for (let c = 0; c < CRACKS; c++) {
-      let cx = half * 0.9 * (((c + 0.5 + 0.4 * (hash01(c, 81) - 0.5)) / CRACKS) * 2 - 1);
+      let cx =
+        half *
+        0.9 *
+        (((c + 0.5 + 0.4 * (hash01(c, 81) - 0.5)) / CRACKS) * 2 - 1);
       const down = c % 2 ? 1 : -1;
       for (let s = 0; s <= CRACK_SEGS; s++) {
         const i = (c * (CRACK_SEGS + 1) + s) * 2;
@@ -550,7 +557,12 @@ function startCanyonRun(floor: Floor, context: EventProcContext): void {
     // timed back from when they land on it
     const shots: ShipShot[] = [];
     const shotBullets: Bullet[] = [];
-    const shootAt = (aim: Point, hitMs: number, side: number, target: number) => {
+    const shootAt = (
+      aim: Point,
+      hitMs: number,
+      side: number,
+      target: number,
+    ) => {
       let fireAt = hitMs - 150;
       let from: Point = { x: 0, y: 0 };
       for (let k = 0; k < 3; k++) {
@@ -595,7 +607,11 @@ function startCanyonRun(floor: Floor, context: EventProcContext): void {
     const gateHits: number[] = [];
     const gateY = view.y + view.h * GATE_Y;
     const half = (gateR - gateL) / 2;
-    for (let t = gateHitFromMs, i = 0; t < fireAtMs - 40; t += GATE_HIT_EVERY, i++) {
+    for (
+      let t = gateHitFromMs, i = 0;
+      t < fireAtMs - 40;
+      t += GATE_HIT_EVERY, i++
+    ) {
       shootAt(
         { x: gateMid + (hash01(i, 40) * 2 - 1) * half * 0.8, y: gateY },
         t,
@@ -826,7 +842,8 @@ function startCanyonRun(floor: Floor, context: EventProcContext): void {
       }
       ctx.beginPath();
       ctx.arc(px, py, r, 0, Math.PI * 2);
-      ctx.fillStyle = heat > 0 || since >= 0 ? COLOR.white : COLOR.unionBossSlate;
+      ctx.fillStyle =
+        heat > 0 || since >= 0 ? COLOR.white : COLOR.unionBossSlate;
       ctx.fill();
       ctx.strokeStyle = COLOR.black;
       ctx.stroke();
@@ -882,15 +899,15 @@ function startCanyonRun(floor: Floor, context: EventProcContext): void {
         (0.85 * landed) / Math.max(1, hits.length) +
         0.15 * clamp01((ms - fireAtMs) / (p.finale.ms - fireAtMs));
       const span = (fireAtMs - gateHitFromMs) / 1000;
-      const s =
-        Math.max(0, Math.min(ms, p.finale.ms) - gateHitFromMs) / 1000;
+      const s = Math.max(0, Math.min(ms, p.finale.ms) - gateHitFromMs) / 1000;
       const phase =
         Math.PI *
         2 *
         (THROB_HZ[0] * s + (0.5 * (THROB_HZ[1] - THROB_HZ[0]) * s * s) / span);
       const pulse = s > 0 ? 0.5 + 0.5 * Math.sin(phase) : 0;
       const seal = easeOutCubic(clamp01((ms - brakeAtMs) / SEAL_MS));
-      const bar = GATE_H * w * (1 + THROB * damage * pulse) * (0.4 + 0.6 * seal);
+      const bar =
+        GATE_H * w * (1 + THROB * damage * pulse) * (0.4 + 0.6 * seal);
       const reach = half * seal;
       const previous = ctx.globalCompositeOperation;
       ctx.globalCompositeOperation = "lighter";
@@ -1079,7 +1096,9 @@ function startCanyonRun(floor: Floor, context: EventProcContext): void {
           ctx,
           d.x,
           d.y,
-          SHARD_SIZE * (0.5 + 0.5 * hash01(i, 64)) * (1 - 0.5 * (since / SHARD_MS)),
+          SHARD_SIZE *
+            (0.5 + 0.5 * hash01(i, 64)) *
+            (1 - 0.5 * (since / SHARD_MS)),
           now * 0.004 + i,
           i % 3 ? COLOR.cyan : COLOR.white,
         );
