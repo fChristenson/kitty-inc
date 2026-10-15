@@ -6,5 +6,4 @@ export default {
   label: "Cash Magnet",
   chance: 0.03,
   style: "pull",
-  isNew: true,
 } satisfies CritMeta;

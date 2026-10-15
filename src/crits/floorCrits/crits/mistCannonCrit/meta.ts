@@ -6,5 +6,4 @@ export default {
   label: "Mist Cannon",
   chance: 0.03,
   style: "spray",
-  isNew: true,
 } satisfies CritMeta;
