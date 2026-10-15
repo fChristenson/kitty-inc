@@ -9,5 +9,4 @@ export default {
   style: "pull",
   // gulp taps on each button, twice as many on its own
   values: { taps: 3 },
-  isNew: true,
 } satisfies CritMeta;

@@ -10,5 +10,4 @@ export default {
   style: "charge",
   // punch taps on the opened floor's button
   values: { taps: 6 },
-  isNew: true,
 } satisfies CritMeta;

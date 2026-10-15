@@ -8,5 +8,4 @@ export default {
   label: "Handoff",
   chance: 0.03,
   style: "wisp",
-  isNew: true,
 } satisfies CritMeta;

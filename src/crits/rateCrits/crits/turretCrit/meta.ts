@@ -10,5 +10,4 @@ export default {
   // the lucky payouts on each bar (its own ownPayouts), each 1 in odds to pay
   // lucky times
   values: { payouts: 8, ownPayouts: 16, lucky: 5, odds: 3 },
-  isNew: true,
 } satisfies CritMeta;

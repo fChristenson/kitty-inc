@@ -9,5 +9,4 @@ export default {
   style: "clutter",
   // how many of the opened floor's next payouts each level it by one
   values: { payouts: 8 },
-  isNew: true,
 } satisfies CritMeta;
