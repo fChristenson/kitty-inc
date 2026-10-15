@@ -99,16 +99,25 @@ registerFloorCrit("swingShiftCrit", {
     const climax = t + PACK_MS;
     keys.push({ ms: climax, x: 0, y: BELOW, r: PACK });
     const live = { to };
-    const swarm = planSwarm(swarmPath(keys, () => live.to), {
-      count: COUNT,
-      startMs: IN_MS,
-      endMs: climax,
-      spread: swarmSpread(keys),
-      spinHz: SPIN_HZ,
-      lagMs: 160,
-      squash: 0.6,
-    });
-    const dives = planDives(swarm, passes, WAVE_SPREAD_MS, FLIGHT_MS, WAVES_SHARE);
+    const swarm = planSwarm(
+      swarmPath(keys, () => live.to),
+      {
+        count: COUNT,
+        startMs: IN_MS,
+        endMs: climax,
+        spread: swarmSpread(keys),
+        spinHz: SPIN_HZ,
+        lagMs: 160,
+        squash: 0.6,
+      },
+    );
+    const dives = planDives(
+      swarm,
+      passes,
+      WAVE_SPREAD_MS,
+      FLIGHT_MS,
+      WAVES_SHARE,
+    );
     diveRest(dives, SWINGS, climax, CLIMAX_SPREAD_MS);
     const waveHits = passes.map((p) => p + WAVE_SPREAD_MS / 2 + FLIGHT_MS);
     for (const at of waveHits) hit(0, at);
@@ -155,7 +164,16 @@ registerFloorCrit("swingShiftCrit", {
     drawSwarm(ctx, swarm, ms, SPECK, dives);
     drawDives(ctx, swarm, dives, state.spots, ms, SPECK);
     for (let i = 0; i < state.leads.length; i++)
-      drawWispBetween(ctx, state.leads[i], ms, now, LEAD, 0.8, IN_MS, dives.startMs[i] + 1);
+      drawWispBetween(
+        ctx,
+        state.leads[i],
+        ms,
+        now,
+        LEAD,
+        0.8,
+        IN_MS,
+        dives.startMs[i] + 1,
+      );
     for (let k = 0; k < SWINGS; k++)
       drawDetonation(ctx, state.spots[k], ms - state.waveHits[k], POP, now);
     drawDetonation(ctx, to, ms - state.inMs, IN_BLAST, now);
