@@ -6,5 +6,4 @@ export default {
   label: "Spritzer",
   chance: 0.03,
   style: "spray",
-  isNew: true,
 } satisfies CritMeta;

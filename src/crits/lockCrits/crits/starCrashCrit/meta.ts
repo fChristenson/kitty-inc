@@ -8,5 +8,4 @@ export default {
   style: "galaxy",
   // levels on the opened floor, times the crit's multiple
   values: { levels: 1 },
-  isNew: true,
 } satisfies CritMeta;

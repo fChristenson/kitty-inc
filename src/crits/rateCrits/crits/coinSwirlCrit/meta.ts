@@ -8,5 +8,4 @@ export default {
   style: "money",
   // the payout a bar ramps up to over ms (its own ownMs), then back to normal
   values: { payout: 3, ms: 30_000, ownMs: 60_000 },
-  isNew: true,
 } satisfies CritMeta;

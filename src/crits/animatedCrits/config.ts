@@ -8267,6 +8267,19 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 102
+  // tornado, levels: src/crits/animatedCrits/events/tornadoAlleyEvent ("Tornado Alley"): a funnel of glitter touches down at the bottom corner of the frozen screen and swells up the whole building, its foot tearing across the screen and back, quicker each way, tearing the glitter off every bar it sweeps (levels); it whips round under the clicked bar and flings it all back down onto the bars (levels), collapsing in a huge blast
+  tornadoAlleyEvent: {
+    chance: 0.01,
+    firstMs: 250, // from the click till it touches down
+    sweepMs: 1300, // its foot's run across the screen and back, quickening
+    whipMs: 250, // whipping round flat out under the clicked bar
+    flingMs: 300, // the glitter flung back down onto the bars
+    flingGapMs: 50, // between the bars' glitter landing, top first, the clicked one last
+    levelShare: 0.03, // per bar, as it's swept and as its glitter lands
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 101
   // shmup, crit tiers: src/crits/animatedCrits/events/bossRushEvent ("Boss Rush"): the floors shrink away into space under one giant boss, three rings of wisps round a core, each ring firing its own pattern while the player's wisp peels it off in a rolling chain of blasts; the bare core charges and fires a beam the wisp swerves from, then the wisp's beam blows it apart; back on the floors every bar in view takes a crit tier up
   bossRushEvent: {
