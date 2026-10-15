@@ -6,7 +6,7 @@
 // in a white blast and a bang; again, higher and harder, and a third time,
 // and the lock blows in a huge blast and shake; the floor bursts open,
 // unlocked for free, as the screen unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const HIT_SHAKE: [number, number] = [0.9, 1.4];
 export const forceTrebuchetEvent = registerWispEvent(
   KEY,
   "Trebuchet",
-  () => CONFIG.trebuchetEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { throwsMs, holdMs, mergeMs } = CONFIG.trebuchetEvent;
+    const { throwsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

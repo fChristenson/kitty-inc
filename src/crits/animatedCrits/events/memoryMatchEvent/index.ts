@@ -6,7 +6,7 @@
 // that lights it up a perma tier with a pop and a jolt; the board cleared,
 // every card flips gold in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -42,9 +42,9 @@ const MATCH_SHAKE: [number, number] = [0.6, 1.3];
 export const forceMemoryMatchEvent = registerWispEvent(
   KEY,
   "Memory Match",
-  () => CONFIG.memoryMatchEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dealMs, turnsMs, holdMs, mergeMs } = CONFIG.memoryMatchEvent;
+    const { dealMs, turnsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const size = Math.min(CARD, (area.right - area.left - 30) / COLS);

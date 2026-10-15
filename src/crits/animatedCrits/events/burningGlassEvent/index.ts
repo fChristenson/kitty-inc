@@ -6,7 +6,7 @@
 // lands free levels; then it settles on the clicked floor's bar and focuses
 // down to a white-hot pinprick as the screen rumbles, until the bar ignites:
 // it jumps a crit tier and every bar slams in a huge blast and shake
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -31,10 +31,10 @@ const SCORCH_SHAKE: [number, number] = [0.7, 1.4];
 export const forceBurningGlassEvent = registerWispEvent(
   KEY,
   "Burning Glass",
-  () => CONFIG.burningGlassEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { focusMs, legsMs, igniteMs, levelShare, holdMs, mergeMs } =
-      CONFIG.burningGlassEvent;
+      meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

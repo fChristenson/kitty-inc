@@ -6,7 +6,7 @@
 // and a puff of coins out of its ends, ever faster and deeper; then it
 // stretches out one last time and whips into the total in a huge blast
 // and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -39,9 +39,9 @@ const WHEEZE_SHAKE: [number, number] = [0.5, 1.2];
 export const forceAccordionEvent = registerWispEvent(
   KEY,
   "Accordion",
-  () => CONFIG.accordionEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { formMs, gapsMs, flightMs, holdMs, mergeMs } = CONFIG.accordionEvent;
+    const { formMs, gapsMs, flightMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const cx = (area.left + area.right) / 2;

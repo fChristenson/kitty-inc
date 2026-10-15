@@ -6,7 +6,7 @@
 // discharges in turn, a bolt cracking down from it onto an income bar that
 // jumps a crit tier with a jolt, quicker and quicker, the last in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ interface Discharge {
 export const forceLikeChargesEvent = registerWispEvent(
   KEY,
   "Like Charges",
-  () => CONFIG.likeChargesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spreadMs, firesMs, holdMs, mergeMs } = CONFIG.likeChargesEvent;
+    const { spreadMs, firesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

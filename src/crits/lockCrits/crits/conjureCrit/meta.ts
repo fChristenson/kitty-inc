@@ -6,4 +6,8 @@ export default {
   label: "Conjure",
   chance: 0.03,
   style: "summon",
+  values: {
+    // its cash: the price of the floor it opens, times this
+    priceBack: 1,
+  },
 } satisfies CritMeta;

@@ -7,7 +7,7 @@
 // the gasket blazes, collapses into a wisp, and that bursts into wisps that
 // arc onto the bars for free levels, the clicked floor's bar last with a
 // slam. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -132,7 +132,7 @@ function strokeRing(
 export const forceApollonianGasketEvent = registerWispEvent(
   KEY,
   "Apollonian Gasket",
-  () => CONFIG.apollonianGasketEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       growMs,
@@ -143,7 +143,7 @@ export const forceApollonianGasketEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.apollonianGasketEvent;
+    } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor);
     if (!clicked) return;

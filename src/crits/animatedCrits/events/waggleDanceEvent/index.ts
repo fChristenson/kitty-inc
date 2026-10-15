@@ -6,7 +6,7 @@
 // spot in a whirl and a new worker forms with a flash and a jolt; dance
 // after dance, quicker each time, the last swarm landing in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -61,9 +61,9 @@ interface Dance {
 export const forceWaggleDanceEvent = registerWispEvent(
   KEY,
   "Waggle Dance",
-  () => CONFIG.waggleDanceEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { runsMs, holdMs, mergeMs } = CONFIG.waggleDanceEvent;
+    const { runsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const hive = getButtonCenter(context.isGroundFloor);

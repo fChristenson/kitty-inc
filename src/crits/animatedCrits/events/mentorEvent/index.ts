@@ -3,8 +3,8 @@
 // lowest-tier one, which brightens as they land and climbs up to two perma
 // tiers, never past its mentor's. Then the screen unfreezes and the crit's
 // tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { critTierRank, pickCritTierByOdds } from "../../../critTypes";
@@ -91,7 +91,7 @@ function findPair(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.mentorEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running && !isScreenFrozen() && findPair(floor, context) !== null,
@@ -113,7 +113,7 @@ function drawOverlay(
   const event = running;
   if (!event) return;
   const now = performance.now();
-  const { streamMs } = CONFIG.mentorEvent;
+  const { streamMs } = meta.values;
   const progress = Math.min(1, (now - event.startedAt) / streamMs);
   const streaming = progress < 1 ? 1 : 0;
   // the student brightens out of the dimmed frame as the lights land
@@ -159,7 +159,7 @@ function startMentor(floor: Floor, context: EventProcContext): void {
   const studentRect = pair && context.getFloorRect?.(pair.student.floor);
   if (!pair || !mentorRect || !studentRect) return;
   const { mentor, student } = pair;
-  const { streamMs, holdMs } = CONFIG.mentorEvent;
+  const { streamMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const event: RunningMentor = {
     mentor,

@@ -5,7 +5,7 @@
 // goes off in a white blast, a bang and a big jolt, and a new worker forms
 // in the smoke: hired for free; the last blows in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const BOOM_SHAKE: [number, number] = [0.8, 1.6];
 export const forceGrenadeTossEvent = registerWispEvent(
   KEY,
   "Grenade Toss",
-  () => CONFIG.grenadeTossEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { gapsMs, throwMs, holdMs, mergeMs } = CONFIG.grenadeTossEvent;
+    const { gapsMs, throwMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

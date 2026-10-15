@@ -6,7 +6,7 @@
 // every catch is a flash, a jolt and free levels on that bar; the dismount
 // off the top bar sticks the landing on it in a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -45,9 +45,9 @@ interface Piece {
 export const forceUnevenBarsEvent = registerWispEvent(
   KEY,
   "Uneven Bars",
-  () => CONFIG.unevenBarsEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { swingsMs, flightsMs, holdMs, mergeMs } = CONFIG.unevenBarsEvent;
+    const { swingsMs, flightsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(-MAX_BARS).reverse();
     if (bars.length === 0) return;
     const n = bars.length;

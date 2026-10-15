@@ -5,7 +5,7 @@
 // across the screen as it swells; then the whole screen shatters and every
 // shard is sucked into the bar, faster and faster, which jumps one crit tier
 // in a huge blast and shake as the last goes in. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,10 +37,10 @@ const KNOCK_SHAKE: [number, number] = [0.8, 1.6];
 export const forceEventHorizonEvent = registerWispEvent(
   KEY,
   "Event Horizon",
-  () => CONFIG.eventHorizonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { knocksMs, pullMs, levelShare, holdMs, mergeMs } =
-      CONFIG.eventHorizonEvent;
+      meta.values;
     const bar = findRewardBars(floor, context).find((b) => b.floor === floor);
     if (!bar) return;
     const impact = bar.center;

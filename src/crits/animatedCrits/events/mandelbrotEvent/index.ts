@@ -8,7 +8,7 @@
 // Mandelbrot set stands in gold, bulbs, cardioid and antenna; it holds a
 // beat, then surges into the total in a huge blast. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -40,10 +40,10 @@ const SURGE_SHAKE = 0.9;
 export const forceMandelbrotEvent = registerWispEvent(
   KEY,
   "Mandelbrot",
-  () => CONFIG.mandelbrotEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fillMs, iterMs, flyMs, surgeMs, holdMs, mergeMs } =
-      CONFIG.mandelbrotEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const total = () => cover?.total() ?? fallback;
     const button = getButtonCenter(context.isGroundFloor);

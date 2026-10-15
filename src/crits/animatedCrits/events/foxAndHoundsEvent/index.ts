@@ -6,7 +6,7 @@
 // and a jolt; finally the fox dives into the total and the whole pack piles
 // in after it in a huge blast and shake. Pays floor income × floor number
 // × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -43,9 +43,9 @@ const BANG_GAP_MS = 60;
 export const forceFoxAndHoundsEvent = registerWispEvent(
   KEY,
   "Fox and Hounds",
-  () => CONFIG.foxAndHoundsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dartsMs, holdMs, mergeMs } = CONFIG.foxAndHoundsEvent;
+    const { dartsMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const cx = (area.left + area.right) / 2;

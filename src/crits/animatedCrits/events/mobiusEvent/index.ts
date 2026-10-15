@@ -6,7 +6,7 @@
 // snaps and unzips from the cut, the whole band whipping off into the
 // total as one long ribbon in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const SPIN_SHAKE: [number, number] = [0.4, 1];
 export const forceMobiusEvent = registerWispEvent(
   KEY,
   "Mobius",
-  () => CONFIG.mobiusEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { formMs, spinMs, flightMs, holdMs, mergeMs } = CONFIG.mobiusEvent;
+    const { formMs, spinMs, flightMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const cx = (area.left + area.right) / 2;

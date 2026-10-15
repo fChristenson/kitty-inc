@@ -6,7 +6,7 @@
 // spray of coins with a pop and a jolt; the throws come ever faster, the
 // last a huge one sliced in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -43,9 +43,9 @@ const CUT_SHAKE: [number, number] = [0.3, 1];
 export const forceNinjaEvent = registerWispEvent(
   KEY,
   "Ninja",
-  () => CONFIG.ninjaEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { tossesMs, flightMs, holdMs, mergeMs } = CONFIG.ninjaEvent;
+    const { tossesMs, flightMs, holdMs, mergeMs } = meta.values;
     const height = area.bottom - area.top;
     let clock = 0;
     const fruits = Array.from({ length: TOSSES }, (_, k) => {

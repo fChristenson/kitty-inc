@@ -5,7 +5,7 @@
 // swaying; then it drops onto the spot with a pop and a jolt and a new
 // worker forms there; the flares fly ever faster, the last landing in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const LAND_SHAKE: [number, number] = [0.5, 1.3];
 export const forceFlareGunEvent = registerWispEvent(
   KEY,
   "Flare Gun",
-  () => CONFIG.flareGunEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { gapsMs, hangMs, dropMs, holdMs, mergeMs } = CONFIG.flareGunEvent;
+    const { gapsMs, hangMs, dropMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

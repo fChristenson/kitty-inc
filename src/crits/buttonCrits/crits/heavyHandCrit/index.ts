@@ -3,8 +3,8 @@
 // quicker and deeper each, the wisps squashing flat, glitter squeezed out;
 // the last slam crushes them all at once and each button turns over: its
 // next taps each land three levels
+import meta from "./meta";
 import { defineTapPerk } from "../../buttonBonus";
-import { CONFIG } from "../../../../config";
 import {
   crushAt,
   drawCrushBurst,
@@ -78,7 +78,7 @@ const heavyTaps = defineTapPerk(
 registerFloorCrit("heavyHandCrit", {
   // heavy taps, twice as many on its own
   reward(t) {
-    const taps = Math.max(1, Math.round(t.count * CONFIG.crit.heavyHandTaps));
+    const taps = Math.max(1, Math.round(t.count * meta.values.taps));
     heavyTaps.add(t.floor, t.own ? taps * 2 : taps);
     t.flipButton();
   },

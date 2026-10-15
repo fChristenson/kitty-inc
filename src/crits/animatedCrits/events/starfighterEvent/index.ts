@@ -5,8 +5,8 @@
 // quicker and quicker, until a big one looms in, takes three volleys and goes
 // up in a huge blast. The view crash-lands back on the floors, the floor gets
 // free levels for every wisp shot down and the crit's tier pays out
+import meta from "./meta";
 import { levelsFor, type Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { drawBeam, drawBeamFlare } from "../../../../shared/animationStyles/beam";
 import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
@@ -104,7 +104,7 @@ interface Wisp {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.starfighterEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -173,7 +173,7 @@ const sizeOf = (wisp: Wisp, ms: number) =>
 
 function startStarfighter(floor: Floor, context: EventProcContext): void {
   const { flyMs, approachMs, lockMs, boltMs, levelShare } =
-    CONFIG.starfighterEvent;
+    meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const wisps = planWisps(approachMs);
   // every volley in the order it lands, for the bangs and shakes

@@ -6,7 +6,7 @@
 // of coins, every power pellet a flash, a bang and a jolt; it gobbles the
 // last power pellet in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const POWER_SHAKE: [number, number] = [0.7, 1.4];
 export const forceGobblerEvent = registerWispEvent(
   KEY,
   "Gobbler",
-  () => CONFIG.gobblerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, holdMs, mergeMs } = CONFIG.gobblerEvent;
+    const { runMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const height = area.bottom - area.top;
     const left = area.left + EDGE;

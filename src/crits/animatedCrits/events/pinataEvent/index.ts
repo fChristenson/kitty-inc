@@ -6,7 +6,7 @@
 // and swelling; then the last whack bursts it open in a huge blast and shake
 // that sprays cash everywhere, and the coins sweep into the total. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -40,9 +40,9 @@ const HIT_SHAKE: [number, number] = [0.5, 1.5];
 export const forcePinataEvent = registerWispEvent(
   KEY,
   "Pinata",
-  () => CONFIG.pinataEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dropMs, gapsMs, holdMs, mergeMs } = CONFIG.pinataEvent;
+    const { dropMs, gapsMs, holdMs, mergeMs } = meta.values;
     const pivot: Point = {
       x: (area.left + area.right) / 2,
       y: area.top + (area.bottom - area.top) * 0.38 - STRING,

@@ -7,7 +7,7 @@
 // the last harmonic each loop flings a wisp off its crest, arcing down onto
 // an empty spot as a new worker, the last in a big blast. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -59,10 +59,10 @@ interface Piece {
 export const forceHarmonicsEvent = registerWispEvent(
   KEY,
   "Harmonics",
-  () => CONFIG.harmonicsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, modeMs, gapMs, dropMs, holdMs, mergeMs } =
-      CONFIG.harmonicsEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_LOOPS);
     if (hires.length === 0) return;
     const left = area.left + MARGIN;

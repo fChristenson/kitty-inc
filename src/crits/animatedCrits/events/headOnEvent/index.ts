@@ -6,7 +6,7 @@
 // next pair tears in along the next bar, quicker each time, the last crash
 // a huge blast and shake as the cash pours into the total. Pays floor
 // income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,10 +35,10 @@ const CRASH_SHAKE: [number, number] = [0.7, 1.5];
 export const forceHeadOnEvent = registerWispEvent(
   KEY,
   "Head-On",
-  () => CONFIG.headOnEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { crashesMs, travelMs, levelShare, holdMs, mergeMs } =
-      CONFIG.headOnEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

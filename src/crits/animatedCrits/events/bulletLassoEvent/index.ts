@@ -6,7 +6,7 @@
 // they all slam into the bar at once, a bang and a big jolt as it jumps a
 // crit tier; bar after bar, each lasso quicker, the last cinch landing in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -66,9 +66,9 @@ interface Lasso {
 export const forceBulletLassoEvent = registerWispEvent(
   KEY,
   "Bullet Lasso",
-  () => CONFIG.bulletLassoEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { loopsMs, holdMs, mergeMs } = CONFIG.bulletLassoEvent;
+    const { loopsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

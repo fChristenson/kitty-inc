@@ -6,7 +6,7 @@
 // shake, as a new worker forms in the smoke; the cars blow in a chain down
 // the line, and once the last is gone the engine itself blows in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,9 +52,9 @@ interface Blast {
 export const forceBombTrainEvent = registerWispEvent(
   KEY,
   "Bomb Train",
-  () => CONFIG.bombTrainEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, holdMs, mergeMs } = CONFIG.bombTrainEvent;
+    const { runMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const ltr = button.x < (area.left + area.right) / 2;
     const hires = findRewardHires(floor, context)

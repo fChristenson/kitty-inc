@@ -6,7 +6,7 @@
 // bursts, its shards diving onto every bar in quick fire, each landing its
 // levels, the clicked bar last in a huge blast that climbs a crit tier.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import {
@@ -118,7 +118,7 @@ function gemDots(): Point[] {
 export const forceGemstoneEvent = registerWispEvent(
   KEY,
   "Gemstone",
-  () => CONFIG.gemstoneEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       chargeMs,
@@ -128,7 +128,7 @@ export const forceGemstoneEvent = registerWispEvent(
       winnerShare,
       holdMs,
       mergeMs,
-    } = CONFIG.gemstoneEvent;
+    } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

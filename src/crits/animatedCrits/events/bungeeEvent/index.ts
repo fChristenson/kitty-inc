@@ -5,7 +5,7 @@
 // onto the next bar, and the next, each bounce quicker, the last plunge
 // slamming its bar in a huge blast and shake as the coins sweep into the
 // total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const HIT_SHAKE: [number, number] = [0.8, 1.4];
 export const forceBungeeEvent = registerWispEvent(
   KEY,
   "Bungee",
-  () => CONFIG.bungeeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { plungesMs, recoilMs, holdMs, mergeMs } = CONFIG.bungeeEvent;
+    const { plungesMs, recoilMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

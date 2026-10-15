@@ -5,7 +5,7 @@
 // wires blaze and the worker crackles with strikes, a bang and a jolt, and
 // climbs a perma tier; the taser darts on to the next worker, quicker each
 // time, the last zap a huge strike and blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ interface Probe {
 export const forceTaserEvent = registerWispEvent(
   KEY,
   "Taser",
-  () => CONFIG.taserEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { zapMs, holdMs, mergeMs } = CONFIG.taserEvent;
+    const { zapMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

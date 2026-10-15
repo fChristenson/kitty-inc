@@ -5,7 +5,7 @@
 // bar flashes with a bang and a jolt and jumps a crit tier as the moon is
 // flung into orbit round the next; its last orbit decays and it crashes
 // into the bar in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ interface Orbit {
 export const forceMoonHopEvent = registerWispEvent(
   KEY,
   "Moon Hop",
-  () => CONFIG.moonHopEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { orbitsMs, hopMs, holdMs, mergeMs } = CONFIG.moonHopEvent;
+    const { orbitsMs, hopMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (found.length === 0) return;
     // bottom bar first, hopping up the stack

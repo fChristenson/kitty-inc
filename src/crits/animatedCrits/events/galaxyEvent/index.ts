@@ -6,7 +6,7 @@
 // lap a whoosh and a jolt; then the core collapses and the galaxy swirls
 // into the total in a huge blast and shake. Pays floor income × floor number
 // × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -39,9 +39,9 @@ const LAP_SHAKE: [number, number] = [0.4, 1.2];
 export const forceGalaxyEvent = registerWispEvent(
   KEY,
   "Galaxy",
-  () => CONFIG.galaxyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { formMs, spinMs, flightMs, holdMs, mergeMs } = CONFIG.galaxyEvent;
+    const { formMs, spinMs, flightMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const core: Point = {

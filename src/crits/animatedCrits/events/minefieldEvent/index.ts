@@ -6,7 +6,7 @@
 // jolt, and every bar it clears gets free levels; the last mine goes off
 // in a huge blast and shake as every bar slams. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ const MINE_SHAKE: [number, number] = [0.6, 1.4];
 export const forceMinefieldEvent = registerWispEvent(
   KEY,
   "Minefield",
-  () => CONFIG.minefieldEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { layMs, runMs, levelShare, holdMs, mergeMs } = CONFIG.minefieldEvent;
+    const { layMs, runMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => a.center.y - b.center.y);

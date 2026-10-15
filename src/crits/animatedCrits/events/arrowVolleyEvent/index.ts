@@ -6,7 +6,7 @@
 // a bang and a big jolt as the bar jumps a crit tier; volley after volley,
 // ever quicker, the last raining down in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const HIT_SHAKE: [number, number] = [0.9, 1.4];
 export const forceArrowVolleyEvent = registerWispEvent(
   KEY,
   "Arrow Volley",
-  () => CONFIG.arrowVolleyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { volleysMs, flightMs, holdMs, mergeMs } = CONFIG.arrowVolleyEvent;
+    const { volleysMs, flightMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

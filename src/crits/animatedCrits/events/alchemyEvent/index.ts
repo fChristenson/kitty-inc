@@ -3,8 +3,8 @@
 // into it; the brew bubbles up ever harder, then boils over and shoots
 // glimmer lights into the floor's lowest-tier worker, which climbs one perma
 // tier as the floor pays out. Then the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { multiply } from "../../../../shared/bigNumber";
@@ -106,7 +106,7 @@ function plan(floor: Floor, context: EventProcContext): Plan | null {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.alchemyEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running && !isScreenFrozen() && plan(floor, context) !== null,
@@ -130,7 +130,7 @@ function drawOverlay(
   const rect = getFloorRect(event.floor);
   if (rect) {
     const now = performance.now();
-    const { brewMs, shootMs, holdMs } = CONFIG.alchemyEvent;
+    const { brewMs, shootMs, holdMs } = meta.values;
     const ms = now - event.startedAt;
     const brew =
       event.boiledAt === null
@@ -198,7 +198,7 @@ function startAlchemy(floor: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen()) return;
   const target = plan(floor, context);
   if (!target) return;
-  const { brewMs, shootMs, holdMs, payouts } = CONFIG.alchemyEvent;
+  const { brewMs, shootMs, holdMs, payouts } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const event: RunningAlchemy = {
     ...target,

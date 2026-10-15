@@ -6,7 +6,7 @@
 // pours down through the hole in blazing shafts onto every worker on the
 // floor, one after another, each lighting up a perma tier, the last in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,10 +48,10 @@ function floorWorkers(floor: Floor, context: EventProcContext): RewardWorker[] {
 export const forceSkylightEvent = registerWispEvent(
   KEY,
   "Skylight",
-  () => CONFIG.skylightEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { approachMs, stallMs, boreMs, holdMs, mergeMs } =
-      CONFIG.skylightEvent;
+      meta.values;
     const workers = floorWorkers(floor, context).sort(
       (a, b) => a.at.x - b.at.x,
     );

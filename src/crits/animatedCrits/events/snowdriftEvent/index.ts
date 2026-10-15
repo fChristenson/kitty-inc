@@ -6,7 +6,7 @@
 // faster; then the wind swings round and blows every drift up into the
 // total in a huge blast and shake. Pays floor income × floor number ×
 // REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -39,10 +39,10 @@ const DRIFT_SHAKE: [number, number] = [0.6, 1.4];
 export const forceSnowdriftEvent = registerWispEvent(
   KEY,
   "Snowdrift",
-  () => CONFIG.snowdriftEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pileMs, gapsMs, flyMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.snowdriftEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;

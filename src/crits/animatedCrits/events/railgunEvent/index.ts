@@ -5,7 +5,7 @@
 // the screen rumbles, then fire: a slug of cash rockets up between them in a
 // blink and punches into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const SECTION_SHAKE: [number, number] = [0.6, 1.3];
 export const forceRailgunEvent = registerWispEvent(
   KEY,
   "Railgun",
-  () => CONFIG.railgunEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { buildsMs, chargeMs, fireMs, holdMs, mergeMs } = CONFIG.railgunEvent;
+    const { buildsMs, chargeMs, fireMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const x = fallback.x;
     const bottom = area.bottom - 30;

@@ -5,7 +5,7 @@
 // across the screen, each a bang, a big jolt and cash blown everywhere; the
 // last and biggest goes off in a huge blast and shake and the cash sweeps
 // into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const BOOM_SHAKE: [number, number] = [1, 1.8];
 export const forceCarpetBombingEvent = registerWispEvent(
   KEY,
   "Carpet Bombing",
-  () => CONFIG.carpetBombingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flyMs, fallMs, holdMs, mergeMs } = CONFIG.carpetBombingEvent;
+    const { flyMs, fallMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fromLeft = Math.random() < 0.5;

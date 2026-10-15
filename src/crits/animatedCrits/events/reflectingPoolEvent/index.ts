@@ -6,7 +6,7 @@
 // reflection wobbling harder, then it all gushes up into the total in a
 // huge blast and shake as the pool drains away. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -48,10 +48,10 @@ const SPLASH_SHAKE: [number, number] = [0.4, 1];
 export const forceReflectingPoolEvent = registerWispEvent(
   KEY,
   "Reflecting Pool",
-  () => CONFIG.reflectingPoolEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, streamsMs, drainMs, holdMs, mergeMs } =
-      CONFIG.reflectingPoolEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

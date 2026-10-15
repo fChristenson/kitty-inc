@@ -8,7 +8,7 @@
 // flat out and flings everything back down onto the bars, a blast and levels
 // on each, collapsing in a huge blast on the clicked one. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import {
@@ -68,7 +68,7 @@ interface Speck {
 export const forceTornadoAlleyEvent = registerWispEvent(
   KEY,
   "Tornado Alley",
-  () => CONFIG.tornadoAlleyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       firstMs,
@@ -79,7 +79,7 @@ export const forceTornadoAlleyEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.tornadoAlleyEvent;
+    } = meta.values;
     const bars = findRewardBars(floor, context);
     if (bars.length === 0) return;
     const clicked =

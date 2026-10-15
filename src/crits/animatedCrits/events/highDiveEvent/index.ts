@@ -5,7 +5,7 @@
 // then plunges straight down, ever faster, into the pool: it hits in a huge
 // blast and shake and a towering column of cash erupts up the screen
 // behind it into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -35,10 +35,10 @@ const DIVER = 0.55;
 export const forceHighDiveEvent = registerWispEvent(
   KEY,
   "High Dive",
-  () => CONFIG.highDiveEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { climbMs, teeterMs, diveMs, poolMs, spoutMs, holdMs, mergeMs } =
-      CONFIG.highDiveEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const cx = (area.left + area.right) / 2;
     const pool: Point = { x: cx, y: area.bottom - EDGE };

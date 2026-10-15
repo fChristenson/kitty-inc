@@ -5,7 +5,7 @@
 // apple clean off their head in a flash, a bang and a jolt as the worker
 // climbs a perma tier; the next apple is already dropping, each shot
 // quicker, the last in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -58,9 +58,9 @@ interface Shot {
 export const forceWilliamTellEvent = registerWispEvent(
   KEY,
   "William Tell",
-  () => CONFIG.williamTellEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotsMs, aimMs, holdMs, mergeMs } = CONFIG.williamTellEvent;
+    const { shotsMs, aimMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     let clock = 0;

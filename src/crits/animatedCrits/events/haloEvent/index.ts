@@ -3,8 +3,8 @@
 // view, orbit it, then shrink into a glowing halo settling over its head: that
 // worker jumps straight to the top perma tier. Then the screen unfreezes and
 // the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { CRIT_TIER_ORDER, pickCritTierByOdds } from "../../../critTypes";
@@ -90,7 +90,7 @@ function findWorker(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.haloEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running && !isScreenFrozen() && findWorker(floor, context) !== null,
@@ -107,7 +107,7 @@ export function forceHaloEvent(floor: Floor): void {
 
 // the ring's turns `ms` in, spinning ever faster until crowned
 function ringTurns(ms: number): number {
-  const { gatherMs, orbitMs, settleMs } = CONFIG.haloEvent;
+  const { gatherMs, orbitMs, settleMs } = meta.values;
   const t = ms / 1000;
   const tc = Math.min(t, (gatherMs + orbitMs + settleMs) / 1000);
   return SPIN * t + SPIN_ACCEL * ((tc * tc) / 2 + tc * (t - tc));
@@ -117,7 +117,7 @@ function ringTurns(ms: number): number {
 // shrinking and rising into the halo. `front` slots pass before the worker,
 // back ones shrink behind it
 function ringAt(i: number, ms: number, cx: number, cy: number) {
-  const { gatherMs, orbitMs, settleMs } = CONFIG.haloEvent;
+  const { gatherMs, orbitMs, settleMs } = meta.values;
   const settle = ease(clamp01((ms - gatherMs - orbitMs) / settleMs));
   const angle = (i / LIGHTS + ringTurns(ms)) * Math.PI * 2;
   const radius = WORKER_HEIGHT * (ORBIT + (HALO_RX - ORBIT) * settle);
@@ -141,7 +141,7 @@ function ringAt(i: number, ms: number, cx: number, cy: number) {
 // light i `ms` in: once launched it swoops in from off screen on a curve
 // swirling the ring's way, slowing as it drops into its slot
 function lightAt(i: number, ms: number, cx: number, cy: number) {
-  const { gatherMs } = CONFIG.haloEvent;
+  const { gatherMs } = meta.values;
   const launchAt = (i / (LIGHTS - 1)) * STAGGER * gatherMs;
   if (ms < launchAt) return null;
   const ring = ringAt(i, ms, cx, cy);
@@ -253,7 +253,7 @@ function startHalo(floor: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen()) return;
   const worker = findWorker(floor, context);
   if (!worker) return;
-  const { gatherMs, orbitMs, settleMs, holdMs } = CONFIG.haloEvent;
+  const { gatherMs, orbitMs, settleMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const event: RunningHalo = {
     worker,

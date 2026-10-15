@@ -6,7 +6,7 @@
 // spot with a crack, a flash and a jolt as a new worker forms there; ever
 // faster, the last snapping back in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -86,9 +86,9 @@ function snapRound(
 export const forceSnapbackEvent = registerWispEvent(
   KEY,
   "Snapback",
-  () => CONFIG.snapbackEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { shotsMs, flightMs, holdMs, mergeMs } = CONFIG.snapbackEvent;
+    const { shotsMs, flightMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const gun = getButtonCenter(context.isGroundFloor);

@@ -6,7 +6,7 @@
 // blazes and crackles, then hurls itself down the strike it fires into the
 // locked floor's lock, which bursts open: the floor unlocked for free. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,10 +46,10 @@ const SOUND_GAP_MS = 60;
 export const forceDroneShowEvent = registerWispEvent(
   KEY,
   "Drone Show",
-  () => CONFIG.droneShowEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { flyMs, climbMs, blazeMs, strikeMs, holdMs, mergeMs } =
-      CONFIG.droneShowEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

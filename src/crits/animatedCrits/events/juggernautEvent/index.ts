@@ -5,7 +5,7 @@
 // income bar it ploughs through on the way down jolts with free levels, and
 // it smashes into the clicked floor's bar at full size in a huge blast and
 // shake: that bar jumps one crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,9 +30,9 @@ const WALL_SHAKE: [number, number] = [0.5, 1.4];
 export const forceJuggernautEvent = registerWispEvent(
   KEY,
   "Juggernaut",
-  () => CONFIG.juggernautEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { legsMs, levelShare, holdMs, mergeMs } = CONFIG.juggernautEvent;
+    const { legsMs, levelShare, holdMs, mergeMs } = meta.values;
     const all = findRewardBars(floor, context);
     const own = all.find((b) => b.floor === floor);
     if (!own) return;

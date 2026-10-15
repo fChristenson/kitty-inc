@@ -3,8 +3,8 @@
 // street; each floor's income bar it reaches slams and rises to the highest
 // floor tier among the floors in view (see ../floodLift). Then the water
 // fades, the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh, startWaterLoop } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -51,7 +51,7 @@ let running: RunningTide | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.risingTideEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -71,7 +71,7 @@ export function forceRisingTideEvent(floor: Floor): void {
 
 // the surface's height ms in, easing in and out of its rise
 function surfaceY(tide: RunningTide, ms: number): number {
-  const u = Math.min(1, Math.max(0, ms / CONFIG.risingTideEvent.riseMs));
+  const u = Math.min(1, Math.max(0, ms / meta.values.riseMs));
   const e = (1 - Math.cos(Math.PI * u)) / 2;
   return tide.fromY + (tide.toY - tide.fromY) * e;
 }
@@ -79,7 +79,7 @@ function surfaceY(tide: RunningTide, ms: number): number {
 // when the surface reaches local height y
 function reachAt(tide: RunningTide, y: number): number {
   const e = (tide.fromY - y) / (tide.fromY - tide.toY);
-  return (CONFIG.risingTideEvent.riseMs * Math.acos(1 - 2 * e)) / Math.PI;
+  return (meta.values.riseMs * Math.acos(1 - 2 * e)) / Math.PI;
 }
 
 function drawOverlay(
@@ -93,7 +93,7 @@ function drawOverlay(
   drawFloodBars(ctx, getFloorRect, tide.lift, now);
   const rect = getFloorRect(tide.floor);
   if (!rect) return;
-  const { riseMs, fadeMs } = CONFIG.risingTideEvent;
+  const { riseMs, fadeMs } = meta.values;
   const surface = surfaceY(tide, ms);
   ctx.save();
   ctx.translate(rect.left, rect.top);
@@ -118,7 +118,7 @@ function startTide(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   const lift = planFloodLift(floor, context);
   if (!area || !lift) return;
-  const { riseMs, fadeMs, holdMs } = CONFIG.risingTideEvent;
+  const { riseMs, fadeMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const tide: RunningTide = {
     floor,

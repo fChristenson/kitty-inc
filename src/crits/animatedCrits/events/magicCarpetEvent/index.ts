@@ -5,7 +5,7 @@
 // every dip a whoosh, a jolt and coins spilling off its trailing edge; then
 // it dives into the total and the carpet piles in after it in a huge blast
 // and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -42,10 +42,10 @@ const DIP_SHAKE: [number, number] = [0.6, 1.3];
 export const forceMagicCarpetEvent = registerWispEvent(
   KEY,
   "Magic Carpet",
-  () => CONFIG.magicCarpetEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { unrollMs, flyMs, pileMs, holdMs, mergeMs } =
-      CONFIG.magicCarpetEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;

@@ -5,7 +5,7 @@
 // mine as it reaches it: a big blast bursting into a cluster of smaller
 // ones, a bang and a jolt, and a new worker forming in the smoke; the last
 // mine goes up in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,9 +53,9 @@ interface Blast {
 export const forceRippleMinesEvent = registerWispEvent(
   KEY,
   "Ripple Mines",
-  () => CONFIG.rippleMinesEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { waveMs, holdMs, mergeMs } = CONFIG.rippleMinesEvent;
+    const { waveMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

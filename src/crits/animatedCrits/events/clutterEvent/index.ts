@@ -6,7 +6,7 @@
 // long line along the bottom, then in from the left and the right, bunching
 // it into one heap that settles with a jolt and lifts off into the total in
 // a huge blast. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -64,10 +64,10 @@ const GATHER_SHAKE = 0.9;
 export const forceClutterEvent = registerWispEvent(
   KEY,
   "Clutter",
-  () => CONFIG.clutterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { enterMs, scatterMs, dragMs, liftMs, holdMs, mergeMs } =
-      CONFIG.clutterEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const centre: Point = {

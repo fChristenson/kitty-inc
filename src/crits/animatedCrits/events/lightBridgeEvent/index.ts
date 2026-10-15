@@ -5,7 +5,7 @@
 // with a flare, a bang and a jolt as a new worker forms there; bridge after
 // bridge fans out, quicker each time, the last landing in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,9 +53,9 @@ interface Bridge {
 export const forceLightBridgeEvent = registerWispEvent(
   KEY,
   "Light Bridge",
-  () => CONFIG.lightBridgeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { archesMs, holdMs, mergeMs } = CONFIG.lightBridgeEvent;
+    const { archesMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context)
       .slice(0, MAX_HIRES)
       .sort((a, b) => a.x - b.x);

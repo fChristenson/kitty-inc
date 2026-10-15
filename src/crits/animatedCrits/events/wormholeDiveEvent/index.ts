@@ -4,8 +4,8 @@
 // Wisps riding the spiral wall are shot down one after another as they
 // wheel past, each paying into the live total, then the view bursts out of
 // the far end in a white blast and crash-lands back on the floors
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { multiply } from "../../../../shared/bigNumber";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
@@ -92,7 +92,7 @@ interface Rider {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.wormholeDiveEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startWormholeDive,
@@ -123,7 +123,7 @@ function riderAt(view: FlightView, rider: Rider, ms: number): Point {
 }
 
 function startWormholeDive(floor: Floor, context: EventProcContext): void {
-  const { payoutsPerRider, payoutsOut } = CONFIG.wormholeDiveEvent;
+  const { payoutsPerRider, payoutsOut } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const riders: Rider[] = Array.from({ length: RIDERS }, (_, k) => ({
     angle: hash01(k, 7901) * Math.PI * 2,

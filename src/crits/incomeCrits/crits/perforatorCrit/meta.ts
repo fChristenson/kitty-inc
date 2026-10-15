@@ -6,5 +6,4 @@ export default {
   label: "Perforator",
   chance: 0.03,
   style: "drill",
-  isNew: true,
 } satisfies CritMeta;

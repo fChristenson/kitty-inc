@@ -6,7 +6,7 @@
 // the total; then a double is flung up from both corners at once, both
 // blasted together in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -56,10 +56,10 @@ interface Clay {
 export const forceSkeetEvent = registerWispEvent(
   KEY,
   "Skeet",
-  () => CONFIG.skeetEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, throwsMs, doubleGapMs, holdMs, mergeMs } =
-      CONFIG.skeetEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const gun: Point = { x: area.left + width / 2, y: area.bottom - 60 };

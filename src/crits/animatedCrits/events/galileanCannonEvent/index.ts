@@ -6,7 +6,7 @@
 // bigger ones only hopping while the tiny one rockets up the building like
 // a shot out of a cannon and smashes into the next locked floor in a huge
 // blast and shake, unlocking it for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const LAUNCH_SHAKE = 1.2;
 export const forceGalileanCannonEvent = registerWispEvent(
   KEY,
   "Galilean Cannon",
-  () => CONFIG.galileanCannonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { launchMs, holdMs, mergeMs } = CONFIG.galileanCannonEvent;
+    const { launchMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

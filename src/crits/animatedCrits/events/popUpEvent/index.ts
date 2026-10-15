@@ -5,7 +5,7 @@
 // shadow with a bloop, a jolt and a burst of coins before flopping back
 // flat; then every band pops at once and slams flat in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -31,9 +31,9 @@ const POP_SHAKE: [number, number] = [0.4, 1.1];
 export const forcePopUpEvent = registerWispEvent(
   KEY,
   "Pop-Up",
-  () => CONFIG.popUpEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { popsMs, holdMs, mergeMs } = CONFIG.popUpEvent;
+    const { popsMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

@@ -136,7 +136,7 @@ export interface Floor {
   overtimeCost: BigNumber; // $ paid for the CURRENT run; ZERO if never triggered
   // permanent per-floor price multiplier (default 1), permanently multiplied
   // by 0.75 each time a "seasonal sale" crit lands on this floor (see
-  // crits/critTypes' SEASONAL_SALE_DISCOUNT_MULTIPLIER) — folded into
+  // crits/critTypes' SALE_DISCOUNT_MULTIPLIERS) — folded into
   // hud/upgradeMenu's getFloorPrice, so it discounts every worker/office
   // chairs/supplies/manager cost derived from it. floor.upgradeCost itself is
   // discounted directly (a stored, already-mutable value), this multiplier is

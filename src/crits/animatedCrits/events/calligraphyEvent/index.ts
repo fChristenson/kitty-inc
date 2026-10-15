@@ -6,7 +6,7 @@
 // jolt; then the brush dives into the total and every stroke of wet cash
 // lifts off the screen after it in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -42,9 +42,9 @@ const FLICK_SHAKE: [number, number] = [0.6, 1.2];
 export const forceCalligraphyEvent = registerWispEvent(
   KEY,
   "Calligraphy",
-  () => CONFIG.calligraphyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { strokesMs, flightMs, holdMs, mergeMs } = CONFIG.calligraphyEvent;
+    const { strokesMs, flightMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;

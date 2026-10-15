@@ -6,7 +6,7 @@
 // as they rise; at the locked floor they slam in from both sides and the
 // floor blows open in a huge blast and shake, unlocked for free, as the
 // screen unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,9 +33,9 @@ const STEP_SHAKE: [number, number] = [0.4, 1.0];
 export const forceArcBridgeEvent = registerWispEvent(
   KEY,
   "Arc Bridge",
-  () => CONFIG.arcBridgeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { stepsMs, holdMs, mergeMs } = CONFIG.arcBridgeEvent;
+    const { stepsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -5,7 +5,7 @@
 // a bang and a jolt as the worker climbs a perma tier; the waves come
 // quicker, from alternate sides, the last crashing down in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,9 +34,9 @@ const CRASH_SHAKE: [number, number] = [0.7, 1.4];
 export const forceBreakersEvent = registerWispEvent(
   KEY,
   "Breakers",
-  () => CONFIG.breakersEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, waveMs, holdMs, mergeMs } = CONFIG.breakersEvent;
+    const { gapsMs, waveMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

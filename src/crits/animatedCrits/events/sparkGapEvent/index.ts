@@ -7,7 +7,7 @@
 // then it discharges in a blinding flash and the floor bursts open in a
 // huge blast and shake, unlocked for free as the screen unfreezes. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,9 +34,9 @@ const SPARK_SHAKE: [number, number] = [0.3, 0.9];
 export const forceSparkGapEvent = registerWispEvent(
   KEY,
   "Spark Gap",
-  () => CONFIG.sparkGapEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { flyMs, sparksMs, arcMs, holdMs, mergeMs } = CONFIG.sparkGapEvent;
+    const { flyMs, sparksMs, arcMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

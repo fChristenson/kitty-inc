@@ -6,7 +6,7 @@
 // a blazing star across the ring; then it breaks out through the rim and
 // slams into the total in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -47,9 +47,9 @@ const BOUNCE_SHAKE: [number, number] = [0.4, 1];
 export const forceRimShotEvent = registerWispEvent(
   KEY,
   "Rim Shot",
-  () => CONFIG.rimShotEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { legsMs, holdMs, mergeMs } = CONFIG.rimShotEvent;
+    const { legsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     const width = area.right - area.left;

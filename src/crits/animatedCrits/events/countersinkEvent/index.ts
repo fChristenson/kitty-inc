@@ -7,7 +7,7 @@
 // up with a pop, the sparks spraying ever thicker, until it punches out
 // the bottom in a huge blast and the count jumps by a big batch of free
 // levels. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,7 +40,7 @@ const PUSH_SHAKE: [number, number] = [0.35, 0.8];
 export const forceCountersinkEvent = registerWispEvent(
   KEY,
   "Countersink",
-  () => CONFIG.countersinkEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       approachMs,
@@ -50,7 +50,7 @@ export const forceCountersinkEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.countersinkEvent;
+    } = meta.values;
     if (!context.upgradeFloorFree || isFloorMaxed(floor)) return;
     const label = getUpgradeIndicatorCenter(floor);
     const target: Point = { x: label.x, y: STAR_Y };

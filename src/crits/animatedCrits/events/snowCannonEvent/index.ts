@@ -6,7 +6,7 @@
 // brighter with every burst, each a thud and a jolt, until the lock is
 // buried and bursts open in a huge blast and shake, the floor unlocked for
 // free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWispHead, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -44,9 +44,9 @@ const LAND_SHAKE: [number, number] = [0.5, 1.0];
 export const forceSnowCannonEvent = registerWispEvent(
   KEY,
   "Snow Cannon",
-  () => CONFIG.snowCannonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { burstsMs, gapMs, holdMs, mergeMs } = CONFIG.snowCannonEvent;
+    const { burstsMs, gapMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

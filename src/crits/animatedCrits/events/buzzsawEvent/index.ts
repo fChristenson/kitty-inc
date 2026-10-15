@@ -5,7 +5,7 @@
 // bite, until the bar jumps a crit tier with a crack and a big jolt; then it
 // rolls on to the next bar and the next, spinning ever faster, the last
 // grind ending in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const HIT_SHAKE: [number, number] = [0.8, 1.4];
 export const forceBuzzsawEvent = registerWispEvent(
   KEY,
   "Buzzsaw",
-  () => CONFIG.buzzsawEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { rollMs, grindsMs, holdMs, mergeMs } = CONFIG.buzzsawEvent;
+    const { rollMs, grindsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

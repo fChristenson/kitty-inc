@@ -5,7 +5,7 @@
 // discharges at once, the coils flaring out and a rattle of strikes running
 // along each bar, every strike free levels, into a huge blast on the
 // clicked bar that slams every bar. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -74,10 +74,10 @@ interface Strike {
 export const forceBoltBindingEvent = registerWispEvent(
   KEY,
   "Bolt Binding",
-  () => CONFIG.boltBindingEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { windMs, hopMs, fireLagMs, levelShare, holdMs, mergeMs } =
-      CONFIG.boltBindingEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

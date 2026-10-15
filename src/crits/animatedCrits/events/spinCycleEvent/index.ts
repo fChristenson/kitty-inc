@@ -7,7 +7,7 @@
 // every half turn a whoosh and a jolt; at full spin the drum's top flies
 // open and the ring peels off it in one long gush that streams into the
 // total in a huge blast. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -60,10 +60,10 @@ const OPEN_SHAKE = 1;
 export const forceSpinCycleEvent = registerWispEvent(
   KEY,
   "Spin Cycle",
-  () => CONFIG.spinCycleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pourMs, rockMs, spinMs, liftMs, holdMs, mergeMs } =
-      CONFIG.spinCycleEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const fallback = totalSpot(area);
     const total = () => cover?.total() ?? fallback;

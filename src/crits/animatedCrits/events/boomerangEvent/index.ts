@@ -5,8 +5,8 @@
 // different way, wider and faster; the last whips back in a huge blast and
 // shake, and the coins sweep into the total. Pays floor income × floor
 // number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import {
@@ -69,13 +69,13 @@ interface Throw {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.boomerangEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { throwMs, holdMs, mergeMs } = CONFIG.boomerangEvent;
+      const { throwMs, holdMs, mergeMs } = meta.values;
       const width = area.right - area.left;
       const margin = width * EDGE_MARGIN;
       const button = getButtonCenter(context.isGroundFloor);

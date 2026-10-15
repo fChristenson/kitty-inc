@@ -5,7 +5,7 @@
 // and spears straight into the building's locked floor in a huge blast and
 // shake, and the floor bursts open, unlocked for free, as the screen
 // unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -30,9 +30,9 @@ const STUNT_SHAKE: [number, number] = [0.5, 1.1];
 export const forcePaperPlaneEvent = registerWispEvent(
   KEY,
   "Paper Plane",
-  () => CONFIG.paperPlaneEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flightMs, holdMs, mergeMs } = CONFIG.paperPlaneEvent;
+    const { flightMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

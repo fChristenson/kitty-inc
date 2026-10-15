@@ -6,7 +6,7 @@
 // champagne on a podium, raking each from end to end and coating it gold
 // until it flashes for free levels; the top bar is soaked last and slams.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,9 +53,9 @@ const COAT_SHAKE = 0.7;
 export const forcePodiumEvent = registerWispEvent(
   KEY,
   "Podium",
-  () => CONFIG.podiumEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shakeMs, legMs, levelShare, holdMs, mergeMs } = CONFIG.podiumEvent;
+    const { shakeMs, legMs, levelShare, holdMs, mergeMs } = meta.values;
     // the lowest bars first, soaking up the screen
     const bars = findRewardBars(floor, context).slice(-MAX_BARS).reverse();
     if (bars.length === 0) return;

@@ -5,8 +5,8 @@
 // gaps between them; guards on the roofs ahead are dropped mid-leap, a big
 // one on the last roof taking two. A final leap through a lit window across
 // the street lands back on the floors, a cat hired on every floor with room
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import {
@@ -42,6 +42,7 @@ import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { findRewardHires, giveHire } from "../../eventRewards";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -137,7 +138,7 @@ interface Guard {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.rooftopsEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -239,8 +240,8 @@ function startRooftops(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   if (!area) return;
   const aspect = (area.bottom - area.top) / (area.right - area.left);
-  const { tipMs, flyMs, hireGapMs } = CONFIG.rooftopsEvent;
-  const { arriveMs } = CONFIG.flightStage;
+  const { tipMs, flyMs, hireGapMs } = meta.values;
+  const { arriveMs } = FLIGHT_STAGE;
   const tier = context.critTier ?? pickCritTierByOdds();
   const go = tipMs * 0.6;
   const runZ = (ms: number) => -FOCAL + (RUN * Math.max(0, ms - go)) / 1000;

@@ -6,7 +6,7 @@
 // on the clicked floor's income bar, which jumps a crit tier in a huge
 // blast and shake as the whole groove of cash lifts off into the total.
 // Pays floor income × floor number × REWARD, plus the tier
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -44,10 +44,10 @@ const CROSS_SHAKE: [number, number] = [0.5, 1.2];
 export const forceFigureSkaterEvent = registerWispEvent(
   KEY,
   "Figure Skater",
-  () => CONFIG.figureSkaterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { enterMs, skateMs, jumpMs, flightMs, holdMs, mergeMs } =
-      CONFIG.figureSkaterEvent;
+      meta.values;
     const own = findRewardBars(floor, context).find((b) => b.floor === floor);
     if (!own) return;
     const fallback = totalSpot(area);

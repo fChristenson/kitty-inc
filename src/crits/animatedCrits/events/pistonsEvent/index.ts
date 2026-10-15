@@ -6,7 +6,7 @@
 // faster into a roar; then it hits the redline and every cylinder fires at
 // once in a row of blasts under a colossal one, the hardest shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,10 +50,10 @@ interface Firing {
 export const forcePistonsEvent = registerWispEvent(
   KEY,
   "Pistons",
-  () => CONFIG.pistonsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { firstMs, firesMs, redlineGapMs, jetMs, holdMs, mergeMs } =
-      CONFIG.pistonsEvent;
+      meta.values;
     const total = totalSpot(area);
     const width = area.right - area.left;
     const y = area.bottom - BOTTOM;

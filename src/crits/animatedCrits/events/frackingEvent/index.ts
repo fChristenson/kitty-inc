@@ -7,7 +7,7 @@
 // fractures along its length in a rolling chain of blasts, each its own
 // bang and shake, the last a huge one as the bar jumps a crit tier. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,10 +49,10 @@ const PUSH_SHAKE: [number, number] = [0.35, 0.8];
 export const forceFrackingEvent = registerWispEvent(
   KEY,
   "Fracking",
-  () => CONFIG.frackingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { curveMs, stallMs, boreMs, fractureMs, holdMs, mergeMs } =
-      CONFIG.frackingEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

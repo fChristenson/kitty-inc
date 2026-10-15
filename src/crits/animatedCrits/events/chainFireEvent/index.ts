@@ -6,7 +6,7 @@
 // jolt and free levels, quicker each hop; the last bar empties a long burst
 // into the building's locked floor until the lock blows in a huge blast
 // and shake and the floor bursts open, unlocked for free
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,10 +55,10 @@ interface Shot {
 export const forceChainFireEvent = registerWispEvent(
   KEY,
   "Chain Fire",
-  () => CONFIG.chainFireEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { hopsMs, shotGapMs, lockGapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.chainFireEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

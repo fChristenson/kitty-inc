@@ -6,7 +6,7 @@
 // free levels; it runs out of the bottom in a huge blast and shake and the
 // coins sweep into the total. Pays floor income × floor number × REWARD,
 // plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -35,9 +35,9 @@ const FLOOD_SHAKE: [number, number] = [0.5, 1.3];
 export const forceMeanderEvent = registerWispEvent(
   KEY,
   "Meander",
-  () => CONFIG.meanderEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.meanderEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

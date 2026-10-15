@@ -6,7 +6,7 @@
 // quicker, the last four flying in abreast and going off together, then the
 // lock itself goes up in a colossal blast and the biggest shake, and the
 // floor bursts open, unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ const CLUSTER_SHAKE = 2;
 export const forceBombCometEvent = registerWispEvent(
   KEY,
   "Bomb Comet",
-  () => CONFIG.bombCometEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flightMs, lagMs, holdMs, mergeMs } = CONFIG.bombCometEvent;
+    const { flightMs, lagMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

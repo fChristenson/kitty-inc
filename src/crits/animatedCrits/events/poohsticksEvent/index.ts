@@ -7,7 +7,7 @@
 // finish each leaps out of the river in turn and lands on an empty spot as
 // a new worker, the last in a huge blast, while the river drains into the
 // total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -69,10 +69,10 @@ interface Stick {
 export const forcePoohsticksEvent = registerWispEvent(
   KEY,
   "Poohsticks",
-  () => CONFIG.poohsticksEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { travelMs, streamMs, dropMs, raceMs, leapMs, holdMs, mergeMs } =
-      CONFIG.poohsticksEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, STICKS);
     if (hires.length === 0) return;
     const fallback = totalSpot(area);

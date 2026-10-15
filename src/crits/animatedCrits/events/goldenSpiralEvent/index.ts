@@ -7,7 +7,7 @@
 // leading a river of cash round every quarter turn, and shoots off its end
 // up into the total, the cash pouring in after it in a huge blast. Pays
 // floor income × floor number × 4
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -90,10 +90,10 @@ function layout(): Square[] {
 export const forceGoldenSpiralEvent = registerWispEvent(
   KEY,
   "Golden Spiral",
-  () => CONFIG.goldenSpiralEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { buildMs, traceMs, streamMs, flyMs, holdMs, mergeMs } =
-      CONFIG.goldenSpiralEvent;
+      meta.values;
     const squares = layout();
     const minX = Math.min(...squares.map((q) => q.x));
     const maxX = Math.max(...squares.map((q) => q.x + q.s));

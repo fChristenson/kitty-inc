@@ -5,8 +5,8 @@
 // fire; it strides to the next door and kicks it down on two more and a big
 // one taking two. The last door goes down on the floors, the view dives
 // through, and every bar in view climbs a crit tier
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import {
@@ -43,6 +43,7 @@ import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { findRewardBars } from "../../eventRewards";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -149,7 +150,7 @@ interface Guard {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.kickInEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -310,8 +311,8 @@ function startKickIn(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   if (!area) return;
   const aspect = (area.bottom - area.top) / (area.right - area.left);
-  const { flyMs, tierGapMs } = CONFIG.kickInEvent;
-  const { arriveMs } = CONFIG.flightStage;
+  const { flyMs, tierGapMs } = meta.values;
+  const { arriveMs } = FLIGHT_STAGE;
   const tier = context.critTier ?? pickCritTierByOdds();
   const doorHigh = 2 * DOOR * aspect;
   const high = Math.max(HIGH, doorHigh + OVER_DOOR);

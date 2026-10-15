@@ -6,7 +6,7 @@
 // floor the beam blazes out wide and the floor bursts open in a huge blast
 // and shake, unlocked for free, as the screen unfreezes. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,9 +33,9 @@ const BURST_SHAKE = 2.2;
 export const forceLaserDrillEvent = registerWispEvent(
   KEY,
   "Laser Drill",
-  () => CONFIG.laserDrillEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { punchesMs, holdMs, mergeMs } = CONFIG.laserDrillEvent;
+    const { punchesMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

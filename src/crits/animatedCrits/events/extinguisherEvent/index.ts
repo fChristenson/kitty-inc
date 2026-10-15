@@ -6,7 +6,7 @@
 // on to the next worker and blasts again, every blast a hiss, a jolt and a
 // kick back, quicker each time, the last a long double blast and a huge
 // blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,10 +50,10 @@ interface Shot {
 export const forceExtinguisherEvent = registerWispEvent(
   KEY,
   "Extinguisher",
-  () => CONFIG.extinguisherEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { dartMs, blastMs, lastBlastMs, holdMs, mergeMs } =
-      CONFIG.extinguisherEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

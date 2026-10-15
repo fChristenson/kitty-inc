@@ -6,7 +6,7 @@
 // each harder, until it punches through and the geode cracks open in a huge
 // blast, crystals of light flaring out of it and cash gushing everywhere.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const PUSH_SHAKE: [number, number] = [0.35, 0.8];
 export const forceGeodeEvent = registerWispEvent(
   KEY,
   "Geode",
-  () => CONFIG.geodeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { approachMs, stallMs, boreMs, holdMs, mergeMs } = CONFIG.geodeEvent;
+    const { approachMs, stallMs, boreMs, holdMs, mergeMs } = meta.values;
     const centre: Point = {
       x: (area.left + area.right) / 2,
       y: area.top + (area.bottom - area.top) * 0.48,

@@ -5,7 +5,7 @@
 // delivers the whole river into the building's locked floor in a huge blast
 // and shake; the floor bursts open, unlocked for free, as the screen
 // unfreezes. Pays floor income × floor number × REWARD, plus the floor
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -38,9 +38,9 @@ const SWERVE_SHAKE: [number, number] = [0.3, 0.9];
 export const forceCourierEvent = registerWispEvent(
   KEY,
   "Courier",
-  () => CONFIG.courierEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.courierEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

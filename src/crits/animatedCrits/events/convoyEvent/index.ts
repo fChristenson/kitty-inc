@@ -4,8 +4,8 @@
 // strafe it from tail to head, every car bursting one after another in a
 // chain, the big engine at the front going up last; the view crash-lands
 // and the floor gets free levels for every car
+import meta from "./meta";
 import { levelsFor, type Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { createBeats } from "../../../../shared/eventBeats";
@@ -74,7 +74,7 @@ const AFTER = 450;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.convoyEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -107,7 +107,7 @@ function carAt(view: FlightView, car: number, ms: number): Point {
 }
 
 function startConvoy(floor: Floor, context: EventProcContext): void {
-  const { levelShare } = CONFIG.convoyEvent;
+  const { levelShare } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const cars = Array.from({ length: CARS }, (_, car) => car);
   const flyMs = popAt(0) + AFTER;

@@ -7,7 +7,7 @@
 // income bar for free levels; the last strike is the biggest, the key
 // lashing bolts onto every bar at once and the clicked floor's bar slamming
 // in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -62,10 +62,10 @@ interface Strike {
 export const forceFranklinsKiteEvent = registerWispEvent(
   KEY,
   "Franklin's Kite",
-  () => CONFIG.franklinsKiteEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, gapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.franklinsKiteEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

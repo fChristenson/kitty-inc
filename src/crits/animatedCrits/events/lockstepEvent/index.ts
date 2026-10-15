@@ -6,7 +6,7 @@
 // and shake and spray of cash; the last group locks step and goes up in a
 // cluster round one colossal blast with the hardest shake of all. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import {
@@ -74,9 +74,9 @@ interface Blast {
 export const forceLockstepEvent = registerWispEvent(
   KEY,
   "Lockstep",
-  () => CONFIG.lockstepEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pullsMs, holdMs, mergeMs } = CONFIG.lockstepEvent;
+    const { pullsMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const centres = GROUPS.map((g) => ({

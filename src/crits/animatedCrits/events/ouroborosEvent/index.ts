@@ -6,7 +6,7 @@
 // screen rumbles, and collapses up into the total-income readout in a huge
 // blast and shake, and the coins sweep into the total. Pays floor income ×
 // floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,10 +45,10 @@ const RUMBLE: [number, number] = [0.5, 1.4];
 export const forceOuroborosEvent = registerWispEvent(
   KEY,
   "Ouroboros",
-  () => CONFIG.ouroborosEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { ringMs, spinMs, collapseMs, holdMs, mergeMs } =
-      CONFIG.ouroborosEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

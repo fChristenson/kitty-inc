@@ -6,7 +6,7 @@
 // pool with a bang and a big jolt, ever faster; then the whole pool erupts
 // into the total in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -59,10 +59,10 @@ const BOOM_SHAKE: [number, number] = [1, 1.8];
 export const forceDepthChargesEvent = registerWispEvent(
   KEY,
   "Depth Charges",
-  () => CONFIG.depthChargesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { dropsMs, fallMs, sinkMs, flightMs, holdMs, mergeMs } =
-      CONFIG.depthChargesEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;

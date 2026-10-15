@@ -6,7 +6,7 @@
 // which goes off in a huge blast and shake as the last arrives, and the
 // coins sweep into the total. Pays floor income × floor number × REWARD
 // (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -30,9 +30,9 @@ const LAUNCH_SHAKE = 0.9;
 export const forceLatticeEvent = registerWispEvent(
   KEY,
   "Lattice",
-  () => CONFIG.latticeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapMs, streamMs, travelMs, holdMs, mergeMs } = CONFIG.latticeEvent;
+    const { gapMs, streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const total = totalSpot(area);

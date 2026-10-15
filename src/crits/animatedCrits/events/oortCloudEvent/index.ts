@@ -7,7 +7,7 @@
 // faster, then breaks orbit along its heading and arcs onto a worker, who
 // climbs a perma tier, the last in a big blast. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -77,10 +77,10 @@ interface Comet {
 export const forceOortCloudEvent = registerWispEvent(
   KEY,
   "Oort Cloud",
-  () => CONFIG.oortCloudEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, passMs, plungeMs, whipMs, gapMs, flyMs, holdMs, mergeMs } =
-      CONFIG.oortCloudEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const w = area.right - area.left;

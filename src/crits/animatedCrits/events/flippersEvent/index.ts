@@ -6,7 +6,7 @@
 // screen in a gush of cash, and it falls back onto the other one, the rally
 // quicker every time; the last whack fires it straight up into the total in
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const WHACK_SHAKE: [number, number] = [0.6, 1.4];
 export const forceFlippersEvent = registerWispEvent(
   KEY,
   "Flippers",
-  () => CONFIG.flippersEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dropMs, shotsMs, finalMs, holdMs, mergeMs } = CONFIG.flippersEvent;
+    const { dropMs, shotsMs, finalMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const mid = (area.left + area.right) / 2;
     const y = area.bottom - FLOOR;

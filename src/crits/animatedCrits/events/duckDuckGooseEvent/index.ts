@@ -6,7 +6,7 @@
 // goose bursts up as a wisp and chases the tapper round in a tight loop,
 // catching it in a huge blast and shake as that worker climbs too. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const TAP_SHAKE: [number, number] = [0.4, 0.9];
 export const forceDuckDuckGooseEvent = registerWispEvent(
   KEY,
   "Duck Duck Goose",
-  () => CONFIG.duckDuckGooseEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { tapsMs, chaseMs, holdMs, mergeMs } = CONFIG.duckDuckGooseEvent;
+    const { tapsMs, chaseMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

@@ -6,7 +6,7 @@
 // wind and bursting with a pop and a jolt as its worker climbs a perma
 // tier; the last one goes out in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,10 +36,10 @@ const OUT_SHAKE: [number, number] = [0.5, 1.2];
 export const forceBirthdayCandlesEvent = registerWispEvent(
   KEY,
   "Birthday Candles",
-  () => CONFIG.birthdayCandlesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { lightMs, flameMs, gustMs, holdMs, mergeMs } =
-      CONFIG.birthdayCandlesEvent;
+      meta.values;
     const ltr = Math.random() < 0.5;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)

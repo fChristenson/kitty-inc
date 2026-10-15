@@ -5,7 +5,7 @@
 // crack, a jolt and a ring of coins clinging to it; fully charged, it
 // discharges one colossal bolt into the total in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const BANG_GAP_MS = 60;
 export const forceStaticClingEvent = registerWispEvent(
   KEY,
   "Static Cling",
-  () => CONFIG.staticClingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { chargeMs, holdMs, mergeMs } = CONFIG.staticClingEvent;
+    const { chargeMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const cx = (area.left + area.right) / 2;
     const cy = (area.top + area.bottom) / 2 + 80;

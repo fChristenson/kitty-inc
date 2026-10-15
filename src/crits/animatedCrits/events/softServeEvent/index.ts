@@ -5,7 +5,7 @@
 // finished a splat and a jolt; it tops off with a curl that flicks up, then
 // the whole swirl is slurped up into the total from the top down in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -38,9 +38,9 @@ const COIL_SHAKE: [number, number] = [0.4, 1];
 export const forceSoftServeEvent = registerWispEvent(
   KEY,
   "Soft Serve",
-  () => CONFIG.softServeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pipeMs, flightMs, holdMs, mergeMs } = CONFIG.softServeEvent;
+    const { pipeMs, flightMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const cx = (area.left + area.right) / 2;
     const base = area.bottom - BASE;

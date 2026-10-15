@@ -4,8 +4,8 @@
 // across the screen, ever bigger and harder shaking, each spraying coins;
 // then the coins sweep into the total. Pays floor income × floor number
 // × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   playExplosion,
@@ -69,13 +69,13 @@ function chainFrom(start: Point, spots: Point[]): Point[] {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.chainReactionEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { armMs, holdMs, mergeMs } = CONFIG.chainReactionEvent;
+      const { armMs, holdMs, mergeMs } = meta.values;
       // the button, then every mine, with when each blows (ms in)
       const button = getButtonCenter(context.isGroundFloor);
       const blasts: (Point & { at: number })[] = [{ ...button, at: armMs }];

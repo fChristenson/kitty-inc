@@ -5,7 +5,7 @@
 // screen, every loop a pop, a "ta-da" and a jolt; at the top the magician
 // whips the last of it free in a huge blast and shake, and all the cash
 // sweeps into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -39,9 +39,9 @@ const LOOP_SHAKE: [number, number] = [0.4, 1];
 export const forceMagicTrickEvent = registerWispEvent(
   KEY,
   "Magic Trick",
-  () => CONFIG.magicTrickEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pullMs, holdMs, mergeMs } = CONFIG.magicTrickEvent;
+    const { pullMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const top: Point = {
       x: (button.x + (area.left + area.right) / 2) / 2,

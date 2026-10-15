@@ -6,7 +6,7 @@
 // repel: the crust flies off and wisps drop onto every empty spot in view,
 // each landing a new worker, the last in a big blast. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
@@ -80,10 +80,10 @@ const GOLD = fadeStops(COLOR.heavenlyGold);
 export const forceLodestonesEvent = registerWispEvent(
   KEY,
   "Lodestones",
-  () => CONFIG.lodestonesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pullMs, slamMs, hireMs, hireGapMs, holdMs, mergeMs } =
-      CONFIG.lodestonesEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const width = area.right - area.left;

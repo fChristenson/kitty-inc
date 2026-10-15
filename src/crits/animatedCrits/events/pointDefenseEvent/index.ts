@@ -6,7 +6,7 @@
 // a pop and a shower of sparks onto the worker, who climbs a perma tier with
 // a jolt; they fall ever faster, the last shot down in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forcePointDefenseEvent = registerWispEvent(
   KEY,
   "Point Defense",
-  () => CONFIG.pointDefenseEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, fallMs, holdMs, mergeMs } = CONFIG.pointDefenseEvent;
+    const { gapsMs, fallMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -5,7 +5,7 @@
 // flash and a jolt and lands free upgrade levels tallied over it, the balls
 // ever faster; then all three dive into the clicked floor's bar together in
 // a huge blast and shake and every bar slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -37,10 +37,10 @@ type Hit = { at: number; bar: RewardBar; spot: Point };
 export const forceMultiballEvent = registerWispEvent(
   KEY,
   "Multiball",
-  () => CONFIG.multiballEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { playMs, slamMs, levelShare, holdMs, mergeMs } =
-      CONFIG.multiballEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const own = bars.find((b) => b.floor === floor) ?? bars[bars.length - 1];

@@ -6,7 +6,7 @@
 // after another down the bolt, left to right, each spraying its coins wide
 // in a flash, a bang and a jolt; the last in a huge blast and shake before
 // the cash pours into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const POP_SHAKE: [number, number] = [0.7, 1.4];
 export const forceSkewerEvent = registerWispEvent(
   KEY,
   "Skewer",
-  () => CONFIG.skewerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gatherGapMs, cookMs, popsMs, holdMs, mergeMs } = CONFIG.skewerEvent;
+    const { gatherGapMs, cookMs, popsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;
     const midY = area.top + (area.bottom - area.top) * HEIGHT;

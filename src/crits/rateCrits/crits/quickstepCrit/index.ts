@@ -2,8 +2,8 @@
 // along it to the right, each hop quicker and shorter, the crit's own last;
 // every landing a tick that turns the bar's readout over a step faster, and
 // for a while after, each of its payouts comes quicker than the last
+import meta from "./meta";
 import { defineBarEffect } from "../../rateBonus";
-import { CONFIG } from "../../../../config";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import {
   drawBounceSplash,
@@ -57,8 +57,8 @@ const splash: Bounce = { at: { x: 0, y: 0 }, ms: 0, normal: -Math.PI / 2 };
 const quicksteps = defineBarEffect<{ until: number; steps: number }>({
   speed: (run) =>
     Math.min(
-      CONFIG.crit.quickstepMaxSpeed,
-      1 + CONFIG.crit.quickstepStep * run.steps,
+      meta.values.maxSpeed,
+      1 + meta.values.step * run.steps,
     ),
   onPayout: (run) => {
     run.steps++;
@@ -74,7 +74,7 @@ registerFloorCrit("quickstepCrit", {
     if (run && t.now < run.until) run.steps++;
     else
       quicksteps.set(t.floor, {
-        until: t.now + CONFIG.crit.quickstepMs,
+        until: t.now + meta.values.ms,
         steps: 1,
       });
   },

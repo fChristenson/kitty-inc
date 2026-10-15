@@ -6,7 +6,7 @@
 // lights the next rocket under the next bar up, quicker each time; the last
 // goes off in one colossal blast ringed by a cluster and the hardest shake
 // of all. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -66,10 +66,10 @@ interface Blast {
 export const forceBottleRocketEvent = registerWispEvent(
   KEY,
   "Bottle Rocket",
-  () => CONFIG.bottleRocketEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fuseMs, flightsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.bottleRocketEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS).reverse();
     if (bars.length === 0) return;
     let clock = fuseMs;

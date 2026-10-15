@@ -5,7 +5,7 @@
 // of coins, a bloop and a jolt, harder each time, until the dancer whips the
 // whole ribbon up into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -42,9 +42,9 @@ const FLICK_SHAKE: [number, number] = [0.4, 1.1];
 export const forceRibbonDancerEvent = registerWispEvent(
   KEY,
   "Ribbon Dancer",
-  () => CONFIG.ribbonDancerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { danceMs, holdMs, mergeMs } = CONFIG.ribbonDancerEvent;
+    const { danceMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const cx = (area.left + area.right) / 2;
     const cy = (area.top + area.bottom) / 2 + 60;

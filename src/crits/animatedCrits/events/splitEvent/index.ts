@@ -5,7 +5,7 @@
 // out of it in bursts as the screen rumbles; then the halves slam back
 // together in a huge blast and shake, and the coins sweep into the total.
 // Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,10 +39,10 @@ const CRACK_SHAKE = 1.6;
 export const forceSplitEvent = registerWispEvent(
   KEY,
   "Split",
-  () => CONFIG.splitEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { crackMs, openMs, gushMs, slamMs, holdMs, mergeMs } =
-      CONFIG.splitEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const y = (area.top + area.bottom) / 2 + height * DROP;

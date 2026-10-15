@@ -6,8 +6,8 @@
 // frozen screen sideways, and coins burst back out of the impact across the
 // screen, then merge into the total. Pays floor income × floor number × REWARD
 // (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -52,7 +52,7 @@ const COIN_REACH: [number, number] = [0.15, 0.9];
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.hammerThrowEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) &&
@@ -61,7 +61,7 @@ registerEventProc(
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { whirlMs, holdMs, mergeMs } = CONFIG.hammerThrowEvent;
+      const { whirlMs, holdMs, mergeMs } = meta.values;
       const center = getButtonCenter(context.isGroundFloor);
       const width = area.right - area.left;
       const coinTop = area.top + 40;

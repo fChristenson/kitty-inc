@@ -3,8 +3,8 @@
 // which swells as they land. It's tossed high, flipping end over end, lands
 // face up with a slam on heads or tails, then bursts, showering the screen
 // with coins that merge into the total: heads pays more (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -45,11 +45,11 @@ const LABEL_RISE = 80; // px between the coin's top and the label
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.coinTossEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const config = CONFIG.coinTossEvent;
+      const config = meta.values;
       const { fillMs, flipMs, showMs, mergeMs } = config;
       const heads = Math.random() < 0.5;
       const fx = createEventFx(fillMs);

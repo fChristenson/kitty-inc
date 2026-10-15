@@ -6,7 +6,7 @@
 // swings back, harder, to smash the other end; after two smashes the bar
 // jumps a crit tier and the pendulum drops to the next bar, the very last
 // swing blowing in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -61,9 +61,9 @@ interface Swing {
 export const forceBombPendulumEvent = registerWispEvent(
   KEY,
   "Bomb Pendulum",
-  () => CONFIG.bombPendulumEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swingsMs, reformMs, holdMs, mergeMs } = CONFIG.bombPendulumEvent;
+    const { swingsMs, reformMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

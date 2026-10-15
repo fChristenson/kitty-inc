@@ -9,6 +9,7 @@ import { snapshotMap } from "../../shared/snapshotState";
 import type { Floor } from "../../gameState";
 import type { CritTier } from "../critTypes";
 import { armCritUpgrade } from "../floorCrits/upgradeCrit";
+import hotButton from "./crits/hotButtonCrit/meta";
 
 const freeTaps = snapshotMap<Floor, number>();
 const charges = snapshotMap<Floor, number>();
@@ -91,9 +92,10 @@ export function takeFreeTap(floor: Floor): boolean {
   return takeTap(freeTaps, floor);
 }
 
-// whether a tap on floor's button rolls its next crit hot, using one up
-export function takeHotTap(floor: Floor): boolean {
-  return takeTap(hotTaps, floor);
+// how many times a tap on floor's button rolls its next crit: a hot tap's
+// rolls (using one up), else once
+export function takeHotTap(floor: Floor): number {
+  return takeTap(hotTaps, floor) ? hotButton.values.rolls : 1;
 }
 
 // whether floor's next tap is free (a charge or a free tap): the only bonuses

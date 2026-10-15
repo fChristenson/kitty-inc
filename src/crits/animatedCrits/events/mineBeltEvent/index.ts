@@ -5,8 +5,8 @@
 // one after another in a chain, row after row, the last row all going up
 // together in one cluster; the view crash-lands and the floor gets free
 // levels for every mine
+import meta from "./meta";
 import { levelsFor, type Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { createBeats } from "../../../../shared/eventBeats";
@@ -89,7 +89,7 @@ interface Mine {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.mineBeltEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -138,7 +138,7 @@ const mineAt = (view: FlightView, mine: Mine, ms: number): Point =>
   );
 
 function startMineBelt(floor: Floor, context: EventProcContext): void {
-  const { levelShare } = CONFIG.mineBeltEvent;
+  const { levelShare } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const mines = planMines();
   const flyMs = Math.max(...mines.map((m) => m.blast)) + AFTER;

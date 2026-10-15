@@ -6,7 +6,7 @@
 // crack, a flash and a pop of coins, the firing ever faster; the last
 // layer fires into the total in a huge blast and shake. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const FIRE_SHAKE: [number, number] = [0.4, 1.2];
 export const forceNeuronsEvent = registerWispEvent(
   KEY,
   "Neurons",
-  () => CONFIG.neuronsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, layersMs, holdMs, mergeMs } = CONFIG.neuronsEvent;
+    const { growMs, layersMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const w = (area.right - area.left) * SPREAD;

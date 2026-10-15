@@ -3,8 +3,8 @@
 // The reels stop one by one, each with a slam on a multiplier; their sum (more
 // when all three match) multiplies the payout, and the reels burst into coins
 // that merge into the total (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { loadImageByName } from "../../../../loadAssets";
 import { playBoostEventStream } from "../../../../sound";
@@ -75,7 +75,7 @@ void loadImageByName("slotsFrame").then((image) => (frameImage = image));
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 
 function rollSymbol(): number {
-  const { symbols } = CONFIG.jackpotReelsEvent;
+  const { symbols } = meta.values;
   let roll = Math.random() * symbols.reduce((sum, s) => sum + s.weight, 0);
   for (let i = 0; i < symbols.length; i++) {
     roll -= symbols[i].weight;
@@ -105,7 +105,7 @@ function drawReel(
   position: number,
   slamPart: [object, string],
 ): void {
-  const { symbols } = CONFIG.jackpotReelsEvent;
+  const { symbols } = meta.values;
   const { x, y, width, height } = box;
   ctx.save();
   ctx.beginPath();
@@ -169,7 +169,7 @@ function reelShade(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.jackpotReelsEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) =>
       frameImage !== null && canStartMoneyCover(context),
@@ -182,7 +182,7 @@ registerEventProc(
         mergeMs,
         symbols,
         matchBonus,
-      } = CONFIG.jackpotReelsEvent;
+      } = meta.values;
       const rolled = Array.from({ length: REELS }, rollSymbol);
       const matched = rolled.every((s) => s === rolled[0]);
       const multiplier =

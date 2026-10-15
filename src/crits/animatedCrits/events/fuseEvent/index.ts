@@ -4,8 +4,8 @@
 // button: KABOOM, a huge blast and shake that sprays coins across the whole
 // screen, then they sweep into the total. Pays floor income × floor number
 // × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -48,11 +48,11 @@ const SPARK_SIZE = 22;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.fuseEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const { burnMs, holdMs, mergeMs } = CONFIG.fuseEvent;
+      const { burnMs, holdMs, mergeMs } = meta.values;
       let boomAt: number | null = null;
       let fuse: Point[] = [];
       const startedAt = performance.now();

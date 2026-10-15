@@ -6,7 +6,7 @@
 // flashing, its last bullet striking the worker in a pop and a jolt as they
 // climb a perma tier; the bottom turret's burst lands in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,9 +45,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceTurretTowerEvent = registerWispEvent(
   KEY,
   "Turret Tower",
-  () => CONFIG.turretTowerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { aimMs, turretsMs, holdMs, mergeMs } = CONFIG.turretTowerEvent;
+    const { aimMs, turretsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

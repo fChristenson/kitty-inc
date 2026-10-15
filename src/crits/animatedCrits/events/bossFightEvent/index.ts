@@ -6,7 +6,7 @@
 // it, ever faster, every hit a flash, a pop and coins knocked out of the
 // boss, every ring it fires a boom and a jolt; then the boss blows apart in
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,9 +51,9 @@ const RING_SHAKE = 0.9;
 export const forceBossFightEvent = registerWispEvent(
   KEY,
   "Boss Fight",
-  () => CONFIG.bossFightEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { enterMs, fightMs, holdMs, mergeMs } = CONFIG.bossFightEvent;
+    const { enterMs, fightMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const cx = (area.left + area.right) / 2;
     const half = (area.right - area.left) / 2;

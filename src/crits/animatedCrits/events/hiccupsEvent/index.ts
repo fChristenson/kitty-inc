@@ -6,7 +6,7 @@
 // again with a wider ring of blasts, then blows a third time in a colossal
 // blast that sets off a last cluster ring. Pays floor income × floor number
 // × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -57,10 +57,10 @@ interface Blast {
 export const forceHiccupsEvent = registerWispEvent(
   KEY,
   "Hiccups",
-  () => CONFIG.hiccupsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fuseMs, outMs, inMs, pauseMs, holdMs, mergeMs } =
-      CONFIG.hiccupsEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const centre: Point = {

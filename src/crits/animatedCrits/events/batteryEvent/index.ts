@@ -5,7 +5,7 @@
 // and a jolt that lands free levels; bar after bar, side after side, ever
 // faster, then every bar fires both ways at once in a blinding volley and
 // slams in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -32,10 +32,10 @@ type Gun = { bar: RewardBar; muzzle: Point; edge: Point };
 export const forceBatteryEvent = registerWispEvent(
   KEY,
   "Battery",
-  () => CONFIG.batteryEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapsMs, aimMs, fireMs, volleyMs, levelShare, holdMs, mergeMs } =
-      CONFIG.batteryEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const own = bars.find((b) => b.floor === floor) ?? bars[bars.length - 1];

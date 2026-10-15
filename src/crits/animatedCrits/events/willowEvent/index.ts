@@ -6,7 +6,7 @@
 // crit tier; every burst sends the next shell up over the next bar, quicker
 // each time, and the last bursts in one colossal blast with the hardest
 // shake of all. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import {
   playExplosion,
@@ -61,9 +61,9 @@ interface Blast {
 export const forceWillowEvent = registerWispEvent(
   KEY,
   "Willow",
-  () => CONFIG.willowEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { riseMs, droopMs, holdMs, mergeMs } = CONFIG.willowEvent;
+    const { riseMs, droopMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS).reverse();
     if (bars.length === 0) return;
     let clock = 0;

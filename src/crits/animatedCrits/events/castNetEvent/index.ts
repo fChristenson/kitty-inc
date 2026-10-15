@@ -6,7 +6,7 @@
 // they climb a perma tier; a fresh net pours into its hands for the next
 // cast, quicker each time, the last in a huge blast and shake. Pays floor
 // income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,10 +53,10 @@ interface Cast {
 export const forceCastNetEvent = registerWispEvent(
   KEY,
   "Cast Net",
-  () => CONFIG.castNetEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { formMs, whirlsMs, flightMs, cinchMs, holdMs, mergeMs } =
-      CONFIG.castNetEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

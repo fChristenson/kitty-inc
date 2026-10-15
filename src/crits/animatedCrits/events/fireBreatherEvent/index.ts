@@ -6,7 +6,7 @@
 // sweeping bar by bar, each blast wider, and its last breath engulfs every
 // bar at once in a huge blast and shake as they all slam. Pays floor income
 // × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ const BREATH_SHAKE: [number, number] = [0.6, 1.2];
 export const forceFireBreatherEvent = registerWispEvent(
   KEY,
   "Fire Breather",
-  () => CONFIG.fireBreatherEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { gulpsMs, breathMs, holdMs, mergeMs } = CONFIG.fireBreatherEvent;
+    const { gulpsMs, breathMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

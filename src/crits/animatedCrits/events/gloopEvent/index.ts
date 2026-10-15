@@ -6,7 +6,7 @@
 // onto the bar with a jolt of free levels, each quicker than the last, the
 // last landing in a huge blast and shake. Pays floor income × floor number
 // × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ interface Bubble {
 export const forceGloopEvent = registerWispEvent(
   KEY,
   "Gloop",
-  () => CONFIG.gloopEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swellsMs, levelShare, holdMs, mergeMs } = CONFIG.gloopEvent;
+    const { swellsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => b.box.y - a.box.y);

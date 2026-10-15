@@ -5,7 +5,7 @@
 // jolt; a beat later a second, wider ring of jets bursts out between the
 // first, harder, and the hydrant blows in a huge blast and shake as the
 // coins sweep into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -31,10 +31,10 @@ const HIT_SHAKE: [number, number] = [0.3, 1];
 export const forceHydrantEvent = registerWispEvent(
   KEY,
   "Hydrant",
-  () => CONFIG.hydrantEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { streamMs, travelMs, secondMs, holdMs, mergeMs } =
-      CONFIG.hydrantEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const box = {
       left: area.left + EDGE,

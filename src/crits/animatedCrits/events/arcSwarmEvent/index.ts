@@ -7,7 +7,7 @@
 // with a crack and a jolt, the web shrinking, quicker each time, until the
 // last sparks dive together in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,9 +51,9 @@ interface Spark {
 export const forceArcSwarmEvent = registerWispEvent(
   KEY,
   "Arc Swarm",
-  () => CONFIG.arcSwarmEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swarmMs, divesMs, holdMs, mergeMs } = CONFIG.arcSwarmEvent;
+    const { swarmMs, divesMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const width = area.right - area.left;

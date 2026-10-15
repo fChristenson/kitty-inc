@@ -6,7 +6,7 @@
 // jolt and a spray of coins; the last leg slams into the total-income
 // readout in a huge blast and shake, and the coins sweep into the total.
 // Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,10 +51,10 @@ const HIT_SHAKE: [number, number] = [1.1, 2.1];
 export const forceReflectorEvent = registerWispEvent(
   KEY,
   "Reflector",
-  () => CONFIG.reflectorEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { popMs, aimMs, legsMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.reflectorEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

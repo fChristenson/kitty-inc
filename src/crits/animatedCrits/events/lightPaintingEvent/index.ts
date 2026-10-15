@@ -5,7 +5,7 @@
 // flash, a pop and a jolt; when the painting is done it flares white-hot and
 // bursts into coins all along it in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const TURN_SHAKE: [number, number] = [0.3, 1];
 export const forceLightPaintingEvent = registerWispEvent(
   KEY,
   "Light Painting",
-  () => CONFIG.lightPaintingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { paintMs, holdMs, mergeMs } = CONFIG.lightPaintingEvent;
+    const { paintMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

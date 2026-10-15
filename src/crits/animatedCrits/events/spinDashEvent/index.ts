@@ -5,7 +5,7 @@
 // a bang and a big jolt, and the bar jumps a crit tier; it bounces up, revs
 // again in mid-air and dashes into the next bar, the revs ever shorter, the
 // last smash a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,9 +33,9 @@ const HIT_SHAKE: [number, number] = [0.9, 1.5];
 export const forceSpinDashEvent = registerWispEvent(
   KEY,
   "Spin Dash",
-  () => CONFIG.spinDashEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { revsMs, holdMs, mergeMs } = CONFIG.spinDashEvent;
+    const { revsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

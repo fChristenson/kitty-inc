@@ -7,7 +7,7 @@
 // it as it goes, each a pop and a spray of coins; when it reaches the rim
 // the newborn stars are flung off their orbits into the total, the last in
 // a huge blast. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -67,10 +67,10 @@ interface Knot {
 export const forceRingGalaxyEvent = registerWispEvent(
   KEY,
   "Ring Galaxy",
-  () => CONFIG.ringGalaxyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, diveMs, ringMs, gapMs, liftMs, holdMs, mergeMs } =
-      CONFIG.ringGalaxyEvent;
+      meta.values;
     const centre: Point = {
       x: (area.left + area.right) / 2,
       y: lerp([area.top, area.bottom], 0.45),

@@ -6,7 +6,7 @@
 // quicker each time, each raining its cash down onto its bar in a downpour
 // that jumps it a crit tier with a jolt, the last in a huge blast and shake.
 // Pays floor income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,9 +51,9 @@ interface Cloud {
 export const forceWaterCycleEvent = registerWispEvent(
   KEY,
   "Water Cycle",
-  () => CONFIG.waterCycleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { riseMs, rainsMs, holdMs, mergeMs } = CONFIG.waterCycleEvent;
+    const { riseMs, rainsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const width = area.right - area.left;

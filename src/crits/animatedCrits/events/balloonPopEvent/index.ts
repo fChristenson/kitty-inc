@@ -5,7 +5,7 @@
 // a flash, a bang, a jolt and a ring of coins, ever faster; the last and
 // fattest balloon goes off in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const POP_SHAKE: [number, number] = [0.6, 1.4];
 export const forceBalloonPopEvent = registerWispEvent(
   KEY,
   "Balloon Pop",
-  () => CONFIG.balloonPopEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { floatMs, gapsMs, holdMs, mergeMs } = CONFIG.balloonPopEvent;
+    const { floatMs, gapsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const w = area.right - area.left;
     let clock: number = floatMs;

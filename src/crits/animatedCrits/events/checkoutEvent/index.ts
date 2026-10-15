@@ -6,7 +6,7 @@
 // the next bar and scans it, faster and faster; the clicked floor's bar is
 // rung up last: every bar slams in a huge blast and shake. Pays floor
 // income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -35,10 +35,10 @@ const BEEP_SHAKE: [number, number] = [0.6, 1.3];
 export const forceCheckoutEvent = registerWispEvent(
   KEY,
   "Checkout",
-  () => CONFIG.checkoutEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { hopMs, scansMs, levelShare, holdMs, mergeMs } =
-      CONFIG.checkoutEvent;
+      meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

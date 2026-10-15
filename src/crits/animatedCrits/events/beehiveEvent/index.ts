@@ -5,7 +5,7 @@
 // in a tight buzzing ball, then swarms it in a flash, a bloop and a jolt that
 // lights it up a perma tier; after the last, the whole swarm bursts outward
 // in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -41,10 +41,10 @@ const BURST_OUT = 420;
 export const forceBeehiveEvent = registerWispEvent(
   KEY,
   "Beehive",
-  () => CONFIG.beehiveEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { flightsMs, buzzesMs, burstMs, holdMs, mergeMs } =
-      CONFIG.beehiveEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context)
       .sort((a, b) => a.at.x - b.at.x)
       .slice(0, MAX_WORKERS);

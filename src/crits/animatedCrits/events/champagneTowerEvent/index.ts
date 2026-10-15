@@ -6,7 +6,7 @@
 // filling with a splash, a bang, a jolt and free levels; the last overflows
 // off the bottom in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,10 +33,10 @@ const FILL_SHAKE: [number, number] = [0.6, 1.4];
 export const forceChampagneTowerEvent = registerWispEvent(
   KEY,
   "Champagne Tower",
-  () => CONFIG.champagneTowerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pourMs, fillMs, levelShare, holdMs, mergeMs } =
-      CONFIG.champagneTowerEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const pour: Pour = {

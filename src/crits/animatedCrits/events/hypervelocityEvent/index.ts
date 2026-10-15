@@ -7,7 +7,7 @@
 // whoosh, off along its orbit and arcing onto a bar for free levels, ever
 // faster; the last is flung onto the clicked bar in a big blast and every
 // bar slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -67,10 +67,10 @@ interface Runner {
 export const forceHypervelocityEvent = registerWispEvent(
   KEY,
   "Hypervelocity",
-  () => CONFIG.hypervelocityEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, sinkMs, gapMs, flyMs, levelShare, holdMs, mergeMs } =
-      CONFIG.hypervelocityEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

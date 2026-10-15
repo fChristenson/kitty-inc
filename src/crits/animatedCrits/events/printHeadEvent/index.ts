@@ -5,7 +5,7 @@
 // glowing column, which bursts in a flash, a pop and a jolt as a new worker
 // forms out of it; then on to the next spot, printing ever faster, the last
 // worker printed in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const DONE_SHAKE: [number, number] = [0.6, 1.2];
 export const forcePrintHeadEvent = registerWispEvent(
   KEY,
   "Print Head",
-  () => CONFIG.printHeadEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { linesMs, holdMs, mergeMs } = CONFIG.printHeadEvent;
+    const { linesMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

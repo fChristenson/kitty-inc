@@ -5,7 +5,7 @@
 // hums; then ring after ring breaks loose and collapses onto an income bar,
 // which blazes with a flash and a jolt and jumps a crit tier; the last
 // slams down in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const HIT_SHAKE: [number, number] = [0.8, 1.4];
 export const forceGyroscopeEvent = registerWispEvent(
   KEY,
   "Gyroscope",
-  () => CONFIG.gyroscopeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, gapsMs, holdMs, mergeMs } = CONFIG.gyroscopeEvent;
+    const { spinMs, gapsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

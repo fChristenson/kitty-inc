@@ -6,7 +6,7 @@
 // crack, a bang and a jolt: free levels for a bar, a perma tier for a worker;
 // then it dives into the clicked floor's bar and blows in a huge blast and
 // shake, every bar slamming. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,10 +50,10 @@ type Target =
 export const forceBallLightningEvent = registerWispEvent(
   KEY,
   "Ball Lightning",
-  () => CONFIG.ballLightningEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { legsMs, diveMs, levelShare, holdMs, mergeMs } =
-      CONFIG.ballLightningEvent;
+      meta.values;
     const bars =
       context.upgradeFloorFree === undefined
         ? []

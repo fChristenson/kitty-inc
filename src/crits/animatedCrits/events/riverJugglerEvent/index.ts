@@ -6,7 +6,7 @@
 // the income bars one after another, each splashing down with a crit tier,
 // the last in a huge blast and shake. Pays floor income × floor number ×
 // REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ interface Throw {
 export const forceRiverJugglerEvent = registerWispEvent(
   KEY,
   "River Juggler",
-  () => CONFIG.riverJugglerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { throwsMs, flightMs, holdMs, mergeMs } = CONFIG.riverJugglerEvent;
+    const { throwsMs, flightMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const centre: Point = {

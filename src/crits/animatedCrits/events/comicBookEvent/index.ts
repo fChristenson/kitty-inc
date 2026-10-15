@@ -7,7 +7,7 @@
 // the worker; then a giant "KA-BOOM!" slams onto the clicked floor's bar in
 // a huge blast and shake and it jumps one crit tier. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -89,9 +89,9 @@ const starburst = (fill: string, edge: string, size: number): GlowSprite =>
 export const forceComicBookEvent = registerWispEvent(
   KEY,
   "Comic Book",
-  () => CONFIG.comicBookEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, levelShare, holdMs, mergeMs } = CONFIG.comicBookEvent;
+    const { gapsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = context.upgradeFloorFree
       ? findRewardBars(floor, context).slice(0, MAX_BARS)
       : [];

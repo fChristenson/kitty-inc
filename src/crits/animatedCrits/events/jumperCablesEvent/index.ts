@@ -5,7 +5,7 @@
 // to new spots and surge again and again, ever faster and harder; then
 // they slam together in the middle in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const SURGE_SHAKE: [number, number] = [0.6, 1.4];
 export const forceJumperCablesEvent = registerWispEvent(
   KEY,
   "Jumper Cables",
-  () => CONFIG.jumperCablesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { surgesMs, slamMs, holdMs, mergeMs } = CONFIG.jumperCablesEvent;
+    const { surgesMs, slamMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

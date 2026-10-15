@@ -7,7 +7,7 @@
 // string of cash whipping off after it, in a huge blast and shake, and the
 // coins sweep into the total. Pays floor income × floor number × REWARD (see
 // ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,10 +49,10 @@ const TWANG_SHAKE = 2.2;
 export const forceBowstringEvent = registerWispEvent(
   KEY,
   "Bowstring",
-  () => CONFIG.bowstringEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { stringMs, drawMs, flightMs, flowMs, holdMs, mergeMs } =
-      CONFIG.bowstringEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

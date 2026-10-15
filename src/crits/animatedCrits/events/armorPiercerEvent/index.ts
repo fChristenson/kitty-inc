@@ -6,7 +6,7 @@
 // and jolting as it lands free levels; each shot slants a little further
 // and fires quicker, and the last punches through in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const PIERCE_SHAKE: [number, number] = [0.4, 1.1];
 export const forceArmorPiercerEvent = registerWispEvent(
   KEY,
   "Armor Piercer",
-  () => CONFIG.armorPiercerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotsMs, holdMs, mergeMs } = CONFIG.armorPiercerEvent;
+    const { shotsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

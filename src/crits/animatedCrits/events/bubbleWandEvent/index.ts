@@ -7,7 +7,7 @@
 // worker drops in out of the splash; then the wisp shoots into the total in
 // a huge blast and shake. Pays floor income × floor number × REWARD, plus
 // the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -57,7 +57,7 @@ const POP_SHAKE: [number, number] = [0.7, 1.5];
 export const forceBubbleWandEvent = registerWispEvent(
   KEY,
   "Bubble Wand",
-  () => CONFIG.bubbleWandEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       riseMs,
@@ -68,7 +68,7 @@ export const forceBubbleWandEvent = registerWispEvent(
       diveMs,
       holdMs,
       mergeMs,
-    } = CONFIG.bubbleWandEvent;
+    } = meta.values;
     const hires = findRewardHires(floor, context)
       .sort((a, b) => a.x - b.x)
       .slice(0, MAX_HIRES);

@@ -6,7 +6,7 @@
 // rising right under the total; off its top the glider shoots into the
 // total in a huge blast as all three columns pour in after it. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -57,9 +57,9 @@ const LAP_SHAKE: [number, number] = [0.15, 0.4];
 export const forceUpdraftEvent = registerWispEvent(
   KEY,
   "Updraft",
-  () => CONFIG.updraftEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { climbsMs, glideMs, diveMs, holdMs, mergeMs } = CONFIG.updraftEvent;
+    const { climbsMs, glideMs, diveMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const total = () => cover?.total() ?? fallback;
     const w = area.right - area.left;

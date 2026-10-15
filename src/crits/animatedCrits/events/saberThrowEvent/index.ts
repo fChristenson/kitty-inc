@@ -5,7 +5,7 @@
 // a crack and a big jolt as the bar jumps a crit tier, spinning ever faster,
 // and the last cut ends in a huge blast and shake. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const HIT_SHAKE: [number, number] = [0.8, 1.4];
 export const forceSaberThrowEvent = registerWispEvent(
   KEY,
   "Saber Throw",
-  () => CONFIG.saberThrowEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { throwMs, holdMs, mergeMs } = CONFIG.saberThrowEvent;
+    const { throwMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

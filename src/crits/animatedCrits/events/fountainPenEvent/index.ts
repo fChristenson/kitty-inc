@@ -6,7 +6,7 @@
 // onto the next bar and dots an i onto the last, each stroke faster, the
 // final dot landing in a huge blast and shake as the ink sweeps into the
 // total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,9 +45,9 @@ const STAB_SHAKE: [number, number] = [0.9, 1.5];
 export const forceFountainPenEvent = registerWispEvent(
   KEY,
   "Fountain Pen",
-  () => CONFIG.fountainPenEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { signMs, strokesMs, holdMs, mergeMs } = CONFIG.fountainPenEvent;
+    const { signMs, strokesMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

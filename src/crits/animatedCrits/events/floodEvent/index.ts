@@ -5,7 +5,7 @@
 // levels; reaching the top, the whole flood surges up into the total in a
 // huge blast and shake. Pays floor income × floor number × REWARD, plus the
 // levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -31,10 +31,10 @@ const SWALLOW_SHAKE: [number, number] = [0.6, 1.4];
 export const forceFloodEvent = registerWispEvent(
   KEY,
   "Flood",
-  () => CONFIG.floodEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, drainMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.floodEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const bars = context.upgradeFloorFree
       ? findRewardBars(floor, context).slice(0, MAX_BARS)

@@ -6,7 +6,7 @@
 // faster the second time; then the jumbled deck squares up with a slap,
 // every strip back in its place, in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -50,9 +50,9 @@ interface Move {
 export const forceShuffleEvent = registerWispEvent(
   KEY,
   "Shuffle",
-  () => CONFIG.shuffleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { cutMs, rifflesMs, squareMs, holdMs, mergeMs } = CONFIG.shuffleEvent;
+    const { cutMs, rifflesMs, squareMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

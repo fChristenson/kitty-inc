@@ -6,7 +6,7 @@
 // swings down onto the disk; it lands flat in a blinding flash and its stars
 // are flung off their orbits in a shower that rains down onto the bar, which
 // jumps a crit tier in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -45,10 +45,10 @@ const FLAT_SHAKE = 1.2;
 export const forcePolarRingEvent = registerWispEvent(
   KEY,
   "Polar Ring",
-  () => CONFIG.polarRingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, tipMs, rainMs, spreadMs, holdMs, mergeMs } =
-      CONFIG.polarRingEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

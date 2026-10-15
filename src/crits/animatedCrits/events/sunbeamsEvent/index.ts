@@ -5,7 +5,7 @@
 // bang and a jolt and climbs a perma tier, the rays swaying as they stand;
 // the last breaks through in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -28,9 +28,9 @@ const HIT_SHAKE: [number, number] = [0.5, 1.3];
 export const forceSunbeamsEvent = registerWispEvent(
   KEY,
   "Sunbeams",
-  () => CONFIG.sunbeamsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { aimMs, gapsMs, holdMs, mergeMs } = CONFIG.sunbeamsEvent;
+    const { aimMs, gapsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

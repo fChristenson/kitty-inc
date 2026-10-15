@@ -5,7 +5,7 @@
 // a jolt that knocks free levels into it, the hops shrinking as they fall;
 // they pile up at the bottom and the whole heap blows together under a
 // colossal blast and the hardest shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,10 +48,10 @@ interface Hit {
 export const forceRockslideEvent = registerWispEvent(
   KEY,
   "Rockslide",
-  () => CONFIG.rockslideEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { tumblesMs, legsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.rockslideEvent;
+      meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => a.center.y - b.center.y);

@@ -5,7 +5,7 @@
 // half turn a whoosh, a flash and a jolt; then it stops dead with a bang and
 // the whole spiral of cash pours up into the total, which goes off in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -32,10 +32,10 @@ const TURN_BURST: [number, number] = [0.4, 0.8];
 export const forceCatherineWheelEvent = registerWispEvent(
   KEY,
   "Catherine Wheel",
-  () => CONFIG.catherineWheelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spinMs, spinRate, outMs, flightMs, holdMs, mergeMs } =
-      CONFIG.catherineWheelEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const hub = getButtonCenter(context.isGroundFloor);
     const [w0, w1] = spinRate;

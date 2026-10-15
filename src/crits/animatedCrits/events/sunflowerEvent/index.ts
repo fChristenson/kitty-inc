@@ -6,7 +6,7 @@
 // and jolt and every Fibonacci seed a cluster; then the heart blows in a
 // colossal blast and shake that flings a spark onto every bar for free
 // levels. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -61,10 +61,10 @@ interface Blast {
 export const forceSunflowerEvent = registerWispEvent(
   KEY,
   "Sunflower",
-  () => CONFIG.sunflowerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, chainMs, levelShare, holdMs, mergeMs } =
-      CONFIG.sunflowerEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     if (bars.length === 0) return;
     const heart: Point = {

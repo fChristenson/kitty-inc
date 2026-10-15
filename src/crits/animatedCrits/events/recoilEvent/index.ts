@@ -6,7 +6,7 @@
 // and a slug of cash bursting into coins where it hits the edge, ever
 // faster; the last shot it turns on the total and blasts a huge round into
 // it in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -59,9 +59,9 @@ interface Shot {
 export const forceRecoilEvent = registerWispEvent(
   KEY,
   "Recoil",
-  () => CONFIG.recoilEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotsMs, finalMs, holdMs, mergeMs } = CONFIG.recoilEvent;
+    const { shotsMs, finalMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const edges = {
       left: area.left + EDGE,

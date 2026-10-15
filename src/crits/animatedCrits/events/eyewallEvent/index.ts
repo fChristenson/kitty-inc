@@ -7,7 +7,7 @@
 // faster as the eye closes in, and when it shuts a colossal bolt and the
 // wall's last forks slam down onto the bar together, blowing it up a crit
 // tier in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,9 +53,9 @@ interface Strike {
 export const forceEyewallEvent = registerWispEvent(
   KEY,
   "Eyewall",
-  () => CONFIG.eyewallEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, gapMs, levelShare, holdMs, mergeMs } = CONFIG.eyewallEvent;
+    const { spinMs, gapMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

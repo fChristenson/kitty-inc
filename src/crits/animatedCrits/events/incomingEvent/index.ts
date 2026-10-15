@@ -8,7 +8,7 @@
 // distance and comes down on the clicked floor's bar in a colossal blast
 // ringed by a cluster of more, the bar jumping a crit tier and slamming.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -77,9 +77,9 @@ interface Blast {
 export const forceIncomingEvent = registerWispEvent(
   KEY,
   "Incoming",
-  () => CONFIG.incomingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flyMs, gapMs, giantMs, holdMs, mergeMs } = CONFIG.incomingEvent;
+    const { flyMs, gapMs, giantMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

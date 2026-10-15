@@ -6,7 +6,7 @@
 // levels, pair after pair, faster and faster; then both guns empty at once
 // along every bar and the last collision goes off in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,10 +53,10 @@ interface Clash {
 export const forceBulletClashEvent = registerWispEvent(
   KEY,
   "Bullet Clash",
-  () => CONFIG.bulletClashEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { firstMs, pairsMs, volleyGapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.bulletClashEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const xs = [area.left + SIDE, area.right - SIDE];

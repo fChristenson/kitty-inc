@@ -4,7 +4,7 @@
 // open; new floors slam down out of the sky onto it one by one, quicker each,
 // a heavy jolt and blasts at every landing, the last the hardest. The floors
 // unlock as the screen goes live again
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
@@ -50,10 +50,10 @@ function floorsLeft(context: EventProcContext): number {
 export const forceRaiseTheRoofEvent = registerWispEvent(
   KEY,
   "Raise the Roof",
-  () => CONFIG.raiseTheRoofEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { floors, zoomMs, blowMs, dropMs, landsMs, holdMs, mergeMs } =
-      CONFIG.raiseTheRoofEvent;
+      meta.values;
     const count = Math.min(floors, landsMs.length, floorsLeft(context));
     if (count <= 0) return;
     const width = area.right - area.left;

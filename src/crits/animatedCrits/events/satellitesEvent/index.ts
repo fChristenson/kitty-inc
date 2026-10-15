@@ -6,7 +6,7 @@
 // faster; with all of them circling, the orbits decay and they spiral down
 // onto the button together in a huge blast as every bar slams. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,7 +36,7 @@ const SKIM_SHAKE: [number, number] = [0.7, 1.4];
 export const forceSatellitesEvent = registerWispEvent(
   KEY,
   "Satellites",
-  () => CONFIG.satellitesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       launchGapsMs,
@@ -46,7 +46,7 @@ export const forceSatellitesEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.satellitesEvent;
+    } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

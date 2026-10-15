@@ -5,7 +5,7 @@
 // the total-income readout with its wisp riding the crest; the last and
 // biggest hits the total in a huge blast and shake, and the coins sweep into
 // the total. Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,10 +48,10 @@ const ERUPT_SHAKE: [number, number] = [1, 2.2];
 export const forceGeysersEvent = registerWispEvent(
   KEY,
   "Geysers",
-  () => CONFIG.geysersEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { leadMs, gapMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.geysersEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const total = totalSpot(area);

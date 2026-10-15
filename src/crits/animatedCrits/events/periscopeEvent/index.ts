@@ -6,7 +6,7 @@
 // bounce a flare, a ping and a jolt; at the top the last mirror swings it
 // back down, the beam crashing onto the clicked floor's bar, which jumps a
 // crit tier in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -33,10 +33,10 @@ const BOUNCE_SHAKE: [number, number] = [0.3, 0.8];
 export const forcePeriscopeEvent = registerWispEvent(
   KEY,
   "Periscope",
-  () => CONFIG.periscopeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, legMs, finalMs, blazeMs, holdMs, mergeMs } =
-      CONFIG.periscopeEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

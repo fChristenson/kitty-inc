@@ -4,8 +4,8 @@
 // found). A wisp bumps it on the head, spinning it until it flips to the
 // badge's art under a "New Badge" title. The stage slides off and that crit
 // lands, its own flash naming it, counting toward its badge
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { loadImage } from "../../../../utils";
 import { getImageUrl } from "../../../../loadAssets";
 import { COLOR } from "../../../../palette";
@@ -44,7 +44,7 @@ const unseenKinds = () =>
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.revealEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isRevealStageRunning(KEY),
     canArm: (_floor, context) =>
       canStartRevealStage(context) && context.applyProcCrit !== undefined,

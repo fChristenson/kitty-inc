@@ -6,7 +6,7 @@
 // it grinds over jolts with a screech of sparks and free levels; then it
 // totters, topples and goes off in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ const GRIND_SHAKE: [number, number] = [0.6, 1.3];
 export const forceSpinningTopEvent = registerWispEvent(
   KEY,
   "Spinning Top",
-  () => CONFIG.spinningTopEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { launchMs, spinMs, levelShare, holdMs, mergeMs } =
-      CONFIG.spinningTopEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

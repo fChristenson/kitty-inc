@@ -6,7 +6,7 @@
 // it cruises on blowing ever quicker, the last spout a huge blast and shake
 // as the coins sweep into the total. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -36,9 +36,9 @@ const SPOUT_SHAKE: [number, number] = [0.5, 1.3];
 export const forceWhaleEvent = registerWispEvent(
   KEY,
   "Whale",
-  () => CONFIG.whaleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { cruiseMs, spoutMs, streamMs, holdMs, mergeMs } = CONFIG.whaleEvent;
+    const { cruiseMs, spoutMs, streamMs, holdMs, mergeMs } = meta.values;
     const ltr = Math.random() < 0.5;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)

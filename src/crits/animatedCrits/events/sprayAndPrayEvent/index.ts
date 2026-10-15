@@ -5,7 +5,7 @@
 // it rakes jolting with free levels, the stream faster and wilder each
 // sweep; then it sprays every bar at once in a wild burst and the last
 // round lands in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,10 +50,10 @@ interface Shot {
 export const forceSprayAndPrayEvent = registerWispEvent(
   KEY,
   "Spray and Pray",
-  () => CONFIG.sprayAndPrayEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { firstMs, shotsMs, wildGapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.sprayAndPrayEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS).reverse();
     if (bars.length === 0) return;
     const turret: Point = {

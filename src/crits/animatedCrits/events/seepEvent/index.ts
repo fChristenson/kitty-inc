@@ -5,7 +5,7 @@
 // its worker it soaks them in a burst, a bloop and a jolt and they climb a
 // perma tier; the last lands in a huge blast and shake and the coins sweep
 // into the total. Pays floor income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -30,9 +30,9 @@ const LAND_SHAKE: [number, number] = [0.5, 1.3];
 export const forceSeepEvent = registerWispEvent(
   KEY,
   "Seep",
-  () => CONFIG.seepEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, streamMs, travelMs, holdMs, mergeMs } = CONFIG.seepEvent;
+    const { gapsMs, streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => b.at.y - a.at.y);

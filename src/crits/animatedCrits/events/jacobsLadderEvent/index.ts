@@ -5,7 +5,7 @@
 // wider, ever faster, and every income bar it sweeps through jolts with a
 // crack and a flash and lands free levels; at the top it snaps with a huge
 // blast and shake and every bar slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,10 +38,10 @@ const CROSS_BURST: [number, number] = [0.6, 1];
 export const forceJacobsLadderEvent = registerWispEvent(
   KEY,
   "Jacob's Ladder",
-  () => CONFIG.jacobsLadderEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { igniteMs, climbMs, levelShare, holdMs, mergeMs } =
-      CONFIG.jacobsLadderEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const own = bars.find((b) => b.floor === floor) ?? bars[bars.length - 1];

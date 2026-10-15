@@ -3,8 +3,8 @@
 // floor. One is meant for each of its workers that can still climb: as it
 // settles on them they glow, play their boost and climb one perma tier. Once
 // the last has landed the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -81,7 +81,7 @@ function findCandidates(floor: Floor, context: EventProcContext): number[] {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.blessingEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -165,7 +165,7 @@ function startBlessing(floor: Floor, context: EventProcContext): void {
   const candidates = findCandidates(floor, context);
   const area = context.getScreenAreaLocal?.(floor);
   if (candidates.length === 0 || !area) return;
-  const { snowMs } = CONFIG.blessingEvent;
+  const { snowMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const top = area.top - START_ABOVE;
   const groundY = (getWorkerCenter(floor, 0)?.y ?? 0) + WORKER_HEIGHT * 0.45;

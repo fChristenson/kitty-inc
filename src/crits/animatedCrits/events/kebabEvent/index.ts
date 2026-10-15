@@ -6,7 +6,7 @@
 // straight into the next and the next, quicker each time, skewering the
 // whole row on a glittering spit, which blazes in a big blast. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ interface Bite {
 export const forceKebabEvent = registerWispEvent(
   KEY,
   "Kebab",
-  () => CONFIG.kebabEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { approachMs, stallMs, boreMs, holdMs, mergeMs } = CONFIG.kebabEvent;
+    const { approachMs, stallMs, boreMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context);
     if (workers.length === 0) return;
     // the longest row of workers, left to right

@@ -6,7 +6,7 @@
 // a jolt and a spray of coins; then both whole teams let fly at once and
 // every ball meets dead center in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -37,9 +37,9 @@ const SMACK_SHAKE: [number, number] = [0.5, 1.2];
 export const forceDodgeballEvent = registerWispEvent(
   KEY,
   "Dodgeball",
-  () => CONFIG.dodgeballEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { lineUpMs, gapsMs, flyMs, holdMs, mergeMs } = CONFIG.dodgeballEvent;
+    const { lineUpMs, gapsMs, flyMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const height = area.bottom - area.top;
     const cx = (area.left + area.right) / 2;

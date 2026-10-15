@@ -5,7 +5,7 @@
 // slams into it with a jolt of free levels, each jet taller than the last;
 // then the whole sea surges up one last jet into the total in a huge blast
 // and shake. Pays floor income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ const FINAL_SHAKE = 1.6;
 export const forceBlowholeEvent = registerWispEvent(
   KEY,
   "Blowhole",
-  () => CONFIG.blowholeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { swellMs, jetsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.blowholeEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS).reverse();
     const width = area.right - area.left;
     const seaY = area.bottom - SEA_LOW;

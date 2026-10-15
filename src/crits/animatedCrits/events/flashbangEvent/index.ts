@@ -6,7 +6,7 @@
 // the glare a little slower each time; the third blows the floor open in a
 // huge blast and shake, unlocked for free as the screen unfreezes. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -43,9 +43,9 @@ const BANG_SHAKE: [number, number] = [1, 1.6];
 export const forceFlashbangEvent = registerWispEvent(
   KEY,
   "Flashbang",
-  () => CONFIG.flashbangEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, flyMs, holdMs, mergeMs } = CONFIG.flashbangEvent;
+    const { gapsMs, flyMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

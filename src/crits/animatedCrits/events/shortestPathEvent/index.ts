@@ -7,7 +7,7 @@
 // shortest way back to the button blazes white-hot and a wisp races down it
 // onto the worker, which jumps a perma tier with a jolt, the last in a huge
 // blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -54,10 +54,10 @@ const HIT_SHAKE: [number, number] = [0.5, 1.1];
 export const forceShortestPathEvent = registerWispEvent(
   KEY,
   "Shortest Path",
-  () => CONFIG.shortestPathEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { appearMs, waveMs, rideMs, holdMs, mergeMs } =
-      CONFIG.shortestPathEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     // the road map: a jittered grid of junctions over the screen

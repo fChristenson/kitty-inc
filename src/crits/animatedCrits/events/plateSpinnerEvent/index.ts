@@ -6,7 +6,7 @@
 // plate spins faster and faster; then one after another they fly off
 // their poles and sail into the total, the last in a huge blast and shake.
 // Pays floor income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -51,10 +51,10 @@ const SET_SHAKE: [number, number] = [0.5, 1.1];
 export const forcePlateSpinnerEvent = registerWispEvent(
   KEY,
   "Plate Spinner",
-  () => CONFIG.plateSpinnerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { hopsMs, spinMs, throwsMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.plateSpinnerEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const fallback = totalSpot(area);

@@ -6,7 +6,7 @@
 // jolt and the bar jumps a crit tier; new coils line up to the next bar
 // and the next, the last shot slamming home in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const HIT_SHAKE: [number, number] = [0.9, 1.5];
 export const forceCoilgunEvent = registerWispEvent(
   KEY,
   "Coilgun",
-  () => CONFIG.coilgunEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { shotMs, holdMs, mergeMs } = CONFIG.coilgunEvent;
+    const { shotMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

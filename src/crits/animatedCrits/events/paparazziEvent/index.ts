@@ -5,8 +5,8 @@
 // worker's first flash lifts it out of the dark and it climbs one perma tier.
 // Then every camera fires at once in one huge flash, blast and shake, the
 // screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop, startBoostEventStreamLoop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -105,7 +105,7 @@ function subjectsOn(floor: Floor, context: EventProcContext): OnScreenWorker[] {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.paparazziEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -125,7 +125,7 @@ export function forcePaparazziEvent(floor: Floor): void {
 // the flashes at random, piling up toward the end; every worker's first
 // comes early enough to be seen
 function planFlashes(workers: OnScreenWorker[]): Flash[] {
-  const { flashMs } = CONFIG.paparazziEvent;
+  const { flashMs } = meta.values;
   const count = Math.max(MIN_FLASHES, workers.length * FLASHES_PER_WORKER);
   const flashes: Flash[] = [];
   for (let i = 0; i < count; i++) {
@@ -147,7 +147,7 @@ function planFlashes(workers: OnScreenWorker[]): Flash[] {
 
 // every flash, then every camera at once, on the frame each is due
 function landBeats(pap: RunningPaparazzi, ms: number, now: number): void {
-  const { flashMs } = CONFIG.paparazziEvent;
+  const { flashMs } = meta.values;
   for (const flash of pap.flashes) {
     if (flash.firedAt !== null || ms < flash.at) continue;
     flash.firedAt = now;
@@ -254,7 +254,7 @@ function drawOverlay(
 function startPaparazzi(floor: Floor, context: EventProcContext): void {
   const workers = subjectsOn(floor, context);
   if (running || isScreenFrozen() || workers.length === 0) return;
-  const { flashMs, finalGapMs, holdMs } = CONFIG.paparazziEvent;
+  const { flashMs, finalGapMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const pap: RunningPaparazzi = {
     floor,

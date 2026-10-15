@@ -4,8 +4,8 @@
 // the floor; then one by one they settle into its empty spots, each forming
 // a new worker out of its glow: the floor fills up to its worker cap. Then
 // the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -66,7 +66,7 @@ let running: RunningFireflies | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.firefliesEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -94,7 +94,7 @@ function flightOf(
   settleStart: number,
   settleAt: number,
 ): (ms: number) => Point | null {
-  const { enterMs } = CONFIG.firefliesEvent;
+  const { enterMs } = meta.values;
   const cx = between(FLOOR_W * 0.25, FLOOR_W * 0.75);
   const cy = spot.y - WORKER_HEIGHT * between(0.1, 0.5);
   const ax = FLOOR_W * between(0.12, 0.22);
@@ -180,7 +180,7 @@ function startFireflies(clicked: Floor, context: EventProcContext): void {
   // every missing worker is hired at once, each where its firefly settles
   const hires = recruitToCap(floor, Date.now());
   if (hires.length === 0) return;
-  const { enterMs, wanderMs, settleMs, gapMs, holdMs } = CONFIG.firefliesEvent;
+  const { enterMs, wanderMs, settleMs, gapMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const settleOrder = [...hires].sort(() => Math.random() - 0.5);
   const flies: Firefly[] = hires.map(({ workerIndex, x }, k) => {

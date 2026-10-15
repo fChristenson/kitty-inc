@@ -1,8 +1,8 @@
 // the "Spray" event: it covers its crit, whose click freezes the screen while
 // the button sprays a sweeping stream of coins and bills over the whole
 // screen, which then merge into the total (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -21,11 +21,11 @@ const COINS = 300;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.sprayEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const cover = startMoneyCover(KEY, floor, context, CONFIG.sprayEvent, {
+      const cover = startMoneyCover(KEY, floor, context, meta.values, {
         layout: (area) => coverSpots(area, COINS),
       });
       if (!cover) return;
@@ -39,7 +39,7 @@ registerEventProc(
           Math.PI * 2) %
         (Math.PI * 2);
       const spots = [...cover.spots].sort((a, b) => angleOf(a) - angleOf(b));
-      cover.stream(spots, CONFIG.sprayEvent.streamMs);
+      cover.stream(spots, meta.values.streamMs);
       playBoostEventStream();
     },
   },

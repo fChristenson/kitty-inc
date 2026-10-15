@@ -7,7 +7,7 @@
 // ever thicker, and as it reaches the end every gun fires at once, the
 // whole volley missing into a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const BANG_GAP_MS = 60;
 export const forceGauntletEvent = registerWispEvent(
   KEY,
   "Gauntlet",
-  () => CONFIG.gauntletEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, shotsMs, holdMs, mergeMs } = CONFIG.gauntletEvent;
+    const { runMs, shotsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

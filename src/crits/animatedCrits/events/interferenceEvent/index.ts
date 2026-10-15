@@ -7,7 +7,7 @@
 // shake and spray of cash, clusters bursting where all three meet, until
 // the rings close on the middle in one colossal blast. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -68,9 +68,9 @@ interface Blast {
 export const forceInterferenceEvent = registerWispEvent(
   KEY,
   "Interference",
-  () => CONFIG.interferenceEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { blowsMs, ringMs, holdMs, mergeMs } = CONFIG.interferenceEvent;
+    const { blowsMs, ringMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const sources = SPOTS.map((share, i) => ({

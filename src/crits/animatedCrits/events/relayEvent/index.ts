@@ -7,7 +7,7 @@
 // anchor leg runs the clicked floor's bar and breaks the tape at its end,
 // the bar jumping a crit tier in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -41,9 +41,9 @@ const HANDOFF_SHAKE: [number, number] = [0.5, 1.2];
 export const forceRelayEvent = registerWispEvent(
   KEY,
   "Relay",
-  () => CONFIG.relayEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { legsMs, tossMs, levelShare, holdMs, mergeMs } = CONFIG.relayEvent;
+    const { legsMs, tossMs, levelShare, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

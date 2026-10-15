@@ -6,7 +6,7 @@
 // levels and a jolt, each heave quicker; on the last it rips free, is
 // thrust high overhead and forks of lightning crack down from it into every
 // bar at once in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,10 +41,10 @@ const HEAVE_SHAKE: [number, number] = [0.6, 1.3];
 export const forceExcaliburEvent = registerWispEvent(
   KEY,
   "Excalibur",
-  () => CONFIG.excaliburEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { heavesMs, firstMs, raiseMs, levelShare, holdMs, mergeMs } =
-      CONFIG.excaliburEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

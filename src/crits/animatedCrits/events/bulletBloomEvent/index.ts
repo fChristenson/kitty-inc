@@ -6,7 +6,7 @@
 // turned between the last and blooming wider, every petal popping into
 // coins at the screen's edge; the boss blows in a huge blast and shake,
 // firing one last ring every way. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,10 +49,10 @@ const BLOOM_SHAKE: [number, number] = [0.5, 1.2];
 export const forceBulletBloomEvent = registerWispEvent(
   KEY,
   "Bullet Bloom",
-  () => CONFIG.bulletBloomEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, wavesMs, hangMs, holdMs, mergeMs } =
-      CONFIG.bulletBloomEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const boss: Point = {
       x: (area.left + area.right) / 2,

@@ -6,7 +6,7 @@
 // dog swoops under the packed herd and drives it up into the total-income
 // readout in a huge blast and shake, and the coins sweep into the total.
 // Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -55,7 +55,7 @@ const DART_SHAKE: [number, number] = [0.9, 1.9];
 export const forceSheepdogEvent = registerWispEvent(
   KEY,
   "Sheepdog",
-  () => CONFIG.sheepdogEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       spillMs,
@@ -65,7 +65,7 @@ export const forceSheepdogEvent = registerWispEvent(
       flightMs,
       holdMs,
       mergeMs,
-    } = CONFIG.sheepdogEvent;
+    } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

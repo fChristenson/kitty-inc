@@ -127,7 +127,6 @@ import {
 } from "../floorLock";
 import { activateBoosted, isFloorMaxed, type Floor } from "../../gameState";
 import { COLOR } from "../../palette";
-import { CONFIG } from "../../config";
 import { type BigNumber, multiply } from "../../shared/bigNumber";
 
 const spawnCoinBurst = liveEffect(animateCoinBurst);
@@ -436,8 +435,8 @@ function rollTapCrit(
 ): void {
   const context = eventProcContext(deps, isGroundFloor);
   rollCritUpgrade(floor, true, context);
-  if (!takeHotTap(floor)) return;
-  for (let k = 1; k < CONFIG.crit.hotButtonRolls; k++) {
+  const rolls = takeHotTap(floor);
+  for (let k = 1; k < rolls; k++) {
     if (isCritUpgrade(floor)) return;
     rollCritUpgrade(floor, true, context);
   }

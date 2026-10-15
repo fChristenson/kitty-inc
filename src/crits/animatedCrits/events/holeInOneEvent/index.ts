@@ -5,7 +5,7 @@
 // button's rim, whirls round its lip, ever tighter, and drops in: the button
 // blows in a huge blast and shake, and the coins sweep into the total. Pays
 // floor income × floor number × REWARD (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const KICK_SPAN = 1.4;
 export const forceHoleInOneEvent = registerWispEvent(
   KEY,
   "Hole in One",
-  () => CONFIG.holeInOneEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hopMs, rimMs, holdMs, mergeMs } = CONFIG.holeInOneEvent;
+    const { hopMs, rimMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const size = Math.max(WISP_SIZE, width * WISP);

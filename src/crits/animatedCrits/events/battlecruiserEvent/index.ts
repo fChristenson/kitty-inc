@@ -4,8 +4,8 @@
 // the distance. The guns strafe it and its nodes blow in a wave rolling from
 // corner to corner, its beams snapping as they go, then its core goes up in
 // a huge blast; the view crash-lands and the floor gets free levels
+import meta from "./meta";
 import { levelsFor, type Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { createBeats } from "../../../../shared/eventBeats";
@@ -72,7 +72,7 @@ interface Node {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.battlecruiserEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -103,7 +103,7 @@ const coreAt = (view: FlightView, ms: number): Point =>
   project(view, 0, RIDE + Math.sin(ms * 0.002) * ROCK, depthAt(ms));
 
 function startBattlecruiser(floor: Floor, context: EventProcContext): void {
-  const { levelShare } = CONFIG.battlecruiserEvent;
+  const { levelShare } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const nodes: Node[] = Array.from({ length: COLS * ROWS }, (_, i) => {
     const c = i % COLS;

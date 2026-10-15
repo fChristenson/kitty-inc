@@ -7,7 +7,7 @@
 // whoosh; once the curve is drawn the scaffold falls away and a river of
 // cash pours along it into the total in a huge blast. Pays floor income ×
 // floor number × 4
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -52,10 +52,10 @@ const POUR_SHAKE = 0.7;
 export const forceDeCasteljauEvent = registerWispEvent(
   KEY,
   "de Casteljau",
-  () => CONFIG.deCasteljauEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, drawMs, travelMs, streamMs, holdMs, mergeMs } =
-      CONFIG.deCasteljauEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const w = area.right - area.left;
     const h = area.bottom - area.top;

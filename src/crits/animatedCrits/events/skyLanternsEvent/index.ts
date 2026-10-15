@@ -7,7 +7,7 @@
 // floor bursts open in a huge blast and shake, unlocked for free as the
 // screen unfreezes. Pays floor income × floor number × REWARD, plus the
 // floor
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -40,10 +40,10 @@ const ARRIVE_SHAKE: [number, number] = [0.4, 1];
 export const forceSkyLanternsEvent = registerWispEvent(
   KEY,
   "Sky Lanterns",
-  () => CONFIG.skyLanternsEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { gapsMs, floatMs, liftMs, holdMs, mergeMs } =
-      CONFIG.skyLanternsEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -5,7 +5,7 @@
 // its spokes burst outward in a flash and a jolt and the bar jumps a crit
 // tier, the wheels finishing one after another, the last in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ interface Wheel {
 export const forceSpokesEvent = registerWispEvent(
   KEY,
   "Spokes",
-  () => CONFIG.spokesEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { staggerMs, rollMs, holdMs, mergeMs } = CONFIG.spokesEvent;
+    const { staggerMs, rollMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const wheels: Wheel[] = bars.map((bar, k) => {

@@ -5,7 +5,7 @@
 // faster and faster, the studs spell out a giant five-pointed star; it
 // blazes, then slams down onto the bar, which jumps a crit tier in a huge
 // blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -44,10 +44,10 @@ const DONE_SHAKE = 1;
 export const forceBulletMosaicEvent = registerWispEvent(
   KEY,
   "Bullet Mosaic",
-  () => CONFIG.bulletMosaicEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, fireMs, blazeMs, slamMs, holdMs, mergeMs } =
-      CONFIG.bulletMosaicEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

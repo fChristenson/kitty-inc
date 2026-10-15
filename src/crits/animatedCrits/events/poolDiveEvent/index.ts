@@ -6,7 +6,7 @@
 // bang and a jolt; it dives back in and rockets out to the next, quicker
 // each time, the last landing in a huge blast and shake. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const LAND_SHAKE: [number, number] = [0.6, 1.3];
 export const forcePoolDiveEvent = registerWispEvent(
   KEY,
   "Pool Dive",
-  () => CONFIG.poolDiveEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fillMs, diveMs, jetsMs, holdMs, mergeMs } = CONFIG.poolDiveEvent;
+    const { fillMs, diveMs, jetsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

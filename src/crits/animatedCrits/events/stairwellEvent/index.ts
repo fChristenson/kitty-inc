@@ -5,7 +5,7 @@
 // it hits, quicker and lower as it goes; it finishes with a slam down onto
 // the clicked floor's bar in a big blast and every bar slams. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -38,9 +38,9 @@ interface Step {
 export const forceStairwellEvent = registerWispEvent(
   KEY,
   "Stairwell",
-  () => CONFIG.stairwellEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hopMs, levelShare, holdMs, mergeMs } = CONFIG.stairwellEvent;
+    const { hopMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

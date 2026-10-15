@@ -7,7 +7,7 @@
 // levels as the wisp glows hotter; the last pump jumps the bar a crit tier
 // and blows the hose off in a huge blast of cash and shake. Pays floor
 // income × floor number × REWARD, plus the levels and the tier
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,7 +45,7 @@ const PUMP_SHAKE: [number, number] = [0.8, 1.6];
 export const forceFuelLineEvent = registerWispEvent(
   KEY,
   "Fuel Line",
-  () => CONFIG.fuelLineEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       plugMs,
@@ -56,7 +56,7 @@ export const forceFuelLineEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.fuelLineEvent;
+    } = meta.values;
     const own = findRewardBars(floor, context).find((b) => b.floor === floor);
     if (!own) return;
     const top = totalSpot(area);

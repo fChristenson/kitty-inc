@@ -7,7 +7,7 @@
 // shake, as the bar lands free levels; volley after volley, ever faster,
 // until both cannons fire together and their shells burst over the last bar
 // in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -54,9 +54,9 @@ interface Blast {
 export const forceConfettiCannonEvent = registerWispEvent(
   KEY,
   "Confetti Cannon",
-  () => CONFIG.confettiCannonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { volleysMs, flightMs, holdMs, mergeMs } = CONFIG.confettiCannonEvent;
+    const { volleysMs, flightMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

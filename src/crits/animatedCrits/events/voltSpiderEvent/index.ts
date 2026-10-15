@@ -5,7 +5,7 @@
 // every step, faster and faster, until it reaches the next locked floor and
 // sinks in its bite, the floor bursting open in a huge blast and shake,
 // unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ interface Leg {
 export const forceVoltSpiderEvent = registerWispEvent(
   KEY,
   "Volt Spider",
-  () => CONFIG.voltSpiderEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { stepsMs, holdMs, mergeMs } = CONFIG.voltSpiderEvent;
+    const { stepsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

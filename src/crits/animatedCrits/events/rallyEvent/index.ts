@@ -4,7 +4,7 @@
 // steeper, every new high a ding, a jolt and a spurt of coins off the
 // peak; at the right edge the line rockets straight up into the total in a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -29,9 +29,9 @@ const PEAK_SHAKE: [number, number] = [0.4, 1.2];
 export const forceRallyEvent = registerWispEvent(
   KEY,
   "Rally",
-  () => CONFIG.rallyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { traceMs, rocketMs, holdMs, mergeMs } = CONFIG.rallyEvent;
+    const { traceMs, rocketMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const width = area.right - area.left;
     const height = area.bottom - area.top;

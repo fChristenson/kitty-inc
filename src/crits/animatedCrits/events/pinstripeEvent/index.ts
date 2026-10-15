@@ -6,7 +6,7 @@
 // splash, a bloop and a jolt; the last stripe slams its bar in a huge blast
 // and shake and the coins sweep into the total. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
@@ -31,10 +31,10 @@ const HIT_SHAKE: [number, number] = [0.5, 1.3];
 export const forcePinstripeEvent = registerWispEvent(
   KEY,
   "Pinstripe",
-  () => CONFIG.pinstripeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapsMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.pinstripeEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const pour: Pour = { coinsAlong: 700, width: 30, streamMs, travelMs };

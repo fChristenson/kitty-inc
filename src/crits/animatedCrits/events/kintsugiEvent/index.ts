@@ -6,7 +6,7 @@
 // jolt that lands free levels; then the gold drains out of every seam into
 // the total in a huge blast and shake. Pays floor income × floor number ×
 // REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,10 +38,10 @@ const FILL_SHAKE: [number, number] = [0.7, 1.5];
 export const forceKintsugiEvent = registerWispEvent(
   KEY,
   "Kintsugi",
-  () => CONFIG.kintsugiEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { crackMs, gapMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.kintsugiEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const bars = context.upgradeFloorFree

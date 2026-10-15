@@ -6,7 +6,7 @@
 // once, the bolts meet mid-screen in a huge blast that forks down onto
 // every bar, and the clicked bar climbs a crit tier. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -58,9 +58,9 @@ interface Volley {
 export const forceThunderDuelEvent = registerWispEvent(
   KEY,
   "Thunder Duel",
-  () => CONFIG.thunderDuelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, levelShare, holdMs, mergeMs } = CONFIG.thunderDuelEvent;
+    const { growMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

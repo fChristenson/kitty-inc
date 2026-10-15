@@ -6,7 +6,7 @@
 // in a perfect staircase; then a river of cash cascades down the staircase
 // and up into the total in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,9 +45,9 @@ interface Swap {
 export const forceQuicksortEvent = registerWispEvent(
   KEY,
   "Quicksort",
-  () => CONFIG.quicksortEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swapsMs, holdMs, mergeMs } = CONFIG.quicksortEvent;
+    const { swapsMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

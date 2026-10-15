@@ -4,8 +4,8 @@
 // climbable worker in view with a small explosion; every worker struck lights
 // up, plays its boost and climbs one perma tier. Then the screen unfreezes
 // and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -87,7 +87,7 @@ function planShower(floor: Floor, context: EventProcContext): Meteor[] | null {
   if (!rect || !area) return null;
   const workers = findClimbers(floor, context.getOnScreenFloors);
   if (workers.length === 0) return null;
-  const { minMeteors, maxMeteors, gapMs } = CONFIG.meteorShowerEvent;
+  const { minMeteors, maxMeteors, gapMs } = meta.values;
   const count =
     minMeteors + Math.floor(Math.random() * (maxMeteors - minMeteors + 1));
   const direction = Math.random() < 0.5 ? -1 : 1;
@@ -119,7 +119,7 @@ function planShower(floor: Floor, context: EventProcContext): Meteor[] | null {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.meteorShowerEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -138,7 +138,7 @@ export function forceMeteorShowerEvent(floor: Floor): void {
 
 // speeding up as it comes down; ms from its own launch
 function meteorAt(meteor: Meteor, ms: number): Point | null {
-  const { streakMs } = CONFIG.meteorShowerEvent;
+  const { streakMs } = meta.values;
   if (ms < 0 || ms > streakMs) return null;
   const t = (ms / streakMs) ** 1.5;
   return {
@@ -180,7 +180,7 @@ function startShower(floor: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen()) return;
   const meteors = planShower(floor, context);
   if (!meteors) return;
-  const { streakMs, holdMs } = CONFIG.meteorShowerEvent;
+  const { streakMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const shower: RunningShower = {
     meteors,

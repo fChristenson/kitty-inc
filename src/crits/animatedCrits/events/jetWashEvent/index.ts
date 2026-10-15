@@ -6,7 +6,7 @@
 // over and buzzes the next bar the other way, quicker each time, the last
 // pass ending in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -54,9 +54,9 @@ interface Pass {
 export const forceJetWashEvent = registerWispEvent(
   KEY,
   "Jet Wash",
-  () => CONFIG.jetWashEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { passesMs, hopMs, holdMs, mergeMs } = CONFIG.jetWashEvent;
+    const { passesMs, hopMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let from: Point = getButtonCenter(context.isGroundFloor);

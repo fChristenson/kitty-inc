@@ -5,7 +5,7 @@
 // a flare and a jolt as the focus on the lock blazes brighter and hotter,
 // quicker and quicker; with every mirror trained on it the lock bursts in a
 // huge blast and shake, unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ interface Mirror {
 export const forceSolarFurnaceEvent = registerWispEvent(
   KEY,
   "Solar Furnace",
-  () => CONFIG.solarFurnaceEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { appearMs, mirrorsMs, holdMs, mergeMs } = CONFIG.solarFurnaceEvent;
+    const { appearMs, mirrorsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

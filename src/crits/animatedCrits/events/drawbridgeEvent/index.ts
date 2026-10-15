@@ -7,7 +7,7 @@
 // then they drop the rest of the way and slam together on the lock in a
 // huge blast and shake; the floor bursts open, unlocked for free, as the
 // screen unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const CLANK_SHAKE: [number, number] = [0.5, 1.2];
 export const forceDrawbridgeEvent = registerWispEvent(
   KEY,
   "Drawbridge",
-  () => CONFIG.drawbridgeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { clanksMs, dropMs, holdMs, mergeMs } = CONFIG.drawbridgeEvent;
+    const { clanksMs, dropMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

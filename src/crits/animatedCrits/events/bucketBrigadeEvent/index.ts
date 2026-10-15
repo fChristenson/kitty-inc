@@ -6,7 +6,7 @@
 // dumped into the total with a splash and a jolt; the last and biggest
 // load lands in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -39,10 +39,10 @@ const DUMP_SHAKE: [number, number] = [0.5, 1.1];
 export const forceBucketBrigadeEvent = registerWispEvent(
   KEY,
   "Bucket Brigade",
-  () => CONFIG.bucketBrigadeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { lineUpMs, gapsMs, hopMs, holdMs, mergeMs } =
-      CONFIG.bucketBrigadeEvent;
+      meta.values;
     const total0 = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     // the hands, button to total; the total itself is the last stop

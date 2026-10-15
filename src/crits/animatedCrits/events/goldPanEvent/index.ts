@@ -7,7 +7,7 @@
 // and a jolt as a new worker; then the whole pan is tossed into the total
 // in a huge blast and shake. Pays floor income × floor number × REWARD,
 // plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -47,9 +47,9 @@ const LAND_SHAKE: [number, number] = [0.5, 1.2];
 export const forceGoldPanEvent = registerWispEvent(
   KEY,
   "Gold Pan",
-  () => CONFIG.goldPanEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pourMs, gapsMs, flightMs, holdMs, mergeMs } = CONFIG.goldPanEvent;
+    const { pourMs, gapsMs, flightMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const fallback = totalSpot(area);

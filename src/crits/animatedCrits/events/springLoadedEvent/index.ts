@@ -6,7 +6,7 @@
 // whole spring launches straight up the screen, uncoiling into a towering
 // jet that slams into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,10 +42,10 @@ const RELEASE_SHAKE = 1.8;
 export const forceSpringLoadedEvent = registerWispEvent(
   KEY,
   "Spring Loaded",
-  () => CONFIG.springLoadedEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { formMs, jerksMs, launchMs, holdMs, mergeMs } =
-      CONFIG.springLoadedEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const cx = (area.left + area.right) / 2;
     const base: Point = { x: cx, y: area.bottom - BASE };

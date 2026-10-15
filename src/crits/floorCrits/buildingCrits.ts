@@ -27,17 +27,7 @@ import {
   playTierFlash,
   triggerScreenShake,
 } from "../critFlash";
-import {
-  runFirstCritProc,
-  GRAND_OPENING_CRIT_COLOR,
-  GRAND_OPENING_CRIT_LABEL,
-  HEAVENLY_CRIT_COLOR,
-  HEAVENLY_CRIT_LABEL,
-  MYSTIC_CRIT_COLOR,
-  MYSTIC_CRIT_LABEL,
-  UPGRADE_CRIT_COLOR,
-  UPGRADE_CRIT_LABEL,
-} from "../critTypes";
+import { runFirstCritProc, CRIT_PROC_INFO } from "../critTypes";
 import { playPayout, playSold } from "../../sound";
 
 // the flash a crit on a building bought on the map plays. Only ONE flash can
@@ -55,8 +45,8 @@ export function celebrateBuildingCrit(result: CritRollResult): void {
       mystic: () => {
         triggerScreenShake({
           intensity: 2.2,
-          label: MYSTIC_CRIT_LABEL,
-          color: MYSTIC_CRIT_COLOR,
+          label: CRIT_PROC_INFO.mystic.label,
+          color: CRIT_PROC_INFO.mystic.color,
           strokeWidth: 15,
           blinkHz: 6,
           holdMs: 900,
@@ -66,14 +56,22 @@ export function celebrateBuildingCrit(result: CritRollResult): void {
       },
       // heavenly crit: the same ultra-strength flash the floors use
       heavenly: () =>
-        playTierFlash("ultra", HEAVENLY_CRIT_LABEL, HEAVENLY_CRIT_COLOR),
+        playTierFlash(
+          "ultra",
+          CRIT_PROC_INFO.heavenly.label,
+          CRIT_PROC_INFO.heavenly.color,
+        ),
       // upgrade crit: the flat special flash (the reward itself, promoting
       // every floor's tier one step, is applied by setBuildingCritTier)
-      upgrade: () => playSpecialFlash(UPGRADE_CRIT_LABEL, UPGRADE_CRIT_COLOR),
+      upgrade: () =>
+        playSpecialFlash(
+          CRIT_PROC_INFO.upgrade.label,
+          CRIT_PROC_INFO.upgrade.color,
+        ),
       grandOpening: () =>
         playSpecialFlash(
-          GRAND_OPENING_CRIT_LABEL,
-          GRAND_OPENING_CRIT_COLOR,
+          CRIT_PROC_INFO.grandOpening.label,
+          CRIT_PROC_INFO.grandOpening.color,
           playSold,
         ),
     },

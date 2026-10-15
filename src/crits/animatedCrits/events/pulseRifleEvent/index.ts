@@ -6,7 +6,7 @@
 // last pulse is the biggest and the total goes off in a huge blast and
 // shake, and the coins sweep into the total. Pays floor income × floor
 // number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -46,10 +46,10 @@ const HIT_SHAKE = 1.4;
 export const forcePulseRifleEvent = registerWispEvent(
   KEY,
   "Pulse Rifle",
-  () => CONFIG.pulseRifleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { chargeMs, gapMs, boltMs, slugMs, holdMs, mergeMs } =
-      CONFIG.pulseRifleEvent;
+      meta.values;
     const width = area.right - area.left;
     const button = getButtonCenter(context.isGroundFloor);
     const fallback = totalSpot(area);

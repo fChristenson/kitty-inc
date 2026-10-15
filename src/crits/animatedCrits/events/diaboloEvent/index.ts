@@ -7,7 +7,7 @@
 // hands glide over to the next bar and it bounces up onto their string
 // again; the last smash a huge blast and shake. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -57,10 +57,10 @@ interface Throw {
 export const forceDiaboloEvent = registerWispEvent(
   KEY,
   "Diabolo",
-  () => CONFIG.diaboloEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { whipsMs, upMs, downMs, levelShare, holdMs, mergeMs } =
-      CONFIG.diaboloEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const apexY = area.top + APEX;

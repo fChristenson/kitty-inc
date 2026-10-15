@@ -5,7 +5,7 @@
 // flash, a pop and a jolt, and they climb a perma tier, its hovers ever
 // shorter; on the last it drops in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -32,9 +32,9 @@ const DIP_SHAKE: [number, number] = [0.5, 1.2];
 export const forceDragonflyEvent = registerWispEvent(
   KEY,
   "Dragonfly",
-  () => CONFIG.dragonflyEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { dartMs, hoversMs, holdMs, mergeMs } = CONFIG.dragonflyEvent;
+    const { dartMs, hoversMs, holdMs, mergeMs } = meta.values;
     const found = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (found.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

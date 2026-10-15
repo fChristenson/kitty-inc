@@ -6,7 +6,7 @@
 // rises past jolting with a splash and free levels; then the moon soars up
 // into the total and drags the whole tide in after it in a huge blast and
 // shake. Pays floor income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -50,10 +50,10 @@ const CREST_SHAKE: [number, number] = [0.6, 1.4];
 export const forceMoonTideEvent = registerWispEvent(
   KEY,
   "Moon Tide",
-  () => CONFIG.moonTideEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, pullMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.moonTideEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;

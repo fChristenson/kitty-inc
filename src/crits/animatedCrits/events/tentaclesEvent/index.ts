@@ -6,7 +6,7 @@
 // rumbles as they heave, and the floor rips open in a huge blast and shake:
 // as the screen unfreezes it's unlocked for free. Pays floor income × floor
 // number × REWARD, plus the floor
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,10 +42,10 @@ const GRIP_SHAKE: [number, number] = [0.8, 1.5];
 export const forceTentaclesEvent = registerWispEvent(
   KEY,
   "Tentacles",
-  () => CONFIG.tentaclesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, gapsMs, reachMs, heaveMs, holdMs, mergeMs } =
-      CONFIG.tentaclesEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const y0 = locked.offsetY + INSET;

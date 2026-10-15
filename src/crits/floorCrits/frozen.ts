@@ -6,10 +6,10 @@
 // clicks, no reward multiplier, no special button appearance) — only the
 // price growth is paused
 import type { Floor } from "../../gameState";
-import { CONFIG } from "../../config";
 import { createTimedFloorEvent } from "../../shared/floorEvents";
+import frozenMeta from "./procs/frozen/meta";
 
-export const FROZEN_DURATION_MS = CONFIG.crit.frozenDurationMs;
+export const FROZEN_DURATION_MS = frozenMeta.values.durationMs;
 
 const frozenEvent = createTimedFloorEvent(FROZEN_DURATION_MS);
 

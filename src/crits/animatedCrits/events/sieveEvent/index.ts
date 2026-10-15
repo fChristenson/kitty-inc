@@ -7,7 +7,7 @@
 // the primes are left blazing; they fire their cash one after another in a
 // rippling chain of bursts and the grid goes off in a blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -57,9 +57,9 @@ interface Hop {
 export const forceSieveEvent = registerWispEvent(
   KEY,
   "Sieve",
-  () => CONFIG.sieveEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hopsMs, holdMs, mergeMs } = CONFIG.sieveEvent;
+    const { hopsMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const span = Math.min(width * SPAN[0], height * SPAN[1]);

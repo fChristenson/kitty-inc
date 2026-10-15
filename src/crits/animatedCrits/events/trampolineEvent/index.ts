@@ -5,7 +5,7 @@
 // launches it right up into the total-income readout in a huge blast and
 // shake, and the coins sweep into the total. Pays floor income × floor
 // number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const LAND_BURST: [number, number] = [0.6, 1.2];
 export const forceTrampolineEvent = registerWispEvent(
   KEY,
   "Trampoline",
-  () => CONFIG.trampolineEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dropMs, holdMs, mergeMs } = CONFIG.trampolineEvent;
+    const { dropMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

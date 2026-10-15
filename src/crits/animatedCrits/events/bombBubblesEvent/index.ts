@@ -6,7 +6,7 @@
 // it lands free levels; bar after bar, ever faster, every blast with its
 // own bang and shake, the last bar going up round a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ interface Blast {
 export const forceBombBubblesEvent = registerWispEvent(
   KEY,
   "Bomb Bubbles",
-  () => CONFIG.bombBubblesEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { riseMs, barsMs, holdMs, mergeMs } = CONFIG.bombBubblesEvent;
+    const { riseMs, barsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const blasts: Blast[] = [];

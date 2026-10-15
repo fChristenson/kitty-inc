@@ -6,7 +6,7 @@
 // slides back a little in the backwash; the last surge sweeps it all
 // together into a heap under the lock, which bursts open in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -52,10 +52,10 @@ const SETTLE_SHAKE = 0.8;
 export const forceBackwashEvent = registerWispEvent(
   KEY,
   "Backwash",
-  () => CONFIG.backwashEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { rainMs, surgeMs, backMs, gatherMs, holdMs, mergeMs } =
-      CONFIG.backwashEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

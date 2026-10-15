@@ -3,7 +3,7 @@
 // ring and a star of marks; the rings turn against each other quicker and
 // quicker, a jolt every turn, glitter rising off them, until a pillar of
 // light erupts out of it: the floor opens free and its price pays back
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { multiply } from "../../../../shared/bigNumber";
 import {
   drawSummon,
@@ -57,7 +57,7 @@ registerFloorCrit("conjureCrit", {
   // the price of the floor it opened, back
   reward(t) {
     if (!t.price) return;
-    t.pay(multiply(t.price, CONFIG.crit.conjurePriceBack));
+    t.pay(multiply(t.price, meta.values.priceBack));
     t.punch("Price Back");
   },
   plan(r, _bars, hit) {

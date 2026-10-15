@@ -5,7 +5,7 @@
 // width of the screen, and every bar its front crashes past flashes with a
 // bang, a jolt and free levels; at the bottom the curtain slams down in a
 // huge blast. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,10 +37,10 @@ const PASS_SHAKE: [number, number] = [0.6, 1.3];
 export const forceSpillwayEvent = registerWispEvent(
   KEY,
   "Spillway",
-  () => CONFIG.spillwayEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { feedMs, sheetMs, levelShare, holdMs, mergeMs } =
-      CONFIG.spillwayEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

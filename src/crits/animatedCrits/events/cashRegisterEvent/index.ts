@@ -6,7 +6,7 @@
 // key: "KA-CHING!", the drawer bursts open and a torrent of cash gushes out
 // of the button and up into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,10 +50,10 @@ const PRESS_SHAKE: [number, number] = [0.3, 0.8];
 export const forceCashRegisterEvent = registerWispEvent(
   KEY,
   "Cash Register",
-  () => CONFIG.cashRegisterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pressesMs, gushMs, travelMs, holdMs, mergeMs } =
-      CONFIG.cashRegisterEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const pad: Point = {
       x: (area.left + area.right) / 2,

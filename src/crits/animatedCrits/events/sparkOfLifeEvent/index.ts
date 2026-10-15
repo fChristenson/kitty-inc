@@ -5,7 +5,7 @@
 // in a blinding strike, a bang and a big jolt, and a new worker jolts to life
 // out of the glow; after the last, every new hire flashes in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -28,9 +28,9 @@ const STRIKE_SHAKE: [number, number] = [1.1, 1.9];
 export const forceSparkOfLifeEvent = registerWispEvent(
   KEY,
   "Spark of Life",
-  () => CONFIG.sparkOfLifeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { chargeMs, gapsMs, holdMs, mergeMs } = CONFIG.sparkOfLifeEvent;
+    const { chargeMs, gapsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context)
       .sort(() => Math.random() - 0.5)
       .slice(0, MAX_HIRES);

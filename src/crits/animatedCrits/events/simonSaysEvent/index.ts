@@ -6,7 +6,7 @@
 // round the pattern is longer and faster; after the last all four pads
 // blaze at once and every bar slams in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -33,10 +33,10 @@ const ROUND_SHAKE: [number, number] = [0.8, 1.5];
 export const forceSimonSaysEvent = registerWispEvent(
   KEY,
   "Simon Says",
-  () => CONFIG.simonSaysEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { lightMs, beatsMs, roundGapMs, holdMs, mergeMs } =
-      CONFIG.simonSaysEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const w = area.right - area.left;

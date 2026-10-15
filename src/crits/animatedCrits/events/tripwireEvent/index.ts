@@ -5,7 +5,7 @@
 // each grab a bloop, a jolt and a spurt of coins; at the top it trips the
 // alarm: every laser blazes and snaps shut on it, and it bolts into the
 // total in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,10 +36,10 @@ const GRAB_SHAKE: [number, number] = [0.4, 1];
 export const forceTripwireEvent = registerWispEvent(
   KEY,
   "Tripwire",
-  () => CONFIG.tripwireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { hopMs, dwellMs, alarmMs, escapeMs, holdMs, mergeMs } =
-      CONFIG.tripwireEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const width = area.right - area.left;
     const height = area.bottom - area.top;

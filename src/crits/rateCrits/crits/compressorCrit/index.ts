@@ -4,7 +4,7 @@
 // above and below, giving in jolts closer and closer; they crumble, the
 // pressure blasting along every bar, and each readout turns over: the bar
 // runs faster for good, its own the most
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import {
   crumbleAt,
   crumbleBits,
@@ -121,8 +121,8 @@ registerFloorCrit("compressorCrit", {
   // faster for good, its own more
   reward(t) {
     t.floor.incomeIntervalSeconds /= t.own
-      ? CONFIG.crit.compressorOwnSpeed
-      : CONFIG.crit.compressorSpeed;
+      ? meta.values.ownSpeed
+      : meta.values.speed;
   },
   plan(r, bars, hit) {
     const press = planPress(IN_MS + SLIDE_MS, PRESS_MS, GIVES, {

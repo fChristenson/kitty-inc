@@ -6,7 +6,7 @@
 // shake, a shower of debris wisps flying out and each popping into a ring of
 // coins, and the coins sweep into the total-income readout. Pays floor
 // income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -49,9 +49,9 @@ const DEBRIS_REACH: [number, number] = [20, 70];
 export const forceColliderEvent = registerWispEvent(
   KEY,
   "Collider",
-  () => CONFIG.colliderEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, dashMs, debrisMs, holdMs, mergeMs } = CONFIG.colliderEvent;
+    const { runMs, dashMs, debrisMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const middle = {

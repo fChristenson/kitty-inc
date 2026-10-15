@@ -5,7 +5,7 @@
 // spot: "CAUGHT!", a pop and a jolt as a new worker forms there; one after
 // another, ever quicker, the last catch landing in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const CATCH_SHAKE: [number, number] = [0.6, 1.3];
 export const forceTrustFallEvent = registerWispEvent(
   KEY,
   "Trust Fall",
-  () => CONFIG.trustFallEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fallsMs, fallMs, holdMs, mergeMs } = CONFIG.trustFallEvent;
+    const { fallsMs, fallMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const caught = createCritTextSprite("CAUGHT!", COLOR.heavenlyGold, STYLE);

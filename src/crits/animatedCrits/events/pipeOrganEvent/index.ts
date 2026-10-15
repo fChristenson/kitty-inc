@@ -7,7 +7,7 @@
 // chord plays every pipe at once and the whole organ roars up into the
 // total in a huge blast and shake. Pays floor income × floor number ×
 // REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,10 +50,10 @@ const CHORD_SHAKE: [number, number] = [0.8, 1.5];
 export const forcePipeOrganEvent = registerWispEvent(
   KEY,
   "Pipe Organ",
-  () => CONFIG.pipeOrganEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, chordsMs, flightMs, holdMs, mergeMs } =
-      CONFIG.pipeOrganEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const fallback = totalSpot(area);

@@ -5,7 +5,7 @@
 // hard on it with a slam, a bang and a jolt as the bar lands free levels,
 // then drops again onto the next, each drop faster, the last slamming to a
 // stop in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -31,10 +31,10 @@ const HIT_SHAKE: [number, number] = [0.8, 1.4];
 export const forceDropTowerEvent = registerWispEvent(
   KEY,
   "Drop Tower",
-  () => CONFIG.dropTowerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { launchMs, hangMs, dropsMs, brakeMs, holdMs, mergeMs } =
-      CONFIG.dropTowerEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

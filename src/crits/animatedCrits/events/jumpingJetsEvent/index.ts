@@ -6,7 +6,7 @@
 // bar, zigzagging up the screen, quicker each leap, the last one leaping
 // into the total in a huge blast and shake. Pays floor income × floor
 // number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,10 +44,10 @@ interface Leap {
 export const forceJumpingJetsEvent = registerWispEvent(
   KEY,
   "Jumping Jets",
-  () => CONFIG.jumpingJetsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { leapsMs, flightMs, slugMs, gushMs, holdMs, mergeMs } =
-      CONFIG.jumpingJetsEvent;
+      meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => b.center.y - a.center.y);

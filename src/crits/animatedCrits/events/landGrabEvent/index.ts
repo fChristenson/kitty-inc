@@ -6,7 +6,7 @@
 // through what's left, ever faster, the claims ever smaller, until the last
 // piece is claimed in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ interface Box {
 export const forceLandGrabEvent = registerWispEvent(
   KEY,
   "Land Grab",
-  () => CONFIG.landGrabEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { cutsMs, holdMs, mergeMs } = CONFIG.landGrabEvent;
+    const { cutsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     let left: Box = {
       left: area.left + EDGE,

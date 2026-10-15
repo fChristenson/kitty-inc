@@ -6,7 +6,7 @@
 // as the screen rumbles; then it hits play: the cash blasts back out at
 // double speed, a roaring river up the same arc into the total in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,10 +36,10 @@ const RUMBLE = 0.5;
 export const forceRewindEvent = registerWispEvent(
   KEY,
   "Rewind",
-  () => CONFIG.rewindEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { rewindMs, pauseMs, playMs, spreadMs, holdMs, mergeMs } =
-      CONFIG.rewindEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const playAt = rewindMs + pauseMs;

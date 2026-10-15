@@ -6,7 +6,7 @@
 // it reaches the hub in a huge blast and shake, and all the cash pours into
 // the total-income readout. Pays floor income × floor number × REWARD (see
 // ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -38,7 +38,7 @@ const CROSS_SHAKE: [number, number] = [0.5, 1.6];
 export const forceSpiderwebEvent = registerWispEvent(
   KEY,
   "Spiderweb",
-  () => CONFIG.spiderwebEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       spokeGapMs,
@@ -48,7 +48,7 @@ export const forceSpiderwebEvent = registerWispEvent(
       spiralTravelMs,
       holdMs,
       mergeMs,
-    } = CONFIG.spiderwebEvent;
+    } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const hub = {

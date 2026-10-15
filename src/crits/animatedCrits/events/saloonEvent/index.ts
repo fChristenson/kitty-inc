@@ -7,8 +7,8 @@
 // draws and fires, the view staggers, pitches forward and falls into a hole
 // opening in the road, dropping through it back onto the floors, which get
 // free levels as the crit's tier pays out
+import meta from "./meta";
 import { levelsFor, type Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop, playSwoosh } from "../../../../sound";
 import { drawMuzzleFlash } from "../../../../shared/animationStyles/bullets";
@@ -44,6 +44,7 @@ import {
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -166,7 +167,7 @@ interface Shop {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.saloonEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -318,7 +319,7 @@ function startSaloon(floor: Floor, context: EventProcContext): void {
     tumbleMs,
     flyMs,
     levelShare,
-  } = CONFIG.saloonEvent;
+  } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const stepAt = doorsMs;
   const countAt = stepAt + stepMs;
@@ -327,7 +328,7 @@ function startSaloon(floor: Floor, context: EventProcContext): void {
   const hitAt = fireAt + boltMs;
   const tumbleAt = hitAt + staggerMs;
   const enterMs = tumbleAt + tumbleMs;
-  const landMs = flyMs + CONFIG.flightStage.arriveMs;
+  const landMs = flyMs + FLIGHT_STAGE.arriveMs;
   const labels: CritTextSprite[] = ["3", "2", "1", "SHOOT!"].map((label, i) =>
     createCritTextSprite(
       label,

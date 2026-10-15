@@ -7,7 +7,7 @@
 // laser twitching to a new spot between them; the third blows in a huge
 // blast and shake, and as the screen unfreezes the floor bursts open:
 // unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,10 +49,10 @@ const SHOT_SHAKE: [number, number] = [1.2, 1.6];
 export const forceSniperNestEvent = registerWispEvent(
   KEY,
   "Sniper Nest",
-  () => CONFIG.sniperNestEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { climbMs, huntMs, shotsMs, holdMs, mergeMs } =
-      CONFIG.sniperNestEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

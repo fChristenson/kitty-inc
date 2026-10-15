@@ -6,7 +6,7 @@
 // the bar soaking up free levels; then a big fat bug blunders in and the
 // zapper fries it with a colossal bolt, the bar jumping a crit tier in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,10 +42,10 @@ const ZAP_SHAKE: [number, number] = [0.4, 1.1];
 export const forceBugZapperEvent = registerWispEvent(
   KEY,
   "Bug Zapper",
-  () => CONFIG.bugZapperEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { flyMs, gapsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.bugZapperEvent;
+      meta.values;
     const own = findRewardBars(floor, context).find((b) => b.floor === floor);
     if (!own) return;
     const { box } = own;

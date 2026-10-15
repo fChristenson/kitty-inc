@@ -6,7 +6,7 @@
 // four times the speed and they slam into the bars, each bar jumping a
 // crit tier with a bang and a jolt, the last in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,10 +45,10 @@ const HIT_SHAKE: [number, number] = [1, 1.6];
 export const forceBulletTimeEvent = registerWispEvent(
   KEY,
   "Bullet Time",
-  () => CONFIG.bulletTimeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, freezeAfterMs, freezeMs, holdMs, mergeMs } =
-      CONFIG.bulletTimeEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

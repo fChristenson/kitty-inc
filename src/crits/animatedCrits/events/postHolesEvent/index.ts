@@ -4,7 +4,7 @@
 // floor and stalls, juddering and rumbling, sparks gushing out both sides,
 // then grinds down in heavy shoves until it punches through in a blast, and
 // a new worker springs up out of the hole. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,10 +47,10 @@ interface Hole {
 export const forcePostHolesEvent = registerWispEvent(
   KEY,
   "Post Holes",
-  () => CONFIG.postHolesEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { approachMs, stallMs, boreMs, staggerMs, holdMs, mergeMs } =
-      CONFIG.postHolesEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HOLES);
     if (hires.length === 0) return;
     const holes: Hole[] = hires.map((hire, k) => {

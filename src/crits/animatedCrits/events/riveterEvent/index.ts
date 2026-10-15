@@ -5,7 +5,7 @@
 // the bar jumps a crit tier, and the gun leaps to the next bar and rivets
 // that one quicker, the last bar's last rivet a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,9 +52,9 @@ interface Shot {
 export const forceRiveterEvent = registerWispEvent(
   KEY,
   "Riveter",
-  () => CONFIG.riveterEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { rivetsMs, holdMs, mergeMs } = CONFIG.riveterEvent;
+    const { rivetsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const shots: Shot[] = [];

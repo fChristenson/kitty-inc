@@ -6,7 +6,7 @@
 // lands free levels, swinging ever faster; the last swing slams its bar in a
 // huge blast and shake as the coins sweep into the total. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
@@ -34,9 +34,9 @@ const HIT_SHAKE: [number, number] = [0.5, 1.3];
 export const forcePendulumPourEvent = registerWispEvent(
   KEY,
   "Pendulum Pour",
-  () => CONFIG.pendulumPourEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swingsMs, holdMs, mergeMs } = CONFIG.pendulumPourEvent;
+    const { swingsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const pivot: Point = { x: bars[0].center.x, y: area.top + TOP };

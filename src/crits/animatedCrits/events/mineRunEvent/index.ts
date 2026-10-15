@@ -6,8 +6,8 @@
 // and the pistol drops each as the cart rattles by, then a big one standing
 // on the rails takes two. The cart bursts out of the tunnel's mouth onto the
 // floors and every bar in view takes a crit tier, top to bottom
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import {
@@ -42,6 +42,7 @@ import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { findRewardBars } from "../../eventRewards";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -129,7 +130,7 @@ interface Imp {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.mineRunEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -158,8 +159,8 @@ const cartAt = (z: number) =>
 function startMineRun(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   if (!area) return;
-  const { dropMs, rideMs, flyMs, tierGapMs } = CONFIG.mineRunEvent;
-  const { arriveMs } = CONFIG.flightStage;
+  const { dropMs, rideMs, flyMs, tierGapMs } = meta.values;
+  const { arriveMs } = FLIGHT_STAGE;
   const tier = context.critTier ?? pickCritTierByOdds();
   // the mouth's opening has the screen's shape, filling it as the cart lands
   const aspect = (area.bottom - area.top) / (area.right - area.left);

@@ -6,7 +6,7 @@
 // and a spurt of coins; then the whole window blazes white and clears back
 // to the screen in a huge blast and shake. Pays floor income × floor number
 // × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,10 +50,10 @@ const SHINE_SHAKE: [number, number] = [0.3, 0.9];
 export const forceStainedGlassEvent = registerWispEvent(
   KEY,
   "Stained Glass",
-  () => CONFIG.stainedGlassEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { leadMs, shineMs, blazeMs, holdMs, mergeMs } =
-      CONFIG.stainedGlassEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

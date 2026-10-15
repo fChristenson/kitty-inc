@@ -5,7 +5,7 @@
 // lines of the other colour in rippling cascades, the big swings a jolt;
 // gold takes the board, and every gold disc bursts into cash in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -136,9 +136,9 @@ const count = (board: Int8Array, who: number) =>
 export const forceOthelloEvent = registerWispEvent(
   KEY,
   "Othello",
-  () => CONFIG.othelloEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { movesMs, holdMs, mergeMs } = CONFIG.othelloEvent;
+    const { movesMs, holdMs, mergeMs } = meta.values;
     let game = playGame();
     for (let t = 1; t < TRIES; t++) {
       if (count(game.board, GOLD) > count(game.board, WHITE)) break;

@@ -7,7 +7,7 @@
 // screen; every kill a pop and a coin sucked into the hero, every level-up a
 // blast, the hero bursting at the end. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -78,10 +78,10 @@ interface Chain {
 export const forceSurvivorsEvent = registerWispEvent(
   KEY,
   "Survivors",
-  () => CONFIG.survivorsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { hordeMs, orbitAtMs, chainAtMs, novaAtMs, holdMs, mergeMs } =
-      CONFIG.survivorsEvent;
+      meta.values;
     const hero: Point = {
       x: (area.left + area.right) / 2,
       y: (area.top + area.bottom) / 2,

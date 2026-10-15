@@ -5,7 +5,7 @@
 // the blasts rolling on one after another; the last volley of eight lands
 // all at once in a cluster of huge blasts, and the total goes up in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,9 +51,9 @@ interface Bomb {
 export const forceBombHailEvent = registerWispEvent(
   KEY,
   "Bomb Hail",
-  () => CONFIG.bombHailEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hailMs, fallMs, holdMs, mergeMs } = CONFIG.bombHailEvent;
+    const { hailMs, fallMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const bombs: Bomb[] = VOLLEYS.flatMap((count, v) => {
       const final = v === VOLLEYS.length - 1;

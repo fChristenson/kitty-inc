@@ -5,7 +5,7 @@
 // puffs up all at once in a bang and a big jolt, firing spikes of cash out
 // every way, and pops in a huge blast and shake as the coins sweep into the
 // total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const RUMBLE_MS = 90;
 export const forcePufferEvent = registerWispEvent(
   KEY,
   "Puffer",
-  () => CONFIG.pufferEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gulpMs, spikeMs, holdMs, mergeMs } = CONFIG.pufferEvent;
+    const { gulpMs, spikeMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

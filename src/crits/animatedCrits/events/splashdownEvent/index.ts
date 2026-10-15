@@ -4,7 +4,7 @@
 // huge blast and shake; cash splashes up out of the impact in a crown of
 // rivers arcing out every way and raining back down, and the coins sweep
 // into the total. Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -40,10 +40,10 @@ const RUMBLE: [number, number] = [0.3, 1.2];
 export const forceSplashdownEvent = registerWispEvent(
   KEY,
   "Splashdown",
-  () => CONFIG.splashdownEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fallMs, splashMs, travelMs, holdMs, mergeMs } =
-      CONFIG.splashdownEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const span = Math.min(width, height);

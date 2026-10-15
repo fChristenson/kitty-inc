@@ -6,7 +6,7 @@
 // bar or lights a worker up a perma tier; then the whole chain blazes at
 // once, crackling, and every bar slams in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,10 +37,10 @@ type Target = { at: Point; bar?: RewardBar; worker?: RewardWorker };
 export const forceChainLightningEvent = registerWispEvent(
   KEY,
   "Chain Lightning",
-  () => CONFIG.chainLightningEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapsMs, boltMs, finaleMs, levelShare, holdMs, mergeMs } =
-      CONFIG.chainLightningEvent;
+      meta.values;
     const bars = context.upgradeFloorFree
       ? findRewardBars(floor, context).slice(0, MAX_BARS)
       : [];

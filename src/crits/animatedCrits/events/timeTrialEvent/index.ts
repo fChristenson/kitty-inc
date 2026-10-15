@@ -6,7 +6,7 @@
 // and slingshots past on the last straight in a whoosh and a jolt, then
 // dives onto the bar first, a big blast and a crit tier, the ghost slamming
 // in a beat behind in a huge one. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const FIRST_SHAKE = 1.8;
 export const forceTimeTrialEvent = registerWispEvent(
   KEY,
   "Time Trial",
-  () => CONFIG.timeTrialEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { raceMs, leadMs, beatMs, holdMs, mergeMs } = CONFIG.timeTrialEvent;
+    const { raceMs, leadMs, beatMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

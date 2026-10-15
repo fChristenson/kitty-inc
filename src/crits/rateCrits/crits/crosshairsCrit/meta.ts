@@ -6,4 +6,9 @@ export default {
   label: "Crosshairs",
   chance: 0.03,
   style: "beam",
+  values: {
+    // a bar's next payout this many times as big (its own ownPayout)
+    payout: 5,
+    ownPayout: 10,
+  },
 } satisfies CritMeta;

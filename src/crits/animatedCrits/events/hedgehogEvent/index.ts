@@ -6,7 +6,7 @@
 // the bullets bursting into coins where they hit the screen's edges; the
 // last bounce fires a huge triple ring and a river of cash slams into the
 // total in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -61,9 +61,9 @@ const BANG_GAP_MS = 60;
 export const forceHedgehogEvent = registerWispEvent(
   KEY,
   "Hedgehog",
-  () => CONFIG.hedgehogEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { bouncesMs, holdMs, mergeMs } = CONFIG.hedgehogEvent;
+    const { bouncesMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const box = {
       left: area.left + EDGE,

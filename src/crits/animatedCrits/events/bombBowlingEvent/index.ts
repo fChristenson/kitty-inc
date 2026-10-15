@@ -7,7 +7,7 @@
 // back row each bursting into a cluster; then the ball itself blows in the
 // middle of the wreckage in a colossal blast. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -57,9 +57,9 @@ interface Blast {
 export const forceBombBowlingEvent = registerWispEvent(
   KEY,
   "Bomb Bowling",
-  () => CONFIG.bombBowlingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { rollMs, chainMs, holdMs, mergeMs } = CONFIG.bombBowlingEvent;
+    const { rollMs, chainMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const dir = Math.random() < 0.5 ? 1 : -1;

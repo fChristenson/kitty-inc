@@ -6,7 +6,7 @@
 // into the total-income readout in a huge blast and shake, and the coins
 // sweep into the total. Pays floor income × floor number × REWARD (see
 // ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const OPEN_SPRAY: [number, number] = [60, 200];
 export const forceZipperEvent = registerWispEvent(
   KEY,
   "Zipper",
-  () => CONFIG.zipperEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { stitchMs, unzipMs, holdMs, mergeMs } = CONFIG.zipperEvent;
+    const { stitchMs, unzipMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const size = Math.max(WISP_SIZE, width * WISP);

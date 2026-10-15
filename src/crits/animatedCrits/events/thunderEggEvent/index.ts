@@ -6,7 +6,7 @@
 // hatches in a blinding flash and a crackling ball of lightning slams down
 // onto the bar in a huge blast and shake, and the bar jumps a crit tier.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -57,9 +57,9 @@ interface Strike {
 export const forceThunderEggEvent = registerWispEvent(
   KEY,
   "Thunder Egg",
-  () => CONFIG.thunderEggEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { strikesMs, dropMs, holdMs, mergeMs } = CONFIG.thunderEggEvent;
+    const { strikesMs, dropMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

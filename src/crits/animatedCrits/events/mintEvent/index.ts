@@ -5,7 +5,7 @@
 // every row a click and a jolt; the finished coin blazes, flips edge over
 // edge as it drops and lands flat on the bar, which jumps a crit tier in a
 // huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -35,10 +35,10 @@ const SOUND_GAP_MS = 60;
 export const forceMintEvent = registerWispEvent(
   KEY,
   "Mint",
-  () => CONFIG.mintEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pourMs, fallMs, blazeMs, dropMs, holdMs, mergeMs } =
-      CONFIG.mintEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

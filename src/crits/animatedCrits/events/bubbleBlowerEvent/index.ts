@@ -5,7 +5,7 @@
 // spray of coins, a bang and a jolt as the worker climbs a perma tier; the
 // wisp flits on to the next, quicker each time, the last pop a huge blast
 // and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const POP_SHAKE: [number, number] = [0.6, 1.3];
 export const forceBubbleBlowerEvent = registerWispEvent(
   KEY,
   "Bubble Blower",
-  () => CONFIG.bubbleBlowerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { blowsMs, holdMs, mergeMs } = CONFIG.bubbleBlowerEvent;
+    const { blowsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

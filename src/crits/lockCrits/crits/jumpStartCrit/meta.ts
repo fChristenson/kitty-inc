@@ -6,4 +6,9 @@ export default {
   label: "Jump Start",
   chance: 0.03,
   style: "charge",
+  values: {
+    // its payout from the floor it opens, in full payouts per the crit's
+    // multiple
+    payouts: 1,
+  },
 } satisfies CritMeta;

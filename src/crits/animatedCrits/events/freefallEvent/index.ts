@@ -5,8 +5,8 @@
 // that rooftop, walks to its far edge and tilts down over it at a small white
 // hole far below, crouches and jumps; it falls into the hole, the floors
 // appear in it and the view crash-lands back on them a crit tier higher
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
@@ -16,6 +16,7 @@ import { drawScreenPart, type ScreenCopy } from "../../../../shared/screenCopy";
 import { nextCritTier, pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -79,7 +80,7 @@ interface Camera {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.freefallEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startFreefall,
@@ -198,14 +199,14 @@ function holeInSight(top: number, y: number, z: number): number {
 }
 
 function startFreefall(floor: Floor, context: EventProcContext): void {
-  const { foldMs, walkMs, tiltMs, jumpMs, flyMs } = CONFIG.freefallEvent;
+  const { foldMs, walkMs, tiltMs, jumpMs, flyMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const walkAt = foldMs;
   const tiltAt = walkAt + walkMs;
   const jumpAt = tiltAt + tiltMs;
   const enterMs = jumpAt + jumpMs;
   // the fall lasts through the stage's arrival, landing at its crash
-  const landMs = flyMs + CONFIG.flightStage.arriveMs;
+  const landMs = flyMs + FLIGHT_STAGE.arriveMs;
   // where the view is `ms` into the way in; `top` the folded half's far edge
   const cameraAt = (ms: number, top: number): Camera => {
     // eyes on the far edge until the hole shows past it, then on the hole

@@ -7,7 +7,7 @@
 // forms where it lands, the line ever shorter and quicker; the leader
 // dances onto the last spot in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const DROP_SHAKE: [number, number] = [0.6, 1.2];
 export const forceCongaLineEvent = registerWispEvent(
   KEY,
   "Conga Line",
-  () => CONFIG.congaLineEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { danceMs, holdMs, mergeMs } = CONFIG.congaLineEvent;
+    const { danceMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     // the spots in a chain, each the nearest left to the last
     const left = findRewardHires(floor, context);

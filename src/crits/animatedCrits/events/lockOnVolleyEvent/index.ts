@@ -5,8 +5,8 @@
 // curls out from under the view and blows the whole squadron in a rattling
 // chain of blasts. Three volleys, the last a whirling ring round a huge one
 // in the middle; the view crash-lands and the floor goes up a perma tier
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { drawAimLaser, drawBeam } from "../../../../shared/animationStyles/beam";
 import { createBeats } from "../../../../shared/eventBeats";
@@ -106,7 +106,7 @@ interface Foe {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.lockOnVolleyEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&

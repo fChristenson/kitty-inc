@@ -6,7 +6,7 @@
 // onto every bar in view in turn, a blast and free levels each, the clicked
 // bar last in a barrage that lifts it a crit tier. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -84,9 +84,9 @@ interface Hit {
 export const forceDysonSphereEvent = registerWispEvent(
   KEY,
   "Dyson Sphere",
-  () => CONFIG.dysonSphereEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { levelShare, holdMs, mergeMs } = CONFIG.dysonSphereEvent;
+    const { levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

@@ -6,7 +6,7 @@
 // jolt and a burst of coins, the pillars coming faster and faster; through
 // the last it bursts in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -40,9 +40,9 @@ const PASS_SHAKE: [number, number] = [0.3, 1.1];
 export const forceFlappyWispEvent = registerWispEvent(
   KEY,
   "Flappy Wisp",
-  () => CONFIG.flappyWispEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pillarsMs, holdMs, mergeMs } = CONFIG.flappyWispEvent;
+    const { pillarsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;
     const birdX = area.left + width * X;

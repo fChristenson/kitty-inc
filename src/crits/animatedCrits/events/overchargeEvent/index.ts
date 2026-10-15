@@ -5,7 +5,7 @@
 // the lock swells with charge, the bolts coming ever faster; then every bar
 // fires at once into the lock, which bursts open in a huge blast and shake,
 // unlocked for free, as the screen unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -28,9 +28,9 @@ const FIRE_SHAKE: [number, number] = [0.5, 1.3];
 export const forceOverchargeEvent = registerWispEvent(
   KEY,
   "Overcharge",
-  () => CONFIG.overchargeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { firesMs, holdMs, mergeMs } = CONFIG.overchargeEvent;
+    const { firesMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     const found = findRewardBars(floor, context).slice(-MAX_BARS);
     if (!locked || found.length === 0) return;

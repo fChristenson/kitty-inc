@@ -6,7 +6,7 @@
 // bloop and a jolt; the glides get quicker and quicker, and the last shoots
 // it up into the total in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -41,9 +41,9 @@ const STOP_SHAKE: [number, number] = [0.35, 0.9];
 export const forceWaterStriderEvent = registerWispEvent(
   KEY,
   "Water Strider",
-  () => CONFIG.waterStriderEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { glidesMs, holdMs, mergeMs } = CONFIG.waterStriderEvent;
+    const { glidesMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     let clock = 0;

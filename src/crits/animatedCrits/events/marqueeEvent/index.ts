@@ -5,7 +5,7 @@
 // blazes at once with a bang and they all fire into the total-income
 // readout, the last in a huge blast and shake, and the coins sweep into the
 // total. Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ const HIT_BURST = 0.4;
 export const forceMarqueeEvent = registerWispEvent(
   KEY,
   "Marquee",
-  () => CONFIG.marqueeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { chaseMs, blazeMs, fireMs, holdMs, mergeMs } = CONFIG.marqueeEvent;
+    const { chaseMs, blazeMs, fireMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

@@ -5,7 +5,7 @@
 // with a flare, a bang and free levels; at the top of its last swing it
 // whips round onto the clicked floor's bar and locks on, blazing twice as
 // thick, and the bar jumps a crit tier in a huge blast and shake
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,10 +30,10 @@ const CUT_SHAKE: [number, number] = [0.5, 1.2];
 export const forceLaserPendulumEvent = registerWispEvent(
   KEY,
   "Laser Pendulum",
-  () => CONFIG.laserPendulumEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { swingMs, periodsMs, lockMs, levelShare, holdMs, mergeMs } =
-      CONFIG.laserPendulumEvent;
+      meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

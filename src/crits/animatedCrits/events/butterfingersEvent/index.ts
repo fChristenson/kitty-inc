@@ -7,7 +7,7 @@
 // jolting with free levels as the cash crashes down on it, the last in a
 // huge blast and shake. Pays floor income × floor number × REWARD, plus the
 // levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,10 +49,10 @@ const SPILL_SHAKE: [number, number] = [0.6, 1.3];
 export const forceButterfingersEvent = registerWispEvent(
   KEY,
   "Butterfingers",
-  () => CONFIG.butterfingersEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pourMs, walkMs, spillMs, levelShare, holdMs, mergeMs } =
-      CONFIG.butterfingersEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;

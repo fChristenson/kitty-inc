@@ -8,7 +8,7 @@
 // jolt, harder each time; on the last flash they all let go at once and
 // stream down onto the workers, who climb a perma tier. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -56,9 +56,9 @@ interface Drop {
 export const forceSyncEvent = registerWispEvent(
   KEY,
   "Sync",
-  () => CONFIG.syncEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, syncMs, dropMs, holdMs, mergeMs } = CONFIG.syncEvent;
+    const { growMs, syncMs, dropMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const n = COLS * ROWS;

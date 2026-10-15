@@ -5,7 +5,7 @@
 // and a jolt, drifting and correcting as it slows; it touches down on the
 // lock in a huge blast and shake and the floor bursts open, unlocked for
 // free, as the screen unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -33,9 +33,9 @@ const PUFF_SHAKE: [number, number] = [0.3, 0.8];
 export const forceLunarLanderEvent = registerWispEvent(
   KEY,
   "Lunar Lander",
-  () => CONFIG.lunarLanderEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { launchMs, descentMs, holdMs, mergeMs } = CONFIG.lunarLanderEvent;
+    const { launchMs, descentMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

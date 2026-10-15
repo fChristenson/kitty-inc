@@ -5,7 +5,7 @@
 // power out along its top, the chaser a beat behind. Then they dash for the
 // total-income readout and slam into it one after the other: a big blast,
 // then a huge one. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -61,9 +61,9 @@ interface Hit {
 export const forceCurvesEvent = registerWispEvent(
   KEY,
   "Curves",
-  () => CONFIG.curvesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { raceMs, gapMs, holdMs, mergeMs } = CONFIG.curvesEvent;
+    const { raceMs, gapMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const mid = (area.left + area.right) / 2;
     const total = totalSpot(area);

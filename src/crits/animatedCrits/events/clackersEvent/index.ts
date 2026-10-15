@@ -6,7 +6,7 @@
 // hand ever faster, every clack a flash, a crack and a jolt that lands free
 // levels on the bar; the last clack is a huge smash that slams the bar.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -42,10 +42,10 @@ interface Clack {
 export const forceClackersEvent = registerWispEvent(
   KEY,
   "Clackers",
-  () => CONFIG.clackersEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { growMs, clackMs, holdMs, mergeMs, levelShare } =
-      CONFIG.clackersEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

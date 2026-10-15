@@ -6,7 +6,7 @@
 // down into an income bar with a pop and a jolt that lands free levels,
 // the draws ever faster; the last ball lands in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -42,10 +42,10 @@ const LAND_SHAKE: [number, number] = [0.6, 1.3];
 export const forceLotteryEvent = registerWispEvent(
   KEY,
   "Lottery",
-  () => CONFIG.lotteryEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spinMs, drawsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.lotteryEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const drum: Point = {

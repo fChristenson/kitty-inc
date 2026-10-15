@@ -5,7 +5,7 @@
 // whirl; on its second stroke of midnight every hour flashes at once and the
 // hub blows in a huge blast and shake, and the coins sweep into the total.
 // Pays floor income × floor number × REWARD (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -45,9 +45,9 @@ const HOUR_BURST = 0.6;
 export const forceClockworkEvent = registerWispEvent(
   KEY,
   "Clockwork",
-  () => CONFIG.clockworkEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { tickMs, holdMs, mergeMs } = CONFIG.clockworkEvent;
+    const { tickMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const middle = {

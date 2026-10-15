@@ -4,8 +4,8 @@
 // from high lands on its own button with the biggest blast and a double
 // ring, and every button turns over: its next taps also level the floors
 // above and below it
+import meta from "./meta";
 import { defineTapPerk } from "../../buttonBonus";
-import { CONFIG } from "../../../../config";
 import {
   drawDrop,
   drawRipple,
@@ -88,7 +88,7 @@ const splashTaps = defineTapPerk("Splash", (t) => {
 registerFloorCrit("splashZoneCrit", {
   // splashing taps, twice as many on its own
   reward(t) {
-    const taps = Math.max(1, Math.round(t.count * CONFIG.crit.splashZoneTaps));
+    const taps = Math.max(1, Math.round(t.count * meta.values.taps));
     splashTaps.add(t.floor, t.own ? taps * 2 : taps);
     t.flipButton();
   },

@@ -6,7 +6,7 @@
 // income bar with a bang and a jolt that jumps the bar a crit tier; each
 // trick shot faster than the last; the final one ends in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const HIT_SHAKE: [number, number] = [0.9, 1.5];
 export const forceTrickShotEvent = registerWispEvent(
   KEY,
   "Trick Shot",
-  () => CONFIG.trickShotEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { setMs, speeds, gapMs, holdMs, mergeMs } = CONFIG.trickShotEvent;
+    const { setMs, speeds, gapMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -6,7 +6,7 @@
 // onto it as a new worker forms; it bounces back up into play and the far
 // side bumps, sets and spikes, rally after rally, every touch a splash and a
 // jolt, the last spike in a big blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -66,9 +66,9 @@ interface Rally {
 export const forceVolleyballEvent = registerWispEvent(
   KEY,
   "Volleyball",
-  () => CONFIG.volleyballEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, legMs, spikeMs, holdMs, mergeMs } = CONFIG.volleyballEvent;
+    const { growMs, legMs, spikeMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_POINTS);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

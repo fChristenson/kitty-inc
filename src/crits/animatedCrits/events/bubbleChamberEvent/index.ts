@@ -5,7 +5,7 @@
 // bubble chamber, spinning down onto an empty spot, where a new worker
 // forms with a pop and a jolt, the stray ones fizzling out in sparks; the
 // last in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,9 +49,9 @@ interface Track {
 export const forceBubbleChamberEvent = registerWispEvent(
   KEY,
   "Bubble Chamber",
-  () => CONFIG.bubbleChamberEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { curlMs, holdMs, mergeMs } = CONFIG.bubbleChamberEvent;
+    const { curlMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

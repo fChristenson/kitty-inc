@@ -4,7 +4,7 @@
 // wiggles as the coins land. When the stream ends the floor lands one regular
 // crit tier (x5/x25/x125 by the crit tier odds), applied and celebrated like
 // any crit
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import {
   drawUpgradeStarStill,
@@ -20,7 +20,7 @@ export const forceRenovateEvent = registerStreamTargetEvent({
   key: "renovate",
   cover: { label: "Renovate", color: COLOR.orange },
   stream: "coins",
-  chance: () => CONFIG.renovateEvent.chance,
+  chance: () => meta.chance,
   target: (floor) => ({
     x: getUpgradeIndicatorCenter(floor).x,
     y: (STAR_Y + STAR_BOTTOM_Y) / 2,

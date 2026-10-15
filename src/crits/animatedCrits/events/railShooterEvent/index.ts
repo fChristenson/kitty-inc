@@ -6,7 +6,7 @@
 // into it, muzzle flashing, in a flurry of pops and a jolt that lights the
 // worker up a perma tier; the last burst ends in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceRailShooterEvent = registerWispEvent(
   KEY,
   "Rail Shooter",
-  () => CONFIG.railShooterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dropMs, runMs, holdMs, mergeMs } = CONFIG.railShooterEvent;
+    const { dropMs, runMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

@@ -5,7 +5,7 @@
 // a blaze of gold behind, each gushing a river of cash out into the total;
 // at the end every hole flares at once in a huge blast and shake and they
 // all snap shut. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -72,9 +72,9 @@ interface Hole {
 export const forceSwissCheeseEvent = registerWispEvent(
   KEY,
   "Swiss Cheese",
-  () => CONFIG.swissCheeseEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { punchMs, flareGapMs, holdMs, mergeMs } = CONFIG.swissCheeseEvent;
+    const { punchMs, flareGapMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const spots: { at: Point; r: number }[] = [];
     for (let tries = 0; spots.length < HOLES && tries < 400; tries++) {

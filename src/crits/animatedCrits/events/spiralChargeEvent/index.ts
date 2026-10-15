@@ -5,7 +5,7 @@
 // the spiral, bang after bang, shake after shake, coins spraying from
 // every one, until the whole outer ring blows at once in a cluster round a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ interface Blast {
 export const forceSpiralChargeEvent = registerWispEvent(
   KEY,
   "Spiral Charge",
-  () => CONFIG.spiralChargeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { setupMs, chainMs, holdMs, mergeMs } = CONFIG.spiralChargeEvent;
+    const { setupMs, chainMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const hub: Point = {
       x: (area.left + area.right) / 2,

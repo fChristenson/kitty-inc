@@ -6,7 +6,7 @@
 // it reboots in a white flash and a huge blast and shake that sprays cash
 // everywhere, and the coins sweep into the total. Pays floor income × floor
 // number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -37,9 +37,9 @@ const REBOOT_REACH: [number, number] = [0.08, 0.6];
 export const forceGlitchEvent = registerWispEvent(
   KEY,
   "Glitch",
-  () => CONFIG.glitchEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, holdMs, mergeMs } = CONFIG.glitchEvent;
+    const { gapsMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const span = Math.min(width, height);

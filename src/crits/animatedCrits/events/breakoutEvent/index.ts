@@ -8,8 +8,8 @@
 // every brick left blows at once in a huge blast, flash and shake, spraying
 // coins that merge into the total. Pays floor income × floor number × REWARD
 // (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import {
@@ -111,7 +111,7 @@ interface Volley {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.breakoutEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) &&
@@ -120,7 +120,7 @@ registerEventProc(
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { dropMs, upMs, holdMs, mergeMs } = CONFIG.breakoutEvent;
+      const { dropMs, upMs, holdMs, mergeMs } = meta.values;
       const { isGroundFloor } = context;
       const box = getIncomeBarBox(isGroundFloor);
       const home = box.x + box.width / 2;

@@ -4,8 +4,8 @@
 // onto it, buffing it in little circles while shine bands sweep across and it
 // glows ever brighter, then they sink into it and it slams, shining: the floor
 // gets free upgrade levels. Then the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh, startBoostEventStreamLoop } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -94,7 +94,7 @@ let running: RunningPolish | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.polishEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -117,7 +117,7 @@ export function forcePolishEvent(floor: Floor): void {
 function lightAt(i: number, ms: number, cx: number, cy: number) {
   const appear = clamp01((ms - i * STAGGER_MS) / APPEAR_MS);
   if (appear <= 0) return null;
-  const { swirlMs } = CONFIG.polishEvent;
+  const { swirlMs } = meta.values;
   const tighten = ease(clamp01(ms / swirlMs));
   const converge = ease(clamp01((ms - swirlMs) / CONVERGE_MS));
   const sec = ms / 1000;
@@ -144,7 +144,7 @@ function drawOverlay(
   if (!rect) return;
   const now = performance.now();
   const ms = now - event.startedAt;
-  const { swirlMs } = CONFIG.polishEvent;
+  const { swirlMs } = meta.values;
   const buffed = ease(clamp01(ms / swirlMs));
   const box = getIncomeBarBox(event.isGroundFloor);
   const cx = box.x + box.width / 2;
@@ -188,7 +188,7 @@ function drawOverlay(
 function startPolish(floor: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen() || !context.upgradeFloorFree) return;
   const upgradeFloorFree = context.upgradeFloorFree;
-  const { swirlMs, holdMs, levelShare, minLevels } = CONFIG.polishEvent;
+  const { swirlMs, holdMs, levelShare, minLevels } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const event: RunningPolish = {
     floor,

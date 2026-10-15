@@ -6,4 +6,8 @@ export default {
   label: "Heavy Hand",
   chance: 0.03,
   style: "crush",
+  values: {
+    // taps landing three levels per the crit's multiple (twice on its own)
+    taps: 0.5,
+  },
 } satisfies CritMeta;

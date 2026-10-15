@@ -6,7 +6,7 @@
 // fan holds, shimmering, then snaps shut onto the clicked floor's bar,
 // every beam on it at once, and the bar jumps a crit tier in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,10 +36,10 @@ const CUT_SHAKE: [number, number] = [0.4, 1.1];
 export const forcePeacockEvent = registerWispEvent(
   KEY,
   "Peacock",
-  () => CONFIG.peacockEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { opensMs, snapMs, shimmerMs, shutMs, levelShare, holdMs, mergeMs } =
-      CONFIG.peacockEvent;
+      meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

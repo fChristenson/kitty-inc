@@ -6,4 +6,8 @@ export default {
   label: "Pull Up",
   chance: 0.03,
   style: "pull",
+  values: {
+    // the floor it opens this many times as fast for good
+    speed: 2,
+  },
 } satisfies CritMeta;

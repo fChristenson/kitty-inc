@@ -5,7 +5,7 @@
 // a free level, a big gold combo counter beside it popping x1, x2, x3 … as
 // it climbs; the last hit is a finisher, the counter slamming "COMBO!" with
 // a huge blast and shake and a pile of levels. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -41,9 +41,9 @@ const HIT_SHAKE: [number, number] = [0.3, 1.1];
 export const forceComboEvent = registerWispEvent(
   KEY,
   "Combo",
-  () => CONFIG.comboEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { hitsMs, jabMs, holdMs, mergeMs } = CONFIG.comboEvent;
+    const { hitsMs, jabMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const bar = found.find((b) => b.floor === floor) ?? found[0];
     if (!bar) return;

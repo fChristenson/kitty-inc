@@ -7,7 +7,7 @@
 // the skipper leaps sky-high over the last turn and slams down onto the bar,
 // which jumps a crit tier in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -48,10 +48,10 @@ const LAND_SHAKE: [number, number] = [0.3, 0.7];
 export const forceJumpRopeEvent = registerWispEvent(
   KEY,
   "Jump Rope",
-  () => CONFIG.jumpRopeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { jumpMs, leapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.jumpRopeEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

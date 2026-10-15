@@ -5,7 +5,7 @@
 // ball on the rebound, flicking the jack in a high arc onto an empty spot,
 // where a new worker forms with a pop and a jolt; toss after toss, ever
 // quicker, the last in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -59,9 +59,9 @@ interface Toss {
 export const forceJacksEvent = registerWispEvent(
   KEY,
   "Jacks",
-  () => CONFIG.jacksEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { tossesMs, flickMs, holdMs, mergeMs } = CONFIG.jacksEvent;
+    const { tossesMs, flickMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const cx = (area.left + area.right) / 2;

@@ -7,7 +7,7 @@
 // last flip drops every ball straight down onto its empty spot, each
 // landing as a new worker, the last in a huge blast. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -79,11 +79,11 @@ interface Ball {
 export const forceTopsyTurvyEvent = registerWispEvent(
   KEY,
   "Topsy-Turvy",
-  () => CONFIG.topsyTurvyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { launchMs, staggerMs, firstHopsMs, fallMs, hopsMs, dropMs } =
-      CONFIG.topsyTurvyEvent;
-    const { holdMs, mergeMs } = CONFIG.topsyTurvyEvent;
+      meta.values;
+    const { holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

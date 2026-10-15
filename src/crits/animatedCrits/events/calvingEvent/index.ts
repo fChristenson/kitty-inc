@@ -5,7 +5,7 @@
 // down flat onto its income bar in a crash of coins and a jolt of free
 // levels, each quicker than the last, the last smashing down in a huge
 // blast and shake. Pays floor income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,10 +46,10 @@ interface Slab {
 export const forceCalvingEvent = registerWispEvent(
   KEY,
   "Calving",
-  () => CONFIG.calvingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, topplesMs, levelShare, holdMs, mergeMs } =
-      CONFIG.calvingEvent;
+      meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => a.box.y - b.box.y);

@@ -6,7 +6,7 @@
 // land, the bursts ever thicker, until both guns pour one last crossing
 // stream into the top bar in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -42,9 +42,9 @@ const BANG_GAP_MS = 60;
 export const forceTracerRoundsEvent = registerWispEvent(
   KEY,
   "Tracer Rounds",
-  () => CONFIG.tracerRoundsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fireMs, levelShare, holdMs, mergeMs } = CONFIG.tracerRoundsEvent;
+    const { fireMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

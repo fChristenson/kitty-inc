@@ -7,7 +7,7 @@
 // round it into a blazing Einstein ring with a shake; then the ring breaks
 // into pieces flung off round it, each arcing down onto an empty spot as a
 // new worker, the last in a big blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -63,10 +63,10 @@ interface Piece {
 export const forceGravitationalLensEvent = registerWispEvent(
   KEY,
   "Gravitational Lens",
-  () => CONFIG.gravitationalLensEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, driftMs, ringMs, gapMs, dropMs, holdMs, mergeMs } =
-      CONFIG.gravitationalLensEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_PIECES);
     if (hires.length === 0) return;
     const centre: Point = {

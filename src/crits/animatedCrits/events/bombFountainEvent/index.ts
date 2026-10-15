@@ -6,7 +6,7 @@
 // into a cluster of smaller blasts round it; the last and biggest lands in
 // the middle and goes off in a ring of blasts round one huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -58,9 +58,9 @@ interface Blast {
 export const forceBombFountainEvent = registerWispEvent(
   KEY,
   "Bomb Fountain",
-  () => CONFIG.bombFountainEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, flightMs, holdMs, mergeMs } = CONFIG.bombFountainEvent;
+    const { gapsMs, flightMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

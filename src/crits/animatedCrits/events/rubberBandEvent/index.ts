@@ -6,7 +6,7 @@
 // jolt, free levels landing as it quivers flat; band after band down the
 // stack, drawn back less and snapped quicker each time, the last snapping
 // in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ interface Band {
 export const forceRubberBandEvent = registerWispEvent(
   KEY,
   "Rubber Band",
-  () => CONFIG.rubberBandEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { pullsMs, levelShare, holdMs, mergeMs } = CONFIG.rubberBandEvent;
+    const { pullsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

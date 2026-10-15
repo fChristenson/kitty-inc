@@ -5,7 +5,7 @@
 // knot tied with a splash, a bang and a jolt, until the tightest knot snaps
 // and whips the cash up into the total in a huge blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,9 +34,9 @@ const TIE_SHAKE: [number, number] = [0.7, 1.3];
 export const forceKnotEvent = registerWispEvent(
   KEY,
   "Knot",
-  () => CONFIG.knotEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { knotsMs, holdMs, mergeMs } = CONFIG.knotEvent;
+    const { knotsMs, holdMs, mergeMs } = meta.values;
     const hub: Point = {
       x: (area.left + area.right) / 2,
       y: (area.top + area.bottom) / 2 + 40,

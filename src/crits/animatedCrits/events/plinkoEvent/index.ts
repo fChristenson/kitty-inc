@@ -5,8 +5,8 @@
 // Each ball slams into the bottom in a burst, a bang and a shake, spraying
 // coins; the last lands in a huge blast and flash, and the coins merge into
 // the total. Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import {
@@ -129,7 +129,7 @@ function simulate(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.plinkoEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) &&
@@ -138,7 +138,7 @@ registerEventProc(
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { dropAt, holdMs, mergeMs } = CONFIG.plinkoEvent;
+      const { dropAt, holdMs, mergeMs } = meta.values;
       const width = area.right - area.left;
       const height = area.bottom - area.top;
       const gap = Math.min(

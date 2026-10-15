@@ -6,7 +6,7 @@
 // with a bang and a shake; then a cluster of sticks lands together and the
 // whole pool goes up round a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -57,10 +57,10 @@ interface Blast {
 export const forceDynamiteFishingEvent = registerWispEvent(
   KEY,
   "Dynamite Fishing",
-  () => CONFIG.dynamiteFishingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fillMs, sticksMs, flightMs, holdMs, mergeMs } =
-      CONFIG.dynamiteFishingEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

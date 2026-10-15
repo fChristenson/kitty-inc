@@ -5,20 +5,6 @@ import {
   CRIT_PROC_KINDS,
   type CritTier,
   CRIT_TIER_CONFIG,
-  BOOST_CRIT_COLOR,
-  BOOST_CRIT_LABEL,
-  BOUNCE_CRIT_LABEL,
-  EXPLOSION_CRIT_LABEL,
-  BOOTY_CRIT_COLOR,
-  BOOTY_CRIT_LABEL,
-  HEAVENLY_CRIT_COLOR,
-  HEAVENLY_CRIT_LABEL,
-  SUNSHINE_CRIT_COLOR,
-  SUNSHINE_CRIT_LABEL,
-  SNOWDAY_CRIT_COLOR,
-  SNOWDAY_CRIT_LABEL,
-  NIGHT_SHIFT_CRIT_COLOR,
-  NIGHT_SHIFT_CRIT_LABEL,
 } from "../critTypes";
 
 import { playCoinDrop } from "../../sound";
@@ -162,14 +148,22 @@ function celebrateChain(tier: CritTier): void {
 // boost crit (see upgradeButton.ts's isBoostCrit): same swap as chain above,
 // but with its own dedicated blue and an extra coin-drop sound
 function celebrateBoost(): void {
-  playSpecialFlash(BOOST_CRIT_LABEL, BOOST_CRIT_COLOR, explosionAndCoins);
+  playSpecialFlash(
+    CRIT_PROC_INFO.boost.label,
+    CRIT_PROC_INFO.boost.color,
+    explosionAndCoins,
+  );
 }
 
 // sunshine crit (see upgradeButton.ts's isSunshineCrit): same celebration
 // shape as boost above (the reward itself — a longer-lasting free worker
 // boost — is applied by floorInteractions.ts), just its own dedicated gold
 function celebrateSunshine(): void {
-  playSpecialFlash(SUNSHINE_CRIT_LABEL, SUNSHINE_CRIT_COLOR, explosionAndCoins);
+  playSpecialFlash(
+    CRIT_PROC_INFO.sunshine.label,
+    CRIT_PROC_INFO.sunshine.color,
+    explosionAndCoins,
+  );
 }
 
 // snowday crit (see upgradeButton.ts's isSnowdayCrit): same celebration
@@ -177,7 +171,11 @@ function celebrateSunshine(): void {
 // free worker boost — is applied by floorInteractions.ts), its own dedicated
 // frost color
 function celebrateSnowday(): void {
-  playSpecialFlash(SNOWDAY_CRIT_LABEL, SNOWDAY_CRIT_COLOR, explosionAndCoins);
+  playSpecialFlash(
+    CRIT_PROC_INFO.snowday.label,
+    CRIT_PROC_INFO.snowday.color,
+    explosionAndCoins,
+  );
 }
 
 // night shift crit (see upgradeButton.ts's isNightShiftCrit): same
@@ -186,8 +184,8 @@ function celebrateSnowday(): void {
 // — is applied by floorInteractions.ts), its own dedicated midnight indigo
 function celebrateNightShift(): void {
   playSpecialFlash(
-    NIGHT_SHIFT_CRIT_LABEL,
-    NIGHT_SHIFT_CRIT_COLOR,
+    CRIT_PROC_INFO.nightShift.label,
+    CRIT_PROC_INFO.nightShift.color,
     explosionAndCoins,
   );
 }
@@ -197,7 +195,7 @@ function celebrateNightShift(): void {
 // bottom up is applied by floorInteractions.ts, this only covers the
 // celebration moment)
 function celebrateBounce(tier: CritTier): void {
-  playSpecialFlash(BOUNCE_CRIT_LABEL, tierColor(tier));
+  playSpecialFlash(CRIT_PROC_INFO.bounce.label, tierColor(tier));
 }
 
 // heavenly crit (see upgradeButton.ts's isHeavenlyCrit): the single biggest
@@ -207,7 +205,11 @@ function celebrateBounce(tier: CritTier): void {
 // max every tier/grant every floor a max-tier upgrade batch) is applied by
 // floorInteractions.ts, this only covers the celebration moment
 function celebrateHeavenly(): void {
-  playTierFlash("ultra", HEAVENLY_CRIT_LABEL, HEAVENLY_CRIT_COLOR);
+  playTierFlash(
+    "ultra",
+    CRIT_PROC_INFO.heavenly.label,
+    CRIT_PROC_INFO.heavenly.color,
+  );
 }
 
 // pair/three of a kind/four of a kind/full house/tick tock crits (see
@@ -224,12 +226,16 @@ function celebrateFlatProc(label: string, color: string): void {
 // explosion is the one proc whose flash takes the LANDED TIER's color rather
 // than a dedicated one of its own
 function celebrateExplosion(tier: CritTier): void {
-  celebrateFlatProc(EXPLOSION_CRIT_LABEL, tierColor(tier));
+  celebrateFlatProc(CRIT_PROC_INFO.explosion.label, tierColor(tier));
 }
 
 // booty adds a coin drop sound on top of the standard flash
 function celebrateBooty(): void {
-  playSpecialFlash(BOOTY_CRIT_LABEL, BOOTY_CRIT_COLOR, explosionAndCoins);
+  playSpecialFlash(
+    CRIT_PROC_INFO.booty.label,
+    CRIT_PROC_INFO.booty.color,
+    explosionAndCoins,
+  );
 }
 
 // chain and boost are both "special" procs riding the SAME landed tier (see

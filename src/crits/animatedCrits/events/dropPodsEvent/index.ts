@@ -5,7 +5,7 @@
 // goes off in a white blast, a bang and a big jolt, and a new worker stands
 // up out of it; they rain in ever faster, the last in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,9 +34,9 @@ const SLAM_SHAKE: [number, number] = [0.8, 1.5];
 export const forceDropPodsEvent = registerWispEvent(
   KEY,
   "Drop Pods",
-  () => CONFIG.dropPodsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, fallMs, holdMs, mergeMs } = CONFIG.dropPodsEvent;
+    const { gapsMs, fallMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const side = Math.random() < 0.5 ? -1 : 1;

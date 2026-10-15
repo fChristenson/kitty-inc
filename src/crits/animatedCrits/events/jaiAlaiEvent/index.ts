@@ -6,7 +6,7 @@
 // under it, catches it in the basket, loops it round and hurls it at the next
 // bar, ever faster; the last throw smashes into the clicked floor's bar in
 // a big blast and every bar slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -50,10 +50,10 @@ interface Throw {
 export const forceJaiAlaiEvent = registerWispEvent(
   KEY,
   "Jai Alai",
-  () => CONFIG.jaiAlaiEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, loopMs, hurlMs, backMs, levelShare, holdMs, mergeMs } =
-      CONFIG.jaiAlaiEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

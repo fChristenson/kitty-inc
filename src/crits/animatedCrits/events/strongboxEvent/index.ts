@@ -6,7 +6,7 @@
 // by shove, each harder, until it punches through and the total bursts open
 // in a huge blast and shake, cash flying out of it. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -32,10 +32,10 @@ const PUSH_SHAKE: [number, number] = [0.35, 0.8];
 export const forceStrongboxEvent = registerWispEvent(
   KEY,
   "Strongbox",
-  () => CONFIG.strongboxEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { approachMs, stallMs, boreMs, holdMs, mergeMs } =
-      CONFIG.strongboxEvent;
+      meta.values;
     const total = totalSpot(area);
     const side = Math.random() < 0.5 ? -1 : 1;
     const target: Point = { x: total.x, y: total.y + 24 };

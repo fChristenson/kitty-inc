@@ -4,7 +4,7 @@
 // collide in a towering splash, a bang and a big jolt, and a geyser of cash
 // erupts out of the crash straight up into the total in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,10 +30,10 @@ const CRASH_SHAKE = 1.4;
 export const forceCrossroadsEvent = registerWispEvent(
   KEY,
   "Crossroads",
-  () => CONFIG.crossroadsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { streamMs, travelMs, eruptMs, holdMs, mergeMs } =
-      CONFIG.crossroadsEvent;
+      meta.values;
     const center: Point = {
       x: (area.left + area.right) / 2,
       y: (area.top + area.bottom) / 2 + 40,

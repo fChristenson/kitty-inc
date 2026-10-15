@@ -6,8 +6,8 @@
 // then the whole swarm dives in at once as the bar slams in a huge explosion
 // and jumps one crit tier. Then the screen unfreezes and the crit's tier
 // pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -126,7 +126,7 @@ let running: RunningPummel | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.pummelEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -178,7 +178,7 @@ function planPummel(box: {
   width: number;
   height: number;
 }): { strikers: Striker[]; hits: Hit[]; finaleAt: number; landAt: number } {
-  const { strikeMs, bounceMs } = CONFIG.pummelEvent;
+  const { strikeMs, bounceMs } = meta.values;
   const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   const halfW = box.width / 2;
   const halfH = box.height / 2;
@@ -229,7 +229,7 @@ function wander(striker: Striker, ms: number): Point {
 // into the bar, bouncing back off it to its next spot, until it dives in for
 // good with the finale
 function strikerAt(striker: Striker, ms: number): Point | null {
-  const { strikeMs, bounceMs } = CONFIG.pummelEvent;
+  const { strikeMs, bounceMs } = meta.values;
   const { dives } = striker;
   if (ms < striker.appearAt || ms >= dives[dives.length - 1].at) return null;
   for (let k = 0; k < dives.length; k++) {
@@ -350,7 +350,7 @@ function drawOverlay(
       ms,
       now,
       WISP_SIZE * pop,
-      ms >= striker.dives[0].at - CONFIG.pummelEvent.strikeMs ? 1 : 0.3,
+      ms >= striker.dives[0].at - meta.values.strikeMs ? 1 : 0.3,
     );
   }
   if (pummel.blastAt !== null)
@@ -369,7 +369,7 @@ function drawOverlay(
 
 function startPummel(floor: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen()) return;
-  const { holdMs } = CONFIG.pummelEvent;
+  const { holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const box = getIncomeBarBox(context.isGroundFloor);
   const { strikers, hits, finaleAt, landAt } = planPummel(box);

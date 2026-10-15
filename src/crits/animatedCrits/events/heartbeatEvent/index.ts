@@ -5,8 +5,8 @@
 // levels. The beats come ever faster and taller; the last spikes to the top
 // of the screen and slams down into the button in a huge blast and shake.
 // Then the screen unfreezes and the crit's tier pays
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import {
@@ -97,7 +97,7 @@ let running: RunningHeartbeat | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.heartbeatEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (_floor, context) =>
       !running &&
@@ -151,7 +151,7 @@ function startHeartbeat(floor: Floor, context: EventProcContext): void {
     holdMs,
     levelShare,
     minLevels,
-  } = CONFIG.heartbeatEvent;
+  } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const button = getButtonCenter(context.isGroundFloor);
   const room = Math.max(0, button.y - (area.top + TOP_MARGIN));

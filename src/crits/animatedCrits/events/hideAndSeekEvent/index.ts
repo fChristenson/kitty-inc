@@ -6,7 +6,7 @@
 // hiding spot to hiding spot, ever faster; every one it finds bursts out
 // with a flash, a pop and a jolt and its worker lights up a perma tier; the
 // last find is a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,10 +41,10 @@ const FIND_SHAKE: [number, number] = [0.6, 1.4];
 export const forceHideAndSeekEvent = registerWispEvent(
   KEY,
   "Hide and Seek",
-  () => CONFIG.hideAndSeekEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { hideMs, countMs, dashesMs, holdMs, mergeMs } =
-      CONFIG.hideAndSeekEvent;
+      meta.values;
     const left = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (left.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

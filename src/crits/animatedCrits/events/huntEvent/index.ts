@@ -3,8 +3,8 @@
 // (crits/animatedCrits/events/boostEvent) flies from the button into the on-screen mouse. When it
 // ends the mouse grows, turns red and restarts its time on screen; clicking
 // it then (see src/spawn/mouse) also multiplies the player's total income
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { playBoostEventStream } from "../../../../sound";
 import { createEventFx, type EventFx } from "../../../../shared/eventFx";
 import { triggerEventEndSlam } from "../../../../shared/eventEndSlam";
@@ -55,7 +55,7 @@ function isTargetOnScreen(getOnScreenFloors: OnScreenFloors | undefined) {
 // only while the mouse is on screen; in progress until the hunted mouse is gone
 registerEventProc({
   key: "hunt",
-  chance: () => CONFIG.huntEvent.chance,
+  chance: () => meta.chance,
   isInProgress: (floor) =>
     running !== null || isHuntEventArmed(floor) || isHuntTargetHunted(),
   canArm: (_floor, { getOnScreenFloors }) =>

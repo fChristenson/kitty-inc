@@ -5,7 +5,7 @@
 // the last and biggest slams down onto the clicked floor's button in a huge
 // blast and shake that sprays cash everywhere, and the coins sweep into the
 // total. Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const FINAL_REACH: [number, number] = [0.1, 0.55];
 export const forceIonStormEvent = registerWispEvent(
   KEY,
   "Ion Storm",
-  () => CONFIG.ionStormEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { aimMs, gapsMs, holdMs, mergeMs } = CONFIG.ionStormEvent;
+    const { aimMs, gapsMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const span = Math.min(width, height);

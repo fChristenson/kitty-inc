@@ -5,7 +5,7 @@
 // sprouts up out of it with a flash and a jolt; then it swoops on to the
 // next spot, quicker each time, the last sprouting in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -61,9 +61,9 @@ interface Seeding {
 export const forceHydroseederEvent = registerWispEvent(
   KEY,
   "Hydroseeder",
-  () => CONFIG.hydroseederEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { passesMs, holdMs, mergeMs } = CONFIG.hydroseederEvent;
+    const { passesMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context)
       .slice(0, MAX_HIRES)
       .sort((a, b) => a.x - b.x);

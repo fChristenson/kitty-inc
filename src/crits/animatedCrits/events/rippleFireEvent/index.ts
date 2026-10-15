@@ -6,7 +6,7 @@
 // ends in toward the middle, faster still; then every gun fires at once,
 // each timed so the whole volley slams into the bar together, and it jumps
 // a crit tier in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -42,10 +42,10 @@ interface Shot {
 export const forceRippleFireEvent = registerWispEvent(
   KEY,
   "Ripple Fire",
-  () => CONFIG.rippleFireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { readyMs, rippleMs, passGapMs, speed, holdMs, mergeMs } =
-      CONFIG.rippleFireEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

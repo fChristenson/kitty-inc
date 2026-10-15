@@ -6,7 +6,7 @@
 // levels on the bar; wound all the way in, the wisp slams into the bar,
 // which jumps a crit tier in a huge blast of cash and shake. Pays floor
 // income × floor number × REWARD, plus the levels and tier
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,10 +35,10 @@ const LAP_SHAKE: [number, number] = [0.6, 1.4];
 export const forceTetherballEvent = registerWispEvent(
   KEY,
   "Tetherball",
-  () => CONFIG.tetherballEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { launchMs, spinMs, levelShare, holdMs, mergeMs } =
-      CONFIG.tetherballEvent;
+      meta.values;
     const own = findRewardBars(floor, context).find((b) => b.floor === floor);
     if (!own) return;
     const pole = own.center;

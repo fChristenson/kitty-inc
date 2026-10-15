@@ -5,7 +5,7 @@
 // view; as each river lands it splashes with a bloop and a jolt and a new
 // worker forms there; the last lands in a huge blast and shake and the coins
 // sweep into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -39,10 +39,10 @@ const LAND_SHAKE: [number, number] = [0.5, 1.3];
 export const forceShowerheadEvent = registerWispEvent(
   KEY,
   "Showerhead",
-  () => CONFIG.showerheadEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.showerheadEvent;
+      meta.values;
     const hires = findRewardHires(floor, context)
       .slice(0, MAX_HIRES)
       .sort((a, b) => a.x - b.x);

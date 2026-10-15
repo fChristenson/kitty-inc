@@ -7,7 +7,7 @@
 // next bar, a rolling chain bar after bar; a giant puck glides last onto the
 // clicked floor's bar and goes up in a colossal ring of blasts, the bar
 // jumping a crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -64,10 +64,10 @@ interface Blast {
 export const forceBombShuffleboardEvent = registerWispEvent(
   KEY,
   "Bomb Shuffleboard",
-  () => CONFIG.bombShuffleboardEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { slideMs, fuseMs, giantFuseMs, levelShare, holdMs, mergeMs } =
-      CONFIG.bombShuffleboardEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

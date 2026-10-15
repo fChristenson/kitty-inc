@@ -5,7 +5,7 @@
 // they shiver apart and snap into a new, finer figure, again and again,
 // every change a hum and a jolt; on the last they leap up into the total in
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -55,9 +55,9 @@ function nodes([n, m]: [number, number], count: number): Point[] {
 export const forceChladniEvent = registerWispEvent(
   KEY,
   "Chladni",
-  () => CONFIG.chladniEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { toneMs, holdMs, mergeMs } = CONFIG.chladniEvent;
+    const { toneMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const side = Math.min(width * PLATE[0], height * PLATE[1]);

@@ -5,7 +5,7 @@
 // faster, a widening triangle of chaotic gold patterns pouring down the
 // screen with a jolt at every surge; then the whole pattern bursts into
 // cash in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,9 +30,9 @@ const FINAL_SHAKE = 2.0;
 export const forceRule30Event = registerWispEvent(
   KEY,
   "Rule 30",
-  () => CONFIG.rule30Event.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pourMs, holdMs, mergeMs } = CONFIG.rule30Event;
+    const { pourMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

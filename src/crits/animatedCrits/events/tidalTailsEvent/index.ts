@@ -6,7 +6,7 @@
 // orbits, every few torn loose a pop; as the galaxies sail apart the tails
 // rain down onto the workers, each climbing a perma tier as its stars land,
 // the last in a big blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -68,10 +68,10 @@ interface Torn {
 export const forceTidalTailsEvent = registerWispEvent(
   KEY,
   "Tidal Tails",
-  () => CONFIG.tidalTailsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, passMs, gapMs, dropMs, holdMs, mergeMs } =
-      CONFIG.tidalTailsEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const mid: Point = {

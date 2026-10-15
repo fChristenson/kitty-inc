@@ -7,7 +7,7 @@
 // doubles every generation, ever faster, every split landing free levels on
 // the bar under it with a shake; it goes critical in a colossal blast on
 // the clicked bar and every bar slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -72,9 +72,9 @@ interface Half {
 export const forceFissionEvent = registerWispEvent(
   KEY,
   "Fission",
-  () => CONFIG.fissionEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, holdMs, mergeMs, levelShare } = CONFIG.fissionEvent;
+    const { growMs, holdMs, mergeMs, levelShare } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

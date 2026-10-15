@@ -6,7 +6,7 @@
 // water into the total-income readout in a huge blast and shake, and the
 // coins sweep into the total. Pays floor income × floor number × REWARD
 // (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -47,10 +47,10 @@ const SPLASH_SHAKE = [1, 1.4, 1.8];
 export const forceFishingEvent = registerWispEvent(
   KEY,
   "Fishing",
-  () => CONFIG.fishingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { castMs, streamMs, bitesMs, strikeMs, holdMs, mergeMs } =
-      CONFIG.fishingEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

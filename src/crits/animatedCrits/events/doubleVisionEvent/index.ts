@@ -5,7 +5,7 @@
 // coins spilling out of the middle; then they slam back together into one
 // sharp screen in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -36,9 +36,9 @@ const GHOSTS = [
 export const forceDoubleVisionEvent = registerWispEvent(
   KEY,
   "Double Vision",
-  () => CONFIG.doubleVisionEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { lurchesMs, holdMs, mergeMs } = CONFIG.doubleVisionEvent;
+    const { lurchesMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

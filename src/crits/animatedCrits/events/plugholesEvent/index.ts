@@ -5,7 +5,7 @@
 // drain the screen gulp by gulp, the glitter swirling down into whichever
 // is nearest; each, full, drops its heap into the spot below as a new
 // worker, the last in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -58,10 +58,10 @@ const POP_SHAKE = 0.8;
 export const forcePlugholesEvent = registerWispEvent(
   KEY,
   "Plugholes",
-  () => CONFIG.plugholesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spillMs, openGapMs, drainMs, popMs, popGapMs, holdMs, mergeMs } =
-      CONFIG.plugholesEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HOLES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

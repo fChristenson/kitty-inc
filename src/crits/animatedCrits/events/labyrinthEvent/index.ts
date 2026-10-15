@@ -6,7 +6,7 @@
 // farthest corner; then the one true path back blazes with light and a
 // river of cash rushes along it into the total in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,10 +36,10 @@ const SOLVE_SHAKE = 1.6;
 export const forceLabyrinthEvent = registerWispEvent(
   KEY,
   "Labyrinth",
-  () => CONFIG.labyrinthEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { appearMs, floodMs, blazeMs, holdMs, mergeMs } =
-      CONFIG.labyrinthEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

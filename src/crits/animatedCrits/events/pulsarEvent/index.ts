@@ -6,7 +6,7 @@
 // popping and throwing coins out where a beam meets the screen's edge; then it
 // collapses in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -37,9 +37,9 @@ const SWEEP_SHAKE: [number, number] = [0.25, 1];
 export const forcePulsarEvent = registerWispEvent(
   KEY,
   "Pulsar",
-  () => CONFIG.pulsarEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, holdMs, mergeMs } = CONFIG.pulsarEvent;
+    const { spinMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

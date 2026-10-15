@@ -5,7 +5,7 @@
 // with a flash, a bloop and a jolt that lights the worker up a perma tier;
 // then the ribbon whips up into the total, which goes off in a huge blast
 // and shake. Pays floor income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -43,9 +43,9 @@ const WRAP_SHAKE: [number, number] = [0.6, 1.4];
 export const forceGiftWrapEvent = registerWispEvent(
   KEY,
   "Gift Wrap",
-  () => CONFIG.giftWrapEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { travelMs, streamMs, holdMs, mergeMs } = CONFIG.giftWrapEvent;
+    const { travelMs, streamMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const workers = findRewardWorkers(floor, context)
       .sort((a, b) => a.at.x - b.at.x)

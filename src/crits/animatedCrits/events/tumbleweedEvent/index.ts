@@ -5,7 +5,7 @@
 // the far side a gust catches it and hurls it back in three giant bounds,
 // the last slamming down in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -36,9 +36,9 @@ const BOUNCE_SHAKE: [number, number] = [0.4, 1.3];
 export const forceTumbleweedEvent = registerWispEvent(
   KEY,
   "Tumbleweed",
-  () => CONFIG.tumbleweedEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hopsMs, boundsMs, holdMs, mergeMs } = CONFIG.tumbleweedEvent;
+    const { hopsMs, boundsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const ltr = button.x < (area.left + area.right) / 2;
     const near = ltr ? area.left + EDGE : area.right - EDGE;

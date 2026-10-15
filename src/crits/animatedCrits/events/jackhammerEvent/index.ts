@@ -4,8 +4,8 @@
 // then it blows apart on the button in a huge blast and shake that sprays
 // coins over the whole screen, and they all sweep into the total. Pays floor
 // income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -53,11 +53,11 @@ const SPARK_SIZE = 22;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.jackhammerEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const { hammerMs, holdMs, mergeMs } = CONFIG.jackhammerEvent;
+      const { hammerMs, holdMs, mergeMs } = meta.values;
       const button = getButtonCenter(context.isGroundFloor);
       const contact = { x: button.x, y: button.y - CONTACT };
       // taps done by ms in: the integral of the speeding-up tap rate

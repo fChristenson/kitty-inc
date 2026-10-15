@@ -5,7 +5,7 @@
 // splash and a boing and caught with a flash and a jolt that lights the
 // worker up a perma tier, the passes snapping quicker and harder; the last
 // catch goes off in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ interface Catch {
 export const forceBouncePassEvent = registerWispEvent(
   KEY,
   "Bounce Pass",
-  () => CONFIG.bouncePassEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { legMs, holdMs, mergeMs } = CONFIG.bouncePassEvent;
+    const { legMs, holdMs, mergeMs } = meta.values;
     const found = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (found.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

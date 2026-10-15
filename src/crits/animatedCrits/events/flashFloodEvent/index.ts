@@ -5,7 +5,7 @@
 // whoosh and a jolt; the flood gains on it the whole way and swallows it as
 // it reaches the total, in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -39,9 +39,9 @@ const SWERVE_SHAKE: [number, number] = [0.4, 1.2];
 export const forceFlashFloodEvent = registerWispEvent(
   KEY,
   "Flash Flood",
-  () => CONFIG.flashFloodEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.flashFloodEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     const left = area.left + EDGE;

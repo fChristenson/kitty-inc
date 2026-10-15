@@ -2,8 +2,8 @@
 // coins and bills pour in from all four screen edges and swirl round in a
 // tightening whirlpool just above the screen's center, then into the total
 // (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -74,11 +74,11 @@ function swirlPath(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.vortexEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const { streamMs, travelMs } = CONFIG.vortexEvent;
+      const { streamMs, travelMs } = meta.values;
       const durationMs =
         streamMs + travelMs * 1.03 + FLOW_FLIGHT_MS + END_PAUSE_MS;
       const cover = startMoneyCover(KEY, floor, context, { durationMs }, {});

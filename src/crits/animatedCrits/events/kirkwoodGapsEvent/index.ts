@@ -7,7 +7,7 @@
 // whoosh and a jolt; each wisp is flung off its orbit and arcs down onto an
 // empty spot as a new worker, the last in a big blast. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -66,10 +66,10 @@ interface Gap {
 export const forceKirkwoodGapsEvent = registerWispEvent(
   KEY,
   "Kirkwood Gaps",
-  () => CONFIG.kirkwoodGapsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, firstMs, gapMs, sweepMs, dropMs, holdMs, mergeMs } =
-      CONFIG.kirkwoodGapsEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, RESONANCES.length);
     if (hires.length === 0) return;
     const centre: Point = {

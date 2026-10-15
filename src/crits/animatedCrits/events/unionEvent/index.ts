@@ -4,8 +4,8 @@
 // and wiggles. It then unfreezes: the merged workers are gone (and can be
 // hired again) and the target has gained one perma tier per merged worker,
 // plus each merged worker's own perma tiers, up to the top tier
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { isFloorLocked } from "../../../../shared/detachedJob";
 import { playBoostEventStream } from "../../../../sound";
 import { createEventFx, type EventFx } from "../../../../shared/eventFx";
@@ -50,7 +50,7 @@ let running: RunningUnion | null = null;
 // only while this floor has 2+ workers and a target that isn't maxed yet
 registerEventProc({
   key: "union",
-  chance: () => CONFIG.unionEvent.chance,
+  chance: () => meta.chance,
   isInProgress: (floor) => running !== null || isUnionEventArmed(floor),
   canArm: (floor) => !isFloorLocked(floor) && getUnionPlan(floor) !== null,
   arm: armUnionEvent,

@@ -6,7 +6,7 @@
 // and a jolt and climbs a perma tier, the pool shrinking as they drink;
 // the last sip lands in a huge blast and shake as the cash sweeps into the
 // total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,10 +40,10 @@ const SIP_SHAKE: [number, number] = [0.5, 1.2];
 export const forceDrinkingStrawEvent = registerWispEvent(
   KEY,
   "Drinking Straw",
-  () => CONFIG.drinkingStrawEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fillMs, sipsMs, sipMs, holdMs, mergeMs } =
-      CONFIG.drinkingStrawEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

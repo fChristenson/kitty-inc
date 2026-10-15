@@ -5,7 +5,7 @@
 // flashing, and every clay it hits shatters in a flash, a crack, a jolt
 // and a shower of coins; the last clay goes off in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceSkeetShootEvent = registerWispEvent(
   KEY,
   "Skeet Shoot",
-  () => CONFIG.skeetShootEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, arcMs, holdMs, mergeMs } = CONFIG.skeetShootEvent;
+    const { gapsMs, arcMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const shooter: Point = { x: button.x, y: button.y - UP };
     const h = area.bottom - area.top;

@@ -5,8 +5,8 @@
 // lock flares as the vine closes round it, and it bursts into bloom at its top.
 // Then the screen unfreezes, both floors it climbed unlock for free (rolling
 // their own unlock crits) and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh, startBoostEventStreamLoop } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -83,7 +83,7 @@ function findLocked(floor: Floor, context: EventProcContext): Floor | null {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.beanstalkEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running && !isScreenFrozen() && findLocked(floor, context) !== null,
@@ -100,7 +100,7 @@ export function forceBeanstalkEvent(floor: Floor): void {
 
 // how far up its climb the vine is ms in, 0..1
 function progressAt(ms: number): number {
-  return ease(Math.min(1, Math.max(0, ms / CONFIG.beanstalkEvent.growMs)));
+  return ease(Math.min(1, Math.max(0, ms / meta.values.growMs)));
 }
 
 // when the climb reaches share p
@@ -112,7 +112,7 @@ function timeAt(p: number): number {
     if (ease(mid) < p) lo = mid;
     else hi = mid;
   }
-  return lo * CONFIG.beanstalkEvent.growMs;
+  return lo * meta.values.growMs;
 }
 
 // the vine at share p of its climb: where it is, and how far round toward
@@ -240,7 +240,7 @@ function drawOverlay(
   }
 
   drawVine(ctx, event, grown, true, now);
-  const { growMs } = CONFIG.beanstalkEvent;
+  const { growMs } = meta.values;
   drawWisp(
     ctx,
     (t) => (t < 0 || t > growMs ? null : vineAt(event, progressAt(t))),
@@ -269,7 +269,7 @@ function startBeanstalk(floor: Floor, context: EventProcContext): void {
   const rect = locked && context.getFloorRect?.(locked);
   const unlockFloorFree = context.unlockFloorFree;
   if (!locked || !rect || !unlockFloorFree) return;
-  const { growMs, holdMs, secondUnlockMs } = CONFIG.beanstalkEvent;
+  const { growMs, holdMs, secondUnlockMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   // up from the top unlocked floor, round the locked one and the next above it
   const baseY = rect.top + FLOOR_H + SPROUT;

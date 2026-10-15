@@ -5,8 +5,8 @@
 // up, it flies on up into the total-income readout and explodes in a huge
 // blast and shake, coins bursting out of it, and all the coins sweep into the
 // total. Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -58,14 +58,14 @@ const SPARK_SIZE = 22;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.eternityEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { entryMs, passMs, shootMs, holdMs, mergeMs } =
-        CONFIG.eternityEvent;
+        meta.values;
       const width = area.right - area.left;
       const middle = {
         x: (area.left + area.right) / 2,

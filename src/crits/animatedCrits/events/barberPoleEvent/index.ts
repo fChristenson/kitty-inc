@@ -5,7 +5,7 @@
 // together in a flash and a jolt and the bar jumps a crit tier, the bars
 // finishing one after another, the last in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ interface Pole {
 export const forceBarberPoleEvent = registerWispEvent(
   KEY,
   "Barber Pole",
-  () => CONFIG.barberPoleEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { staggerMs, spinMs, holdMs, mergeMs } = CONFIG.barberPoleEvent;
+    const { staggerMs, spinMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     // each pole spins a little shorter than the last

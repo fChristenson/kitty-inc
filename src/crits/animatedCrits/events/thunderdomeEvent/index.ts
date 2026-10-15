@@ -5,7 +5,7 @@
 // bar, every snap a crack, a bang and a big jolt that lands free levels on
 // it; then the cage slams shut on the bar, which jumps a crit tier in a huge
 // blast and shake
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,10 +30,10 @@ const SNAP_SHAKE: [number, number] = [0.9, 1.7];
 export const forceThunderdomeEvent = registerWispEvent(
   KEY,
   "Thunderdome",
-  () => CONFIG.thunderdomeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { formMs, holdsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.thunderdomeEvent;
+      meta.values;
     const own = findRewardBars(floor, context).find((b) => b.floor === floor);
     if (!own) return;
     const outer = {

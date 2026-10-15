@@ -8,7 +8,7 @@
 // thicker, until it punches through the wall in a blast and shake and
 // rockets across the floor into its lock, which bursts open in a huge one:
 // the floor unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,10 +41,10 @@ const THROUGH_SHAKE = 1.8;
 export const forceTunnelBorerEvent = registerWispEvent(
   KEY,
   "Tunnel Borer",
-  () => CONFIG.tunnelBorerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { approachMs, stallMs, boreMs, exitMs, holdMs, mergeMs } =
-      CONFIG.tunnelBorerEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

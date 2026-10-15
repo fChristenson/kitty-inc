@@ -5,7 +5,7 @@
 // bang and a jolt as the bar jumps a crit tier; the next bar fires its own,
 // quicker each time, and the last tears up in a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ interface Strike {
 export const forceUpstrikeEvent = registerWispEvent(
   KEY,
   "Upstrike",
-  () => CONFIG.upstrikeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { climbMs, strikesMs, holdMs, mergeMs } = CONFIG.upstrikeEvent;
+    const { climbMs, strikesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

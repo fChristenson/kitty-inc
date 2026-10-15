@@ -6,7 +6,7 @@
 // faster, the last leaping into the building's locked floor in a huge blast
 // and shake; the floor bursts open, unlocked for free, as the screen
 // unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,10 +36,10 @@ const CHAIN_SHAKE: [number, number] = [0.3, 1.2];
 export const forceDaisyChainEvent = registerWispEvent(
   KEY,
   "Daisy Chain",
-  () => CONFIG.daisyChainEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { scatterMs, chainMs, leapMs, holdMs, mergeMs } =
-      CONFIG.daisyChainEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

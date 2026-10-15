@@ -6,7 +6,7 @@
 // the bottom bursts with a splash and a jolt into a stream of cash pouring
 // up into the total; the last one off in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -57,9 +57,9 @@ interface Drop {
 export const forceRainyWindowEvent = registerWispEvent(
   KEY,
   "Rainy Window",
-  () => CONFIG.rainyWindowEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dropsMs, slideMs, holdMs, mergeMs } = CONFIG.rainyWindowEvent;
+    const { dropsMs, slideMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

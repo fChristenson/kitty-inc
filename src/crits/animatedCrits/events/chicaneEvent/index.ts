@@ -6,7 +6,7 @@
 // then power out and swoop onto the floor: the leader slams onto a new hire
 // in a big blast, the chaser onto the next in a huge one, both workers
 // forming out of the glow
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,9 +53,9 @@ const FIRST_SHAKE = 1.8;
 export const forceChicaneEvent = registerWispEvent(
   KEY,
   "Chicane",
-  () => CONFIG.chicaneEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { raceMs, gapMs, holdMs, mergeMs } = CONFIG.chicaneEvent;
+    const { raceMs, gapMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context);
     if (hires.length === 0) return;
     const width = area.right - area.left;

@@ -7,7 +7,7 @@
 // jumps a crit tier; the next one drops onto the next bar, quicker each
 // time, the last blowing in a colossal blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ interface Fountain {
 export const forceGerbEvent = registerWispEvent(
   KEY,
   "Gerb",
-  () => CONFIG.gerbEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { dropMs, spurtsMs, holdMs, mergeMs } = CONFIG.gerbEvent;
+    const { dropMs, spurtsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

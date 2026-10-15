@@ -7,7 +7,7 @@
 // banger on the locked floor, which fizzes, blinks and blows in a huge blast
 // and shake, and as the screen unfreezes the floor bursts open: unlocked
 // for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const POP_SHAKE: [number, number] = [0.3, 0.9];
 export const forceFirecrackersEvent = registerWispEvent(
   KEY,
   "Firecrackers",
-  () => CONFIG.firecrackersEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, fuseMs, holdMs, mergeMs } = CONFIG.firecrackersEvent;
+    const { runMs, fuseMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

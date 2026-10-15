@@ -5,7 +5,7 @@
 // whole river back in, spinning faster and tighter, a bang and a shake as
 // it winds in tight; then it fires the lot straight up into the total in a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const SPOOL = 0.6;
 export const forceSpoolEvent = registerWispEvent(
   KEY,
   "Spool",
-  () => CONFIG.spoolEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { unspoolMs, reelMs, holdMs, mergeMs } = CONFIG.spoolEvent;
+    const { unspoolMs, reelMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const hub: Point = {
       x: (area.left + area.right) / 2,

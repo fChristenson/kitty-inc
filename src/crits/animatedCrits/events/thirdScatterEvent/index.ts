@@ -6,7 +6,7 @@
 // chain of blasts along it, top to bottom, each taking its levels, the
 // clicked one last in a huge blast that climbs a crit tier. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
@@ -67,10 +67,10 @@ interface Scatter {
 export const forceThirdScatterEvent = registerWispEvent(
   KEY,
   "Third Scatter",
-  () => CONFIG.thirdScatterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { landsMs, hoverMs, linkMs, levelShare, holdMs, mergeMs } =
-      CONFIG.thirdScatterEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

@@ -6,7 +6,7 @@
 // faster as the screen rumbles harder; then the funnel fires the whole haul
 // up into the total as a roaring river of cash in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -82,9 +82,9 @@ function swirlRound(
 export const forceBulletFunnelEvent = registerWispEvent(
   KEY,
   "Bullet Funnel",
-  () => CONFIG.bulletFunnelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, flightMs, holdMs, mergeMs } = CONFIG.bulletFunnelEvent;
+    const { gapsMs, flightMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const vortex: Point = {
       x: (area.left + area.right) / 2,

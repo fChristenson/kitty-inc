@@ -5,7 +5,7 @@
 // and the whole flock bursts into flight at once, every bird scattering a
 // spray of coins as it takes off and flapping up into the total, the last in
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const LAND_SHAKE = 0.3;
 export const forcePigeonsEvent = registerWispEvent(
   KEY,
   "Pigeons",
-  () => CONFIG.pigeonsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flutterMs, perchMs, flyMs, holdMs, mergeMs } = CONFIG.pigeonsEvent;
+    const { flutterMs, perchMs, flyMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;
     const height = area.bottom - area.top;

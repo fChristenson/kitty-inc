@@ -6,7 +6,7 @@
 // each one finished landing free levels with a splash and a jolt; the last
 // stroke slams its bar in a huge blast and shake and the coins sweep into
 // the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -41,9 +41,9 @@ const DONE_SHAKE: [number, number] = [0.5, 1.3];
 export const forcePaintRollerEvent = registerWispEvent(
   KEY,
   "Paint Roller",
-  () => CONFIG.paintRollerEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.paintRollerEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

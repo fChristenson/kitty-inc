@@ -6,7 +6,7 @@
 // screen's edge with a flash and a jolt; at last it nails the leader, which
 // goes down in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -50,9 +50,9 @@ const POP_SHAKE: [number, number] = [0.25, 0.8];
 export const forceDogfightEvent = registerWispEvent(
   KEY,
   "Dogfight",
-  () => CONFIG.dogfightEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fightMs, burstsMs, holdMs, mergeMs } = CONFIG.dogfightEvent;
+    const { fightMs, burstsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

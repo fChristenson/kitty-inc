@@ -3,8 +3,8 @@
 // one side; each floor's income bar its front reaches slams and rises to the
 // highest floor tier among the floors in view (see ../floodLift). Then the
 // water fades, the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh, startWaterLoop } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -63,7 +63,7 @@ let running: RunningWave | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.tidalWaveEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -83,7 +83,7 @@ export function forceTidalWaveEvent(floor: Floor): void {
 
 // the crest's x ms in, rolling across at a steady speed
 function crestX(run: RunningWave, ms: number): number {
-  const u = Math.min(1, Math.max(0, ms / CONFIG.tidalWaveEvent.sweepMs));
+  const u = Math.min(1, Math.max(0, ms / meta.values.sweepMs));
   return run.from + (run.to - run.from) * u;
 }
 
@@ -91,7 +91,7 @@ function crestX(run: RunningWave, ms: number): number {
 function reachAt(run: RunningWave, x: number, y: number): number {
   const crest = x - run.dir * waveFrontAt(run.wave, run.baseY - y);
   const u = Math.min(1, Math.max(0, (crest - run.from) / (run.to - run.from)));
-  return CONFIG.tidalWaveEvent.sweepMs * u;
+  return meta.values.sweepMs * u;
 }
 
 function drawOverlay(
@@ -116,7 +116,7 @@ function startWave(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   const lift = planFloodLift(floor, context);
   if (!area || !lift) return;
-  const { sweepMs } = CONFIG.tidalWaveEvent;
+  const { sweepMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const dir: 1 | -1 = Math.random() < 0.5 ? 1 : -1;
   const wave = tidalWave((area.bottom - area.top) * CREST_SHARE + SINK);

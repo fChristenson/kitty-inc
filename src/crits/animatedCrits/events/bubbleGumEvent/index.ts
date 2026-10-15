@@ -5,7 +5,7 @@
 // a ring of coins bursting out of it; each bubble blown bigger than the
 // last, until a giant one fills the screen and pops in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const POP_SHAKE: [number, number] = [0.8, 1.3];
 export const forceBubbleGumEvent = registerWispEvent(
   KEY,
   "Bubble Gum",
-  () => CONFIG.bubbleGumEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { blowMs, holdMs, mergeMs } = CONFIG.bubbleGumEvent;
+    const { blowMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const mouth: Point = {
       x: (area.left + area.right) / 2,

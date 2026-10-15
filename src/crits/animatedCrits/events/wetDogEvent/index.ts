@@ -5,7 +5,7 @@
 // spray of cash flying every way with a jolt, harder each time, the last
 // shake flinging off the lot in a huge blast and shake as the cash pours
 // into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -42,10 +42,10 @@ const SHAKE_SHAKE: [number, number] = [0.6, 1.3];
 export const forceWetDogEvent = registerWispEvent(
   KEY,
   "Wet Dog",
-  () => CONFIG.wetDogEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { soakMs, firstMs, shakesMs, shakeMs, holdMs, mergeMs } =
-      CONFIG.wetDogEvent;
+      meta.values;
     const width = area.right - area.left;
     const dog: Point = {
       x: area.left + width / 2,

@@ -7,7 +7,7 @@
 // empty spots, each landing as a new worker, then the hub and the rest of
 // the ring shoot up into the total-income readout in a huge blast. Pays
 // floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,10 +53,10 @@ const HIRE_SHAKE = 1.2;
 export const forceTurbineEvent = registerWispEvent(
   KEY,
   "Turbine",
-  () => CONFIG.turbineEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { feedMs, spinMs, flyMs, riseMs, holdMs, mergeMs } =
-      CONFIG.turbineEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

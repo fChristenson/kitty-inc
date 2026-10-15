@@ -6,7 +6,7 @@
 // a solid column of cash thunders down onto the bar, which jumps a crit tier
 // in a huge blast and shake as the coins sweep into the total. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const DRIP_SHAKE: [number, number] = [0.3, 0.9];
 export const forceFaucetEvent = registerWispEvent(
   KEY,
   "Faucet",
-  () => CONFIG.faucetEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dripsMs, fallMs, gushMs, holdMs, mergeMs } = CONFIG.faucetEvent;
+    const { dripsMs, fallMs, gushMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const bar = found.find((b) => b.floor === floor) ?? found[0];
     if (!bar) return;

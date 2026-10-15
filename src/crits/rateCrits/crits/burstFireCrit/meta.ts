@@ -9,5 +9,4 @@ export default {
   style: "gunfire",
   // every third payout's multiple, for ms (its own for ownMs)
   values: { payout: 3, ms: 40_000, ownMs: 80_000 },
-  isNew: true,
 } satisfies CritMeta;

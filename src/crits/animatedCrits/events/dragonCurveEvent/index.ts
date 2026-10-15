@@ -6,7 +6,7 @@
 // line folding out into the twisting coastline of the dragon fractal;
 // then the whole dragon flares and bursts into cash in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -31,9 +31,9 @@ const FINAL_SHAKE = 2.0;
 export const forceDragonCurveEvent = registerWispEvent(
   KEY,
   "Dragon Curve",
-  () => CONFIG.dragonCurveEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { foldsMs, holdMs, mergeMs } = CONFIG.dragonCurveEvent;
+    const { foldsMs, holdMs, mergeMs } = meta.values;
     // the whole curve in unit steps: each fold adds the curve so far,
     // turned a quarter round its end, in reverse
     const xs = [0, 1];

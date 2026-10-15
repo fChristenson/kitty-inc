@@ -5,7 +5,7 @@
 // spins up; with the eighth the gate fires, a blinding flare blowing open
 // its middle in a huge blast and shake, and the floor bursts open,
 // unlocked for free, as the screen unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -29,9 +29,9 @@ const LOCK_SHAKE: [number, number] = [0.3, 1.1];
 export const forceStargateEvent = registerWispEvent(
   KEY,
   "Stargate",
-  () => CONFIG.stargateEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { riseMs, locksMs, fireMs, holdMs, mergeMs } = CONFIG.stargateEvent;
+    const { riseMs, locksMs, fireMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const center: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

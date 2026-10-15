@@ -6,7 +6,7 @@
 // flaring with a crack, a jolt and sprays of coins off their tips; then every
 // tendril whips round onto the total at once and the core fires into it in
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,10 +34,10 @@ const PULSE_SHAKE: [number, number] = [0.6, 1.4];
 export const forcePlasmaGlobeEvent = registerWispEvent(
   KEY,
   "Plasma Globe",
-  () => CONFIG.plasmaGlobeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { writheMs, pulses, flowMs, holdMs, mergeMs } =
-      CONFIG.plasmaGlobeEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const core: Point = {
       x: (area.left + area.right) / 2,

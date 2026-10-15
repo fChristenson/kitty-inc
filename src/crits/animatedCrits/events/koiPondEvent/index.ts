@@ -6,7 +6,7 @@
 // view with a flash and a jolt that lights it up a perma tier, ever
 // faster; then the whole pond swirls up into the total in a huge blast and
 // shake. Pays floor income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,9 +49,9 @@ const DIVE_SHAKE: [number, number] = [0.6, 1.3];
 export const forceKoiPondEvent = registerWispEvent(
   KEY,
   "Koi Pond",
-  () => CONFIG.koiPondEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { floodMs, gapsMs, flightMs, holdMs, mergeMs } = CONFIG.koiPondEvent;
+    const { floodMs, gapsMs, flightMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const fallback = totalSpot(area);

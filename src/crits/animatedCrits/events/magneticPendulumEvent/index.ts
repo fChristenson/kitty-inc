@@ -6,7 +6,7 @@
 // pass a whoosh and a jolt that sets a new worker down under that magnet,
 // slowing as it goes, until it's caught on one for good and that spot
 // lands in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const PASS_SHAKE = 0.9;
 export const forceMagneticPendulumEvent = registerWispEvent(
   KEY,
   "Magnetic Pendulum",
-  () => CONFIG.magneticPendulumEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { swingMs, settleMs, holdMs, mergeMs } = CONFIG.magneticPendulumEvent;
+    const { swingMs, settleMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const magnets: Point[] = hires.map((h) => ({ x: h.x, y: h.y - 40 }));

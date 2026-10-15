@@ -5,7 +5,7 @@
 // the opposite end of the next, every landing a thud, a jolt and free
 // levels, the bounces quickening; off the last bar it bounces down to the
 // floor in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -39,9 +39,9 @@ interface Hop {
 export const forceBarHopEvent = registerWispEvent(
   KEY,
   "Bar Hop",
-  () => CONFIG.barHopEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hopsMs, levelShare, holdMs, mergeMs } = CONFIG.barHopEvent;
+    const { hopsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     // landing spots: both ends of every bar, zigzagging down the stack

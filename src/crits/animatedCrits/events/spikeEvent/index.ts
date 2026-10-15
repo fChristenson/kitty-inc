@@ -5,7 +5,7 @@
 // a big jolt, and the bar jumps a crit tier; the ball pops back up and is
 // set again over the next bar, each rally quicker, the last spike a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,9 +33,9 @@ const HIT_SHAKE: [number, number] = [1, 1.5];
 export const forceSpikeEvent = registerWispEvent(
   KEY,
   "Spike",
-  () => CONFIG.spikeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { setsMs, holdMs, mergeMs } = CONFIG.spikeEvent;
+    const { setsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

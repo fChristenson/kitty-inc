@@ -7,7 +7,7 @@
 // out crashes into a worker already taken, bounces off and dives into the
 // clicked floor's income bar, which jumps a crit tier in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -53,10 +53,10 @@ const TAKE_SHAKE: [number, number] = [0.6, 1.3];
 export const forceMusicalChairsEvent = registerWispEvent(
   KEY,
   "Musical Chairs",
-  () => CONFIG.musicalChairsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { circleMs, dashMs, outMs, holdMs, mergeMs } =
-      CONFIG.musicalChairsEvent;
+      meta.values;
     const own = findRewardBars(floor, context).find((b) => b.floor === floor);
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (!own || workers.length === 0) return;

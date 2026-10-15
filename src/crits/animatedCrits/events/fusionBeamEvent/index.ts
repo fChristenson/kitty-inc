@@ -6,7 +6,7 @@
 // building into the locked floor, which blows open in a huge blast and
 // shake, unlocked for free, as the screen unfreezes. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const FIRE_SHAKE: [number, number] = [0.3, 0.8];
 export const forceFusionBeamEvent = registerWispEvent(
   KEY,
   "Fusion Beam",
-  () => CONFIG.fusionBeamEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gatherMs, fireMs, holdMs, mergeMs } = CONFIG.fusionBeamEvent;
+    const { gatherMs, fireMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -6,7 +6,7 @@
 // a jolt and a spray of cash out of the middle; then it snaps back out to
 // one plain screen in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const PASS_SHAKE: [number, number] = [0.7, 1.5];
 export const forceInfinityMirrorEvent = registerWispEvent(
   KEY,
   "Infinity Mirror",
-  () => CONFIG.infinityMirrorEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { diveMs, holdMs, mergeMs } = CONFIG.infinityMirrorEvent;
+    const { diveMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

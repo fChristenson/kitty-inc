@@ -8,7 +8,7 @@
 // elastic, scooping up every pin inside as it passes, into one ball that
 // shoots into the total in a huge blast. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -90,9 +90,9 @@ function edgeDistance(c: Point, dx: number, dy: number, hull: Point[]): number {
 export const forceConvexHullEvent = registerWispEvent(
   KEY,
   "Convex Hull",
-  () => CONFIG.convexHullEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pinMs, wrapMs, snapMs, holdMs, mergeMs } = CONFIG.convexHullEvent;
+    const { pinMs, wrapMs, snapMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const pins: Point[] = [];
     for (let tries = 0; pins.length < PINS && tries < PINS * 40; tries++) {

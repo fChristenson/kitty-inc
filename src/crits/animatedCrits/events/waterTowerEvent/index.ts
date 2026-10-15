@@ -7,7 +7,7 @@
 // each jolting with free levels as its torrent crashes in, the last in a
 // huge blast and shake. Pays floor income × floor number × REWARD, plus the
 // levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,10 +50,10 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceWaterTowerEvent = registerWispEvent(
   KEY,
   "Water Tower",
-  () => CONFIG.waterTowerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fillMs, swellMs, levelShare, holdMs, mergeMs } =
-      CONFIG.waterTowerEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;

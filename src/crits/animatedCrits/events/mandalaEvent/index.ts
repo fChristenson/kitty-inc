@@ -5,7 +5,7 @@
 // ring a bloop and a jolt, ever faster, the whole pattern slowly turning;
 // then it is swept away, swirling inward and pouring into the total in a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -42,10 +42,10 @@ const RING_SHAKE: [number, number] = [0.4, 1.1];
 export const forceMandalaEvent = registerWispEvent(
   KEY,
   "Mandala",
-  () => CONFIG.mandalaEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapsMs, bloomMs, sweepMs, flightMs, holdMs, mergeMs } =
-      CONFIG.mandalaEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {

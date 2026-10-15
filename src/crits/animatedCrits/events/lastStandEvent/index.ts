@@ -6,7 +6,7 @@
 // coins, the waves ever bigger and faster; when the last falls it fires a
 // ring every way in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -48,9 +48,9 @@ const KILL_SHAKE: [number, number] = [0.25, 0.9];
 export const forceLastStandEvent = registerWispEvent(
   KEY,
   "Last Stand",
-  () => CONFIG.lastStandEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { wavesMs, approachMs, holdMs, mergeMs } = CONFIG.lastStandEvent;
+    const { wavesMs, approachMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

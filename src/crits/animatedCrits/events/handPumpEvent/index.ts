@@ -6,7 +6,7 @@
 // crit tier; the strokes come quicker and quicker until the last plunge
 // blasts a gusher all the way into the total in a huge blast and shake.
 // Pays floor income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,10 +55,10 @@ interface Jet {
 export const forceHandPumpEvent = registerWispEvent(
   KEY,
   "Hand Pump",
-  () => CONFIG.handPumpEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { firstMs, strokesMs, squirtMs, gushMs, holdMs, mergeMs } =
-      CONFIG.handPumpEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     const spout: Point = { x: button.x, y: button.y - BOTTOM };

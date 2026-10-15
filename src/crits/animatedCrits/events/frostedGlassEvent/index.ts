@@ -6,7 +6,7 @@
 // with a pop and a jolt and pours into the total; then the frost blows away
 // in a huge blast and shake at the total. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,10 +42,10 @@ const BLOW_SHAKE = 2.2;
 export const forceFrostedGlassEvent = registerWispEvent(
   KEY,
   "Frosted Glass",
-  () => CONFIG.frostedGlassEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { frostMs, wipeMs, blowMs, holdMs, mergeMs } =
-      CONFIG.frostedGlassEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

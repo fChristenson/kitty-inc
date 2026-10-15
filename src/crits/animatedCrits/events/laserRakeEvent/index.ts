@@ -5,7 +5,7 @@
 // tooth's tip with a scrape and a jolt, ever harder; at the left edge its
 // teeth all swing onto the total and the raked-up heap pours up into it in
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -42,9 +42,9 @@ const STROKE_SHAKE: [number, number] = [0.4, 1.3];
 export const forceLaserRakeEvent = registerWispEvent(
   KEY,
   "Laser Rake",
-  () => CONFIG.laserRakeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { strokesMs, gatherMs, holdMs, mergeMs } = CONFIG.laserRakeEvent;
+    const { strokesMs, gatherMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const top = area.top + 200;
     const bottom = area.bottom - 120;

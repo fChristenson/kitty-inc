@@ -7,8 +7,8 @@
 // a big champion takes two shots. Then the view is flung up out of the pit,
 // the floors drop back into place and the wisps rain down onto the bars,
 // each landing free levels, the champion's on the clicked floor's bar
+import meta from "./meta";
 import { levelsFor, type Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
@@ -158,7 +158,7 @@ interface Fighter {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.arenaEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -301,7 +301,7 @@ function startArena(floor: Floor, context: EventProcContext): void {
   const bars = findRewardBars(floor, context);
   if (!area || bars.length === 0) return;
   const { diveMs, flyMs, riseMs, levelShare, champLevelShare } =
-    CONFIG.arenaEvent;
+    meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const fighters = PADS.map((p, k) => {
     const at = diveMs + FIRST + k * SPAWN_GAP;

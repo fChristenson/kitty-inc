@@ -5,7 +5,7 @@
 // quicker, every bounce a splash, a boing and a jolt that lands free
 // levels; at full tilt it smashes up out through the top of the bar in a
 // huge blast and a big batch of levels. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -44,10 +44,10 @@ interface Leg {
 export const forceBarBilliardsEvent = registerWispEvent(
   KEY,
   "Bar Billiards",
-  () => CONFIG.barBilliardsEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { dropMs, exitMs, levelShare, holdMs, mergeMs } =
-      CONFIG.barBilliardsEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

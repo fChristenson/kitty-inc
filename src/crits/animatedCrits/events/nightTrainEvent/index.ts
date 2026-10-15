@@ -6,8 +6,8 @@
 // hisses open on a guard, dropped as the view runs at him, a big one in the
 // last taking two. The end door slides open on the floors, the view dives
 // through, and every worker in view climbs a perma tier
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import {
@@ -42,6 +42,7 @@ import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { findRewardWorkers, giveWorkerTier } from "../../eventRewards";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -136,7 +137,7 @@ interface Guard {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.nightTrainEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -267,8 +268,8 @@ function startNightTrain(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   if (!area) return;
   const aspect = (area.bottom - area.top) / (area.right - area.left);
-  const { slideMs, flyMs, promoteGapMs } = CONFIG.nightTrainEvent;
-  const { arriveMs } = CONFIG.flightStage;
+  const { slideMs, flyMs, promoteGapMs } = meta.values;
+  const { arriveMs } = FLIGHT_STAGE;
   const tier = context.critTier ?? pickCritTierByOdds();
   const doorHigh = 2 * DOOR * aspect;
   const high = Math.max(HIGH, doorHigh + OVER_DOOR);

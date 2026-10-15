@@ -6,7 +6,7 @@
 // round one big blast and the bar jumps a crit tier; the fault tears on to
 // the next bar and the next, ever faster, the last eruption one huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,9 +53,9 @@ interface Blast {
 export const forceFaultLineEvent = registerWispEvent(
   KEY,
   "Fault Line",
-  () => CONFIG.faultLineEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { chainsMs, holdMs, mergeMs } = CONFIG.faultLineEvent;
+    const { chainsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

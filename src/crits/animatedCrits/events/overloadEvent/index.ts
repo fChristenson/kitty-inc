@@ -4,8 +4,8 @@
 // rumbles; it sucks in for a split second, then blows in a huge explosion,
 // flash and shockwave and jumps one crit tier. Then the screen unfreezes and
 // the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -80,7 +80,7 @@ let running: RunningOverload | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.overloadEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -101,14 +101,14 @@ export function forceOverloadEvent(floor: Floor): void {
 }
 
 function blowMs(): number {
-  const { chargeMs, suckMs } = CONFIG.overloadEvent;
+  const { chargeMs, suckMs } = meta.values;
   return chargeMs + suckMs;
 }
 
 // the bar's size ms in: steady while it heats, sucking in, then popping out
 // and springing back once it's blown
 function barScale(overload: RunningOverload, ms: number, now: number): number {
-  const { chargeMs, suckMs } = CONFIG.overloadEvent;
+  const { chargeMs, suckMs } = meta.values;
   if (overload.blewAt !== null) {
     const t = now - overload.blewAt;
     return 1 + (POP - 1) * Math.exp(-t / POP_SPRING_MS) * Math.cos(t / 45);
@@ -124,7 +124,7 @@ function drawSparks(
   ms: number,
   now: number,
 ): void {
-  const { chargeMs } = CONFIG.overloadEvent;
+  const { chargeMs } = meta.values;
   const { box } = overload;
   const cx = box.x + box.width / 2;
   const cy = box.y + box.height / 2;
@@ -167,7 +167,7 @@ function drawOverlay(
   const now = performance.now();
   const ms = now - overload.startedAt;
   if (overload.blewAt === null && ms >= blowMs()) blow(overload, now);
-  const { chargeMs } = CONFIG.overloadEvent;
+  const { chargeMs } = meta.values;
   const { box, area } = overload;
   const cx = box.x + box.width / 2;
   const cy = box.y + box.height / 2;
@@ -243,7 +243,7 @@ function blow(overload: RunningOverload, now: number): void {
 function startOverload(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   if (running || isScreenFrozen() || !area) return;
-  const { chargeMs, holdMs } = CONFIG.overloadEvent;
+  const { chargeMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const overload: RunningOverload = {
     floor,

@@ -5,7 +5,7 @@
 // jolt and coins flung off the edge it's running toward; then it brakes
 // hard and lands back exactly in place with a lurch, in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -31,9 +31,9 @@ const LAP_SHAKE: [number, number] = [0.5, 1.4];
 export const forceTreadmillEvent = registerWispEvent(
   KEY,
   "Treadmill",
-  () => CONFIG.treadmillEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, laps, holdMs, mergeMs } = CONFIG.treadmillEvent;
+    const { runMs, laps, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

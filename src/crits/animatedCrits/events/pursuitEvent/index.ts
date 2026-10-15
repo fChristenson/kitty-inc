@@ -6,7 +6,7 @@
 // and a jolt; they meet dead in the middle in a bang and shake and burst
 // back out, each flying onto an empty spot in view and landing as a new
 // worker, the last in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const HIRE_SHAKE = 1.0;
 export const forcePursuitEvent = registerWispEvent(
   KEY,
   "Pursuit",
-  () => CONFIG.pursuitEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { chaseMs, flyMs, holdMs, mergeMs } = CONFIG.pursuitEvent;
+    const { chaseMs, flyMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_CHASERS);
     if (hires.length === 0) return;
     const n = Math.max(MIN_CHASERS, hires.length);

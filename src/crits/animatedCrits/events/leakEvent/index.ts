@@ -5,7 +5,7 @@
 // the total-income readout, until it bursts in a huge blast and shake and a
 // fat gush of cash roars up out of it into the total, and the coins sweep
 // into the total. Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -44,10 +44,10 @@ const LEAK_SHAKE: [number, number] = [0.8, 1.8];
 export const forceLeakEvent = registerWispEvent(
   KEY,
   "Leak",
-  () => CONFIG.leakEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { leadMs, gapMs, travelMs, gushMs, holdMs, mergeMs } =
-      CONFIG.leakEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const span = Math.min(width, height);

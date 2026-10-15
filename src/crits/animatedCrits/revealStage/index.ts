@@ -7,7 +7,6 @@
 // unfreezes and the event pays out. The event only draws its reveal and times
 // its own beats
 import type { Floor } from "../../../gameState";
-import { CONFIG } from "../../../config";
 import { COLOR } from "../../../palette";
 import { playSwoosh } from "../../../sound";
 import { hash01 } from "../../../shared/twinkle";
@@ -20,6 +19,11 @@ import {
 } from "../../../shared/screenFreeze";
 import type { EventProcContext } from "../eventProcs";
 import { drawStageBackdrop } from "./backdrop";
+
+const REVEAL_STAGE = {
+  windUpMs: 220, // the screen leaning in and rumbling before each whip
+  slideMs: 420, // the whip pan in over the floors, and back out
+} as const;
 
 // the stage's rect in the game canvas's world space
 export interface StageRect {
@@ -93,7 +97,7 @@ export function canStartRevealStage(context: EventProcContext): boolean {
 
 // how long the stage takes to come in (and to leave)
 function inMs(): number {
-  const { windUpMs, slideMs } = CONFIG.revealStage;
+  const { windUpMs, slideMs } = REVEAL_STAGE;
   return windUpMs + slideMs;
 }
 
@@ -103,7 +107,7 @@ export function revealStageTotalMs(durationMs: number): number {
 
 // the stage's left edge, of the screen's width from its left
 function stageShare(ms: number, durationMs: number): number {
-  const { windUpMs, slideMs } = CONFIG.revealStage;
+  const { windUpMs, slideMs } = REVEAL_STAGE;
   const leaveAt = inMs() + durationMs;
   return (
     1 -
@@ -115,7 +119,7 @@ function stageShare(ms: number, durationMs: number): number {
 // where it is and how it's moving `ms` after the stage started coming in:
 // warp 0..1 with its speed, windUp 0..1 rumbling before each whip
 function stageMotion(ms: number, durationMs: number) {
-  const { windUpMs, slideMs } = CONFIG.revealStage;
+  const { windUpMs, slideMs } = REVEAL_STAGE;
   const share = stageShare(ms, durationMs);
   const slope =
     Math.abs(stageShare(ms + 4, durationMs) - stageShare(ms - 4, durationMs)) /
@@ -186,7 +190,7 @@ export function drawRevealStage(
   ms: number,
   now: number,
 ): void {
-  const { windUpMs, slideMs } = CONFIG.revealStage;
+  const { windUpMs, slideMs } = REVEAL_STAGE;
   const { durationMs } = content;
   const { share, leaving, warp, rumble } = stageMotion(ms, durationMs);
   const sinceIn = ms - inMs();
@@ -267,7 +271,7 @@ export function startRevealStage(
   };
   running = stage;
   const isLive = () => running === stage;
-  const { windUpMs } = CONFIG.revealStage;
+  const { windUpMs } = REVEAL_STAGE;
   const { durationMs } = content;
   freezeScreen(drawOverlay, {
     frameMotion: () =>

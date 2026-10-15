@@ -5,7 +5,7 @@
 // afterimages peel off one after another and streak into the clicked
 // floor's income bar, each a jolt of free levels, the last in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,7 +43,7 @@ interface Stop {
 export const forceAfterimageEvent = registerWispEvent(
   KEY,
   "Afterimage",
-  () => CONFIG.afterimageEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const {
       dashMs,
@@ -53,7 +53,7 @@ export const forceAfterimageEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.afterimageEvent;
+    } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     const target = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!target) return;

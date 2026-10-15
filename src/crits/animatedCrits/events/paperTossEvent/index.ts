@@ -5,7 +5,7 @@
 // and drops dead into a bin at the end of an income bar: "SWISH!", a pop
 // and a jolt as the bar lands free levels; ever quicker, the last shot
 // dropping in for a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const SWISH_SHAKE: [number, number] = [0.6, 1.3];
 export const forcePaperTossEvent = registerWispEvent(
   KEY,
   "Paper Toss",
-  () => CONFIG.paperTossEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { tossesMs, flightMs, holdMs, mergeMs } = CONFIG.paperTossEvent;
+    const { tossesMs, flightMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

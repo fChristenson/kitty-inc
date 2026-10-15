@@ -5,7 +5,7 @@
 // blinding flash, a huge blast and shake, its shards blowing outward and
 // tumbling away under gravity to reveal the game again, and the cash sweeps
 // into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const KNOCK_SHAKE = [0.9, 1.3, 1.7];
 export const forceShatterEvent = registerWispEvent(
   KEY,
   "Shatter",
-  () => CONFIG.shatterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { knocksMs, fallMs, holdMs, mergeMs } = CONFIG.shatterEvent;
+    const { knocksMs, fallMs, holdMs, mergeMs } = meta.values;
     const impact = getButtonCenter(context.isGroundFloor);
     const pane = createPane(impact, area, { cracks: CRACKS });
     // the knocks before the last each open their share of the cracks

@@ -2,7 +2,7 @@
 // glimmer lights stream into the floor's income bar. When the stream ends the floor's
 // permanent crit tier becomes the crit's rolled tier, or the tier above its own
 // when that roll wouldn't promote it. Never lands on a top-tier floor
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import {
   drawIncomePanel,
@@ -17,7 +17,7 @@ export const forceUpgradeEvent = registerStreamTargetEvent({
   key: "upgrade",
   cover: { label: "Upgrade", color: COLOR.teal },
   stream: "glimmers",
-  chance: () => CONFIG.upgradeEvent.chance,
+  chance: () => meta.chance,
   target: (_floor, isGroundFloor) => getIncomeBarCenter(isGroundFloor),
   canStart: (floor, { promoteFloorTier }) =>
     promoteFloorTier !== undefined && canPromote(floor),

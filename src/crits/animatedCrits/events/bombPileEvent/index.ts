@@ -6,7 +6,7 @@
 // bang and a shake, the bottom bomb bursting into a cluster right on the bar
 // as it jumps a crit tier; tower after tower, quicker each time, the last
 // pile's base a colossal blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ interface Pile {
 export const forceBombPileEvent = registerWispEvent(
   KEY,
   "Bomb Pile",
-  () => CONFIG.bombPileEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dropsMs, holdMs, mergeMs } = CONFIG.bombPileEvent;
+    const { dropsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

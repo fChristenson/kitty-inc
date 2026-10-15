@@ -5,7 +5,7 @@
 // sun rises past lights up with a flare, a bang and free levels; at the top
 // it blazes out in a huge blast and shake as every bar slams. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,10 +35,10 @@ const RISE_SHAKE: [number, number] = [0.5, 1.3];
 export const forceSunriseEvent = registerWispEvent(
   KEY,
   "Sunrise",
-  () => CONFIG.sunriseEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, blazeMs, levelShare, holdMs, mergeMs } =
-      CONFIG.sunriseEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const height = area.bottom - area.top;

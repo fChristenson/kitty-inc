@@ -4,7 +4,7 @@
 // feet, quickening from a drizzle to a downpour; a worker's second drop
 // strikes it up a perma tier; then one huge drop falls from high into their
 // midst with the biggest blast and a double ring. Then the crit's tier pays
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   drawDrop,
@@ -56,10 +56,10 @@ const BIG_SHAKE = 2.8;
 export const forceMonsoonEvent = registerWispEvent(
   KEY,
   "Monsoon",
-  () => CONFIG.monsoonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { firstMs, gapsMs, bigGapMs, bigFallMs, holdMs, mergeMs } =
-      CONFIG.monsoonEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const n = workers.length;

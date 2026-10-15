@@ -6,7 +6,7 @@
 // fold shut on the middle like the paper closing, in a slap and a big
 // jolt, and the whole blot surges into the total in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,10 +36,10 @@ const SPLAT_SHAKE: [number, number] = [0.5, 1.1];
 export const forceInkblotEvent = registerWispEvent(
   KEY,
   "Inkblot",
-  () => CONFIG.inkblotEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapsMs, bloomMs, foldMs, flightMs, holdMs, mergeMs } =
-      CONFIG.inkblotEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const axis = (area.left + area.right) / 2;
     const height = area.bottom - area.top;

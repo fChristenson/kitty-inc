@@ -6,7 +6,7 @@
 // climbs a perma tier; match after match down the line, ever quicker, the
 // last slam landing in a huge blast and shake. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const SLAM_SHAKE: [number, number] = [0.6, 1.3];
 export const forceArmWrestlingEvent = registerWispEvent(
   KEY,
   "Arm Wrestling",
-  () => CONFIG.armWrestlingEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { strainMs, holdMs, mergeMs } = CONFIG.armWrestlingEvent;
+    const { strainMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

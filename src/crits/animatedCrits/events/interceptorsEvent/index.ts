@@ -7,7 +7,7 @@
 // across the sky, each a bang, a jolt and a spray of coins; the last wave
 // all goes up at once in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,9 +51,9 @@ interface Blast {
 export const forceInterceptorsEvent = registerWispEvent(
   KEY,
   "Interceptors",
-  () => CONFIG.interceptorsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { wavesMs, fallMs, holdMs, mergeMs } = CONFIG.interceptorsEvent;
+    const { wavesMs, fallMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

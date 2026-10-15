@@ -5,7 +5,7 @@
 // worker in a flash and a jolt that lights it up a perma tier, the bouts
 // finishing one after another, the last in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ interface Bout {
 export const forceFencingEvent = registerWispEvent(
   KEY,
   "Fencing",
-  () => CONFIG.fencingEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { staggerMs, boutMs, holdMs, mergeMs } = CONFIG.fencingEvent;
+    const { staggerMs, boutMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const bouts: Bout[] = workers.map((worker, k) => {

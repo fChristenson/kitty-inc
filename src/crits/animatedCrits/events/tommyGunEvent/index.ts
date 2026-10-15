@@ -5,7 +5,7 @@
 // the screen's edge popping out coins and every swing a jolt; the drum
 // runs dry in one long roaring burst that ends in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ const SWING_SHAKE: [number, number] = [0.4, 1];
 export const forceTommyGunEvent = registerWispEvent(
   KEY,
   "Tommy Gun",
-  () => CONFIG.tommyGunEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { riseMs, sprayMs, holdMs, mergeMs } = CONFIG.tommyGunEvent;
+    const { riseMs, sprayMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const gun: Point = { x: button.x, y: button.y - UP };
     // ever faster sweeps: the aim at ms

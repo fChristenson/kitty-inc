@@ -5,7 +5,7 @@
 // tier with a flash, a bloop and a jolt; then the ball blazes every way at
 // once in a blinding burst of beams and blows in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -33,9 +33,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceMirrorBallEvent = registerWispEvent(
   KEY,
   "Mirror Ball",
-  () => CONFIG.mirrorBallEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dropMs, spinMs, holdMs, mergeMs } = CONFIG.mirrorBallEvent;
+    const { dropMs, spinMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const ball: Point = {

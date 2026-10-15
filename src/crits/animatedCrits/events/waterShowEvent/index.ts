@@ -6,7 +6,7 @@
 // curls over into the total-income readout in a huge blast and shake, and
 // the coins sweep into the total. Pays floor income × floor number × REWARD
 // (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -37,10 +37,10 @@ const ACT_SHAKE: [number, number] = [1, 1.8];
 export const forceWaterShowEvent = registerWispEvent(
   KEY,
   "Water Show",
-  () => CONFIG.waterShowEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { actMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.waterShowEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const total = totalSpot(area);

@@ -6,7 +6,7 @@
 // jolt as the bar beside it lands free levels, and the river surges up into
 // the next chamber, every surge faster; the top lock bursts over its bar in
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,9 +52,9 @@ const BURST_SHAKE: [number, number] = [0.6, 1.4];
 export const forceCanalLocksEvent = registerWispEvent(
   KEY,
   "Canal Locks",
-  () => CONFIG.canalLocksEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { locksMs, holdMs, mergeMs } = CONFIG.canalLocksEvent;
+    const { locksMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(-MAX_LOCKS).reverse();
     if (bars.length === 0) return;
     const n = bars.length;

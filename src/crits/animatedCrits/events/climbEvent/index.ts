@@ -5,7 +5,7 @@
 // it hits flaring with a flash, a bloop and a harder jolt before it pops,
 // until it hits the total in a huge blast and shake, and the coins sweep
 // into the total. Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -52,9 +52,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.9];
 export const forceClimbEvent = registerWispEvent(
   KEY,
   "Climb",
-  () => CONFIG.climbEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { leadMs, streamMs, travelMs, holdMs, mergeMs } = CONFIG.climbEvent;
+    const { leadMs, streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

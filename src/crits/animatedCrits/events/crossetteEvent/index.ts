@@ -6,7 +6,7 @@
 // its own bang, shake and spray of coins; shell after shell, the last one
 // splitting round a huge blast and shake. Pays floor income × floor number
 // × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,10 +51,10 @@ interface Blast {
 export const forceCrossetteEvent = registerWispEvent(
   KEY,
   "Crossette",
-  () => CONFIG.crossetteEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { shellsMs, riseMs, splitMs, holdMs, mergeMs } =
-      CONFIG.crossetteEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const blasts: Blast[] = [];
     const flyers: {

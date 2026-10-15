@@ -2,8 +2,8 @@
 // while the button jets coins and bills straight up; they arc over, rain down
 // across the whole screen and hang there, then sweep into the total (see
 // ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -47,12 +47,12 @@ function arcPath(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.fountainEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const { streamMs, travelMs } = CONFIG.fountainEvent;
-      const cover = startMoneyCover(KEY, floor, context, CONFIG.fountainEvent, {
+      const { streamMs, travelMs } = meta.values;
+      const cover = startMoneyCover(KEY, floor, context, meta.values, {
         layout: (area) => coverSpots(area, COINS),
       });
       if (!cover) return;

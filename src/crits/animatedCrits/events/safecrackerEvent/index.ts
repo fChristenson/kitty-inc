@@ -7,7 +7,7 @@
 // its number popping up; on the third number the lock blows in a huge blast
 // and shake and the floor bursts open, unlocked for free, as the screen
 // unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const STOP_SHAKE: [number, number] = [0.6, 1.1];
 export const forceSafecrackerEvent = registerWispEvent(
   KEY,
   "Safecracker",
-  () => CONFIG.safecrackerEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { spinsMs, holdMs, mergeMs } = CONFIG.safecrackerEvent;
+    const { spinsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

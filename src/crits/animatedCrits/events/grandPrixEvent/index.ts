@@ -6,7 +6,7 @@
 // the workers, then swoop onto two workers: the leader slams into one in a
 // big blast, the chaser into the next in a huge one, each lighting up a
 // perma tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -54,9 +54,9 @@ function landmarks(floor: Floor, context: EventProcContext): RewardWorker[] {
 export const forceGrandPrixEvent = registerWispEvent(
   KEY,
   "Grand Prix",
-  () => CONFIG.grandPrixEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { raceMs, gapMs, holdMs, mergeMs } = CONFIG.grandPrixEvent;
+    const { raceMs, gapMs, holdMs, mergeMs } = meta.values;
     const corner = landmarks(floor, context)[0];
     const rewards = findRewardWorkers(floor, context);
     if (!corner || rewards.length === 0) return;

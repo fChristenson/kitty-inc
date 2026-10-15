@@ -4,7 +4,7 @@
 // doors, revealing a blinding gold light behind them, and rivers of cash
 // come flooding out of the gap into the total; then the doors slam shut
 // in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,10 +34,10 @@ const GOLD = fadeStops(COLOR.heavenlyGold);
 export const forceVaultDoorsEvent = registerWispEvent(
   KEY,
   "Vault Doors",
-  () => CONFIG.vaultDoorsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { clunkMs, openMs, floodMs, slamMs, holdMs, mergeMs } =
-      CONFIG.vaultDoorsEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

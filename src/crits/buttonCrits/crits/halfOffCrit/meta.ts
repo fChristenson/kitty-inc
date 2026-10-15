@@ -5,4 +5,8 @@ export default {
   label: "Half Off",
   chance: 0.03,
   style: "drill",
+  values: {
+    // half-price taps per the crit's multiple (twice on its own)
+    taps: 1,
+  },
 } satisfies CritMeta;

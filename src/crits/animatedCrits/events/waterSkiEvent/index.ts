@@ -6,7 +6,7 @@
 // coins; the boat roars into the total, the skier lets go and flies in after
 // it in a huge blast, and the whole wake pours in. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -43,9 +43,9 @@ const FINISH_SHAKE = 1;
 export const forceWaterSkiEvent = registerWispEvent(
   KEY,
   "Water Ski",
-  () => CONFIG.waterSkiEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, letGoMs, holdMs, mergeMs } = CONFIG.waterSkiEvent;
+    const { runMs, letGoMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const total = () => cover?.total() ?? fallback;
     const w = area.right - area.left;

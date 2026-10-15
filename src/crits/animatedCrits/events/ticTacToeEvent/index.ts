@@ -6,7 +6,7 @@
 // moves ever faster; the third cross completes the line, a blazing beam
 // strikes through it and every bar slams in a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const CROSS_SHAKE: [number, number] = [0.8, 1.4];
 export const forceTicTacToeEvent = registerWispEvent(
   KEY,
   "Tic-Tac-Toe",
-  () => CONFIG.ticTacToeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gridMs, movesMs, holdMs, mergeMs } = CONFIG.ticTacToeEvent;
+    const { gridMs, movesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, 3);
     if (bars.length === 0) return;
     const side =

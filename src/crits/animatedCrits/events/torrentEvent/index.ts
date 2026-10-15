@@ -5,7 +5,7 @@
 // and a jolt, harder as it climbs; it smashes into the building's locked
 // floor in a huge blast and shake, and the floor bursts open, unlocked for
 // free, as the screen unfreezes. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,9 +34,9 @@ const WALL_SHAKE: [number, number] = [0.5, 1.3];
 export const forceTorrentEvent = registerWispEvent(
   KEY,
   "Torrent",
-  () => CONFIG.torrentEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { climbMs, holdMs, mergeMs } = CONFIG.torrentEvent;
+    const { climbMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

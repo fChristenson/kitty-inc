@@ -5,8 +5,8 @@
 // that worker climbs one perma tier. The last head gets the biggest bounce
 // of all, a blast and a big shake that rockets the wisp up off the screen.
 // Then the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop, startBoostEventStreamLoop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -94,7 +94,7 @@ function headsOn(floor: Floor, context: EventProcContext): OnScreenWorker[] {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.headHopEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -115,7 +115,7 @@ export function forceHeadHopEvent(floor: Floor): void {
 // the ball ms in: dropping in, hopping head to head in arcs, then rocketing
 // up off the screen from the last
 function ballAt(hop: RunningHop, ms: number): Point | null {
-  const { entryMs, launchMs } = CONFIG.headHopEvent;
+  const { entryMs, launchMs } = meta.values;
   const { heads, from, area } = hop;
   if (ms < 0) return null;
   const first = heads[0];
@@ -238,7 +238,7 @@ function startHop(floor: Floor, context: EventProcContext): void {
   const workers = headsOn(floor, context);
   if (running || isScreenFrozen() || !area || workers.length === 0) return;
   const { entryMs, firstHopMs, lastHopMs, launchMs, holdMs } =
-    CONFIG.headHopEvent;
+    meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const headY = WORKER_FEET_Y - WORKER_HEIGHT - BALL_R;
   let at = entryMs;

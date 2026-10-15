@@ -4,8 +4,7 @@
 // crackling until the floor is caught in a cage of lightning; the whole cage
 // blazes, a huge bolt splits the floor across and it bursts open: its new
 // bar's payouts half as big again for a while
-import { CONFIG } from "../../../../config";
-import { windUpBar } from "../../../rateCrits/barEffects";
+import { WOUND_UP_PAYOUT, windUpBar } from "../../../rateCrits/barEffects";
 import {
   createBolt,
   drawBolt,
@@ -74,7 +73,7 @@ registerFloorCrit("crackleCageCrit", {
   reward(t) {
     windUpBar(t.floor);
     t.flipRate();
-    t.punch(`${CONFIG.crit.woundUpPayout}x Pay`);
+    t.punch(`${WOUND_UP_PAYOUT}x Pay`);
   },
   plan(r, _bars, hit) {
     const lock = getLockCenter();

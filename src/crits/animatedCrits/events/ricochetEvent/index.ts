@@ -2,8 +2,8 @@
 // the button fires one fat stream of coins and bills that bounces off the
 // screen's edges like a pinball before diving into the total; every bounce
 // adds the floor's payout once more (see ../moneyCover and ../riverPaths)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { randomInt } from "../../../../utils";
 import { playBoostEventStream } from "../../../../sound";
@@ -81,11 +81,11 @@ function bounceLine(area: CoverArea, start: Pt, bounces: number) {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.ricochetEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const { travelMs } = CONFIG.ricochetEvent;
+      const { travelMs } = meta.values;
       const bounces = randomInt(...BOUNCES);
       // the button fires until the stream's head reaches the total
       const streamMs = travelMs + FLOW_FLIGHT_MS;

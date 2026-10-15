@@ -6,7 +6,7 @@
 // back again, ever faster, solving it; the missing tile slams into its gap
 // and the screen goes off in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -36,9 +36,9 @@ const SLIDE_SHAKE: [number, number] = [0.4, 1.1];
 export const forceSlidePuzzleEvent = registerWispEvent(
   KEY,
   "Slide Puzzle",
-  () => CONFIG.slidePuzzleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { slidesMs, holdMs, mergeMs } = CONFIG.slidePuzzleEvent;
+    const { slidesMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

@@ -6,7 +6,7 @@
 // snake ever wilder, until a last huge round blows the lock in a huge blast
 // and shake and the floor bursts open, unlocked for free, as the screen
 // unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const BANG_GAP_MS = 60;
 export const forceBulletSnakeEvent = registerWispEvent(
   KEY,
   "Bullet Snake",
-  () => CONFIG.bulletSnakeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { fireMs, flightMs, holdMs, mergeMs } = CONFIG.bulletSnakeEvent;
+    const { fireMs, flightMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

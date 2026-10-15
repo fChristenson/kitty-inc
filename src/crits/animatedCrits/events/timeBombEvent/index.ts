@@ -5,7 +5,7 @@
 // it swells and a shockwave that jolts the next income bar in view with
 // free levels; at zero it goes off in a huge blast and shake that slams
 // every bar. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -42,10 +42,10 @@ const TICK_SHAKE: [number, number] = [0.3, 1.2];
 export const forceTimeBombEvent = registerWispEvent(
   KEY,
   "Time Bomb",
-  () => CONFIG.timeBombEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { flyMs, ticksMs, levelShare, holdMs, mergeMs } =
-      CONFIG.timeBombEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -8,7 +8,7 @@
 // the whole last swarm streaks round it into the total, every rocket landing
 // a spray of coins, the last in a huge blast. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -56,9 +56,9 @@ interface Flight {
 export const forceSmartRocketsEvent = registerWispEvent(
   KEY,
   "Smart Rockets",
-  () => CONFIG.smartRocketsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, flyMs, gapMs, holdMs, mergeMs } = CONFIG.smartRocketsEvent;
+    const { growMs, flyMs, gapMs, holdMs, mergeMs } = meta.values;
     const start = getButtonCenter(context.isGroundFloor);
     const target = totalSpot(area);
     const wallY = (start.y + target.y) / 2;

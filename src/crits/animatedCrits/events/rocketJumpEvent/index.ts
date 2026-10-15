@@ -6,7 +6,7 @@
 // blasts itself higher, bar after bar, the fuses ever shorter, up the
 // screen; the last blast launches it into a huge blast and shake as every
 // bar slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ const BLAST_SHAKE: [number, number] = [0.8, 1.5];
 export const forceRocketJumpEvent = registerWispEvent(
   KEY,
   "Rocket Jump",
-  () => CONFIG.rocketJumpEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { fusesMs, flyMs, levelShare, holdMs, mergeMs } =
-      CONFIG.rocketJumpEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const bars = findRewardBars(floor, context)
       .sort((a, b) => b.center.y - a.center.y)

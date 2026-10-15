@@ -5,7 +5,7 @@
 // room, landing in a flash, a bang and a jolt as a new worker; after the
 // last lands its new hire flashes in a huge blast and shake as the leader
 // flies on off the screen. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,10 +33,10 @@ const LAND_SHAKE: [number, number] = [0.9, 1.7];
 export const forceMigrationEvent = registerWispEvent(
   KEY,
   "Migration",
-  () => CONFIG.migrationEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { crossMs, firstPeelMs, peelGapsMs, diveMs, holdMs, mergeMs } =
-      CONFIG.migrationEvent;
+      meta.values;
     const hires = findRewardHires(floor, context)
       .sort(() => Math.random() - 0.5)
       .slice(0, MAX_HIRES);

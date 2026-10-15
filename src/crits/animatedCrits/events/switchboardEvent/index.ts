@@ -6,7 +6,7 @@
 // next cord, quicker each time, until a fan of live cords links the button
 // to every worker; then the whole board surges at once in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,9 +49,9 @@ interface Cord {
 export const forceSwitchboardEvent = registerWispEvent(
   KEY,
   "Switchboard",
-  () => CONFIG.switchboardEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { runsMs, surgeAfterMs, holdMs, mergeMs } = CONFIG.switchboardEvent;
+    const { runsMs, surgeAfterMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

@@ -6,7 +6,7 @@
 // finished gem blazes and shatters, its glinting tiles arcing down onto the
 // bars, each landing free levels on its bar, the last slamming every bar.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -57,10 +57,10 @@ interface Shard {
 export const forceStencilEvent = registerWispEvent(
   KEY,
   "Stencil",
-  () => CONFIG.stencilEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { sprayMs, blazeMs, shatterMs, levelShare, holdMs, mergeMs } =
-      CONFIG.stencilEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     if (bars.length === 0) return;
     const size = Math.min(SIZE, (area.right - area.left) * WIDTH);

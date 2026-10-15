@@ -8,7 +8,7 @@
 // board flashes in a bang, then the queens dive one after another onto the
 // clicked floor's income bar, every hit a jolt, the fourth and the last
 // each a crit tier, the last in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -94,10 +94,10 @@ function solve(first: number): Step[] {
 export const forceEightQueensEvent = registerWispEvent(
   KEY,
   "Eight Queens",
-  () => CONFIG.eightQueensEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { boardMs, stepMs, flyGapMs, flyMs, holdMs, mergeMs } =
-      CONFIG.eightQueensEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

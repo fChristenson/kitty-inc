@@ -6,7 +6,7 @@
 // bar up, swinging bar to bar up the screen ever faster; off the last it
 // flings up off the top of the screen, and every bar slams in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,10 +37,10 @@ const GRAB_BURST: [number, number] = [0.4, 0.75];
 export const forceGrappleEvent = registerWispEvent(
   KEY,
   "Grapple",
-  () => CONFIG.grappleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { swingsMs, levelShare, slamMs, holdMs, mergeMs } =
-      CONFIG.grappleEvent;
+      meta.values;
     // bottom first, so it swings up the screen
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS).reverse();
     if (bars.length === 0) return;

@@ -5,7 +5,7 @@
 // splash, a bang and a jolt, and jumps a crit tier; the river meanders on to
 // loop the next bar, quicker each time, the last loop closing in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ interface Loop {
 export const forceOxbowEvent = registerWispEvent(
   KEY,
   "Oxbow",
-  () => CONFIG.oxbowEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { loopsMs, holdMs, mergeMs } = CONFIG.oxbowEvent;
+    const { loopsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let from: Point = getButtonCenter(context.isGroundFloor);

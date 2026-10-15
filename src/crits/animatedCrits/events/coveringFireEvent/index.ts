@@ -6,7 +6,7 @@
 // zigzags through the crossfire; each one reaching its spot is a flash, a
 // pop and a jolt as a new worker forms there, the last arrival landing in
 // a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const ARRIVE_SHAKE: [number, number] = [0.6, 1.2];
 export const forceCoveringFireEvent = registerWispEvent(
   KEY,
   "Covering Fire",
-  () => CONFIG.coveringFireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapMs, dashMs, holdMs, mergeMs } = CONFIG.coveringFireEvent;
+    const { gapMs, dashMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

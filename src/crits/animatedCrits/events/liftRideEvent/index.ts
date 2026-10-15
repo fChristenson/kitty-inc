@@ -6,8 +6,8 @@
 // clunk shut and the car rattles on up, the shaft's lights strobing through
 // the seam; the third guard is a big one taking two. The last doors open back
 // onto the floors, the locked floor's lock blows apart and it unlocks free
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { getLockCenter } from "../../../../floors/floorLock";
@@ -124,7 +124,7 @@ interface Stop {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.liftRideEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -251,7 +251,7 @@ function startLiftRide(floor: Floor, context: EventProcContext): void {
   const locked = findRewardLocked(floor, context);
   const area = context.getScreenAreaLocal?.(floor);
   if (!locked || !area) return;
-  const { openMs, rideMs, flyMs } = CONFIG.liftRideEvent;
+  const { openMs, rideMs, flyMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const stops: Stop[] = [];
   let at = 0;

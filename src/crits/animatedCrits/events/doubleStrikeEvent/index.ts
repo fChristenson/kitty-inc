@@ -6,7 +6,7 @@
 // jolt, and the worker climbs a perma tier; worker after worker, the beats
 // ever quicker, the last strike a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -29,9 +29,9 @@ const HIT_SHAKE: [number, number] = [0.8, 1.5];
 export const forceDoubleStrikeEvent = registerWispEvent(
   KEY,
   "Double Strike",
-  () => CONFIG.doubleStrikeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, waitMs, holdMs, mergeMs } = CONFIG.doubleStrikeEvent;
+    const { gapsMs, waitMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     let clock = 0;

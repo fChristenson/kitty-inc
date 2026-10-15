@@ -6,7 +6,7 @@
 // rings all meet at one point mid-screen, which goes off in a cluster of
 // blasts at once and then one colossal blast and the hardest shake of all
 // as the cash pours into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -62,10 +62,10 @@ interface Charge {
 export const forceSeismicChargesEvent = registerWispEvent(
   KEY,
   "Seismic Charges",
-  () => CONFIG.seismicChargesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fuseMs, chainMs, meetMs, holdMs, mergeMs } =
-      CONFIG.seismicChargesEvent;
+      meta.values;
     const width = area.right - area.left;
     const focus: Point = {
       x: area.left + width / 2,

@@ -6,8 +6,8 @@
 // clicks, see upgradeButton/shared.ts's mirrorUpgradeButton), which flashes
 // white and wiggles as the coins land and is left armed as the "Swarm" event
 // button (see upgradeButton/swarm.ts)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { playBoostEventStream } from "../../../../sound";
 import { LONG_PRESS_COIN_ARRIVE_MS } from "../../../../shared/pressAndHold";
 import { createEventFx, type EventFx } from "../../../../shared/eventFx";
@@ -50,7 +50,7 @@ let running: RunningSwarm | null = null;
 
 registerEventProc({
   key: "swarm",
-  chance: () => CONFIG.swarmEvent.chance,
+  chance: () => meta.chance,
   isInProgress: (floor) =>
     running !== null ||
     isSwarmEventArmed(floor) ||

@@ -6,7 +6,7 @@
 // jolt, ever faster; then the whole ring fires at once and the lock goes in
 // a huge blast and shake, and the floor bursts open, unlocked for free, as
 // the screen unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const HIT_SHAKE: [number, number] = [0.15, 0.7];
 export const forceLockbusterEvent = registerWispEvent(
   KEY,
   "Lockbuster",
-  () => CONFIG.lockbusterEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { ringMs, shotsMs, holdMs, mergeMs } = CONFIG.lockbusterEvent;
+    const { ringMs, shotsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

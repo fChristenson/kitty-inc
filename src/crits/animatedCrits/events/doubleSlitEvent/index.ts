@@ -8,7 +8,7 @@
 // a jolt; then the fringes blaze one by one, outermost first, and smear
 // along their bars for free levels, the clicked floor's own fringe last
 // with a slam. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -65,7 +65,7 @@ interface Hit {
 export const forceDoubleSlitEvent = registerWispEvent(
   KEY,
   "Double Slit",
-  () => CONFIG.doubleSlitEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       setupMs,
@@ -77,7 +77,7 @@ export const forceDoubleSlitEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.doubleSlitEvent;
+    } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor);
     if (!clicked) return;

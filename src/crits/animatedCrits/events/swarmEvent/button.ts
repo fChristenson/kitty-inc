@@ -1,9 +1,9 @@
 // "Swarm" event button: crits/animatedCrits/events/swarmEvent's proc animation arms it; clicking it
 // is free and starts a timed swarm sale, during which every click on this
 // button pays a Sale payout from it and each of its mirrored clones (see floorInteractions)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
 import { COLOR } from "../../../../palette";
-import { CONFIG } from "../../../../config";
 import {
   createTimedFloorEvent,
   registerEventButton,
@@ -28,7 +28,7 @@ export function isSwarmEventArmed(floor: Floor, _now?: number): boolean {
 }
 
 const swarmSale = createTimedFloorEvent(
-  CONFIG.swarmEvent.durationMs,
+  meta.values.durationMs,
   (floor) => {
     announceEventEnded(floor, "total");
     endEventProc("swarm");

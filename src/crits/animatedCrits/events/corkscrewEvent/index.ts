@@ -7,7 +7,7 @@
 // blast of cash and shake, and as the screen unfreezes the floor bursts
 // open: unlocked for free. Pays floor income × floor number × REWARD, plus
 // the floor
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const LAP_SHAKE: [number, number] = [0.8, 1.5];
 export const forceCorkscrewEvent = registerWispEvent(
   KEY,
   "Corkscrew",
-  () => CONFIG.corkscrewEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { climbMs, orbitMs, holdMs, mergeMs } = CONFIG.corkscrewEvent;
+    const { climbMs, orbitMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

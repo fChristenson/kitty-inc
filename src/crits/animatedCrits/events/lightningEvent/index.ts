@@ -6,7 +6,7 @@
 // and harder, and the last, biggest bolt blows the button in a huge blast and
 // shake, and the coins sweep into the total. Pays floor income × floor
 // number × REWARD (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -50,9 +50,9 @@ interface Bolt {
 export const forceLightningEvent = registerWispEvent(
   KEY,
   "Lightning",
-  () => CONFIG.lightningEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { strikeMs, gapMs, holdMs, mergeMs } = CONFIG.lightningEvent;
+    const { strikeMs, gapMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const middleX = (area.left + area.right) / 2;
     const size = Math.max(WISP_SIZE, width * WISP);

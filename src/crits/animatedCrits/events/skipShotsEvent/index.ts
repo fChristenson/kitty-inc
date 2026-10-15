@@ -5,7 +5,7 @@
 // income bar with a flash, a pop and a jolt of free levels; the guns trade
 // shots faster and faster, then fire one last volley that skips into every
 // bar at once in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,10 +53,10 @@ interface Shot {
 export const forceSkipShotsEvent = registerWispEvent(
   KEY,
   "Skip Shots",
-  () => CONFIG.skipShotsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { aimMs, shotsMs, volleyGapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.skipShotsEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const guns: Point[] = [

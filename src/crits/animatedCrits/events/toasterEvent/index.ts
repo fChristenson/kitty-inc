@@ -5,7 +5,7 @@
 // pops ever quicker and ever higher, until the last round shoots four
 // toasts to the top of the screen, bursting together in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const POP_SHAKE: [number, number] = [0.6, 1.2];
 export const forceToasterEvent = registerWispEvent(
   KEY,
   "Toaster",
-  () => CONFIG.toasterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { roundsMs, holdMs, mergeMs } = CONFIG.toasterEvent;
+    const { roundsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const reach = button.y - (area.top + TOP);
     let clock = 0;

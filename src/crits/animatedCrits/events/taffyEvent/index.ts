@@ -5,7 +5,7 @@
 // slap and a jolt, again and again, ever wider and faster, the rope
 // twisting as it goes; on the last pull they fling it into the total in a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -47,9 +47,9 @@ const SLAP_SHAKE: [number, number] = [0.5, 1.2];
 export const forceTaffyEvent = registerWispEvent(
   KEY,
   "Taffy",
-  () => CONFIG.taffyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { lumpMs, pullsMs, flingMs, holdMs, mergeMs } = CONFIG.taffyEvent;
+    const { lumpMs, pullsMs, flingMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const cx = (area.left + area.right) / 2;

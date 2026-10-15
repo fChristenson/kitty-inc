@@ -6,7 +6,7 @@
 // forms, scoop after scoop, quicker each time; then the rest of the tub
 // pours into the total in a huge blast and shake. Pays floor income × floor
 // number × REWARD, plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -58,9 +58,9 @@ interface Scoop {
 export const forceScoopsEvent = registerWispEvent(
   KEY,
   "Scoops",
-  () => CONFIG.scoopsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fillMs, scoopsMs, flightMs, holdMs, mergeMs } = CONFIG.scoopsEvent;
+    const { fillMs, scoopsMs, flightMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

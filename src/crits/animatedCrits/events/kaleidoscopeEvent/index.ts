@@ -6,7 +6,7 @@
 // jolt. Then they all slam together in the middle in a huge blast and shake,
 // and the coins sweep into the total. Pays floor income × floor number ×
 // REWARD (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -38,9 +38,9 @@ const MEET_SHAKE: [number, number] = [0.5, 1.4];
 export const forceKaleidoscopeEvent = registerWispEvent(
   KEY,
   "Kaleidoscope",
-  () => CONFIG.kaleidoscopeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { petalMs, holdMs, mergeMs } = CONFIG.kaleidoscopeEvent;
+    const { petalMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const middle = {

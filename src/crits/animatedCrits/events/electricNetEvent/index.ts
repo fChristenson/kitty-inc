@@ -6,7 +6,7 @@
 // jolt: a perma tier for a worker, free levels for a bar; it drapes over
 // the clicked floor's bar and cinches shut round it, the bar jumping a crit
 // tier in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,10 +50,10 @@ type Target =
 export const forceElectricNetEvent = registerWispEvent(
   KEY,
   "Electric Net",
-  () => CONFIG.electricNetEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { dropMs, cinchMs, levelShare, holdMs, mergeMs } =
-      CONFIG.electricNetEvent;
+      meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

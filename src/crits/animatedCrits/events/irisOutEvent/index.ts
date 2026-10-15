@@ -5,7 +5,7 @@
 // jolt as it climbs a perma tier, then the iris jumps to the next worker,
 // quicker each time; after the last it bursts wide open in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,10 +42,10 @@ interface Shot {
 export const forceIrisOutEvent = registerWispEvent(
   KEY,
   "Iris Out",
-  () => CONFIG.irisOutEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { closeMs, holdsMs, moveMs, openMs, holdMs, mergeMs } =
-      CONFIG.irisOutEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

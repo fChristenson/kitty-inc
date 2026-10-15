@@ -5,8 +5,8 @@
 // each split a flash, a pop, a jolt and a coin; then the whole swarm blows at
 // once in a blinding flash, a bang and a huge shake, spraying coins that merge
 // into the total. Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -72,14 +72,14 @@ interface Wisp {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.mitosisEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) &&
       context.getOnScreenFloors?.().some((entry) => entry.floor === floor) ===
         true,
     arm: (floor, context) => {
-      const { genMs, holdMs, mergeMs } = CONFIG.mitosisEvent;
+      const { genMs, holdMs, mergeMs } = meta.values;
       const last = genMs.length - 1;
       // when each generation splits (the last: blows)
       const ends: number[] = [];

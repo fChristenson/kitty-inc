@@ -4,8 +4,8 @@
 // emitter wisps at their corners. As each grid comes up the guns blow its
 // emitters one after another and its beams die; the last grid is
 // eight-sided. The view crash-lands and the floor goes up a perma tier
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
 import { createBeats } from "../../../../shared/eventBeats";
@@ -77,7 +77,7 @@ interface Grid {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.laserGauntletEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&

@@ -6,7 +6,7 @@
 // in a huge blast and shake and, as the screen unfreezes, the floor unlocks
 // for free while the cash sweeps into the total. Pays floor income × floor
 // number × REWARD, plus the floor
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -36,9 +36,9 @@ const GUSH_SHAKE: [number, number] = [0.6, 1.4];
 export const forceGusherEvent = registerWispEvent(
   KEY,
   "Gusher",
-  () => CONFIG.gusherEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { streamMs, riseMs, holdMs, mergeMs } = CONFIG.gusherEvent;
+    const { streamMs, riseMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

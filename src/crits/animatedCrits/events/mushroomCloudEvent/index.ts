@@ -8,7 +8,7 @@
 // whoomp and free levels; it swells and churns ever faster as the screen
 // rumbles, then the whole cloud is sucked up into the total in a huge blast
 // and shake. Pays floor income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -58,10 +58,10 @@ const PASS_SHAKE: [number, number] = [0.8, 1.6];
 export const forceMushroomCloudEvent = registerWispEvent(
   KEY,
   "Mushroom Cloud",
-  () => CONFIG.mushroomCloudEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fallMs, riseMs, billowMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.mushroomCloudEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const peak = area.top + (area.bottom - area.top) * PEAK;

@@ -7,7 +7,7 @@
 // passes; on its last run it switches to full suction and gulps in what's
 // left from all over, then docks in the lock, which blows open in a huge
 // blast: the floor unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,9 +55,9 @@ const GULP_SHAKE = 0.9;
 export const forceRobovacEvent = registerWispEvent(
   KEY,
   "Robovac",
-  () => CONFIG.robovacEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dumpMs, spiralMs, holdMs, mergeMs } = CONFIG.robovacEvent;
+    const { dumpMs, spiralMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

@@ -5,7 +5,7 @@
 // rumbling and cash flying off each crest with a bang; then the wind drops
 // and the frame snaps dead straight with a crack in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const GUST_SHAKE: [number, number] = [0.6, 1.5];
 export const forceFlagEvent = registerWispEvent(
   KEY,
   "Flag",
-  () => CONFIG.flagEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { waveMs, gusts, holdMs, mergeMs } = CONFIG.flagEvent;
+    const { waveMs, gusts, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

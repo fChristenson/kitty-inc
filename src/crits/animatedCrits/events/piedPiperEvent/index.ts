@@ -6,7 +6,7 @@
 // faster; then the piper leads the whole train into the clicked floor's
 // income bar, one after another, and as the last goes in it jumps a crit
 // tier in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -35,9 +35,9 @@ const PASS_SHAKE: [number, number] = [0.5, 1.2];
 export const forcePiedPiperEvent = registerWispEvent(
   KEY,
   "Pied Piper",
-  () => CONFIG.piedPiperEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { leadMs, holdMs, mergeMs } = CONFIG.piedPiperEvent;
+    const { leadMs, holdMs, mergeMs } = meta.values;
     const own = findRewardBars(floor, context).find((b) => b.floor === floor);
     if (!own) return;
     const button = getButtonCenter(context.isGroundFloor);

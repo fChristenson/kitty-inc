@@ -6,7 +6,7 @@
 // tier; the ring of charges sets again round the next bar, quicker each
 // time, and the last goes off in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const BLOW_SHAKE: [number, number] = [0.8, 1.5];
 export const forceShapedChargeEvent = registerWispEvent(
   KEY,
   "Shaped Charge",
-  () => CONFIG.shapedChargeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { fusesMs, holdMs, mergeMs } = CONFIG.shapedChargeEvent;
+    const { fusesMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

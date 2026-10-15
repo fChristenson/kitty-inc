@@ -6,7 +6,7 @@
 // meet in the middle with a blinding flash, a bang and a big jolt as the bar
 // jumps a crit tier; then on to the next bar, ever faster, the last weld
 // ending in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -32,9 +32,9 @@ const HIT_SHAKE: [number, number] = [0.9, 1.5];
 export const forceArcWeldEvent = registerWispEvent(
   KEY,
   "Arc Weld",
-  () => CONFIG.arcWeldEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { weldsMs, holdMs, mergeMs } = CONFIG.arcWeldEvent;
+    const { weldsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

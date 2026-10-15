@@ -5,7 +5,7 @@
 // jolt that lands free levels; it buries itself in the bottom of the screen,
 // fizzes for a heartbeat, then blows in a huge blast and shake that hurls
 // cash everywhere. Pays floor income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,10 +38,10 @@ const PUNCH_SHAKE: [number, number] = [0.8, 1.6];
 export const forceBunkerBusterEvent = registerWispEvent(
   KEY,
   "Bunker Buster",
-  () => CONFIG.bunkerBusterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fallMs, buriedMs, levelShare, holdMs, mergeMs } =
-      CONFIG.bunkerBusterEvent;
+      meta.values;
     const found = findRewardBars(floor, context);
     const bars = context.upgradeFloorFree ? found.slice(0, MAX_BARS) : [];
     const x = found.length

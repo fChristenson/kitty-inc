@@ -5,7 +5,7 @@
 // they launch into a towering last leap and slam down onto their worker in
 // a flash and a jolt, raising its perma tier, the last in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ interface Bean {
 export const forceJumpingBeansEvent = registerWispEvent(
   KEY,
   "Jumping Beans",
-  () => CONFIG.jumpingBeansEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { staggerMs, hopMs, holdMs, mergeMs } = CONFIG.jumpingBeansEvent;
+    const { staggerMs, hopMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     // later beans hop more times, so they slam down one after another

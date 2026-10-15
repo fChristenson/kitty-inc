@@ -6,7 +6,7 @@
 // every one emptying its cash into the total, the last capsule landing in a
 // huge blast and shake. Pays floor income × floor number × REWARD, plus the
 // hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -54,9 +54,9 @@ interface Tube {
 export const forcePneumaticTubesEvent = registerWispEvent(
   KEY,
   "Pneumatic Tubes",
-  () => CONFIG.pneumaticTubesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { firesMs, travelMs, holdMs, mergeMs } = CONFIG.pneumaticTubesEvent;
+    const { firesMs, travelMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

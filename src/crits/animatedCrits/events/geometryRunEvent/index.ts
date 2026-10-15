@@ -5,8 +5,8 @@
 // glitter spike on each; every landing jolts its platform and levels that
 // floor's bar. Off the last one it launches up a ramp into a huge blast, the
 // stage whips out and the crit's tier lands on the clicked floor
+import meta from "./meta";
 import { levelsFor, type Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
@@ -88,7 +88,7 @@ interface Jump {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.geometryRunEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isRevealStageRunning(KEY),
     canArm: (floor, context) =>
       canStartRevealStage(context) &&
@@ -107,7 +107,7 @@ export function forceGeometryRunEvent(floor: Floor): void {
 
 function startRun(floor: Floor, context: EventProcContext): void {
   const { speed, hopMs, spikeHopMs, launchMs, holdMs } =
-    CONFIG.geometryRunEvent;
+    meta.values;
   const bars = findRewardBars(floor, context);
   const tier = context.critTier ?? pickCritTierByOdds();
   // the bars' own size, of the stage's (the screen's) width

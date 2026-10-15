@@ -7,8 +7,8 @@
 // coins out of it; the rally ends with a hard smash into the clicked floor's
 // bar, and the coins merge into the total. Pays floor income × floor number
 // once per bar hit (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import {
@@ -123,7 +123,7 @@ function planPaddles(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.pingPongEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) && planPaddles(floor, context) !== null,
@@ -133,7 +133,7 @@ registerEventProc(
       if (!area || !paddles) return;
       const { bar, above } = paddles;
       const { approachMs, firstRallyMs, lastRallyMs, holdMs, mergeMs } =
-        CONFIG.pingPongEvent;
+        meta.values;
       const barY = bar.box.y - BALL_R;
       const roofY = above
         ? above.box.y + above.box.height + BALL_R

@@ -7,7 +7,7 @@
 // slam in together in a cluster round one huge blast and shake; the floor
 // bursts open, unlocked for free, as the screen unfreezes. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const DIVE_SHAKE: [number, number] = [0.6, 1.3];
 export const forceSwarmStrikeEvent = registerWispEvent(
   KEY,
   "Swarm Strike",
-  () => CONFIG.swarmStrikeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { circleMs, divesMs, holdMs, mergeMs } = CONFIG.swarmStrikeEvent;
+    const { circleMs, divesMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

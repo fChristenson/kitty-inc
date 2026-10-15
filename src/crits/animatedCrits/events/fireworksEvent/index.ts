@@ -5,7 +5,7 @@
 // and biggest shell climbs right into the total-income readout and bursts
 // there in a huge blast and shake, and the coins sweep into the total. Pays
 // floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ const POP_SHAKE = 1.6;
 export const forceFireworksEvent = registerWispEvent(
   KEY,
   "Fireworks",
-  () => CONFIG.fireworksEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapMs, riseMs, holdMs, mergeMs } = CONFIG.fireworksEvent;
+    const { gapMs, riseMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const reach = Math.min(width, height) * REACH;

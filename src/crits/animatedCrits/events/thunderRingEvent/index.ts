@@ -5,7 +5,7 @@
 // bolt strikes it in a blinding flash and a new worker forms; the last
 // spot it crosses goes off in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,9 +30,9 @@ const HIT_SHAKE: [number, number] = [0.5, 1.1];
 export const forceThunderRingEvent = registerWispEvent(
   KEY,
   "Thunder Ring",
-  () => CONFIG.thunderRingEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { surges, surgeMs, gapMs, holdMs, mergeMs } = CONFIG.thunderRingEvent;
+    const { surges, surgeMs, gapMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

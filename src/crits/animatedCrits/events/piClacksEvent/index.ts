@@ -8,7 +8,7 @@
 // gives way: 31 clacks in all, the first digits of pi, every one a flash
 // and a jolt of the bar; the big wisp rolls off, leaps and slams back down
 // onto the bar, blowing it up a crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -48,10 +48,10 @@ interface Clack {
 export const forcePiClacksEvent = registerWispEvent(
   KEY,
   "Pi Clacks",
-  () => CONFIG.piClacksEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { growMs, clackMs, rollMs, slamMs, holdMs, mergeMs } =
-      CONFIG.piClacksEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

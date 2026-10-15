@@ -7,7 +7,7 @@
 // total-income readout, shrinking, in a huge blast and shake that sprays
 // cash everywhere, and the coins sweep into the total. Pays floor income ×
 // floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -43,9 +43,9 @@ const FINAL_REACH: [number, number] = [0.08, 0.6];
 export const forceCookieCutterEvent = registerWispEvent(
   KEY,
   "Cookie Cutter",
-  () => CONFIG.cookieCutterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { aimMs, cutMs, liftMs, holdMs, mergeMs } = CONFIG.cookieCutterEvent;
+    const { aimMs, cutMs, liftMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const span = Math.min(width, height);

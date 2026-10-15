@@ -5,7 +5,7 @@
 // a jolt and cash jumping out of the gaps; on the last they all slam down
 // flat together in a huge blast and shake as the cash pours into the total.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const CLACK_SHAKE: [number, number] = [0.4, 1.1];
 export const forceRattleEvent = registerWispEvent(
   KEY,
   "Rattle",
-  () => CONFIG.rattleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hopsMs, holdMs, mergeMs } = CONFIG.rattleEvent;
+    const { hopsMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

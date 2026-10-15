@@ -6,7 +6,7 @@
 // a jolt, the fans narrowing and the swings tightening onto the clicked
 // floor's bar until every beam locks onto it at once in a blazing flare and
 // it jumps a crit tier in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
@@ -35,9 +35,9 @@ const SWING_SHAKE: [number, number] = [0.3, 0.9];
 export const forceMoireEvent = registerWispEvent(
   KEY,
   "Moiré",
-  () => CONFIG.moireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, sweepMs, holdMs, mergeMs } = CONFIG.moireEvent;
+    const { growMs, sweepMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

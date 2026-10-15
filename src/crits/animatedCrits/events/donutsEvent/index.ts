@@ -5,7 +5,7 @@
 // levels; then it peels off onto the next bar and the next, spinning ever
 // faster, the last set of donuts ending in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -33,9 +33,9 @@ const DONE_SHAKE: [number, number] = [0.7, 1.4];
 export const forceDonutsEvent = registerWispEvent(
   KEY,
   "Donuts",
-  () => CONFIG.donutsEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { spinsMs, holdMs, mergeMs } = CONFIG.donutsEvent;
+    const { spinsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

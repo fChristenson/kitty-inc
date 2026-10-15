@@ -5,7 +5,7 @@
 // whole screen is laid it dives into the total and the carpet is raked up
 // after it, stripe by stripe, in a huge blast and shake. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -42,10 +42,10 @@ const TURN_SHAKE: [number, number] = [0.5, 1.2];
 export const forceLawnmowerEvent = registerWispEvent(
   KEY,
   "Lawnmower",
-  () => CONFIG.lawnmowerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { stripesMs, turnMs, diveMs, flightMs, holdMs, mergeMs } =
-      CONFIG.lawnmowerEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const left = area.left + INSET;
     const right = area.right - INSET;

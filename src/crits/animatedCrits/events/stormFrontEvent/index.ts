@@ -6,7 +6,7 @@
 // worker, free levels for a bar, ever faster; at the far edge a colossal
 // bolt cracks down and every bar slams in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const STRIKE_SHAKE: [number, number] = [0.7, 1.5];
 export const forceStormFrontEvent = registerWispEvent(
   KEY,
   "Storm Front",
-  () => CONFIG.stormFrontEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { sweepMs, levelShare, holdMs, mergeMs } = CONFIG.stormFrontEvent;
+    const { sweepMs, levelShare, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     const bars = context.upgradeFloorFree
       ? findRewardBars(floor, context).slice(0, MAX_BARS)

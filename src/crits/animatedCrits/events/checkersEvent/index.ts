@@ -6,7 +6,7 @@
 // side it crowns itself, "KING ME!", and every bar it jumped on jumps a crit
 // tier in a cascade, the last in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,9 +53,9 @@ interface Hop {
 export const forceCheckersEvent = registerWispEvent(
   KEY,
   "Checkers",
-  () => CONFIG.checkersEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hopsMs, cascadeMs, holdMs, mergeMs } = CONFIG.checkersEvent;
+    const { hopsMs, cascadeMs, holdMs, mergeMs } = meta.values;
     // bottom to top: the far side is the top of the screen
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS).reverse();
     if (bars.length === 0) return;

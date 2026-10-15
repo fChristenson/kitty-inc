@@ -6,7 +6,7 @@
 // end in a cluster of blasts, a big jolt and the bar jumping a crit tier;
 // then onto the next bar, the last run ending round a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ interface Blast {
 export const forceRocketSledEvent = registerWispEvent(
   KEY,
   "Rocket Sled",
-  () => CONFIG.rocketSledEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { runsMs, holdMs, mergeMs } = CONFIG.rocketSledEvent;
+    const { runsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

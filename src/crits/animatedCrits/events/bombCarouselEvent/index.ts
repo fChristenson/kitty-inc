@@ -6,7 +6,7 @@
 // in a white blast, a bang, a big jolt and a spray of coins, the blasts
 // racing round in a circle; the button blows last in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,10 +40,10 @@ const BLOW_SHAKE: [number, number] = [0.6, 1.3];
 export const forceBombCarouselEvent = registerWispEvent(
   KEY,
   "Bomb Carousel",
-  () => CONFIG.bombCarouselEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spinMs, flingMs, releasesMs, holdMs, mergeMs } =
-      CONFIG.bombCarouselEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const hub: Point = {
       x: Math.min(area.right - 200, Math.max(area.left + 200, button.x)),

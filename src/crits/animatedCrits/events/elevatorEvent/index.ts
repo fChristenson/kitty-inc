@@ -5,7 +5,7 @@
 // which jolts with a splash, a bloop and free levels; floor after floor up
 // the screen, and at the top bar every bar slams in a huge blast and shake.
 // Pays floor income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -32,10 +32,10 @@ const DING_SHAKE: [number, number] = [0.6, 1.4];
 export const forceElevatorEvent = registerWispEvent(
   KEY,
   "Elevator",
-  () => CONFIG.elevatorEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, branchMs, levelShare, holdMs, mergeMs } =
-      CONFIG.elevatorEvent;
+      meta.values;
     // bottom first, the way the column climbs
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS).reverse();
     if (bars.length === 0) return;

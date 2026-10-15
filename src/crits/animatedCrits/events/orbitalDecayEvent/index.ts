@@ -6,7 +6,7 @@
 // a spray of cash; the last three hit at once in a cluster and one colossal
 // blast with the hardest shake of all. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -56,9 +56,9 @@ interface Bomb {
 export const forceOrbitalDecayEvent = registerWispEvent(
   KEY,
   "Orbital Decay",
-  () => CONFIG.orbitalDecayEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { firstMs, hitsMs, holdMs, mergeMs } = CONFIG.orbitalDecayEvent;
+    const { firstMs, hitsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const centre: Point = {
       x: button.x,

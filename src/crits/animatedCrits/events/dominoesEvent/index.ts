@@ -7,7 +7,7 @@
 // clack and free levels; at the end the whole fallen line surges up into
 // the total in a huge blast and shake. Pays floor income × floor number ×
 // REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -42,10 +42,10 @@ const BAR_SHAKE: [number, number] = [0.6, 1.3];
 export const forceDominoesEvent = registerWispEvent(
   KEY,
   "Dominoes",
-  () => CONFIG.dominoesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { layMs, runMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.dominoesEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const fallback = totalSpot(area);

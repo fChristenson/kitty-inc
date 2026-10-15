@@ -5,7 +5,7 @@
 // time a beam sweeps across a bar it flashes with a crack, a jolt and free
 // levels; at full spin the beams flare wide and the hub blows in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const POP_GAP_MS = 50;
 export const forceLaserTurnstileEvent = registerWispEvent(
   KEY,
   "Laser Turnstile",
-  () => CONFIG.laserTurnstileEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, levelShare, holdMs, mergeMs } = CONFIG.laserTurnstileEvent;
+    const { spinMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const hub: Point = {

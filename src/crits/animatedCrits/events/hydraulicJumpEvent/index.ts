@@ -6,7 +6,7 @@
 // it, every surge a whoosh and a jolt; then the towering roller breaks and
 // pours up into the total-income readout, the last of it in a huge blast.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
@@ -52,10 +52,10 @@ const BREAK_SHAKE = 1.2;
 export const forceHydraulicJumpEvent = registerWispEvent(
   KEY,
   "Hydraulic Jump",
-  () => CONFIG.hydraulicJumpEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { streamMs, growMs, riseMs, holdMs, mergeMs } =
-      CONFIG.hydraulicJumpEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const total = () => cover?.total() ?? fallback;
     const button = getButtonCenter(context.isGroundFloor);

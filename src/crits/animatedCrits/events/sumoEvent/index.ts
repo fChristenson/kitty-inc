@@ -5,7 +5,7 @@
 // shoving each other back and forth across the ring; on the last charge
 // one heaves the other clean out of the ring: "YOKOZUNA!", in a huge blast
 // and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const CLASH_SHAKE: [number, number] = [0.8, 1.4];
 export const forceSumoEvent = registerWispEvent(
   KEY,
   "Sumo",
-  () => CONFIG.sumoEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { clashesMs, holdMs, mergeMs } = CONFIG.sumoEvent;
+    const { clashesMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const hub: Point = {
       x: (area.left + area.right) / 2,

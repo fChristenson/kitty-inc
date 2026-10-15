@@ -7,7 +7,7 @@
 // bit grinds in, stalling hard in a roaring gush of sparks, and bores through
 // in heavy shoves for a big batch, the bar slamming. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,10 +53,10 @@ interface Bit {
 export const forcePilotHoleEvent = registerWispEvent(
   KEY,
   "Pilot Hole",
-  () => CONFIG.pilotHoleEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { approachMs, stallMs, boreMs, levelShare, holdMs, mergeMs } =
-      CONFIG.pilotHoleEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

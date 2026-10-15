@@ -7,7 +7,7 @@
 // in a huge blast that bursts into a cluster of more, a new worker forming in
 // the smoke; the last bunch goes up in a colossal blast. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -80,10 +80,10 @@ interface Blast {
 export const forceBombGrapesEvent = registerWispEvent(
   KEY,
   "Bomb Grapes",
-  () => CONFIG.bombGrapesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, popGapMs, bunchGapMs, fallMs, holdMs, mergeMs } =
-      CONFIG.bombGrapesEvent;
+      meta.values;
     const hires = findRewardHires(floor, context)
       .slice(0, MAX_BUNCHES)
       .sort((a, b) => a.x - b.x);

@@ -7,7 +7,7 @@
 // worker with a flash, a bloop and a jolt and the worker climbs a perma
 // tier; the last tags in with a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -40,9 +40,9 @@ const TAG_SHAKE: [number, number] = [0.6, 1.3];
 export const forceStatuesEvent = registerWispEvent(
   KEY,
   "Statues",
-  () => CONFIG.statuesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dashesMs, freezeMs, holdMs, mergeMs } = CONFIG.statuesEvent;
+    const { dashesMs, freezeMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const go = createCritTextSprite("GO!", COLOR.heavenlyGold, STYLE);

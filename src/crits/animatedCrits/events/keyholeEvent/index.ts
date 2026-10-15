@@ -6,7 +6,7 @@
 // jolt, and on the final clunk the floor bursts open in a huge blast and
 // shake, unlocked for free as the screen unfreezes. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -41,10 +41,10 @@ const CLICK_SHAKE: [number, number] = [0.6, 1];
 export const forceKeyholeEvent = registerWispEvent(
   KEY,
   "Keyhole",
-  () => CONFIG.keyholeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { riseMs, traceMs, flyMs, clicksMs, holdMs, mergeMs } =
-      CONFIG.keyholeEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

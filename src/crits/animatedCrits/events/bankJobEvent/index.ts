@@ -6,8 +6,8 @@
 // the pistol drops each, the gold beside him bursting into coins that pay
 // into the total. At the end it blows the round vault door off, paying big,
 // and a flood of coins pours out at the view as the floors rush back up
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playCoinDrop, playSwoosh } from "../../../../sound";
 import { rewardPayoutAmount } from "../../../../floors/incomePanel";
@@ -128,7 +128,7 @@ const SWING_SHAKE = 0.6;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.bankJobEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startBankJob,
@@ -252,7 +252,7 @@ function startBankJob(floor: Floor, context: EventProcContext): void {
   // the room's height: the doorway has the screen's shape
   const high = (area.bottom - area.top) / (area.right - area.left);
   const { swingMs, walkMs, flyMs, payoutsPerGuard, payoutsVault } =
-    CONFIG.bankJobEvent;
+    meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const go = swingMs / 2;
   const camZ = (ms: number) => -FOCAL + STRIDE * clamp01((ms - go) / walkMs);

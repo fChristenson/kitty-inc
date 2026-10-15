@@ -6,7 +6,7 @@
 // a pop and coins bursting out of it, the last a huge blast and shake, and
 // the coins sweep into the total. Pays floor income × floor number × REWARD
 // (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,10 +52,10 @@ const HIT_RING: [number, number] = [60, 180];
 export const forceLineupEvent = registerWispEvent(
   KEY,
   "Lineup",
-  () => CONFIG.lineupEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { alignMs, trembleMs, fireMs, flyMs, holdMs, mergeMs } =
-      CONFIG.lineupEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const size = Math.max(WISP_SIZE, width * WISP);

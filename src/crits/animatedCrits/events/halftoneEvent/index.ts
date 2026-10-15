@@ -6,7 +6,7 @@
 // the dots peel off in a wave and swirl up into the total as cash, the
 // picture fading back in behind them, in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -118,9 +118,9 @@ function printOf(
 export const forceHalftoneEvent = registerWispEvent(
   KEY,
   "Halftone",
-  () => CONFIG.halftoneEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { sweepMs, showMs, peelMs, holdMs, mergeMs } = CONFIG.halftoneEvent;
+    const { sweepMs, showMs, peelMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

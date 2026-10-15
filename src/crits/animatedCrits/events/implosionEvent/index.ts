@@ -6,8 +6,8 @@
 // ring closes in as the core trembles and the screen rumbles, and it all
 // blows in a huge blast and shake, and the coins sweep into the total. Pays
 // floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import {
@@ -81,14 +81,14 @@ interface Ring {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.implosionEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { firstRingMs, gapMs, collapseMs, finalMs, holdMs, mergeMs } =
-        CONFIG.implosionEvent;
+        meta.values;
       const width = area.right - area.left;
       const button = getButtonCenter(context.isGroundFloor);
       const core = Math.max(WISP_SIZE * 1.2, width * CORE);

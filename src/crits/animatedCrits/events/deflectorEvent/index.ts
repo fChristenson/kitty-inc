@@ -6,7 +6,7 @@
 // the spot charges up with glitter, and its last hit bursts it into a new
 // worker, the final one in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -67,9 +67,9 @@ interface Shot {
 export const forceDeflectorEvent = registerWispEvent(
   KEY,
   "Deflector",
-  () => CONFIG.deflectorEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fireMs, speed, holdMs, mergeMs } = CONFIG.deflectorEvent;
+    const { fireMs, speed, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const deflector: Point = {

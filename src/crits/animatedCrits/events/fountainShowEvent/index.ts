@@ -6,7 +6,7 @@
 // free levels, until the finale shoots every jet sky high into the total in
 // a huge blast and shake. Pays floor income × floor number × REWARD, plus
 // the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,10 +36,10 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceFountainShowEvent = registerWispEvent(
   KEY,
   "Fountain Show",
-  () => CONFIG.fountainShowEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { waveMs, leapsMs, finaleMs, levelShare, holdMs, mergeMs } =
-      CONFIG.fountainShowEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS).reverse();
     const width = area.right - area.left;
     const base = area.bottom - LOW;

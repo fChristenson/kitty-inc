@@ -6,7 +6,7 @@
 // surge, until out of the chaos it suddenly builds its endless diagonal
 // highway and races off along it; then every gold cell bursts into cash in
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const DY = [-1, 0, 1, 0];
 export const forceLangtonsAntEvent = registerWispEvent(
   KEY,
   "Langton's Ant",
-  () => CONFIG.langtonsAntEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, holdMs, mergeMs } = CONFIG.langtonsAntEvent;
+    const { runMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

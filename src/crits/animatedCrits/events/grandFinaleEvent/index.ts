@@ -6,7 +6,7 @@
 // shells all goes up and off together, every blast spraying coins, the
 // shakes piling up into a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,10 +55,10 @@ interface Blast {
 export const forceGrandFinaleEvent = registerWispEvent(
   KEY,
   "Grand Finale",
-  () => CONFIG.grandFinaleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, chainMs, clusterMs, holdMs, mergeMs } =
-      CONFIG.grandFinaleEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

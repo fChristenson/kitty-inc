@@ -6,7 +6,7 @@
 // hurls it free and it streaks away into the next locked floor, which
 // bursts open in a huge blast and shake, unlocked for free. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ interface Orbit {
 export const forceEscapeVelocityEvent = registerWispEvent(
   KEY,
   "Escape Velocity",
-  () => CONFIG.escapeVelocityEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { orbitsMs, escapeMs, holdMs, mergeMs } = CONFIG.escapeVelocityEvent;
+    const { orbitsMs, escapeMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const sun = getButtonCenter(context.isGroundFloor);

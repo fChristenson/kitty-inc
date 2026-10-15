@@ -5,7 +5,7 @@
 // of coins pumped out under it; at the top it dives into the total-income
 // readout in a huge blast and shake, and the coins sweep into the total.
 // Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -46,9 +46,9 @@ const PULSE_SHAKE: [number, number] = [0.9, 2];
 export const forceJellyfishEvent = registerWispEvent(
   KEY,
   "Jellyfish",
-  () => CONFIG.jellyfishEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pulseGapsMs, diveMs, holdMs, mergeMs } = CONFIG.jellyfishEvent;
+    const { pulseGapsMs, diveMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

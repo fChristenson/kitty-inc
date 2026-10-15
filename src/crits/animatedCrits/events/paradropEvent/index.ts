@@ -5,7 +5,7 @@
 // off in a big blast that bursts into a cluster, a bang and a shake, and a
 // new worker forms out of the smoke; the last lands in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,9 +55,9 @@ interface Blast {
 export const forceParadropEvent = registerWispEvent(
   KEY,
   "Paradrop",
-  () => CONFIG.paradropEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dropMs, gapsMs, holdMs, mergeMs } = CONFIG.paradropEvent;
+    const { dropMs, gapsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const n = hires.length;

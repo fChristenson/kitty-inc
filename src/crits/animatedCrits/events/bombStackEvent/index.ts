@@ -6,7 +6,7 @@
 // a bang, a big jolt and a spray of coins, until the lone bomb at the top is
 // flung sky high and goes off in a huge blast and shake. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const ROW_SHAKE: [number, number] = [0.8, 1.5];
 export const forceBombStackEvent = registerWispEvent(
   KEY,
   "Bomb Stack",
-  () => CONFIG.bombStackEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { stackMs, blowsMs, holdMs, mergeMs } = CONFIG.bombStackEvent;
+    const { stackMs, blowsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const cx = (area.left + area.right) / 2;
     const base = area.bottom - BASE;

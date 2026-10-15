@@ -6,7 +6,7 @@
 // flings its stars off along their orbits onto the bars in a rattling storm
 // of blasts, every landing free levels, into a huge blast on the clicked
 // bar, which climbs a crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -80,10 +80,10 @@ interface Star {
 export const forceNebulaEvent = registerWispEvent(
   KEY,
   "Nebula",
-  () => CONFIG.nebulaEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { sprayMs, igniteMs, levelShare, holdMs, mergeMs } =
-      CONFIG.nebulaEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

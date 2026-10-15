@@ -7,7 +7,7 @@
 // crit tier; it flies back up, charges and smashes again, ever faster, bar
 // after bar; the last strike slams every bar in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const STRIKE_SHAKE: [number, number] = [1, 1.6];
 export const forceMjolnirEvent = registerWispEvent(
   KEY,
   "Mjolnir",
-  () => CONFIG.mjolnirEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { chargesMs, holdMs, mergeMs } = CONFIG.mjolnirEvent;
+    const { chargesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

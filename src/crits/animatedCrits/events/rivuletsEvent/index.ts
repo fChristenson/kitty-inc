@@ -5,7 +5,7 @@
 // together with a bang and a jolt and a new worker forms in the puddle;
 // pair after pair, quicker each time, the last meeting in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,9 +33,9 @@ const MEET_SHAKE: [number, number] = [0.6, 1.3];
 export const forceRivuletsEvent = registerWispEvent(
   KEY,
   "Rivulets",
-  () => CONFIG.rivuletsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, runMs, holdMs, mergeMs } = CONFIG.rivuletsEvent;
+    const { gapsMs, runMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const pour: Pour = {

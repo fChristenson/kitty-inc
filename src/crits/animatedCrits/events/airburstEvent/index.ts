@@ -5,7 +5,7 @@
 // curtain of sparks down onto the bar, which jumps a crit tier with a jolt
 // as they land; ever faster, bar after bar; the last bursts in a huge blast
 // and shake as every bar slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ const RAIN_SHAKE: [number, number] = [0.9, 1.5];
 export const forceAirburstEvent = registerWispEvent(
   KEY,
   "Airburst",
-  () => CONFIG.airburstEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, climbMs, holdMs, mergeMs } = CONFIG.airburstEvent;
+    const { gapsMs, climbMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

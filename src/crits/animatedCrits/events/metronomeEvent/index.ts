@@ -5,7 +5,7 @@
 // each swing after the first two it sweeps across the next income bar,
 // which flares as it jumps a crit tier, the last in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ interface Swing {
 export const forceMetronomeEvent = registerWispEvent(
   KEY,
   "Metronome",
-  () => CONFIG.metronomeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { ticksMs, holdMs, mergeMs } = CONFIG.metronomeEvent;
+    const { ticksMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const pivot: Point = {

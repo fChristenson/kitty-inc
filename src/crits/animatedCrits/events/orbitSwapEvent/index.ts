@@ -5,7 +5,7 @@
 // third crossing they smash into each other on the bar in a flash, a bang
 // and a jolt, and it jumps a crit tier; they split off to circle the next
 // bar, the last smash a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ interface Orbit {
 export const forceOrbitSwapEvent = registerWispEvent(
   KEY,
   "Orbit Swap",
-  () => CONFIG.orbitSwapEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { orbitsMs, holdMs, mergeMs } = CONFIG.orbitSwapEvent;
+    const { orbitsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let from: Point = getButtonCenter(context.isGroundFloor);

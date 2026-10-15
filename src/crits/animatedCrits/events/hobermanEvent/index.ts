@@ -5,7 +5,7 @@
 // jolt; then it springs wide open across the screen and snaps shut on the
 // lock, crushing it in a colossal blast and shake, and the floor bursts
 // open, unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,10 +34,10 @@ const SWELL_SHAKE: [number, number] = [0.6, 1.2];
 export const forceHobermanEvent = registerWispEvent(
   KEY,
   "Hoberman",
-  () => CONFIG.hobermanEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { breathsMs, openMs, crushMs, holdMs, mergeMs } =
-      CONFIG.hobermanEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

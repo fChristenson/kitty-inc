@@ -6,7 +6,7 @@
 // huge blast and shake that sprays hundreds of coins over the screen, and the
 // coins sweep into the total. Pays floor income × floor number × REWARD (see
 // ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ const SPRAY: [number, number] = [0.1, 0.55];
 export const forceSparklerEvent = registerWispEvent(
   KEY,
   "Sparkler",
-  () => CONFIG.sparklerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { burnMs, holdMs, mergeMs } = CONFIG.sparklerEvent;
+    const { burnMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const span = Math.min(width, area.bottom - area.top);
     const button = getButtonCenter(context.isGroundFloor);

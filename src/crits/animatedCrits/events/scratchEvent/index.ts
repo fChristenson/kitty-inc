@@ -4,8 +4,8 @@
 // jolt, until the bar is covered in them. They blaze and tremble, then burst
 // into coins all at once in a huge blast and shake, and the coins sweep into
 // the total. Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -84,7 +84,7 @@ interface Swipe {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.scratchEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) &&
@@ -94,7 +94,7 @@ registerEventProc(
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { firstSwipeMs, gapMs, chargeMs, holdMs, mergeMs } =
-        CONFIG.scratchEvent;
+        meta.values;
       const box = getIncomeBarBox(context.isGroundFloor);
       const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
 

@@ -5,7 +5,7 @@
 // jolts with free levels, the pack picking up speed all the way, and the
 // sprint over the last bar ends in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ interface Finish {
 export const forcePelotonEvent = registerWispEvent(
   KEY,
   "Peloton",
-  () => CONFIG.pelotonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { levelShare, holdMs, mergeMs } = CONFIG.pelotonEvent;
+    const { levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     // in from the side, then end to end along every bar, alternating

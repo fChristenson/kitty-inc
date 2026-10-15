@@ -5,7 +5,7 @@
 // coins, PENNY, then HONEY, ever faster; the last row flips MONEY all gold
 // and the whole board blows in a huge blast and shake. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,10 +35,10 @@ const ROW_SHAKE: [number, number] = [0.6, 1.2];
 export const forceWordGuessEvent = registerWispEvent(
   KEY,
   "Word Guess",
-  () => CONFIG.wordGuessEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { showMs, flipsMs, rowGapMs, holdMs, mergeMs } =
-      CONFIG.wordGuessEvent;
+      meta.values;
     const size = Math.min(TILE, (area.right - area.left - 40) / ANSWER.length);
     const scale = size / TILE;
     const cx = (area.left + area.right) / 2;

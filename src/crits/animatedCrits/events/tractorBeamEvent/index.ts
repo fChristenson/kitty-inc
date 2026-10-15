@@ -5,7 +5,7 @@
 // screen rumbling; then the beam slams shut in a huge blast and shake and
 // the coins sweep into the total. Pays floor income × floor number × REWARD
 // (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -37,10 +37,10 @@ const RUMBLE = 1;
 export const forceTractorBeamEvent = registerWispEvent(
   KEY,
   "Tractor Beam",
-  () => CONFIG.tractorBeamEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { aimMs, openMs, liftMs, riseMs, holdMs, mergeMs } =
-      CONFIG.tractorBeamEvent;
+      meta.values;
     const width = area.right - area.left;
     const button = getButtonCenter(context.isGroundFloor);
     const fallback = totalSpot(area);

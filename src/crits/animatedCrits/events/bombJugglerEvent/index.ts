@@ -6,7 +6,7 @@
 // blasts round it, its own bang and shake, the bar jolting with free
 // levels; the last toss sends all three at once onto the last bar in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -72,10 +72,10 @@ interface Toss {
 export const forceBombJugglerEvent = registerWispEvent(
   KEY,
   "Bomb Juggler",
-  () => CONFIG.bombJugglerEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { juggleMs, tossMs, flightMs, holdMs, mergeMs } =
-      CONFIG.bombJugglerEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

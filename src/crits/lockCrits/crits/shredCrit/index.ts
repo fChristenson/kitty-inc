@@ -3,7 +3,7 @@
 // price's pieces sliding apart along every cut; a cross of two long cuts
 // tears through it, the pieces fly apart and the floor bursts open: its
 // button's next taps land double
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { doubleTaps } from "../../../buttonCrits/tapPerks";
 import {
   drawSlash,
@@ -103,7 +103,7 @@ const off: Point = { x: 0, y: 0 };
 registerFloorCrit("shredCrit", {
   // double taps on the floor it opened
   reward(t) {
-    doubleTaps.add(t.floor, t.count * CONFIG.crit.shredTaps);
+    doubleTaps.add(t.floor, t.count * meta.values.taps);
     t.flipButton();
   },
   plan(r, _bars, hit) {

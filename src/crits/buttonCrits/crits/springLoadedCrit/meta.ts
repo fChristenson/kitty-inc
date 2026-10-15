@@ -6,4 +6,8 @@ export default {
   label: "Spring Loaded",
   chance: 0.03,
   style: "charge",
+  values: {
+    // hiring taps per the crit's multiple (twice on its own)
+    hires: 0.5,
+  },
 } satisfies CritMeta;

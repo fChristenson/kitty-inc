@@ -6,7 +6,7 @@
 // income bar a crest slaps jolts with a thump and free levels; at full
 // volume the wave whips up into the total in a huge blast and shake. Pays
 // floor income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -39,10 +39,10 @@ const SLAP_SHAKE: [number, number] = [0.5, 1.2];
 export const forceSoundwaveEvent = registerWispEvent(
   KEY,
   "Soundwave",
-  () => CONFIG.soundwaveEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { formMs, swellMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.soundwaveEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;

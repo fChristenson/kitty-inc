@@ -6,7 +6,7 @@
 // left edge, then down and up along it into one heap, which it shoves along
 // onto a worker; the heap settles with a jolt and the worker lights up a
 // perma tier in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -50,9 +50,9 @@ const GATHER_SHAKE = 0.8;
 export const forceLeafFallEvent = registerWispEvent(
   KEY,
   "Leaf Fall",
-  () => CONFIG.leafFallEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fallMs, dragMs, liftMs, holdMs, mergeMs } = CONFIG.leafFallEvent;
+    const { fallMs, dragMs, liftMs, holdMs, mergeMs } = meta.values;
     const target = findRewardWorkers(floor, context).sort(
       (a, b) => a.at.x - b.at.x,
     )[0];

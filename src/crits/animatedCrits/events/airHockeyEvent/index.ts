@@ -6,7 +6,7 @@
 // clack, a jolt and a spray of coins, ever faster, until one smashes it
 // straight into the far goal in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -36,9 +36,9 @@ const HIT_SHAKE: [number, number] = [0.3, 1.1];
 export const forceAirHockeyEvent = registerWispEvent(
   KEY,
   "Air Hockey",
-  () => CONFIG.airHockeyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotsMs, holdMs, mergeMs } = CONFIG.airHockeyEvent;
+    const { shotsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const h = area.bottom - area.top;
     const top = area.top + h * TOP;

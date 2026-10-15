@@ -5,7 +5,7 @@
 // spark sizzles in place a beat, then leaps on to the next spot, quicker
 // each time, the last strike landing in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,9 +53,9 @@ interface Jump {
 export const forceSparkJumpEvent = registerWispEvent(
   KEY,
   "Spark Jump",
-  () => CONFIG.sparkJumpEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { jumpsMs, holdMs, mergeMs } = CONFIG.sparkJumpEvent;
+    const { jumpsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context)
       .slice(0, MAX_HIRES)
       .sort((a, b) => a.x - b.x);

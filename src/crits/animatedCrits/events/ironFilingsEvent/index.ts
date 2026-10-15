@@ -6,7 +6,7 @@
 // every pulse a hum and a jolt, piling up in two heaps on the poles; then
 // the heaps slam together into the middle of the bar in a big blast,
 // landing free levels. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -41,10 +41,10 @@ const PULSE_SHAKE: [number, number] = [0.4, 0.9];
 export const forceIronFilingsEvent = registerWispEvent(
   KEY,
   "Iron Filings",
-  () => CONFIG.ironFilingsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { sprinkleMs, pullMs, slamMs, levelShare, holdMs, mergeMs } =
-      CONFIG.ironFilingsEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

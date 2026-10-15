@@ -5,8 +5,8 @@
 // one after another in a quick cluster of blasts, every chunk paying into
 // the live total; the last huge rock splits eight ways, then the view
 // crash-lands back on the floors
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { multiply } from "../../../../shared/bigNumber";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
@@ -105,7 +105,7 @@ interface Pop {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.rockFieldEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startRockField,
@@ -178,7 +178,7 @@ function drawGlitterLump(
 }
 
 function startRockField(floor: Floor, context: EventProcContext): void {
-  const { payoutsPerChunk } = CONFIG.rockFieldEvent;
+  const { payoutsPerChunk } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const rocks = planRocks();
   const pops: Pop[] = rocks.flatMap((rock) =>

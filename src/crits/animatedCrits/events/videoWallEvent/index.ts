@@ -5,7 +5,7 @@
 // coins bursting out of the screens; then every screen but one cuts out
 // and the one showing the clicked floor's button zooms back up to fill the
 // view in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -31,9 +31,9 @@ const BEAT_SHAKE: [number, number] = [0.6, 1.4];
 export const forceVideoWallEvent = registerWispEvent(
   KEY,
   "Video Wall",
-  () => CONFIG.videoWallEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { beatsMs, zoomMs, holdMs, mergeMs } = CONFIG.videoWallEvent;
+    const { beatsMs, zoomMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

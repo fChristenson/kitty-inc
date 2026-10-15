@@ -5,7 +5,7 @@
 // onto the next spot with a bang and a jolt as a new worker forms there,
 // knocking that pillar over in turn, domino after domino, the last falling
 // flat in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ interface Domino {
 export const forceLightDominoesEvent = registerWispEvent(
   KEY,
   "Light Dominoes",
-  () => CONFIG.lightDominoesEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { fallsMs, holdMs, mergeMs } = CONFIG.lightDominoesEvent;
+    const { fallsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (found.length === 0) return;
     // the nearest spot next, from the button on

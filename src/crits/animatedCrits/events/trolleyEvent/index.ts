@@ -6,7 +6,7 @@
 // income bars it drops a bolt onto the next one down in a blinding flash, a
 // crack and a jolt that lands free levels, each run quicker; the last bolt
 // slams its bar in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const DROP_SHAKE: [number, number] = [0.7, 1.4];
 export const forceTrolleyEvent = registerWispEvent(
   KEY,
   "Trolley",
-  () => CONFIG.trolleyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runsMs, holdMs, mergeMs } = CONFIG.trolleyEvent;
+    const { runsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

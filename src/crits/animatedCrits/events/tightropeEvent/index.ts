@@ -6,7 +6,7 @@
 // bar, and the rope snaps across over the next bar, the walker quicker
 // each time; the last crossing ends in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ const CROSS_SHAKE: [number, number] = [0.6, 1.3];
 export const forceTightropeEvent = registerWispEvent(
   KEY,
   "Tightrope",
-  () => CONFIG.tightropeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { crossingsMs, levelShare, holdMs, mergeMs } = CONFIG.tightropeEvent;
+    const { crossingsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => a.center.y - b.center.y);

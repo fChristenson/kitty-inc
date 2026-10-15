@@ -6,7 +6,7 @@
 // blasts and bangs, but every other one arcs over onto an income bar and
 // goes off on it with a big jolt as the bar jumps a crit tier; the last
 // lands in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const HIT_SHAKE: [number, number] = [0.8, 1.5];
 export const forceRomanCandleEvent = registerWispEvent(
   KEY,
   "Roman Candle",
-  () => CONFIG.romanCandleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { popsMs, flightMs, holdMs, mergeMs } = CONFIG.romanCandleEvent;
+    const { popsMs, flightMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

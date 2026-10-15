@@ -4,7 +4,7 @@
 // after lap, every corner a splash, a bloop and a jolt, ever harder; then
 // it breaks off at the top and surges into the total in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -32,9 +32,9 @@ const CORNER_SHAKE: [number, number] = [0.3, 1.2];
 export const forceMoatEvent = registerWispEvent(
   KEY,
   "Moat",
-  () => CONFIG.moatEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.moatEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

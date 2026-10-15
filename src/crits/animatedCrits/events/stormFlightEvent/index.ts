@@ -4,8 +4,8 @@
 // first and arcs on from each to the next in a crackling chain, every strike
 // a flash and a blast that blows its wisp, quicker and quicker, the last the
 // biggest; the view crash-lands and the floor goes up a perma tier
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
@@ -87,7 +87,7 @@ interface Node {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.stormFlightEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&

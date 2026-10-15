@@ -5,7 +5,7 @@
 // levels, the jabs speeding up into a buzz; then it hops to the next bar,
 // and the next, until the last bar takes one huge zap in a blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,10 +55,10 @@ interface Jab {
 export const forceCattleProdEvent = registerWispEvent(
   KEY,
   "Cattle Prod",
-  () => CONFIG.cattleProdEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { hopMs, jabMs, levelShare, holdMs, mergeMs } =
-      CONFIG.cattleProdEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

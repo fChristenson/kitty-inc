@@ -5,7 +5,7 @@
 // scattering lands with a flash, a bloop and a jolt and a new worker sprouts
 // from it; the last sprouts in a huge blast and shake. Pays floor income ×
 // floor number × REWARD, plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -41,9 +41,9 @@ const SPROUT_SHAKE: [number, number] = [0.5, 1.2];
 export const forceSowerEvent = registerWispEvent(
   KEY,
   "Sower",
-  () => CONFIG.sowerEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { glideMs, holdMs, mergeMs } = CONFIG.sowerEvent;
+    const { glideMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context)
       .slice(0, MAX_HIRES)
       .sort((a, b) => a.x - b.x);

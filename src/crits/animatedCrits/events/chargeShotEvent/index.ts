@@ -6,7 +6,7 @@
 // smashes into the bar with a flash, a bang and a big jolt as the bar jumps
 // a crit tier; bar after bar, each charge quicker, the last shot landing in
 // a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ const BANG_GAP_MS = 60;
 export const forceChargeShotEvent = registerWispEvent(
   KEY,
   "Charge Shot",
-  () => CONFIG.chargeShotEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { chargeMs, holdMs, mergeMs } = CONFIG.chargeShotEvent;
+    const { chargeMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

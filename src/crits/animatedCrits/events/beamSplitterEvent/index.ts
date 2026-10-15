@@ -6,7 +6,7 @@
 // a crack and a jolt, until the last generation's tips all land on the
 // income bars at once, burning each a crit tier in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -56,9 +56,9 @@ interface Segment {
 export const forceBeamSplitterEvent = registerWispEvent(
   KEY,
   "Beam Splitter",
-  () => CONFIG.beamSplitterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { genMs, holdMs, mergeMs } = CONFIG.beamSplitterEvent;
+    const { genMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

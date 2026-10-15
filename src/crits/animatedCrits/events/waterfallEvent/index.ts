@@ -4,8 +4,8 @@
 // every one tipping in a stream of its own, then pour into the total. Pays
 // the floor's payout once per button the falls pass (see ../moneyCover and
 // ../riverPaths)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,7 +47,7 @@ type Pt = { x: number; y: number };
 // every open floor's button in view, top first, local to floor's own space
 function findLedges(floor: Floor, context: EventProcContext): Pt[] {
   return findOnScreenButtons(floor, context)
-    .slice(0, CONFIG.waterfallEvent.maxFloors)
+    .slice(0, meta.values.maxFloors)
     .map(({ x, y }) => ({ x, y }));
 }
 
@@ -89,14 +89,14 @@ function fallsLine(ledges: Pt[], area: CoverArea) {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.waterfallEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) && findLedges(floor, context).length >= 2,
     arm: (floor, context) => {
       const ledges = findLedges(floor, context);
       if (ledges.length < 2) return;
-      const travelMs = CONFIG.waterfallEvent.dropMs * (ledges.length - 1);
+      const travelMs = meta.values.dropMs * (ledges.length - 1);
       // the top button pours until the falls' head reaches the total
       const streamMs = travelMs + FLOW_FLIGHT_MS;
       const durationMs =

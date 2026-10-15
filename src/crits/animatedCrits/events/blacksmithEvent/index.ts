@@ -6,7 +6,7 @@
 // fall faster and faster, the anvil glowing hotter, until a last colossal
 // blow sends sparks onto every bar at once in a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,9 +45,9 @@ interface Blow {
 export const forceBlacksmithEvent = registerWispEvent(
   KEY,
   "Blacksmith",
-  () => CONFIG.blacksmithEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { warmMs, blowsMs, holdMs, mergeMs } = CONFIG.blacksmithEvent;
+    const { warmMs, blowsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const anvil: Point = {

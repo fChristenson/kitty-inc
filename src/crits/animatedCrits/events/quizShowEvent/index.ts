@@ -5,7 +5,7 @@
 // from the buzzer to an income bar, which jumps a crit tier with a bang;
 // question after question, ever faster, until the final answer is "JACKPOT!"
 // in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ const ANSWER_SHAKE: [number, number] = [0.9, 1.4];
 export const forceQuizShowEvent = registerWispEvent(
   KEY,
   "Quiz Show",
-  () => CONFIG.quizShowEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { questionsMs, answerMs, holdMs, mergeMs } = CONFIG.quizShowEvent;
+    const { questionsMs, answerMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

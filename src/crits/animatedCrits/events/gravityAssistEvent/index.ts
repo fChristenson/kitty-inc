@@ -5,7 +5,7 @@
 // whoosh, a flash and a jolt that lands free levels on that bar; off the last
 // it dives into the clicked floor's bar at full speed, slamming every bar in
 // a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -35,9 +35,9 @@ const PASS_SHAKE: [number, number] = [0.6, 1.4];
 export const forceGravityAssistEvent = registerWispEvent(
   KEY,
   "Gravity Assist",
-  () => CONFIG.gravityAssistEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { flightMs, levelShare, holdMs, mergeMs } = CONFIG.gravityAssistEvent;
+    const { flightMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS).reverse();
     if (bars.length === 0) return;
     const own = bars.find((b) => b.floor === floor) ?? bars[0];

@@ -5,7 +5,7 @@
 // and a jolt, each skip shorter, lower and quicker than the last; it
 // slams into the far side of the screen and goes off in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -38,9 +38,9 @@ const SKIP_SHAKE: [number, number] = [0.5, 1.2];
 export const forceDambusterEvent = registerWispEvent(
   KEY,
   "Dambuster",
-  () => CONFIG.dambusterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { lobMs, skipsMs, holdMs, mergeMs } = CONFIG.dambusterEvent;
+    const { lobMs, skipsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const y = area.bottom - LOW;
     const ltr = button.x < (area.left + area.right) / 2;

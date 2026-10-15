@@ -10,5 +10,4 @@ export default {
   // sliced taps on each button, twice as many on its own, and the levels
   // each lands on the middle floor
   values: { taps: 3, levels: 2 },
-  isNew: true,
 } satisfies CritMeta;

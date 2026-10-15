@@ -6,7 +6,7 @@
 // lands free levels on its last splat; then every gun turns on the clicked
 // floor's bar at once and splatters it in a huge blast, and every bar
 // slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -51,10 +51,10 @@ interface Shot {
 export const forcePaintballEvent = registerWispEvent(
   KEY,
   "Paintball",
-  () => CONFIG.paintballEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, volleyMs, levelShare, holdMs, mergeMs } =
-      CONFIG.paintballEvent;
+      meta.values;
     const all = findRewardBars(floor, context);
     const clicked = all.find((b) => b.floor === floor) ?? all[0];
     if (!clicked) return;

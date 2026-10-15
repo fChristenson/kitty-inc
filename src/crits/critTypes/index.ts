@@ -20,6 +20,37 @@ import type { ImageName } from "../../loadAssets";
 import type { BigNumber } from "../../shared/bigNumber";
 import { CONFIG } from "../../config";
 import { critRandom } from "./critRandom";
+import type { ProcMeta } from "../floorCrits/procMeta";
+import chainMeta from "../floorCrits/procs/chain/meta";
+import dominoEffectMeta from "../floorCrits/procs/dominoEffect/meta";
+import bounceMeta from "../floorCrits/procs/bounce/meta";
+import explosionMeta from "../floorCrits/procs/explosion/meta";
+import mysticMeta from "../floorCrits/procs/mystic/meta";
+import keynoteMeta from "../floorCrits/procs/keynote/meta";
+import pairMeta from "../floorCrits/procs/pair/meta";
+import threeOfAKindMeta from "../floorCrits/procs/threeOfAKind/meta";
+import fourOfAKindMeta from "../floorCrits/procs/fourOfAKind/meta";
+import fullHouseMeta from "../floorCrits/procs/fullHouse/meta";
+import royalFlushMeta from "../floorCrits/procs/royalFlush/meta";
+import luckyNumberMeta from "../floorCrits/procs/luckyNumber/meta";
+import winterSaleMeta from "../floorCrits/procs/winterSale/meta";
+import springSaleMeta from "../floorCrits/procs/springSale/meta";
+import summerSaleMeta from "../floorCrits/procs/summerSale/meta";
+import autumnSaleMeta from "../floorCrits/procs/autumnSale/meta";
+import halloweenSaleMeta from "../floorCrits/procs/halloweenSale/meta";
+import easterSaleMeta from "../floorCrits/procs/easterSale/meta";
+import frozenMeta from "../floorCrits/procs/frozen/meta";
+import spendingFreezeMeta from "../floorCrits/procs/spendingFreeze/meta";
+import rushHourMeta from "../floorCrits/procs/rushHour/meta";
+import rateLockMeta from "../floorCrits/procs/rateLock/meta";
+import luckyCloverMeta from "../floorCrits/procs/luckyClover/meta";
+import roundUpMeta from "../floorCrits/procs/roundUp/meta";
+import safetyNetMeta from "../floorCrits/procs/safetyNet/meta";
+import casualFridayMeta from "../floorCrits/procs/casualFriday/meta";
+import fancyFridayMeta from "../floorCrits/procs/fancyFriday/meta";
+import doubleDownMeta from "../floorCrits/procs/doubleDown/meta";
+import rainCheckMeta from "../floorCrits/procs/rainCheck/meta";
+import priceMatchMeta from "../floorCrits/procs/priceMatch/meta";
 import {
   PLAYED_CRITS,
   FLOOR_CRIT_KINDS,
@@ -139,276 +170,43 @@ export const CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.crit.multiplier;
 export const MEGA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.mega.multiplier;
 export const ULTRA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.ultra.multiplier;
 
-// "chain crit" — an extra roll on top of an already-landed crit/mega/ultra (see
-// upgradeButton.ts's rollCritUpgrade): applies that same tier's upgrade to the
-// next floor too, then has chainContinueChance to keep going up the building
-// one floor at a time
-export const CHAIN_CRIT_CHANCE = CONFIG.crit.chainChance;
-export const CHAIN_CRIT_CONTINUE_CHANCE = CONFIG.crit.chainContinueChance;
-// chain has no dedicated celebration color (its flash always uses the landed
-// tier's own color instead, see critCelebration.ts's tierColor) — this one is
-// only CRIT_PROC_INFO's display color, same for bounce/explosion below
-export const CHAIN_CRIT_COLOR = COLOR.blue;
-export const CHAIN_CRIT_LABEL = "Chain";
-
-// "domino effect" — starts with one free upgrade on the floor that crit,
-// then has a 50% chance to reach each floor above it with double the previous
-// floor's upgrade count. Its reward is applied by floorInteractions.ts.
-export const DOMINO_EFFECT_CRIT_CHANCE = CONFIG.crit.dominoEffectChance;
+// procs' own amounts, from their meta.ts (floorCrits/procs/<kind>)
+export const CHAIN_CRIT_CONTINUE_CHANCE = chainMeta.values.continueChance;
 export const DOMINO_EFFECT_CONTINUE_CHANCE =
-  CONFIG.crit.dominoEffectContinueChance;
-export const DOMINO_EFFECT_CRIT_COLOR = COLOR.blue;
-export const DOMINO_EFFECT_CRIT_LABEL = "Domino Effect";
-
-export const BLUEPRINT_CRIT_CHANCE = CONFIG.crit.blueprintChance;
-export const BLUEPRINT_CRIT_COLOR = COLOR.blue;
-export const BLUEPRINT_CRIT_LABEL = "Blueprint";
-
-// "boost crit" — another proc riding on an already-landed crit/mega/ultra (see
-// rollCrit below), same as chain: instead of extra upgrades it grants a
-// free worker boost. Neither proc's button EVER changes appearance on its
-// own — both are invisible until the already-armed tier is actually clicked,
-// only then do they reveal themselves via their own celebration flash
-export const BOOST_CRIT_CHANCE = CONFIG.crit.boostChance;
-export const BOOST_CRIT_COLOR = COLOR.blue;
-export const BOOST_CRIT_LABEL = "Boost";
-
-// "bounce crit" — a third piggyback proc, same shape as chain (extends the
-// landed tier's free-upgrade payout floor by floor) but the walk starts from
-// the BOTTOM of the building (floor 0) and climbs up, instead of starting at
-// the floor that actually crit — see floorInteractions.ts's applyChainCrit
-// call with startIndex -1
-export const BOUNCE_CRIT_CHANCE = CONFIG.crit.bounceChance;
-export const BOUNCE_CRIT_CONTINUE_CHANCE = CONFIG.crit.bounceContinueChance;
-export const BOUNCE_CRIT_COLOR = COLOR.blue;
-export const BOUNCE_CRIT_LABEL = "Bounce";
-
-// "explosion crit" — a fourth piggyback proc, same shape as chain again, but
-// spreads BOTH directions (up AND down) from the floor that actually crit,
-// instead of only upward — see floorInteractions.ts's applyExplosionCrit
-export const EXPLOSION_CRIT_CHANCE = CONFIG.crit.explosionChance;
+  dominoEffectMeta.values.continueChance;
+export const BOUNCE_CRIT_CONTINUE_CHANCE = bounceMeta.values.continueChance;
 export const EXPLOSION_CRIT_CONTINUE_CHANCE =
-  CONFIG.crit.explosionContinueChance;
-export const EXPLOSION_CRIT_COLOR = COLOR.blue;
-export const EXPLOSION_CRIT_LABEL = "Boom";
-
-// "booty crit" — a fifth piggyback proc, a flat one-time effect (not
-// tier-scaled) like boost: doubles the CURRENTLY ACTIVE company's total
-// income once, applied by floorInteractions.ts
-export const BOOTY_CRIT_CHANCE = CONFIG.crit.bootyChance;
-export const BOOTY_CRIT_COLOR = COLOR.gold;
-export const BOOTY_CRIT_LABEL = "Booty";
-
-// "cash flow crit" — a flat one-time effect that pays one combined income
-// cycle across every corporation (see floorInteractions.ts)
-export const CASH_FLOW_CRIT_CHANCE = CONFIG.crit.cashFlowChance;
-export const CASH_FLOW_CRIT_COLOR = COLOR.moneyGreen;
-export const CASH_FLOW_CRIT_LABEL = "Cash Flow";
-
-// "upgrade crit" — a sixth piggyback proc, a flat one-time effect (not
-// tier-scaled) like boost/booty: permanently promotes the affected floor's
-// (or, for a building-unlock crit, every floor in that building's) own
-// critMultiplierTier one step further — applied by floorInteractions.ts/
-// main.ts using nextCritTier (defined further down this file)
-export const UPGRADE_CRIT_CHANCE = CONFIG.crit.upgradeChance;
-export const UPGRADE_CRIT_COLOR = COLOR.cyan;
-export const UPGRADE_CRIT_LABEL = "Upgrade";
-
-// "peppermint crit" — a seventh piggyback proc, a flat one-time effect (not
-// tier-scaled) like booty/upgrade: promotes every OTHER unlocked floor in the
-// building one tier step at once (same nextCritTier promotion upgrade crit
-// uses, just applied to alternating floors building-wide) — applied by
-// floorInteractions.ts
-export const PEPPERMINT_CRIT_CHANCE = CONFIG.crit.peppermintChance;
-export const PEPPERMINT_CRIT_COLOR = COLOR.peppermintPink;
-export const PEPPERMINT_CRIT_LABEL = "Peppermint";
-
-// "heavenly crit" — an eighth piggyback proc, the single biggest reward in the
-// game: unlocks every remaining floor in the building for free, promotes
-// every floor (including newly-unlocked ones) straight to the strongest tier,
-// then grants that tier's own free-upgrade batch to every floor — applied by
-// floorInteractions.ts
-export const HEAVENLY_CRIT_CHANCE = CONFIG.crit.heavenlyChance;
-export const HEAVENLY_CRIT_COLOR = COLOR.heavenlyGold;
-export const HEAVENLY_CRIT_LABEL = "Heavenly";
-
-// "skip crit" — unlocks every floor and buys its upgrade items for free,
-// without changing floor tiers or upgrade levels
-export const SKIP_CRIT_CHANCE = CONFIG.crit.skipChance;
-export const SKIP_CRIT_COLOR = COLOR.cyan;
-export const SKIP_CRIT_LABEL = "Skip";
-
-// "mystic crit" — buys one additional building for free at map scope, or
-// applies exactly 10 normal upgrade-rate increases to the triggering floor at
-// upgrade/floor-unlock scope.
-export const MYSTIC_CRIT_CHANCE = CONFIG.crit.mysticChance;
-export const MYSTIC_CRIT_COLOR = COLOR.mysticTeal;
-export const MYSTIC_CRIT_LABEL = "Mystic";
-export const MYSTIC_UPGRADE_COUNT = 10;
-
-// "keynote crit" — grants 10 free upgrades to the floor that landed the
-// proc, without changing the normal tier-scaled crit reward.
-export const KEYNOTE_CRIT_CHANCE = CONFIG.crit.keynoteChance;
-export const KEYNOTE_CRIT_COLOR = COLOR.gold;
-export const KEYNOTE_CRIT_LABEL = "Keynote";
-export const KEYNOTE_UPGRADE_COUNT = 10;
-
-// "pair"/"three of a kind"/"four of a kind"/"full house" crits — four more
-// flat, not-tier-scaled piggyback procs (same shape as booty/upgrade/
-// peppermint/heavenly): each promotes a FIXED number of floors' (or, at
-// building-unlock scope, buildings') own permanent crit tier one step,
-// starting at whatever just landed the proc and walking upward — auto-
-// unlocking any locked floor/building in its path for free instead of
-// stopping early if there aren't enough already-unlocked ones yet (same as
-// applyChainCrit's own walk, just a fixed count instead of a probabilistic
-// continue-chance). POKER_HAND_CRIT_COUNTS is the ONE place that "how many"
-// number for each is ever named — every consumer (floorInteractions.ts's
-// per-click/floor-unlock reward, main.ts's building-unlock reward) reads it
-// from here instead of re-hardcoding it
+  explosionMeta.values.continueChance;
+export const MYSTIC_UPGRADE_COUNT = mysticMeta.values.upgrades;
+export const KEYNOTE_UPGRADE_COUNT = keynoteMeta.values.upgrades;
+// floors (or, at building-unlock scope, buildings) each poker hand promotes
 export const POKER_HAND_CRIT_COUNTS = {
-  pair: 2,
-  threeOfAKind: 3,
-  fourOfAKind: 4,
-  fullHouse: 5,
-  royalFlush: 6,
+  pair: pairMeta.values.floors,
+  threeOfAKind: threeOfAKindMeta.values.floors,
+  fourOfAKind: fourOfAKindMeta.values.floors,
+  fullHouse: fullHouseMeta.values.floors,
+  royalFlush: royalFlushMeta.values.floors,
 } as const;
-
-export const PAIR_CRIT_CHANCE = CONFIG.crit.pairChance;
-export const PAIR_CRIT_COLOR = COLOR.pairBlue;
-export const PAIR_CRIT_LABEL = "Pair";
-
-export const THREE_OF_A_KIND_CRIT_CHANCE = CONFIG.crit.threeOfAKindChance;
-export const THREE_OF_A_KIND_CRIT_COLOR = COLOR.threeOfAKindGreen;
-export const THREE_OF_A_KIND_CRIT_LABEL = "Three of a Kind";
-
-export const FOUR_OF_A_KIND_CRIT_CHANCE = CONFIG.crit.fourOfAKindChance;
-export const FOUR_OF_A_KIND_CRIT_COLOR = COLOR.fourOfAKindIndigo;
-export const FOUR_OF_A_KIND_CRIT_LABEL = "Four of a Kind";
-
-export const FULL_HOUSE_CRIT_CHANCE = CONFIG.crit.fullHouseChance;
-export const FULL_HOUSE_CRIT_COLOR = COLOR.fullHouseCrimson;
-export const FULL_HOUSE_CRIT_LABEL = "Full House";
-
-export const ROYAL_FLUSH_CRIT_CHANCE = CONFIG.crit.royalFlushChance;
-export const ROYAL_FLUSH_CRIT_COLOR = COLOR.royalFlushPurple;
-export const ROYAL_FLUSH_CRIT_LABEL = "Royal Flush";
-
-export const LUCKY_NUMBER_CRIT_CHANCE = CONFIG.crit.luckyNumberChance;
-export const LUCKY_NUMBER_CRIT_COLOR = COLOR.gold;
-export const LUCKY_NUMBER_CRIT_LABEL = "Lucky Number";
-export const LUCKY_NUMBER_MIN_FLOORS = 2;
-export const LUCKY_NUMBER_MAX_FLOORS = 12;
-export const OPEN_BOOK_CRIT_CHANCE = CONFIG.crit.openBookChance;
-export const OPEN_BOOK_CRIT_COLOR = COLOR.cyan;
-export const OPEN_BOOK_CRIT_LABEL = "Open Book";
-
-// "tick tock crit" — a flat, not-tier-scaled proc: instantly grants every
-// unlocked floor 2 extra payouts' worth of income at its own current rate,
-// without touching its fill-cycle progress (floor.lastCollectedAt is never
-// changed) — the bar keeps ticking from exactly where it was, it just also
-// gets 2 payouts credited on top right now. Reuses the clock icon already
-// shipped for hud/boostMenu's "Work overtime" menu entry
-export const TICK_TOCK_CRIT_CHANCE = CONFIG.crit.tickTockChance;
-export const TICK_TOCK_CRIT_COLOR = COLOR.teal;
-export const TICK_TOCK_CRIT_LABEL = "Tick Tock";
-
-// "Chair Giveaway"/"Supplies Giveaway" crits — two more flat, not-tier-scaled procs:
-// grant the floor being upgraded its one-time office chairs/supplies
-// purchase (see hud/upgradeMenu's buyOfficeChairs/buyOfficeSupplies) for
-// free, if it doesn't already have it. Reuse the icons already shipped for
-// those exact menu entries
-export const CHAIR_GIVEAWAY_CRIT_CHANCE = CONFIG.crit.chairGiveawayChance;
-export const CHAIR_GIVEAWAY_CRIT_COLOR = COLOR.chairGiveawayBrown;
-export const CHAIR_GIVEAWAY_CRIT_LABEL = "Chair Giveaway";
-
-export const SUPPLIES_GIVEAWAY_CRIT_CHANCE = CONFIG.crit.suppliesGiveawayChance;
-export const SUPPLIES_GIVEAWAY_CRIT_COLOR = COLOR.suppliesGiveawayLime;
-export const SUPPLIES_GIVEAWAY_CRIT_LABEL = "Supplies Giveaway";
-
-// "winter sale"/"spring sale"/"summer sale"/"autumn sale" crits — four more
-// flat, not-tier-scaled procs, all sharing the exact same reward (only the
-// season/icon/label/color differ): permanently cuts every unlocked floor's
-// own upgrade AND worker/office chairs/supplies/manager costs by 25%, for
-// the WHOLE building the roll happened in (see floorInteractions.ts's
-// applySeasonalSaleCrit and hud/upgradeMenu's getFloorPrice, which folds
-// Floor.priceDiscountMultiplier into every worker-derived cost).
-// SEASONAL_SALE_DISCOUNT_MULTIPLIER is the ONE place "25% off" is ever named
-export const SEASONAL_SALE_DISCOUNT_MULTIPLIER =
-  1 - CONFIG.crit.seasonalSaleDiscount;
-
-export const WINTER_SALE_CRIT_CHANCE = CONFIG.crit.winterSaleChance;
-export const WINTER_SALE_CRIT_COLOR = COLOR.winterSaleIceBlue;
-export const WINTER_SALE_CRIT_LABEL = "Winter Sale";
-
-export const SPRING_SALE_CRIT_CHANCE = CONFIG.crit.springSaleChance;
-export const SPRING_SALE_CRIT_COLOR = COLOR.springSalePink;
-export const SPRING_SALE_CRIT_LABEL = "Spring Sale";
-
-export const SUMMER_SALE_CRIT_CHANCE = CONFIG.crit.summerSaleChance;
-export const SUMMER_SALE_CRIT_COLOR = COLOR.summerSaleOrange;
-export const SUMMER_SALE_CRIT_LABEL = "Summer Sale";
-
-export const AUTUMN_SALE_CRIT_CHANCE = CONFIG.crit.autumnSaleChance;
-export const AUTUMN_SALE_CRIT_COLOR = COLOR.autumnSaleAmber;
-export const AUTUMN_SALE_CRIT_LABEL = "Autumn Sale";
-
-// "halloween sale" crit — same shape as the 4 seasonal sales above, but its
-// own steeper discount (its own multiplier, never reuses
-// SEASONAL_SALE_DISCOUNT_MULTIPLIER) — see floorInteractions.ts's
-// applySeasonalSaleCrit, which takes the discount multiplier as a param so
-// this and the 4 seasonal sales can share the one reward function
-export const HALLOWEEN_SALE_DISCOUNT_MULTIPLIER =
-  1 - CONFIG.crit.halloweenSaleDiscount;
-
-export const HALLOWEEN_SALE_CRIT_CHANCE = CONFIG.crit.halloweenSaleChance;
-export const HALLOWEEN_SALE_CRIT_COLOR = COLOR.halloweenSalePurple;
-export const HALLOWEEN_SALE_CRIT_LABEL = "Halloween Sale";
-
-// "easter sale" crit — same shape/same steeper discount again as halloween
-// sale above (its own multiplier, never reuses SEASONAL_SALE_DISCOUNT_
-// MULTIPLIER or HALLOWEEN_SALE_DISCOUNT_MULTIPLIER), just its own icon/
-// label/color
-export const EASTER_SALE_DISCOUNT_MULTIPLIER =
-  1 - CONFIG.crit.easterSaleDiscount;
-
-export const EASTER_SALE_CRIT_CHANCE = CONFIG.crit.easterSaleChance;
-export const EASTER_SALE_CRIT_COLOR = COLOR.easterSalePink;
-export const EASTER_SALE_CRIT_LABEL = "Easter Sale";
-
-// "sunshine crit" — same reward as boost above (a free worker boost on
-// every unlocked floor), just lasting twice as long — see floorInteractions.ts's
-// applyFloorBoost, which takes the boost's own duration as a param so this
-// and plain boost can share the one reward function
-export const SUNSHINE_CRIT_CHANCE = CONFIG.crit.sunshineChance;
-export const SUNSHINE_CRIT_COLOR = COLOR.sunshineGold;
-export const SUNSHINE_CRIT_LABEL = "Sunshine";
-
-// "snowday crit" — same reward as sunshine above (a free worker boost on
-// every unlocked floor), just its own even longer duration — see
-// floorInteractions.ts's applySnowdayCrit
-export const SNOWDAY_CRIT_CHANCE = CONFIG.crit.snowdayChance;
-export const SNOWDAY_CRIT_COLOR = COLOR.snowdayFrost;
-export const SNOWDAY_CRIT_LABEL = "Snowday";
-
-// "fast forward crit" — same reward as tick tock above (instantly credits
-// every unlocked floor extra payouts' worth of income at its own current
-// rate, without touching its fill-cycle progress), just a steeper multiplier
-// — see floorInteractions.ts's applyFastForwardCrit
-export const FAST_FORWARD_CRIT_CHANCE = CONFIG.crit.fastForwardChance;
-export const FAST_FORWARD_CRIT_COLOR = COLOR.fastForwardBlue;
-export const FAST_FORWARD_CRIT_LABEL = "Fast Forward";
+export const LUCKY_NUMBER_MIN_FLOORS = luckyNumberMeta.values.minFloors;
+export const LUCKY_NUMBER_MAX_FLOORS = luckyNumberMeta.values.maxFloors;
+// what each sale multiplies a building's costs by
+export const SALE_DISCOUNT_MULTIPLIERS = {
+  winterSale: 1 - winterSaleMeta.values.discount,
+  springSale: 1 - springSaleMeta.values.discount,
+  summerSale: 1 - summerSaleMeta.values.discount,
+  autumnSale: 1 - autumnSaleMeta.values.discount,
+  halloweenSale: 1 - halloweenSaleMeta.values.discount,
+  easterSale: 1 - easterSaleMeta.values.discount,
+} as const;
 
 // "frozen crit" — also no instant reward: arming this proc just marks the
 // floor so that, once the crit is actually clicked, triggerFrozenCrit below
-// starts a CONFIG.crit.frozenDurationMs window during which this floor's
+// starts a FROZEN_DURATION_MS window during which this floor's
 // own upgradeCost stops growing entirely (see incomePanel.ts's
 // increaseIncomeRate) — upgrades still cost real money and behave
 // completely normally otherwise, just at whatever price was already locked
 // in when the window started
-export const FROZEN_CRIT_CHANCE = CONFIG.crit.frozenChance;
-export const FROZEN_CRIT_COLOR = COLOR.frozenIceBlue;
-export const FROZEN_CRIT_LABEL = "Frozen";
-export const FROZEN_DURATION_MS = CONFIG.crit.frozenDurationMs;
+export const FROZEN_DURATION_MS = frozenMeta.values.durationMs;
 // a per-floor start timestamp, not a plain WeakSet flag like every other
 // proc — the price-freeze needs to know WHEN its window ends, not just
 // whether it landed
@@ -426,10 +224,7 @@ export function isFrozenActive(floor: Floor, now: number): boolean {
 // "spending freeze crit" — building-wide counterpart to Frozen: every
 // currently unlocked floor shares one start timestamp, so all prices expire
 // together while each floor retains the price it had when the window began.
-export const SPENDING_FREEZE_CRIT_CHANCE = CONFIG.crit.spendingFreezeChance;
-export const SPENDING_FREEZE_CRIT_COLOR = COLOR.spendingFreezeTeal;
-export const SPENDING_FREEZE_CRIT_LABEL = "Spending Freeze";
-export const SPENDING_FREEZE_DURATION_MS = CONFIG.crit.spendingFreezeDurationMs;
+export const SPENDING_FREEZE_DURATION_MS = spendingFreezeMeta.values.durationMs;
 const spendingFreezeStartedAt = snapshotMap<Floor, number>();
 
 export function triggerSpendingFreeze(floors: Floor[]): void {
@@ -446,84 +241,15 @@ export function isSpendingFreezeActive(floor: Floor, now: number): boolean {
   );
 }
 
-// "snowball crit" — a flat, not-tier-scaled proc (same shape as tick tock/
-// fast forward): instantly credits every unlocked floor 1 extra payout's
-// worth of income at its own current rate, multiplied by however many
-// floors are currently unlocked (the more floors owned, the bigger the
-// snowball) — see floorInteractions.ts's applySnowballCrit, which reuses
-// applyTickTockCrit with that count as its own multiplier
-export const SNOWBALL_CRIT_CHANCE = CONFIG.crit.snowballChance;
-export const SNOWBALL_CRIT_COLOR = COLOR.snowballBlue;
-export const SNOWBALL_CRIT_LABEL = "Snowball";
-
-// "bull market crit" — an instant, flat, building-wide reward: doubles
-// every unlocked floor's own upgradeCount at once (see
-// floorInteractions.ts's applyBullMarketCrit, which reads each floor's
-// current count once then replays that many more direct increaseIncomeRate
-// bumps, same perf-conscious approach applyHeavenlyCrit already uses)
-export const BULL_MARKET_CRIT_CHANCE = CONFIG.crit.bullMarketChance;
-export const BULL_MARKET_CRIT_COLOR = COLOR.bullMarketGreen;
-export const BULL_MARKET_CRIT_LABEL = "Bull Market";
-
-// "payday crit" — a flat, not-tier-scaled proc like booty: triples the
-// CURRENTLY ACTIVE company's total income once (see
-// floorInteractions.ts's applyPaydayCrit)
-export const PAYDAY_CRIT_CHANCE = CONFIG.crit.paydayChance;
-export const PAYDAY_CRIT_COLOR = COLOR.paydayEmerald;
-export const PAYDAY_CRIT_LABEL = "Payday";
-
-// "gold standard crit" — same flat one-time effect as payday, just a
-// steeper multiplier (see floorInteractions.ts's applyGoldStandardCrit)
-export const GOLD_STANDARD_CRIT_CHANCE = CONFIG.crit.goldStandardChance;
-export const GOLD_STANDARD_CRIT_COLOR = COLOR.goldStandardAmber;
-export const GOLD_STANDARD_CRIT_LABEL = "Gold Standard";
-
-// "night shift crit" — same building-wide free-worker-boost reward as
-// boost/sunshine/snowday above, but its own SHORTER duration, and while
-// active also temporarily counts as +1 worker for boost-strength purposes
-// (see floorInteractions.ts's applyNightShiftCrit, which activates a
-// "virtual" boosted worker slot one past each floor's own last rendered
-// worker index — countBoostedWorkers counts it toward incomePanel's own
-// boost-speed exponent, but rendering never draws it since it's past
-// getRenderedWorkerCount)
-export const NIGHT_SHIFT_CRIT_CHANCE = CONFIG.crit.nightShiftChance;
-export const NIGHT_SHIFT_CRIT_COLOR = COLOR.nightShiftIndigo;
-export const NIGHT_SHIFT_CRIT_LABEL = "Night Shift";
-
-// "Intern"/"Union Boss" crits — two more flat, not-tier-scaled procs: grant
-// the floor being upgraded one free worker/manager (see hud/upgradeMenu's
-// buyWorker/buyManager), for free — same shape as Chair Giveaway/Supplies
-// Giveaway above, just a counted resource (workerCount) instead of a
-// one-time flag for Intern. Their own backdrop icons reuse the SAME
-// camera-facing worker/manager crop hud/upgradeMenu's own "hire worker"/
-// "hire manager" icons use (see scripts/process-intern.mjs/process-union-
-// boss.mjs, which crop that same frame at build time instead of runtime)
-export const INTERN_CRIT_CHANCE = CONFIG.crit.internChance;
-export const INTERN_CRIT_COLOR = COLOR.internSkyBlue;
-export const INTERN_CRIT_LABEL = "Intern";
-
-// "Talent Scout" crit — adds one capped worker, then boosts every actual
-// worker on the critted floor for the normal boost duration
-export const TALENT_SCOUT_CRIT_CHANCE = CONFIG.crit.talentScoutChance;
-export const TALENT_SCOUT_CRIT_COLOR = COLOR.talentScoutOrange;
-export const TALENT_SCOUT_CRIT_LABEL = "Talent Scout";
-
-export const UNION_BOSS_CRIT_CHANCE = CONFIG.crit.unionBossChance;
-export const UNION_BOSS_CRIT_COLOR = COLOR.unionBossSlate;
-export const UNION_BOSS_CRIT_LABEL = "Union Boss";
-
 // "Rush Hour" crit — also no instant reward: arming this proc just marks the
 // floor so that, once the crit is actually clicked, triggerRushHourCrit below
-// starts a CONFIG.crit.rushHourDurationMs window across the WHOLE building
+// starts a RUSH_HOUR_DURATION_MS window across the WHOLE building
 // during which every unlocked floor's own income timer is capped at
 // RUSH_HOUR_INTERVAL_SECONDS (see incomePanel.ts's currentSpeedMultiplier) —
 // this stacks with (never undoes) whatever worker-boost/office-upgrade speedup
 // already applies, and a floor already faster than the cap is left untouched
-export const RUSH_HOUR_CRIT_CHANCE = CONFIG.crit.rushHourChance;
-export const RUSH_HOUR_CRIT_COLOR = COLOR.orange;
-export const RUSH_HOUR_CRIT_LABEL = "Rush Hour";
-export const RUSH_HOUR_DURATION_MS = CONFIG.crit.rushHourDurationMs;
-export const RUSH_HOUR_INTERVAL_SECONDS = CONFIG.crit.rushHourIntervalSeconds;
+export const RUSH_HOUR_DURATION_MS = rushHourMeta.values.durationMs;
+export const RUSH_HOUR_INTERVAL_SECONDS = rushHourMeta.values.intervalSeconds;
 // a per-floor start timestamp, not a plain WeakSet flag — same shape as
 // Frozen's own frozenStartedAt, since this needs to know WHEN its window ends
 const rushHourStartedAt = snapshotMap<Floor, number>();
@@ -542,11 +268,8 @@ export function isRushHourActive(floor: Floor, now: number): boolean {
   return startedAt !== undefined && now - startedAt < RUSH_HOUR_DURATION_MS;
 }
 
-export const RATE_LOCK_CRIT_CHANCE = CONFIG.crit.rateLockChance;
-export const RATE_LOCK_CRIT_COLOR = COLOR.rateLockBlue;
-export const RATE_LOCK_CRIT_LABEL = "Rate Lock";
-export const RATE_LOCK_DURATION_MS = CONFIG.crit.rateLockDurationMs;
-export const RATE_LOCK_SPEED_MULTIPLIER = CONFIG.crit.rateLockSpeedMultiplier;
+export const RATE_LOCK_DURATION_MS = rateLockMeta.values.durationMs;
+export const RATE_LOCK_SPEED_MULTIPLIER = rateLockMeta.values.speedMultiplier;
 const rateLockStartedAt = snapshotMap<Floor, number>();
 
 export function triggerRateLockCrit(floor: Floor): void {
@@ -558,250 +281,21 @@ export function isRateLockActive(floor: Floor, now: number): boolean {
   return startedAt !== undefined && now - startedAt < RATE_LOCK_DURATION_MS;
 }
 
-// "Golden Ticket" crit — also no instant reward: arming this proc just marks
-// the floor so that, once the crit is actually clicked, floorInteractions.ts's
-// applyGoldenTicketCrit arms upgradeButton.ts's own armGuaranteedUltraCrit —
-// the very next rollCritUpgrade call on that floor skips the tier/proc
-// chances entirely and forces a plain ultra tier, guaranteed
-export const GOLDEN_TICKET_CRIT_CHANCE = CONFIG.crit.goldenTicketChance;
-export const GOLDEN_TICKET_CRIT_COLOR = COLOR.goldenTicketYellow;
-export const GOLDEN_TICKET_CRIT_LABEL = "Golden Ticket";
-
-// "Silver Ticket" crit — same shape as Golden Ticket, but arms
-// upgradeButton.ts's own armGuaranteedMegaCrit instead — the very next
-// rollCritUpgrade call on that floor is forced to a plain mega tier
-// (a smaller guaranteed swing than Golden Ticket's ultra)
-export const SILVER_TICKET_CRIT_CHANCE = CONFIG.crit.silverTicketChance;
-export const SILVER_TICKET_CRIT_COLOR = COLOR.silverTicketGray;
-export const SILVER_TICKET_CRIT_LABEL = "Silver Ticket";
-
-// "Grand Opening" crit — dual-scope unlock proc: on a map building purchase,
-// buys the next building for free; on an upgrade/floor unlock, unlocks every
-// remaining floor in that same building for free
-export const GRAND_OPENING_CRIT_CHANCE = CONFIG.crit.grandOpeningChance;
-export const GRAND_OPENING_CRIT_COLOR = COLOR.grandOpeningRose;
-export const GRAND_OPENING_CRIT_LABEL = "Grand Opening";
-
-// "Fully Staffed" crit — fills every unlocked floor to its worker cap and
-// grants every manager-eligible unlocked floor a manager for free
-export const FULLY_STAFFED_CRIT_CHANCE = CONFIG.crit.fullyStaffedChance;
-export const FULLY_STAFFED_CRIT_COLOR = COLOR.fullyStaffedGreen;
-export const FULLY_STAFFED_CRIT_LABEL = "Fully Staffed";
-
-// "Shift Change" crit — fills the critted floor and the immediately lower
-// unlocked floor to their rendered worker cap
-export const SHIFT_CHANGE_CRIT_CHANCE = CONFIG.crit.shiftChangeChance;
-export const SHIFT_CHANGE_CRIT_COLOR = COLOR.teamBuildingCoral;
-export const SHIFT_CHANGE_CRIT_LABEL = "Shift Change";
-
-// "Espresso Shot" crit — boosts every unlocked floor's workers using the
-// canonical worker-boost behavior for the regular 15-second duration
-export const ESPRESSO_SHOT_CRIT_CHANCE = CONFIG.crit.espressoShotChance;
-export const ESPRESSO_SHOT_CRIT_COLOR = COLOR.espressoShotBrown;
-export const ESPRESSO_SHOT_CRIT_LABEL = "Espresso Shot";
-
-// "Deja Vu" crit — chooses a random crit tier when consumed and applies that
-// tier's free-upgrade batch twice, without recursively rolling more procs
-export const DEJA_VU_CRIT_CHANCE = CONFIG.crit.dejaVuChance;
-export const DEJA_VU_CRIT_COLOR = COLOR.dejaVuBlue;
-export const DEJA_VU_CRIT_LABEL = "Deja Vu";
-
-// "Reinforcements" crit - copies the largest unlocked floor workforce to every
-// other unlocked floor for free
-export const CLONE_ARMY_CRIT_CHANCE = CONFIG.crit.cloneArmyChance;
-export const CLONE_ARMY_CRIT_COLOR = COLOR.cloneArmyViolet;
-export const CLONE_ARMY_CRIT_LABEL = "Reinforcements";
-
-export const LUCKY_CLOVER_CRIT_CHANCE = CONFIG.crit.luckyCloverChance;
-export const LUCKY_CLOVER_CRIT_COLOR = COLOR.luckyCloverGreen;
-export const LUCKY_CLOVER_CRIT_LABEL = "Lucky Clover";
 // how many back-to-back ultra-tier crit payouts the clover instantly grants
-export const LUCKY_CLOVER_CRIT_COUNT = 4;
+export const LUCKY_CLOVER_CRIT_COUNT = luckyCloverMeta.values.crits;
 export const LUCKY_CLOVER_CRIT_TIER: CritTier = "ultra";
-
-// "Second Wind" crit — refunds every dollar the active company has sunk into
-// upgrades, floor unlocks and building purchases
-export const SECOND_WIND_CRIT_CHANCE = CONFIG.crit.secondWindChance;
-export const SECOND_WIND_CRIT_COLOR = COLOR.secondWindSky;
-export const SECOND_WIND_CRIT_LABEL = "Second Wind";
-
-// "Executive Order" crit — promotes EVERY floor in the building one permanent
-// crit tier step at once (Peppermint's reward without the every-other-floor
-// stride)
-export const EXECUTIVE_ORDER_CRIT_CHANCE = CONFIG.crit.executiveOrderChance;
-export const EXECUTIVE_ORDER_CRIT_COLOR = COLOR.executiveOrderTeal;
-export const EXECUTIVE_ORDER_CRIT_LABEL = "Executive Order";
-
-// "Round Up" crit — tops every unlocked floor's own upgradeCount up to the
-// next multiple of ROUND_UP_CRIT_STEP, for free
-export const ROUND_UP_CRIT_CHANCE = CONFIG.crit.roundUpChance;
-export const ROUND_UP_CRIT_COLOR = COLOR.roundUpOrange;
-export const ROUND_UP_CRIT_LABEL = "Round Up";
-export const ROUND_UP_CRIT_STEP = 10;
-
-// "Safety Net" crit — gives five normal free upgrades to the most expensive
-// unlocked floor in the current building
-export const SAFETY_NET_CRIT_CHANCE = CONFIG.crit.safetyNetChance;
-export const SAFETY_NET_CRIT_COLOR = COLOR.safetyNetOrange;
-export const SAFETY_NET_CRIT_LABEL = "Safety Net";
-export const SAFETY_NET_CRIT_UPGRADES = 5;
-
-// "Floor Share" crit - gives the critted floor one temporary upgrade reward
-// scaled by its own level plus every unlocked floor below it
-export const FLOOR_SHARE_CRIT_CHANCE = CONFIG.crit.floorShareChance;
-export const FLOOR_SHARE_CRIT_COLOR = COLOR.floorShareBlue;
-export const FLOOR_SHARE_CRIT_LABEL = "Floor Share";
-
-// "Same Boat" crit — Floor Share's temporary reward at twice the level
-export const SAME_BOAT_CRIT_CHANCE = CONFIG.crit.sameBoatChance;
-export const SAME_BOAT_CRIT_COLOR = COLOR.sameBoatCoral;
-export const SAME_BOAT_CRIT_LABEL = "Same Boat";
-
-// "Golden Handshake" crit — Union Boss's building-wide sibling: a free
-// manager on every unlocked floor at once
-export const GOLDEN_HANDSHAKE_CRIT_CHANCE = CONFIG.crit.goldenHandshakeChance;
-export const GOLDEN_HANDSHAKE_CRIT_COLOR = COLOR.goldenHandshakeGold;
-export const GOLDEN_HANDSHAKE_CRIT_LABEL = "Golden Handshake";
-
-// "Supply Run" crit — Chair Giveaway and Supplies Giveaway at once, on the
-// floor that actually crit
-export const SUPPLY_RUN_CRIT_CHANCE = CONFIG.crit.supplyRunChance;
-export const SUPPLY_RUN_CRIT_COLOR = COLOR.supplyRunTan;
-export const SUPPLY_RUN_CRIT_LABEL = "Supply Run";
-
-// "Casual Friday" crit — a flat CASUAL_FRIDAY_CRIT_UPGRADES free upgrades on
-// every unlocked floor at once, no tier scaling
-export const CASUAL_FRIDAY_CRIT_CHANCE = CONFIG.crit.casualFridayChance;
-export const CASUAL_FRIDAY_CRIT_COLOR = COLOR.casualFridayTeal;
-export const CASUAL_FRIDAY_CRIT_LABEL = "Casual Friday";
-export const CASUAL_FRIDAY_CRIT_UPGRADES = 5;
-
-// "Fancy Friday" crit — Casual Friday's bigger sibling, same flat shape
-export const FANCY_FRIDAY_CRIT_CHANCE = CONFIG.crit.fancyFridayChance;
-export const FANCY_FRIDAY_CRIT_COLOR = COLOR.fancyFridayIndigo;
-export const FANCY_FRIDAY_CRIT_LABEL = "Fancy Friday";
-export const FANCY_FRIDAY_CRIT_UPGRADES = 10;
-
-// "Fire Drill" crit — unlike tick tock (which pays out without disturbing
-// any bar), this actually COMPLETES every unlocked floor's income timer:
-// full payout, then the bar restarts from empty
-export const FIRE_DRILL_CRIT_CHANCE = CONFIG.crit.fireDrillChance;
-export const FIRE_DRILL_CRIT_COLOR = COLOR.fireDrillRed;
-export const FIRE_DRILL_CRIT_LABEL = "Fire Drill";
-
-// "Bonus Round" crit — completes only the critted floor's income timer twice
-export const BONUS_ROUND_CRIT_CHANCE = CONFIG.crit.bonusRoundChance;
-export const BONUS_ROUND_CRIT_COLOR = COLOR.bonusRoundGold;
-export const BONUS_ROUND_CRIT_LABEL = "Bonus Round";
-
-// "Overflow" crit — pays five current income timer payouts on only the floor
-// where the crit landed, then restarts that floor's timer
-export const OVERFLOW_CRIT_CHANCE = CONFIG.crit.overflowChance;
-export const OVERFLOW_CRIT_COLOR = COLOR.overflowBlue;
-export const OVERFLOW_CRIT_LABEL = "Overflow";
-
-// "Performance Bonus" crit — completes one current income timer for every
-// actual worker and manager on every unlocked floor
-export const PERFORMANCE_BONUS_CRIT_CHANCE = CONFIG.crit.performanceBonusChance;
-export const PERFORMANCE_BONUS_CRIT_COLOR = COLOR.performanceBonusBlue;
-export const PERFORMANCE_BONUS_CRIT_LABEL = "Performance Bonus";
-
-// "Double Down" crit — unlike Deja Vu (which picks a RANDOM tier), this
-// replays whatever tier actually landed, DOUBLE_DOWN_CRIT_REPEATS more times
-export const DOUBLE_DOWN_CRIT_CHANCE = CONFIG.crit.doubleDownChance;
-export const DOUBLE_DOWN_CRIT_COLOR = COLOR.doubleDownCrimson;
-export const DOUBLE_DOWN_CRIT_LABEL = "Double Down";
-export const DOUBLE_DOWN_CRIT_REPEATS = 2;
-
-// "Coffee Run" crit — the boost/sunshine/snowday family's longest window: a
-// full minute of boosted workers building-wide
-export const COFFEE_RUN_CRIT_CHANCE = CONFIG.crit.coffeeRunChance;
-export const COFFEE_RUN_CRIT_COLOR = COLOR.coffeeRunTeal;
-export const COFFEE_RUN_CRIT_LABEL = "Coffee Run";
-
-// "Team Building" crit — Intern's building-wide sibling: one free worker on
-// every unlocked floor at once
-export const TEAM_BUILDING_CRIT_CHANCE = CONFIG.crit.teamBuildingChance;
-export const TEAM_BUILDING_CRIT_COLOR = COLOR.teamBuildingCoral;
-export const TEAM_BUILDING_CRIT_LABEL = "Team Building";
-
-// "Team Lunch" crit — doubles the normal boost duration for every actual
-// worker on only the floor where the crit landed
-export const TEAM_LUNCH_CRIT_CHANCE = CONFIG.crit.teamLunchChance;
-export const TEAM_LUNCH_CRIT_COLOR = COLOR.teamBuildingCoral;
-export const TEAM_LUNCH_CRIT_LABEL = "Team Lunch";
-
-// "Night Owl" crit — Night Shift's exact reward, but worth +2 virtual boosted
-// workers instead of +1
-export const NIGHT_OWL_CRIT_CHANCE = CONFIG.crit.nightOwlChance;
-export const NIGHT_OWL_CRIT_COLOR = COLOR.nightOwlIndigo;
-export const NIGHT_OWL_CRIT_LABEL = "Night Owl";
-
-// "Headhunter" crit — poaches the building's best headcount onto the floor
-// that crit; a no-op when that floor already IS the best-staffed one
-export const HEADHUNTER_CRIT_CHANCE = CONFIG.crit.headhunterChance;
-export const HEADHUNTER_CRIT_COLOR = COLOR.headhunterRust;
-export const HEADHUNTER_CRIT_LABEL = "Headhunter";
-
-// "Dress Code" crit — adds a manager to each unlocked floor without one,
-// otherwise adds one worker
-export const DRESS_CODE_CRIT_CHANCE = CONFIG.crit.dressCodeChance;
-export const DRESS_CODE_CRIT_COLOR = COLOR.dressCodeGreen;
-export const DRESS_CODE_CRIT_LABEL = "Dress Code";
-
-// "Tea Break" crit — grants one free upgrade to the floor that landed it
-export const TEA_BREAK_CRIT_CHANCE = CONFIG.crit.teaBreakChance;
-export const TEA_BREAK_CRIT_COLOR = COLOR.teaBreakBrown;
-export const TEA_BREAK_CRIT_LABEL = "Tea Break";
+export const ROUND_UP_CRIT_STEP = roundUpMeta.values.step;
+export const SAFETY_NET_CRIT_UPGRADES = safetyNetMeta.values.upgrades;
+export const CASUAL_FRIDAY_CRIT_UPGRADES = casualFridayMeta.values.upgrades;
+export const FANCY_FRIDAY_CRIT_UPGRADES = fancyFridayMeta.values.upgrades;
+export const DOUBLE_DOWN_CRIT_REPEATS = doubleDownMeta.values.repeats;
 
 export function isTeaBreakCrit(floor: Floor): boolean {
   return teaBreakCrits.has(floor);
 }
 
-// "Recruitment Drive" crit — fills this floor and contiguous unlocked floors
-// above it to the rendered worker cap, stopping before the first maxed/locked
-// floor
-export const RECRUITMENT_DRIVE_CRIT_CHANCE = CONFIG.crit.recruitmentDriveChance;
-export const RECRUITMENT_DRIVE_CRIT_COLOR = COLOR.recruitmentDriveBlue;
-export const RECRUITMENT_DRIVE_CRIT_LABEL = "Recruitment Drive";
-// "Merger" crit - synchronizes every unlocked lower floor to the landing
-// floor's current upgrade level, without changing the landing floor itself
-export const MERGER_CRIT_CHANCE = CONFIG.crit.mergerChance;
-export const MERGER_CRIT_COLOR = COLOR.mergerGold;
-export const MERGER_CRIT_LABEL = "Merger";
-export const SHAREHOLDERS_CRIT_CHANCE = CONFIG.crit.shareholdersChance;
-export const SHAREHOLDERS_CRIT_COLOR = COLOR.shareholdersGreen;
-export const SHAREHOLDERS_CRIT_LABEL = "Shareholders";
-
-// "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
-// floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
-// seconds' worth of the currently active company's own combined income rate
-// (every building, not just this one) straight to its total, same one-shot
-// shape as booty/payday/gold standard
-export const GOLDEN_PARACHUTE_CRIT_CHANCE = CONFIG.crit.goldenParachuteChance;
-export const GOLDEN_PARACHUTE_CRIT_COLOR = COLOR.goldenParachuteMarigold;
-export const GOLDEN_PARACHUTE_CRIT_LABEL = "Golden Parachute";
-
-// "Rain Check" crit — a flat, not-tier-scaled payout equal to five seconds
-// of the landed building's combined current income rate
-export const RAIN_CHECK_CRIT_CHANCE = CONFIG.crit.rainCheckChance;
-export const RAIN_CHECK_CRIT_SECONDS = CONFIG.crit.rainCheckSeconds;
-export const RAIN_CHECK_CRIT_COLOR = COLOR.rainCheckBlue;
-export const RAIN_CHECK_CRIT_LABEL = "Rain Check";
-
-export const EXECUTIVE_BONUS_CRIT_CHANCE = CONFIG.crit.executiveBonusChance;
-export const EXECUTIVE_BONUS_CRIT_COLOR = COLOR.gold;
-export const EXECUTIVE_BONUS_CRIT_LABEL = "Executive Bonus";
-export const POWER_SURGE_CRIT_CHANCE = CONFIG.crit.powerSurgeChance;
-export const POWER_SURGE_CRIT_COLOR = COLOR.starYellow;
-export const POWER_SURGE_CRIT_LABEL = "Power Surge";
-export const PRICE_MATCH_CRIT_CHANCE = CONFIG.crit.priceMatchChance;
-export const PRICE_MATCH_CRIT_COLOR = COLOR.cyan;
-export const PRICE_MATCH_CRIT_LABEL = "Price Match";
-export const PRICE_MATCH_DURATION_MS = CONFIG.crit.priceMatchDurationMs;
-export const FIRST_CLASS_CRIT_CHANCE = CONFIG.crit.firstClassChance;
-export const FIRST_CLASS_CRIT_COLOR = COLOR.blue;
-export const FIRST_CLASS_CRIT_LABEL = "First Class";
+export const RAIN_CHECK_CRIT_SECONDS = rainCheckMeta.values.seconds;
+export const PRICE_MATCH_DURATION_MS = priceMatchMeta.values.durationMs;
 const priceMatchCosts = snapshotMap<
   Floor,
   { cost: BigNumber; originalCost: BigNumber; startedAt: number }
@@ -831,14 +325,6 @@ export function getPriceMatchCost(floor: Floor, now: number): BigNumber | null {
   }
   return match.cost;
 }
-
-// "Payout" crit — the biggest flat one-time jackpot (see
-// floorInteractions.ts's applyPayoutCrit): instantly adds the combined total
-// income + upgrades value across EVERY corporation, not just the active
-// one, to the currently active company's own total
-export const PAYOUT_CRIT_CHANCE = CONFIG.crit.payoutChance;
-export const PAYOUT_CRIT_COLOR = COLOR.payoutOlive;
-export const PAYOUT_CRIT_LABEL = "Payout";
 
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place.
@@ -1441,8 +927,8 @@ export interface CritProcDisplayInfo {
 // rarer crits grant a larger income bonus per collection milestone. Milestones
 // are powers of ten (1, 10, 100, ...), not every tenth collection
 export function getCritProcChance(kind: CritProcKind): number {
-  const chanceKey = `${kind}Chance` as keyof typeof CONFIG.crit;
-  const chance = CONFIG.crit[chanceKey];
+  if (!isBadgeCritKind(kind)) return PROC_METAS[kind].chance;
+  const chance = CONFIG.crit[`${kind}Chance` as keyof typeof CONFIG.crit];
   return typeof chance === "number" ? chance : 0;
 }
 
@@ -1467,587 +953,23 @@ export function getCritProcIncomeModifierPercent(
   return getCritProcMilestone(count) * (CRIT_PROC_MODIFIER_WEIGHT / chance);
 }
 
+// every non-badge proc's meta.ts (floorCrits/procs/<kind>), by kind
+export const PROC_METAS = Object.fromEntries(
+  Object.entries(
+    import.meta.glob<ProcMeta>("../floorCrits/procs/*/meta.ts", {
+      eager: true,
+      import: "default",
+    }),
+  ).map(([file, meta]) => [file.split("/")[3], meta]),
+) as Record<Exclude<CritProcKind, BadgeCritKind>, ProcMeta>;
+
 // badge crits join once their catalog loads (onBadgeCatalog below): a
 // badge kind reads undefined till then; every other proc is here from the start
 export const CRIT_PROC_INFO: Record<
   Exclude<CritProcKind, BadgeCritKind>,
   CritProcDisplayInfo
 > &
-  Partial<Record<BadgeCritKind, CritProcDisplayInfo>> = {
-  chain: {
-    label: CHAIN_CRIT_LABEL,
-
-    color: CHAIN_CRIT_COLOR,
-    icon: "chain",
-    description: "Repeats the crit on the floor above",
-  },
-  dominoEffect: {
-    label: DOMINO_EFFECT_CRIT_LABEL,
-    color: DOMINO_EFFECT_CRIT_COLOR,
-    icon: "dominoEffect",
-    description: "Doubles upgrades across a lucky floor run",
-  },
-  blueprint: {
-    label: BLUEPRINT_CRIT_LABEL,
-    color: BLUEPRINT_CRIT_COLOR,
-    icon: "blueprint",
-    description: "Unlocks and copies the crit floor's upgrades and staff",
-  },
-  boost: {
-    label: BOOST_CRIT_LABEL,
-
-    color: BOOST_CRIT_COLOR,
-    icon: "mouse",
-    description: "Boosts every worker for free",
-  },
-  bounce: {
-    label: BOUNCE_CRIT_LABEL,
-
-    color: BOUNCE_CRIT_COLOR,
-    icon: "ball",
-    description: "Repeats the crit on the floor below",
-  },
-  explosion: {
-    label: EXPLOSION_CRIT_LABEL,
-
-    color: EXPLOSION_CRIT_COLOR,
-    icon: "explosion",
-    description: "Repeats the crit up and down at once",
-  },
-  booty: {
-    label: BOOTY_CRIT_LABEL,
-
-    color: BOOTY_CRIT_COLOR,
-    icon: "booty",
-    description: "Doubles your total income",
-  },
-  cashFlow: {
-    label: CASH_FLOW_CRIT_LABEL,
-    color: CASH_FLOW_CRIT_COLOR,
-    icon: "cashFlow",
-    description: "Pays one combined income cycle",
-  },
-  upgrade: {
-    label: UPGRADE_CRIT_LABEL,
-
-    color: UPGRADE_CRIT_COLOR,
-    icon: "upgrade",
-    description: "Upgrades the floor's crit tier",
-  },
-  peppermint: {
-    label: PEPPERMINT_CRIT_LABEL,
-
-    color: PEPPERMINT_CRIT_COLOR,
-    icon: "peppermint",
-    description: "Upgrades every other floor's tier",
-  },
-  heavenly: {
-    label: HEAVENLY_CRIT_LABEL,
-
-    color: HEAVENLY_CRIT_COLOR,
-    icon: "heaven",
-    description: "Unlocks, maxes, and upgrades every floor",
-  },
-  mystic: {
-    label: MYSTIC_CRIT_LABEL,
-    color: MYSTIC_CRIT_COLOR,
-    icon: "mystic",
-    description: "Builds one free building with 10 upgrades",
-  },
-  keynote: {
-    label: KEYNOTE_CRIT_LABEL,
-    color: KEYNOTE_CRIT_COLOR,
-    icon: "keynote",
-    description: "Adds 10 free upgrades to the crit floor",
-  },
-  shiftChange: {
-    label: SHIFT_CHANGE_CRIT_LABEL,
-    color: SHIFT_CHANGE_CRIT_COLOR,
-    icon: "shiftChange",
-    description: "Fills this floor and the one below",
-  },
-  pair: {
-    label: PAIR_CRIT_LABEL,
-
-    color: PAIR_CRIT_COLOR,
-    icon: "pair",
-    description: "Upgrades 2 floors' crit tier",
-  },
-  threeOfAKind: {
-    label: THREE_OF_A_KIND_CRIT_LABEL,
-
-    color: THREE_OF_A_KIND_CRIT_COLOR,
-    icon: "threeOfAKind",
-    description: "Upgrades 3 floors' crit tier",
-  },
-  fourOfAKind: {
-    label: FOUR_OF_A_KIND_CRIT_LABEL,
-
-    color: FOUR_OF_A_KIND_CRIT_COLOR,
-    icon: "fourOfAKind",
-    description: "Upgrades 4 floors' crit tier",
-  },
-  fullHouse: {
-    label: FULL_HOUSE_CRIT_LABEL,
-
-    color: FULL_HOUSE_CRIT_COLOR,
-    icon: "fullHouse",
-    description: "Upgrades 5 floors' crit tier",
-  },
-  royalFlush: {
-    label: ROYAL_FLUSH_CRIT_LABEL,
-
-    color: ROYAL_FLUSH_CRIT_COLOR,
-    icon: "royalFlush",
-    description: "Upgrades 6 floors' crit tier",
-  },
-  luckyNumber: {
-    label: LUCKY_NUMBER_CRIT_LABEL,
-    color: LUCKY_NUMBER_CRIT_COLOR,
-    icon: "luckyNumber",
-    description: "Unlocks 2-12 floors for free",
-  },
-  openBook: {
-    label: OPEN_BOOK_CRIT_LABEL,
-    color: OPEN_BOOK_CRIT_COLOR,
-    icon: "openBook",
-    description: "Pays the value of all bought upgrades",
-  },
-  tickTock: {
-    label: TICK_TOCK_CRIT_LABEL,
-
-    color: TICK_TOCK_CRIT_COLOR,
-    icon: "clock",
-    description: "Pays every floor twice, instantly",
-  },
-  chairGiveaway: {
-    label: CHAIR_GIVEAWAY_CRIT_LABEL,
-
-    color: CHAIR_GIVEAWAY_CRIT_COLOR,
-    icon: "officeChairsIcon",
-    description: "Free office chairs for the floor",
-  },
-  suppliesGiveaway: {
-    label: SUPPLIES_GIVEAWAY_CRIT_LABEL,
-
-    color: SUPPLIES_GIVEAWAY_CRIT_COLOR,
-    icon: "officeSuppliesIcon",
-    description: "Free office supplies for the floor",
-  },
-  winterSale: {
-    label: WINTER_SALE_CRIT_LABEL,
-
-    color: WINTER_SALE_CRIT_COLOR,
-    icon: "winter",
-    description: "Cuts upgrade/worker costs 25% building-wide",
-  },
-  springSale: {
-    label: SPRING_SALE_CRIT_LABEL,
-
-    color: SPRING_SALE_CRIT_COLOR,
-    icon: "spring",
-    description: "Cuts upgrade/worker costs 25% building-wide",
-  },
-  summerSale: {
-    label: SUMMER_SALE_CRIT_LABEL,
-
-    color: SUMMER_SALE_CRIT_COLOR,
-    icon: "summer",
-    description: "Cuts upgrade/worker costs 25% building-wide",
-  },
-  autumnSale: {
-    label: AUTUMN_SALE_CRIT_LABEL,
-
-    color: AUTUMN_SALE_CRIT_COLOR,
-    icon: "autumn",
-    description: "Cuts upgrade/worker costs 25% building-wide",
-  },
-  halloweenSale: {
-    label: HALLOWEEN_SALE_CRIT_LABEL,
-
-    color: HALLOWEEN_SALE_CRIT_COLOR,
-    icon: "halloween",
-    description: "Cuts upgrade/worker costs 50% building-wide",
-  },
-  easterSale: {
-    label: EASTER_SALE_CRIT_LABEL,
-
-    color: EASTER_SALE_CRIT_COLOR,
-    icon: "easterBunny",
-    description: "Cuts upgrade/worker costs 50% building-wide",
-  },
-  sunshine: {
-    label: SUNSHINE_CRIT_LABEL,
-
-    color: SUNSHINE_CRIT_COLOR,
-    icon: "sunny",
-    description: "Boosts every worker, twice as long",
-  },
-  snowday: {
-    label: SNOWDAY_CRIT_LABEL,
-
-    color: SNOWDAY_CRIT_COLOR,
-    icon: "snowman",
-    description: "Boosts every worker, three times as long",
-  },
-  fastForward: {
-    label: FAST_FORWARD_CRIT_LABEL,
-
-    color: FAST_FORWARD_CRIT_COLOR,
-    icon: "fastforward",
-    description: "Instantly credits 4 payouts' worth of income",
-  },
-  frozen: {
-    label: FROZEN_CRIT_LABEL,
-
-    color: FROZEN_CRIT_COLOR,
-    icon: "icecube",
-    description: "Locks this floor's upgrade price for 15s",
-  },
-  spendingFreeze: {
-    label: SPENDING_FREEZE_CRIT_LABEL,
-    color: SPENDING_FREEZE_CRIT_COLOR,
-    icon: "spendingFreeze",
-    description: "Locks every unlocked floor's upgrade price for 5s",
-  },
-  snowball: {
-    label: SNOWBALL_CRIT_LABEL,
-
-    color: SNOWBALL_CRIT_COLOR,
-    icon: "snowball",
-    description: "Pays every floor once, times floors unlocked",
-  },
-  bullMarket: {
-    label: BULL_MARKET_CRIT_LABEL,
-
-    color: BULL_MARKET_CRIT_COLOR,
-    icon: "bull",
-    description: "Doubles every unlocked floor's own upgrade count",
-  },
-  payday: {
-    label: PAYDAY_CRIT_LABEL,
-
-    color: PAYDAY_CRIT_COLOR,
-    icon: "payday",
-    description: "Triples your total income",
-  },
-  goldStandard: {
-    label: GOLD_STANDARD_CRIT_LABEL,
-
-    color: GOLD_STANDARD_CRIT_COLOR,
-    icon: "goldStandard",
-    description: "Quadruples your total income",
-  },
-  nightShift: {
-    label: NIGHT_SHIFT_CRIT_LABEL,
-
-    color: NIGHT_SHIFT_CRIT_COLOR,
-    icon: "sleepyMoon",
-    description: "Short worker boost, counts as +1 worker",
-  },
-  intern: {
-    label: INTERN_CRIT_LABEL,
-
-    color: INTERN_CRIT_COLOR,
-    icon: "intern",
-    description: "Grants the floor a free worker",
-  },
-  talentScout: {
-    label: TALENT_SCOUT_CRIT_LABEL,
-    color: TALENT_SCOUT_CRIT_COLOR,
-    icon: "talentScout",
-    description: "Adds and boosts a worker on this floor",
-  },
-  unionBoss: {
-    label: UNION_BOSS_CRIT_LABEL,
-
-    color: UNION_BOSS_CRIT_COLOR,
-    icon: "unionBoss",
-    description: "Grants the floor a free manager",
-  },
-  rushHour: {
-    label: RUSH_HOUR_CRIT_LABEL,
-
-    color: RUSH_HOUR_CRIT_COLOR,
-    icon: "sportscar",
-    description: "Caps every floor's income timer at 0.5s for 15s",
-  },
-  rateLock: {
-    label: RATE_LOCK_CRIT_LABEL,
-    color: RATE_LOCK_CRIT_COLOR,
-    icon: "rateLock",
-    description: "Locks this floor to at least 0.5x speed for 10s",
-  },
-  goldenTicket: {
-    label: GOLDEN_TICKET_CRIT_LABEL,
-
-    color: GOLDEN_TICKET_CRIT_COLOR,
-    icon: "goldenTicket",
-    description: "Guarantees this floor's next crit is ultra",
-  },
-  silverTicket: {
-    label: SILVER_TICKET_CRIT_LABEL,
-
-    color: SILVER_TICKET_CRIT_COLOR,
-    icon: "silverTicket",
-    description: "Guarantees this floor's next crit is mega",
-  },
-  goldenParachute: {
-    label: GOLDEN_PARACHUTE_CRIT_LABEL,
-
-    color: GOLDEN_PARACHUTE_CRIT_COLOR,
-    icon: "goldenParachute",
-    description: "Instantly adds 15s of your company's income",
-  },
-  rainCheck: {
-    label: RAIN_CHECK_CRIT_LABEL,
-    color: RAIN_CHECK_CRIT_COLOR,
-    icon: "rainCheck",
-    description: "Adds 5s of this building's income",
-  },
-  executiveBonus: {
-    label: EXECUTIVE_BONUS_CRIT_LABEL,
-    color: EXECUTIVE_BONUS_CRIT_COLOR,
-    icon: "executiveBonus",
-    description: "Pays 25% of company value",
-  },
-  powerSurge: {
-    label: POWER_SURGE_CRIT_LABEL,
-    color: POWER_SURGE_CRIT_COLOR,
-    icon: "powerSurge",
-    description: "Boosts workers across every company building",
-  },
-  priceMatch: {
-    label: PRICE_MATCH_CRIT_LABEL,
-    color: PRICE_MATCH_CRIT_COLOR,
-    icon: "priceMatch",
-    description: "Matches this floor to the cheapest upgrade price for 5s",
-  },
-  firstClass: {
-    label: FIRST_CLASS_CRIT_LABEL,
-    color: FIRST_CLASS_CRIT_COLOR,
-    icon: "firstClass",
-    description: "Unlocks the next floor at the cheapest starting price",
-  },
-  payout: {
-    label: PAYOUT_CRIT_LABEL,
-
-    color: PAYOUT_CRIT_COLOR,
-    icon: "payout",
-    description: "Instantly adds every company's income + upgrades",
-  },
-  grandOpening: {
-    label: GRAND_OPENING_CRIT_LABEL,
-
-    color: GRAND_OPENING_CRIT_COLOR,
-    icon: "grandOpening",
-    description: "Buys the next building free, or unlocks all floors",
-  },
-  fullyStaffed: {
-    label: FULLY_STAFFED_CRIT_LABEL,
-
-    color: FULLY_STAFFED_CRIT_COLOR,
-    icon: "fullyStaffed",
-    description: "Hires workers and managers on every unlocked floor",
-  },
-  skip: {
-    label: SKIP_CRIT_LABEL,
-    color: SKIP_CRIT_COLOR,
-    icon: "skip",
-    description: "Unlocks every floor and buys its upgrade items for free",
-  },
-  espressoShot: {
-    label: ESPRESSO_SHOT_CRIT_LABEL,
-
-    color: ESPRESSO_SHOT_CRIT_COLOR,
-    icon: "espressoShot",
-    description: "Boosts every worker for 15 seconds",
-  },
-  dejaVu: {
-    label: DEJA_VU_CRIT_LABEL,
-
-    color: DEJA_VU_CRIT_COLOR,
-    icon: "dejaVu",
-    description: "Repeats a random crit twice",
-  },
-  cloneArmy: {
-    label: CLONE_ARMY_CRIT_LABEL,
-
-    color: CLONE_ARMY_CRIT_COLOR,
-    icon: "cloneArmy",
-    description: "Copies the strongest workforce to every floor",
-  },
-  luckyClover: {
-    label: LUCKY_CLOVER_CRIT_LABEL,
-
-    color: LUCKY_CLOVER_CRIT_COLOR,
-    icon: "luckyClover",
-    description: `Triggers 4 x${CONFIG.crit.ultra.multiplier} crits in succession`,
-  },
-  secondWind: {
-    label: SECOND_WIND_CRIT_LABEL,
-
-    color: SECOND_WIND_CRIT_COLOR,
-    icon: "secondWind",
-    description: "Refunds every upgrade, floor and building bought",
-  },
-  executiveOrder: {
-    label: EXECUTIVE_ORDER_CRIT_LABEL,
-
-    color: EXECUTIVE_ORDER_CRIT_COLOR,
-    icon: "executiveOrder",
-    description: "Promotes every floor one crit tier",
-  },
-  roundUp: {
-    label: ROUND_UP_CRIT_LABEL,
-
-    color: ROUND_UP_CRIT_COLOR,
-    icon: "roundUp",
-    description: "Tops every floor up to the next 10 upgrades",
-  },
-  safetyNet: {
-    label: SAFETY_NET_CRIT_LABEL,
-    color: SAFETY_NET_CRIT_COLOR,
-    icon: "safetyNet",
-    description: "Adds 5 upgrades to the priciest floor",
-  },
-  floorShare: {
-    label: FLOOR_SHARE_CRIT_LABEL,
-    color: FLOOR_SHARE_CRIT_COLOR,
-    icon: "floorShare",
-    description: "Shares lower floors' levels for one reward",
-  },
-  sameBoat: {
-    label: SAME_BOAT_CRIT_LABEL,
-    color: SAME_BOAT_CRIT_COLOR,
-    icon: "sameBoat",
-    description: "Doubles the shared lower-floor level for one reward",
-  },
-  goldenHandshake: {
-    label: GOLDEN_HANDSHAKE_CRIT_LABEL,
-
-    color: GOLDEN_HANDSHAKE_CRIT_COLOR,
-    icon: "goldenHandshake",
-    description: "Gives every unlocked floor a free manager",
-  },
-  supplyRun: {
-    label: SUPPLY_RUN_CRIT_LABEL,
-
-    color: SUPPLY_RUN_CRIT_COLOR,
-    icon: "supplyRun",
-    description: "Free office chairs and supplies for the floor",
-  },
-  casualFriday: {
-    label: CASUAL_FRIDAY_CRIT_LABEL,
-
-    color: CASUAL_FRIDAY_CRIT_COLOR,
-    icon: "casualFriday",
-    description: "Five free upgrades on every unlocked floor",
-  },
-  fancyFriday: {
-    label: FANCY_FRIDAY_CRIT_LABEL,
-
-    color: FANCY_FRIDAY_CRIT_COLOR,
-    icon: "fancyFriday",
-    description: "Ten free upgrades on every unlocked floor",
-  },
-  fireDrill: {
-    label: FIRE_DRILL_CRIT_LABEL,
-
-    color: FIRE_DRILL_CRIT_COLOR,
-    icon: "fireDrill",
-    description: "Completes every floor's income timer at once",
-  },
-  bonusRound: {
-    label: BONUS_ROUND_CRIT_LABEL,
-    color: BONUS_ROUND_CRIT_COLOR,
-    icon: "bonusRound",
-    description: "Completes this floor's income timer twice",
-  },
-  overflow: {
-    label: OVERFLOW_CRIT_LABEL,
-    color: OVERFLOW_CRIT_COLOR,
-    icon: "overflow",
-    description: "Pays five timer payouts on this floor",
-  },
-  performanceBonus: {
-    label: PERFORMANCE_BONUS_CRIT_LABEL,
-    color: PERFORMANCE_BONUS_CRIT_COLOR,
-    icon: "performanceBonus",
-    description: "Completes one timer per worker and manager",
-  },
-  doubleDown: {
-    label: DOUBLE_DOWN_CRIT_LABEL,
-
-    color: DOUBLE_DOWN_CRIT_COLOR,
-    icon: "doubleDown",
-    description: "Replays the crit that spawned it twice more",
-  },
-  coffeeRun: {
-    label: COFFEE_RUN_CRIT_LABEL,
-
-    color: COFFEE_RUN_CRIT_COLOR,
-    icon: "coffeeRun",
-    description: "Boosts every worker for a full minute",
-  },
-  teamBuilding: {
-    label: TEAM_BUILDING_CRIT_LABEL,
-
-    color: TEAM_BUILDING_CRIT_COLOR,
-    icon: "teamBuilding",
-    description: "Hires a free worker on every unlocked floor",
-  },
-  teamLunch: {
-    label: TEAM_LUNCH_CRIT_LABEL,
-    color: TEAM_LUNCH_CRIT_COLOR,
-    icon: "teamLunch",
-    description: "Doubles every worker's boost duration",
-  },
-  nightOwl: {
-    label: NIGHT_OWL_CRIT_LABEL,
-
-    color: NIGHT_OWL_CRIT_COLOR,
-    icon: "nightOwl",
-    description: "Night Shift's boost, worth two extra workers",
-  },
-  headhunter: {
-    label: HEADHUNTER_CRIT_LABEL,
-
-    color: HEADHUNTER_CRIT_COLOR,
-    icon: "headhunter",
-    description: "Matches this floor to the best-staffed one",
-  },
-  dressCode: {
-    label: DRESS_CODE_CRIT_LABEL,
-    color: DRESS_CODE_CRIT_COLOR,
-    icon: "dressCode",
-    description: "Adds managers, then workers, building-wide",
-  },
-  teaBreak: {
-    label: TEA_BREAK_CRIT_LABEL,
-    color: TEA_BREAK_CRIT_COLOR,
-    icon: "teaBreak",
-    description: "Pauses every floor, then pays them together",
-  },
-  recruitmentDrive: {
-    label: RECRUITMENT_DRIVE_CRIT_LABEL,
-    color: RECRUITMENT_DRIVE_CRIT_COLOR,
-    icon: "recruitmentDrive",
-    description: "Fills this floor and unlocked floors above",
-  },
-  merger: {
-    label: MERGER_CRIT_LABEL,
-    color: MERGER_CRIT_COLOR,
-    icon: "merger",
-    description: "Raises lower unlocked floors to this level",
-  },
-  shareholders: {
-    label: SHAREHOLDERS_CRIT_LABEL,
-    color: SHAREHOLDERS_CRIT_COLOR,
-    icon: "shareholders",
-    description: "Pays 1% of income per staffing unit",
-  },
-};
+  Partial<Record<BadgeCritKind, CritProcDisplayInfo>> = { ...PROC_METAS };
 
 // loadAssets registers each badge crit's image under its kind
 onBadgeCatalog((catalog) => {

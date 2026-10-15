@@ -6,7 +6,7 @@
 // the seam closes the cut-out bursts in a huge blast and shake and the floor
 // bursts open, unlocked for free, as the screen unfreezes. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const CORNER_SHAKE: [number, number] = [0.5, 1.2];
 export const forceCuttingTorchEvent = registerWispEvent(
   KEY,
   "Cutting Torch",
-  () => CONFIG.cuttingTorchEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { flyMs, cutMs, holdMs, mergeMs } = CONFIG.cuttingTorchEvent;
+    const { flyMs, cutMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

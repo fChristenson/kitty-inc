@@ -7,7 +7,7 @@
 // crosses another; a wisp races once round the finished tour, then the whole
 // loop cinches in onto the clicked floor's bar, which jumps a crit tier.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -48,10 +48,10 @@ interface Swap {
 export const forceTravellingSalesmanEvent = registerWispEvent(
   KEY,
   "Travelling Salesman",
-  () => CONFIG.travellingSalesmanEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, solveMs, lapMs, cinchMs, holdMs, mergeMs } =
-      CONFIG.travellingSalesmanEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

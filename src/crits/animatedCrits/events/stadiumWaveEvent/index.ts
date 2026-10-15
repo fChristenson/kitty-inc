@@ -6,7 +6,7 @@
 // faster, and every worker it lifts lights up a perma tier with a pop and a
 // jolt; then the whole crowd leaps at once in a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -37,10 +37,10 @@ const CREST_SHAKE = 0.6;
 export const forceStadiumWaveEvent = registerWispEvent(
   KEY,
   "Stadium Wave",
-  () => CONFIG.stadiumWaveEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { riseMs, passMs, finalGapMs, holdMs, mergeMs } =
-      CONFIG.stadiumWaveEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

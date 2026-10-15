@@ -6,7 +6,7 @@
 // climbs a perma tier with a bang and a jolt; it moves down the line,
 // worker after worker, ever quicker, the last dubbing ending in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const DUB_SHAKE: [number, number] = [0.6, 1.3];
 export const forceKnighthoodEvent = registerWispEvent(
   KEY,
   "Knighthood",
-  () => CONFIG.knighthoodEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { knightsMs, holdMs, mergeMs } = CONFIG.knighthoodEvent;
+    const { knightsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.y - b.at.y || a.at.x - b.at.x);

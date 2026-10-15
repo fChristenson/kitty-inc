@@ -6,7 +6,7 @@
 // ever fiercer; then the electrodes slam together in a blinding strike and
 // the whole pool erupts into the total in a huge blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,10 +55,10 @@ const GEYSER_SHAKE: [number, number] = [0.6, 1.4];
 export const forceArcFurnaceEvent = registerWispEvent(
   KEY,
   "Arc Furnace",
-  () => CONFIG.arcFurnaceEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fillMs, geyserMs, eruptMs, holdMs, mergeMs } =
-      CONFIG.arcFurnaceEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const width = area.right - area.left;
     const cx = (area.left + area.right) / 2;

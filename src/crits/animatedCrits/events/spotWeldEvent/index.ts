@@ -7,7 +7,7 @@
 // upgrade levels tallied over the bar; they meet in its middle in a huge
 // blast and shake and the bar jumps one crit tier. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -29,9 +29,9 @@ const QUARTER_SHAKE: [number, number] = [0.9, 1.6];
 export const forceSpotWeldEvent = registerWispEvent(
   KEY,
   "Spot Weld",
-  () => CONFIG.spotWeldEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { aimMs, weldMs, levelShare, holdMs, mergeMs } = CONFIG.spotWeldEvent;
+    const { aimMs, weldMs, levelShare, holdMs, mergeMs } = meta.values;
     const bar = findRewardBars(floor, context).find((b) => b.floor === floor);
     if (!bar) return;
     const skies: [Point, Point] = [

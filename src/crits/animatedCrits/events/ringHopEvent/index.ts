@@ -6,7 +6,7 @@
 // every pass; the last twin opens right under the dark locked floor and the
 // wisp shoots up into it, bursting it open, unlocked for free as the screen
 // unfreezes
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import {
   drawPortal,
@@ -58,9 +58,9 @@ interface Ring {
 export const forceRingHopEvent = registerWispEvent(
   KEY,
   "Ring Hop",
-  () => CONFIG.ringHopEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { firstMs, holdMs, mergeMs } = CONFIG.ringHopEvent;
+    const { firstMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

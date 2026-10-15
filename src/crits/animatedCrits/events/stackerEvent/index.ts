@@ -6,7 +6,7 @@
 // screen, row after row ever quicker; every few rows a bar jumps a crit tier
 // with a bang, and the top row lands the prize in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const STOP_SHAKE: [number, number] = [0.4, 1.1];
 export const forceStackerEvent = registerWispEvent(
   KEY,
   "Stacker",
-  () => CONFIG.stackerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { rowsMs, holdMs, mergeMs } = CONFIG.stackerEvent;
+    const { rowsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

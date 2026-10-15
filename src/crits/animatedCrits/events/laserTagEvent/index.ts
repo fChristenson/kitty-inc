@@ -5,7 +5,7 @@
 // perma tier in a flash, a bang and a jolt, ever faster, criss-crossing the
 // screen until every worker's been tagged; then they all fire into one point
 // at once in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -28,10 +28,10 @@ const TAG_BURST: [number, number] = [0.5, 0.9];
 export const forceLaserTagEvent = registerWispEvent(
   KEY,
   "Laser Tag",
-  () => CONFIG.laserTagEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { gapsMs, aimMs, fireMs, volleyMs, holdMs, mergeMs } =
-      CONFIG.laserTagEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context)
       .sort(() => Math.random() - 0.5)
       .slice(0, MAX_WORKERS);

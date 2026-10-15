@@ -5,7 +5,7 @@
 // back and forth down the screen; each one rolls to a stop on its own bar
 // and blows in a white blast, a bang and a big jolt that lands free levels;
 // the last goes off in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const BLOW_SHAKE: [number, number] = [0.8, 1.5];
 export const forceBarrelRollEvent = registerWispEvent(
   KEY,
   "Barrel Roll",
-  () => CONFIG.barrelRollEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, holdMs, mergeMs } = CONFIG.barrelRollEvent;
+    const { gapsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const left = area.left + EDGE;

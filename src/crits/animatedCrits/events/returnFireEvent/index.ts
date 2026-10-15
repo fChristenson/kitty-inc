@@ -5,7 +5,7 @@
 // levels into the bar it hits, the bursts coming quicker each time; then it
 // lets loose a last volley at every bar at once, slamming them all in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,10 +46,10 @@ interface Shot {
 export const forceReturnFireEvent = registerWispEvent(
   KEY,
   "Return Fire",
-  () => CONFIG.returnFireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { burstsMs, shotGapMs, volleyGapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.returnFireEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const gun = totalSpot(area);

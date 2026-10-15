@@ -5,7 +5,7 @@
 // a splash, a bang and a jolt that lights it up a perma tier, the last in a
 // huge blast and shake, and the cash runs on into the total. Pays floor
 // income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -32,10 +32,10 @@ const SPLASH_BURST: [number, number] = [0.6, 1];
 export const forceCashShowerEvent = registerWispEvent(
   KEY,
   "Cash Shower",
-  () => CONFIG.cashShowerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapsMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.cashShowerEvent;
+      meta.values;
     // sweeping across the screen from a random side
     const flip = Math.random() < 0.5 ? 1 : -1;
     const workers = findRewardWorkers(floor, context)

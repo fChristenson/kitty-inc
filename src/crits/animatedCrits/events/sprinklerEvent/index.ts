@@ -5,7 +5,7 @@
 // sparkle; then it whirls round once, spraying a ring of them every way, and
 // as they land it blows in a huge blast and shake, and the coins sweep into
 // the total. Pays floor income × floor number × REWARD (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -48,9 +48,9 @@ interface Drop {
 export const forceSprinklerEvent = registerWispEvent(
   KEY,
   "Sprinkler",
-  () => CONFIG.sprinklerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { sprayMs, emitMs, holdMs, mergeMs } = CONFIG.sprinklerEvent;
+    const { sprayMs, emitMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const nozzle = getButtonCenter(context.isGroundFloor);

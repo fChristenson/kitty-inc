@@ -6,7 +6,7 @@
 // slung clean out of the system and streaks into the total in a huge blast,
 // the other two fading off as a pair. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -161,9 +161,9 @@ function simulate(): Run {
 export const forceThreeBodyEvent = registerWispEvent(
   KEY,
   "Three-Body",
-  () => CONFIG.threeBodyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { danceMs, flingMs, holdMs, mergeMs } = CONFIG.threeBodyEvent;
+    const { danceMs, flingMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const centre: Point = {

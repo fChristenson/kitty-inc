@@ -6,7 +6,7 @@
 // third faster; at the finish a parachute of coins blooms open behind it,
 // then the whole tail of cash whips up into the total in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,10 +53,10 @@ const CAR = 0.6;
 export const forceDragsterEvent = registerWispEvent(
   KEY,
   "Dragster",
-  () => CONFIG.dragsterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { revMs, thirdsMs, chuteMs, whipMs, holdMs, mergeMs } =
-      CONFIG.dragsterEvent;
+      meta.values;
     const y = area.bottom - BOTTOM;
     const start: Point = { x: area.left + EDGE, y };
     const finish: Point = { x: area.right - EDGE - ROLL, y };

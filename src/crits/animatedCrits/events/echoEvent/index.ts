@@ -6,7 +6,7 @@
 // in rings; then every echo comes rushing back in and collapses into the
 // button in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const BOOM_SHAKE: [number, number] = [0.5, 1.3];
 export const forceEchoEvent = registerWispEvent(
   KEY,
   "Echo",
-  () => CONFIG.echoEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { boomsMs, collapseMs, holdMs, mergeMs } = CONFIG.echoEvent;
+    const { boomsMs, collapseMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

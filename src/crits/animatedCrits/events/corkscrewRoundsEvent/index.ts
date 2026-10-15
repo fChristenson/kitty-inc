@@ -6,7 +6,7 @@
 // of coins; volley after volley at new heights, ever faster, until every
 // stream converges on the middle in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -42,10 +42,10 @@ const BANG_GAP_MS = 60;
 export const forceCorkscrewRoundsEvent = registerWispEvent(
   KEY,
   "Corkscrew Rounds",
-  () => CONFIG.corkscrewRoundsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { shotMs, flightMs, volleysMs, holdMs, mergeMs } =
-      CONFIG.corkscrewRoundsEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const side = button.x > (area.left + area.right) / 2 ? -1 : 1;
     const gunX = side > 0 ? area.left + EDGE : area.right - EDGE;

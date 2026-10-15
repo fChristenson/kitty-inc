@@ -7,7 +7,7 @@
 // every bar slams in a huge blast and shake, and the whip's cash flies off
 // into the total. Pays floor income × floor number × REWARD, plus the
 // levels and tier
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,7 +42,7 @@ const CRACK_BURST: [number, number] = [0.6, 0.9];
 export const forceWhipEvent = registerWispEvent(
   KEY,
   "Whip",
-  () => CONFIG.whipEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       unfurlMs,
@@ -52,7 +52,7 @@ export const forceWhipEvent = registerWispEvent(
       flightMs,
       holdMs,
       mergeMs,
-    } = CONFIG.whipEvent;
+    } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const own = bars.find((b) => b.floor === floor) ?? bars[bars.length - 1];

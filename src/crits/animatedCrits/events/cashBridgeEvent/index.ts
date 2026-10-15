@@ -5,7 +5,7 @@
 // arch springs to the next spot, span after span like a bridge across the
 // screen, ever faster, the last span landing in a huge blast and shake as
 // the cash sweeps into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const LAND_SHAKE: [number, number] = [0.6, 1.3];
 export const forceCashBridgeEvent = registerWispEvent(
   KEY,
   "Cash Bridge",
-  () => CONFIG.cashBridgeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { spansMs, holdMs, mergeMs } = CONFIG.cashBridgeEvent;
+    const { spansMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const hires = findRewardHires(floor, context)
       .slice(0, MAX_HIRES)

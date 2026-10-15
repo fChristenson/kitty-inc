@@ -7,7 +7,7 @@
 // until each heap slides onto its target in a flash; with all three home
 // the targets blaze and the heaps burst into rivers of cash pouring into
 // the total, the last in a huge blast. Pays floor income × floor number × 4
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -66,10 +66,10 @@ interface Move {
 export const forceSokobanEvent = registerWispEvent(
   KEY,
   "Sokoban",
-  () => CONFIG.sokobanEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { dropMs, stepMs, burstMs, riseMs, holdMs, mergeMs } =
-      CONFIG.sokobanEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const total = () => cover?.total() ?? fallback;
     const cell = (area.right - area.left) * CELL;

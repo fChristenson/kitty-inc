@@ -6,7 +6,7 @@
 // volley a bang and a big jolt that lands free levels, ever faster; the
 // last volley fires at every bar at once in a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,10 +44,10 @@ const VOLLEY_SHAKE: [number, number] = [0.8, 1.5];
 export const forceFiringSquadEvent = registerWispEvent(
   KEY,
   "Firing Squad",
-  () => CONFIG.firingSquadEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { formMs, gapsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.firingSquadEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

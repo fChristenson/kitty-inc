@@ -6,7 +6,7 @@
 // the last gulp swirling everything down into a heap in its throat; then
 // the hole sinks onto the clicked floor's bar in a huge blast and shake and
 // the bar jumps a crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -49,10 +49,10 @@ const GULP_SHAKE: [number, number] = [0.5, 1.1];
 export const forceSinkholeEvent = registerWispEvent(
   KEY,
   "Sinkhole",
-  () => CONFIG.sinkholeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spillMs, gulpMs, gapMs, sinkMs, holdMs, mergeMs } =
-      CONFIG.sinkholeEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

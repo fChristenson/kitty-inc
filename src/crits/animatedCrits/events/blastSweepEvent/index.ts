@@ -7,7 +7,7 @@
 // shakes rolling on blast after blast; the last blast sucks it all in onto
 // the lock in one heap, which goes up in a colossal blast that bursts the
 // lock open: the floor unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -66,10 +66,10 @@ interface Bomb {
 export const forceBlastSweepEvent = registerWispEvent(
   KEY,
   "Blast Sweep",
-  () => CONFIG.blastSweepEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spillMs, fuseMs, blastsMs, implodeMs, holdMs, mergeMs } =
-      CONFIG.blastSweepEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lockAt = getLockCenter();

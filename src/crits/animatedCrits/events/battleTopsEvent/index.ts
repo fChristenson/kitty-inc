@@ -6,7 +6,7 @@
 // and the winner spins down onto the bar in a burst that jumps it a crit
 // tier; a battle on every bar, the last ending in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ interface Battle {
 export const forceBattleTopsEvent = registerWispEvent(
   KEY,
   "Battle Tops",
-  () => CONFIG.battleTopsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { staggerMs, clashesMs, holdMs, mergeMs } = CONFIG.battleTopsEvent;
+    const { staggerMs, clashesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const battles: Battle[] = bars.map((bar, k) => {

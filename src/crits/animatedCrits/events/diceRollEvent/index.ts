@@ -6,7 +6,7 @@
 // every pip shoots off onto an income bar, each a pop and free levels,
 // ever faster; the last pip lands in a huge blast and shake as every bar
 // slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -74,10 +74,10 @@ const PIP_SHAKE: [number, number] = [0.4, 1.2];
 export const forceDiceRollEvent = registerWispEvent(
   KEY,
   "Dice Roll",
-  () => CONFIG.diceRollEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { rollMs, restMs, pipsMs, flyMs, levelShare, holdMs, mergeMs } =
-      CONFIG.diceRollEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

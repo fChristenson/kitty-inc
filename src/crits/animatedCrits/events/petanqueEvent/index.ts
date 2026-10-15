@@ -7,7 +7,7 @@
 // lobbed sky-high and lands dead on the closest one with a crack, taking
 // its place, and knocks it flying into the lock, which blows open in a
 // huge blast: the floor unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -60,10 +60,10 @@ interface Hit {
 export const forcePetanqueEvent = registerWispEvent(
   KEY,
   "Pétanque",
-  () => CONFIG.petanqueEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { lobMs, gapMs, rollMs, knockMs, holdMs, mergeMs } =
-      CONFIG.petanqueEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

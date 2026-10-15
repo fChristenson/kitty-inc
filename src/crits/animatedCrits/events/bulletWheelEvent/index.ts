@@ -5,7 +5,7 @@
 // that hits the screen's edge pops into coins, the walls jolting; at the far
 // side the guns fold into the hub, which fires one great bullet into the
 // total in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -50,9 +50,9 @@ const POP_GAP_MS = 45;
 export const forceBulletWheelEvent = registerWispEvent(
   KEY,
   "Bullet Wheel",
-  () => CONFIG.bulletWheelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, holdMs, mergeMs } = CONFIG.bulletWheelEvent;
+    const { spinMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const box = {
       left: area.left + BOX,

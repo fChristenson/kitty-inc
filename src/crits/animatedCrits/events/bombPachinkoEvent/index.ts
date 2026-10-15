@@ -6,7 +6,7 @@
 // in big blasts spraying coins, each with its own shake, then the whole
 // bottom row erupts at once and a river of cash blasts up into the total in
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -72,10 +72,10 @@ interface Blast {
 export const forceBombPachinkoEvent = registerWispEvent(
   KEY,
   "Bomb Pachinko",
-  () => CONFIG.bombPachinkoEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { dropGapMs, rowMs, chainMs, holdMs, mergeMs } =
-      CONFIG.bombPachinkoEvent;
+      meta.values;
     const height = area.bottom - area.top;
     const spacing = (area.right - area.left - EDGE * 2) / COLS;
     const xAt = (p: number) => area.left + EDGE + p * spacing;

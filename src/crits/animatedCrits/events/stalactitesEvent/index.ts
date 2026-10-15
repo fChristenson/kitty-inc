@@ -6,7 +6,7 @@
 // splash with a bang and a jolt that lands free levels; then all the
 // splashed cash surges up into the total in a huge blast and shake. Pays
 // floor income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,10 +47,10 @@ const SMASH_SHAKE: [number, number] = [0.8, 1.6];
 export const forceStalactitesEvent = registerWispEvent(
   KEY,
   "Stalactites",
-  () => CONFIG.stalactitesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, gapsMs, fallMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.stalactitesEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const bars = findRewardBars(floor, context).slice(-MAX_BARS);
     if (bars.length === 0) return;

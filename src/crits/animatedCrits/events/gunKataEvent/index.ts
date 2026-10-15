@@ -5,7 +5,7 @@
 // directions, muzzles flashing both ways; each shot lands on an empty spot
 // with a pop and a jolt and a new worker forms there; the last pose fires a
 // ring every way in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceGunKataEvent = registerWispEvent(
   KEY,
   "Gun Kata",
-  () => CONFIG.gunKataEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dartMs, posesMs, holdMs, mergeMs } = CONFIG.gunKataEvent;
+    const { dartMs, posesMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

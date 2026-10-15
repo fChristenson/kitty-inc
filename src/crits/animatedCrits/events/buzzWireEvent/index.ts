@@ -6,7 +6,7 @@
 // cracks down into the bar with a blinding flash and a jolt of free levels;
 // at the wire's end over the clicked bar the whole wire discharges into it
 // in a colossal bolt and a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -57,9 +57,9 @@ interface Brush {
 export const forceBuzzWireEvent = registerWispEvent(
   KEY,
   "Buzz Wire",
-  () => CONFIG.buzzWireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, levelShare, holdMs, mergeMs } = CONFIG.buzzWireEvent;
+    const { runMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const clicked =

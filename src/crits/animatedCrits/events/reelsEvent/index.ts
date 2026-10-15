@@ -6,7 +6,7 @@
 // cash, free upgrade levels on every bar in view, a crit tier on the clicked
 // floor's bar or a perma tier for every worker in view, picked at random.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -45,9 +45,9 @@ type Prize = "cash" | "levels" | "tier" | "workers";
 export const forceReelsEvent = registerWispEvent(
   KEY,
   "Reels",
-  () => CONFIG.reelsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { stopsMs, levelShare, holdMs, mergeMs } = CONFIG.reelsEvent;
+    const { stopsMs, levelShare, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const span = Math.min(width, height);

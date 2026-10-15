@@ -6,7 +6,7 @@
 // faster as the screen rumbles; then every plug fires at once and the
 // clicked floor's bar jumps a crit tier in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,10 +36,10 @@ const FIRE_SHAKE: [number, number] = [0.3, 1.1];
 export const forceIgnitionEvent = registerWispEvent(
   KEY,
   "Ignition",
-  () => CONFIG.ignitionEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { firesMs, finalGapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.ignitionEvent;
+      meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

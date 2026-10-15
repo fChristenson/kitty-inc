@@ -5,7 +5,7 @@
 // straight down onto it with a flash, a bloop and a jolt and a new worker
 // forms there, as if it struck gold; it hunts on, faster each time, the last
 // plunge a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -35,9 +35,9 @@ const FIND_SHAKE: [number, number] = [0.5, 1.3];
 export const forceDowsingEvent = registerWispEvent(
   KEY,
   "Dowsing",
-  () => CONFIG.dowsingEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { findsMs, holdMs, mergeMs } = CONFIG.dowsingEvent;
+    const { findsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

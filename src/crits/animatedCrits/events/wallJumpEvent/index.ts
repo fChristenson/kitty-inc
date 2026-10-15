@@ -5,7 +5,7 @@
 // kick level with an income bar, a thud, a flash and a jolt as the bar
 // lands free levels; it climbs ever faster, the last kick slamming its bar
 // in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -32,9 +32,9 @@ const KICK_SHAKE: [number, number] = [0.5, 1.3];
 export const forceWallJumpEvent = registerWispEvent(
   KEY,
   "Wall Jump",
-  () => CONFIG.wallJumpEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { jumpsMs, holdMs, mergeMs } = CONFIG.wallJumpEvent;
+    const { jumpsMs, holdMs, mergeMs } = meta.values;
     // the bottom bar first, climbing
     const bars = findRewardBars(floor, context).slice(-MAX_BARS).reverse();
     if (bars.length === 0) return;

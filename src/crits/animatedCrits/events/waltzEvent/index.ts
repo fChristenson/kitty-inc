@@ -5,7 +5,7 @@
 // of the music every couple flings out a ring of coins with a bloop and a
 // jolt; then all the couples spiral into the middle and collide in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -37,9 +37,9 @@ const BEAT_SHAKE: [number, number] = [0.3, 1];
 export const forceWaltzEvent = registerWispEvent(
   KEY,
   "Waltz",
-  () => CONFIG.waltzEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { enterMs, danceMs, gatherMs, holdMs, mergeMs } = CONFIG.waltzEvent;
+    const { enterMs, danceMs, gatherMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

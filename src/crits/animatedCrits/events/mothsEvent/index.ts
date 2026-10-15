@@ -6,7 +6,7 @@
 // blazing onto an empty spot on a floor in view, each a pop and a jolt as
 // a new worker forms; the flame then flares in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -38,9 +38,9 @@ const DART_SHAKE: [number, number] = [0.5, 1.2];
 export const forceMothsEvent = registerWispEvent(
   KEY,
   "Moths",
-  () => CONFIG.mothsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flareMs, circleMs, gapsMs, holdMs, mergeMs } = CONFIG.mothsEvent;
+    const { flareMs, circleMs, gapsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -6,7 +6,7 @@
 // in turn, the relay racing up the building faster and faster, until the
 // last circle, on the dark locked floor's ground, erupts and bursts it
 // open, unlocked for free as the screen unfreezes
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   drawSummon,
@@ -47,9 +47,9 @@ const OPEN_FADE_MS = 500;
 export const forceTorchRelayEvent = registerWispEvent(
   KEY,
   "Torch Relay",
-  () => CONFIG.torchRelayEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { firstMs, holdMs, mergeMs } = CONFIG.torchRelayEvent;
+    const { firstMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

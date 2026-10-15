@@ -6,7 +6,7 @@
 // one after another and fly up into the total-income readout, the last in a
 // huge blast and shake, and the coins sweep into the total. Pays floor
 // income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -43,9 +43,9 @@ const HIT_BURST = 0.5;
 export const forcePendulumWaveEvent = registerWispEvent(
   KEY,
   "Pendulum Wave",
-  () => CONFIG.pendulumWaveEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swingMs, fireMs, holdMs, mergeMs } = CONFIG.pendulumWaveEvent;
+    const { swingMs, fireMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

@@ -5,8 +5,8 @@
 // pays into the live total, quicker and closer each time, the last eight
 // blown in a rattling barrage right in the view's face; then the view
 // crash-lands on the floors
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { multiply } from "../../../../shared/bigNumber";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
@@ -86,7 +86,7 @@ interface Rock {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.meteorSplitterEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startMeteorSplitter,
@@ -131,7 +131,7 @@ function planRocks(): Rock[] {
 }
 
 function startMeteorSplitter(floor: Floor, context: EventProcContext): void {
-  const { payoutsPerSplit } = CONFIG.meteorSplitterEvent;
+  const { payoutsPerSplit } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const rocks = planRocks();
   const lastDies = Math.max(...rocks.map((r) => r.dies));

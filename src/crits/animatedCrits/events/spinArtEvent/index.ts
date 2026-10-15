@@ -6,7 +6,7 @@
 // worker with a bang and a jolt, each climbing a perma tier, quicker each
 // time, the last splat a huge blast and shake as the cash pours into the
 // total. Pays floor income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const SPLAT_SHAKE: [number, number] = [0.6, 1.4];
 export const forceSpinArtEvent = registerWispEvent(
   KEY,
   "Spin Art",
-  () => CONFIG.spinArtEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { feedMs, flingsMs, flightMs, holdMs, mergeMs } = CONFIG.spinArtEvent;
+    const { feedMs, flingsMs, flightMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

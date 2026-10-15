@@ -6,7 +6,7 @@
 // ever faster, the hail ever thicker; the last tears the floor open in a
 // huge blast and shake, unlocked for free as the screen unfreezes. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,9 +45,9 @@ const SHELL_SHAKE: [number, number] = [0.8, 1.4];
 export const forceFlechettesEvent = registerWispEvent(
   KEY,
   "Flechettes",
-  () => CONFIG.flechettesEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { gapsMs, climbMs, holdMs, mergeMs } = CONFIG.flechettesEvent;
+    const { gapsMs, climbMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

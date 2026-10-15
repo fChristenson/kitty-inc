@@ -6,7 +6,7 @@
 // jolt with free levels; the cannon swings to the next bar and fires again,
 // the waves fiercer and faster, the last crashing in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -88,10 +88,10 @@ interface Volley {
 export const forceWaveCannonEvent = registerWispEvent(
   KEY,
   "Wave Cannon",
-  () => CONFIG.waveCannonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { volleysMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.waveCannonEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const x = area.left + 40;

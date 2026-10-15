@@ -6,7 +6,7 @@
 // it, then power out flat out along the top of the bar and dive onto it:
 // the leader slams in for free levels in a big blast, the chaser right
 // after for twice as many in a huge one. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ const FIRST_SHAKE = 1.8;
 export const forceLeMansEvent = registerWispEvent(
   KEY,
   "Le Mans",
-  () => CONFIG.leMansEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { raceMs, gapMs, levelShare, holdMs, mergeMs } = CONFIG.leMansEvent;
+    const { raceMs, gapMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

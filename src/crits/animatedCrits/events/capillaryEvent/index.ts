@@ -6,7 +6,7 @@
 // levels; then the whole pool drains up the threads into the total in a
 // huge blast and shake. Pays floor income × floor number × REWARD, plus the
 // levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,10 +42,10 @@ interface Wick {
 export const forceCapillaryEvent = registerWispEvent(
   KEY,
   "Capillary",
-  () => CONFIG.capillaryEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spreadMs, climbsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.capillaryEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     const width = area.right - area.left;
     const poolY = area.bottom - LOW;

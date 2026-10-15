@@ -6,7 +6,7 @@
 // one after another, each cracking down onto an income bar in a blinding
 // strike and a jolt that jumps the bar a crit tier; the last blows the
 // bottle in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,9 +33,9 @@ const STRIKE_SHAKE: [number, number] = [1, 1.6];
 export const forceBottledBoltEvent = registerWispEvent(
   KEY,
   "Bottled Bolt",
-  () => CONFIG.bottledBoltEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { trapMs, releasesMs, holdMs, mergeMs } = CONFIG.bottledBoltEvent;
+    const { trapMs, releasesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const center: Point = {

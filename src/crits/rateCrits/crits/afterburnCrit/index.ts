@@ -4,8 +4,8 @@
 // bar below and runs back the other way, snaking down the building faster
 // and faster, its own readout bursting in a cluster: every bar it passes
 // runs three times as fast, fading back over a while
+import meta from "./meta";
 import { defineBarEffect } from "../../rateBonus";
-import { CONFIG } from "../../../../config";
 import {
   DETONATION_MS,
   drawDetonation,
@@ -68,9 +68,9 @@ const atFuse = () => at;
 const afterburns = defineBarEffect<number>({
   speed: (start, now) =>
     1 +
-    (CONFIG.crit.afterburnSpeed - 1) *
-      (1 - (now - start) / CONFIG.crit.afterburnMs),
-  ended: (start, now) => now - start >= CONFIG.crit.afterburnMs,
+    (meta.values.speed - 1) *
+      (1 - (now - start) / meta.values.ms),
+  ended: (start, now) => now - start >= meta.values.ms,
 });
 
 registerFloorCrit("afterburnCrit", {

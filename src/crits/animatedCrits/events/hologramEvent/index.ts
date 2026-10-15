@@ -5,7 +5,7 @@
 // faster and faster; it flickers, collapses to a point with a flash and a
 // jolt, and a new worker materialises out of the glow; the last in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -70,9 +70,9 @@ interface Frame {
 export const forceHologramEvent = registerWispEvent(
   KEY,
   "Hologram",
-  () => CONFIG.hologramEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { buildMs, gapMs, holdMs, mergeMs } = CONFIG.hologramEvent;
+    const { buildMs, gapMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -5,7 +5,7 @@
 // bloop and a jolt; once the grid is built every beam collapses at once and
 // all the cash pours into the total-income readout in a huge blast and
 // shake. Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -45,10 +45,10 @@ const CROSS_SHAKE = 1.4;
 export const forceLaserGridEvent = registerWispEvent(
   KEY,
   "Laser Grid",
-  () => CONFIG.laserGridEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapMs, aimMs, zipMs, flightMs, holdMs, mergeMs } =
-      CONFIG.laserGridEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

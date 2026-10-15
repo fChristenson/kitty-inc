@@ -5,7 +5,7 @@
 // cash with a jolt, the creeps coming ever thicker and faster; last comes a
 // big boss creep that soaks up shot after shot from every tower until it
 // blows in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -65,9 +65,9 @@ interface Creep {
 export const forceTowerDefenseEvent = registerWispEvent(
   KEY,
   "Tower Defense",
-  () => CONFIG.towerDefenseEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { walkMs, spawnsMs, holdMs, mergeMs } = CONFIG.towerDefenseEvent;
+    const { walkMs, spawnsMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const place = (p: Point): Point => ({

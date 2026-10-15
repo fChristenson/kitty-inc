@@ -5,7 +5,7 @@
 // splash, a boing and a jolt of free levels, quicker and quicker as the
 // walls close in, then shoots out of the neck onto the bar in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -35,9 +35,9 @@ const BOUNCE_SHAKE: [number, number] = [0.25, 0.9];
 export const forceBottleneckEvent = registerWispEvent(
   KEY,
   "Bottleneck",
-  () => CONFIG.bottleneckEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { legsMs, levelShare, holdMs, mergeMs } = CONFIG.bottleneckEvent;
+    const { legsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

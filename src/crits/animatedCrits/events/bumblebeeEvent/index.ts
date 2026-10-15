@@ -4,7 +4,7 @@
 // spot, wobbles over it a moment, then darts down: a flash, a buzz and a
 // jolt as a new worker forms there; each flight quicker than the last, the
 // last hire landing in a big blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -36,9 +36,9 @@ const HIT_SHAKE: [number, number] = [0.5, 1.2];
 export const forceBumblebeeEvent = registerWispEvent(
   KEY,
   "Bumblebee",
-  () => CONFIG.bumblebeeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { flightsMs, holdMs, mergeMs } = CONFIG.bumblebeeEvent;
+    const { flightsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

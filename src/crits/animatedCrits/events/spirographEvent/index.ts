@@ -6,7 +6,7 @@
 // beam sweeps across jolts with a flare, a bang and free levels; then both
 // spiral into the middle and the beam collapses in a huge blast and shake
 // as every bar slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,10 +44,10 @@ const SWEEP_SHAKE: [number, number] = [0.4, 1.1];
 export const forceSpirographEvent = registerWispEvent(
   KEY,
   "Spirograph",
-  () => CONFIG.spirographEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { enterMs, whirlMs, collapseMs, levelShare, holdMs, mergeMs } =
-      CONFIG.spirographEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -4,8 +4,8 @@
 // blast and shake, and a shockwave racing up and down the screen. Every income
 // bar it passes jolts, flashes and gets free upgrade levels. Then the screen
 // unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import {
@@ -120,7 +120,7 @@ function barsInView(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.thunderclapEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -141,13 +141,13 @@ export function forceThunderclapEvent(floor: Floor): void {
 
 // how far the shockwave has spread since the clap
 function waveSpread(clap: RunningClap, since: number): number {
-  const t = clamp01(since / CONFIG.thunderclapEvent.waveMs);
+  const t = clamp01(since / meta.values.waveMs);
   return clap.reach * (1 - (1 - t) ** 2);
 }
 
 // the clap, and every bar the shockwave has reached, on the frame it's drawn
 function landBeats(clap: RunningClap, ms: number, now: number): void {
-  const { rushMs } = CONFIG.thunderclapEvent;
+  const { rushMs } = meta.values;
   if (clap.clappedAt === null && ms >= rushMs) {
     clap.clappedAt = clap.startedAt + rushMs;
     playSlamExplosion();
@@ -173,7 +173,7 @@ function drawOverlay(
   const now = performance.now();
   const ms = now - clap.startedAt;
   landBeats(clap, ms, now);
-  const { rushMs, waveMs } = CONFIG.thunderclapEvent;
+  const { rushMs, waveMs } = meta.values;
   ctx.save();
   ctx.translate(rect.left, rect.top);
 
@@ -291,7 +291,7 @@ function startClap(floor: Floor, context: EventProcContext): void {
   const own = found.find((b) => b.floor === floor);
   if (running || isScreenFrozen() || !area || !upgradeFloorFree || !own) return;
   const { rushMs, waveMs, holdMs, levelShare, minLevels } =
-    CONFIG.thunderclapEvent;
+    meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const clap: RunningClap = {
     floor,

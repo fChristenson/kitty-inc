@@ -4,8 +4,8 @@
 // each is knocked flying in a full flip with a bang and a shake, lands in a
 // burst and climbs one perma tier. Then the screen unfreezes and the crit's
 // tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import {
@@ -90,7 +90,7 @@ function pinsOn(floor: Floor, context: EventProcContext): OnScreenWorker[] {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.bowlingEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -109,14 +109,14 @@ export function forceBowlingEvent(floor: Floor): void {
 }
 
 function ballX(bowl: RunningBowl, ms: number): number {
-  const u = clamp01(ms / CONFIG.bowlingEvent.rollMs) ** ROLL_EASE;
+  const u = clamp01(ms / meta.values.rollMs) ** ROLL_EASE;
   return bowl.fromX + (bowl.toX - bowl.fromX) * u;
 }
 
 // knocks over every pin the ball has reached, and lands every flipped one,
 // on the frame it's drawn
 function landBeats(bowl: RunningBowl, ms: number, now: number): void {
-  const { flyMs } = CONFIG.bowlingEvent;
+  const { flyMs } = meta.values;
   const x = ballX(bowl, ms);
   for (const pin of bowl.pins) {
     if (pin.hitAt === null && x >= pin.worker.center.x - HIT_REACH) {
@@ -152,7 +152,7 @@ function drawPin(ctx: CanvasRenderingContext2D, pin: Pin, now: number): void {
   const t =
     pin.hitAt === null || pin.landedAt !== null
       ? 0
-      : clamp01((now - pin.hitAt) / CONFIG.bowlingEvent.flyMs);
+      : clamp01((now - pin.hitAt) / meta.values.flyMs);
   ctx.save();
   ctx.translate(FLY_ON * Math.sin(Math.PI * t), -FLY_UP * 4 * t * (1 - t));
   ctx.translate(worker.center.x, worker.center.y);
@@ -201,7 +201,7 @@ function drawOverlay(
   drawWisp(
     ctx,
     (t) =>
-      t < 0 || t > CONFIG.bowlingEvent.rollMs
+      t < 0 || t > meta.values.rollMs
         ? null
         : { x: ballX(bowl, t), y: bowl.laneY },
     ms,
@@ -216,7 +216,7 @@ function startBowling(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   const workers = pinsOn(floor, context);
   if (running || isScreenFrozen() || !area || workers.length === 0) return;
-  const { rollMs, flyMs, holdMs } = CONFIG.bowlingEvent;
+  const { rollMs, flyMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const laneY =
     workers.reduce((sum, w) => sum + w.center.y, 0) / workers.length +

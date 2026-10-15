@@ -6,7 +6,7 @@
 // after round, ever quicker; on the last bar they fan the hammer, three
 // shots each smashing together across it, in a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,9 +49,9 @@ interface Clash {
 export const forceShowdownEvent = registerWispEvent(
   KEY,
   "Showdown",
-  () => CONFIG.showdownEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { roundsMs, holdMs, mergeMs } = CONFIG.showdownEvent;
+    const { roundsMs, holdMs, mergeMs } = meta.values;
     // bottom up
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS).reverse();
     if (bars.length === 0) return;

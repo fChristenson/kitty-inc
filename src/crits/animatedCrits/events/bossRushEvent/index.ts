@@ -7,8 +7,8 @@
 // trembling and glowing, and fires a huge beam the wisp swerves from, then
 // the wisp's own beam blows the core apart in a chain and the biggest blast;
 // the floors rush back up and every bar in view takes a crit tier up
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
@@ -155,7 +155,7 @@ interface Plan {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.bossRushEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startBossRush,
@@ -171,7 +171,7 @@ export function forceBossRushEvent(floor: Floor): void {
 }
 
 function startBossRush(floor: Floor, context: EventProcContext): void {
-  const { enterMs, flyMs, tierGapMs } = CONFIG.bossRushEvent;
+  const { enterMs, flyMs, tierGapMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
 
   // the player's wisp at ms on the flight's clock, swerving off the core's

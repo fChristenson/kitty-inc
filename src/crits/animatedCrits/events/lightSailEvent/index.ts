@@ -6,7 +6,7 @@
 // straight up the building, swaying, ever faster, until it smashes into the
 // next locked floor, which bursts open in a huge blast and shake, unlocked
 // for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ interface Emitter {
 export const forceLightSailEvent = registerWispEvent(
   KEY,
   "Light Sail",
-  () => CONFIG.lightSailEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { chargeMs, riseMs, holdMs, mergeMs } = CONFIG.lightSailEvent;
+    const { chargeMs, riseMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

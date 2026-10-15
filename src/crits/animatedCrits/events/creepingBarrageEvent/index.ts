@@ -5,7 +5,7 @@
 // levels; the barrage creeps up the screen row by row, bar by bar, every row
 // quicker, until a last row slams down across the top all at once under a
 // colossal blast and the hardest shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,10 +52,10 @@ interface Shell {
 export const forceCreepingBarrageEvent = registerWispEvent(
   KEY,
   "Creeping Barrage",
-  () => CONFIG.creepingBarrageEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { firstMs, rowsMs, rippleMs, fallMs, levelShare, holdMs, mergeMs } =
-      CONFIG.creepingBarrageEvent;
+      meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => b.center.y - a.center.y);

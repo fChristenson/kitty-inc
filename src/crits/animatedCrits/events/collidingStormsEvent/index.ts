@@ -6,7 +6,7 @@
 // until they collide in the middle in one colossal bolt and a blinding
 // strike, raining cash, and a river of it slams into the total in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -62,10 +62,10 @@ const LASH_SHAKE: [number, number] = [0.4, 1];
 export const forceCollidingStormsEvent = registerWispEvent(
   KEY,
   "Colliding Storms",
-  () => CONFIG.collidingStormsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { approachMs, riverMs, holdMs, mergeMs } =
-      CONFIG.collidingStormsEvent;
+      meta.values;
     const total = totalSpot(area);
     const cx = (area.left + area.right) / 2;
     const cy = area.top + (area.bottom - area.top) * CLOUD_Y;

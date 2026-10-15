@@ -6,7 +6,7 @@
 // the winner turns and bores straight down into the worker, lighting it up
 // a perma tier; a duel over every worker, quicker each time, the last
 // ending in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,10 +55,10 @@ interface Duel {
 export const forceDrillDuelEvent = registerWispEvent(
   KEY,
   "Drill Duel",
-  () => CONFIG.drillDuelEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { approachMs, grindsMs, boreMs, holdMs, mergeMs } =
-      CONFIG.drillDuelEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     let clock = 0;

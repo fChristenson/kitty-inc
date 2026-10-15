@@ -5,7 +5,7 @@
 // ends, a crack, a jolt and free levels on both bars; then one great bolt
 // chains through every bar at once in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ interface Arc {
 export const forceGalvanizeEvent = registerWispEvent(
   KEY,
   "Galvanize",
-  () => CONFIG.galvanizeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { arcsMs, levelShare, holdMs, mergeMs } = CONFIG.galvanizeEvent;
+    const { arcsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const endOf = (bar: RewardBar, right: boolean): Point => ({

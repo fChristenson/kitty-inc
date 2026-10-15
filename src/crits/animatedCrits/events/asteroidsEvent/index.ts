@@ -6,8 +6,8 @@
 // one bursts into coins. The last blows in a huge blast and shake, and the
 // coins sweep into the total. Pays floor income × floor number × REWARD
 // (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import {
@@ -96,14 +96,14 @@ const rockAt = (rock: Rock, ms: number): Point => {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.asteroidsEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { firstShotMs, gapMs, travelMs, holdMs, mergeMs } =
-        CONFIG.asteroidsEvent;
+        meta.values;
       const width = area.right - area.left;
       const height = area.bottom - area.top;
       const center = {

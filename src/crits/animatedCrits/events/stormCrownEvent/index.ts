@@ -6,7 +6,7 @@
 // the crown sweeps on to the next bar and the next, spinning and striking
 // ever faster, the last volley ending in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const TIER_SHAKE: [number, number] = [0.8, 1.4];
 export const forceStormCrownEvent = registerWispEvent(
   KEY,
   "Storm Crown",
-  () => CONFIG.stormCrownEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { volleysMs, holdMs, mergeMs } = CONFIG.stormCrownEvent;
+    const { volleysMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

@@ -6,7 +6,7 @@
 // fuller than the last; as the rounds reach the screen's edge they pop
 // into coins with a flash and a jolt, and the boss blows in a huge blast
 // and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ const RING_SHAKE: [number, number] = [0.6, 1.2];
 export const forceBulletRoseEvent = registerWispEvent(
   KEY,
   "Bullet Rose",
-  () => CONFIG.bulletRoseEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { ringsMs, holdMs, mergeMs } = CONFIG.bulletRoseEvent;
+    const { ringsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const boss: Point = {
       x: (area.left + area.right) / 2,

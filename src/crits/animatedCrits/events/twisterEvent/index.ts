@@ -4,8 +4,8 @@
 // a short stream sucked out of it into the funnel, which then lifts off and
 // spins up into the total. It pays the floor's payout once per worker swept
 // up, then the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   playBoostEventStream,
@@ -89,7 +89,7 @@ let running: RunningTwister | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.twisterEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, { getOnScreenFloors }) =>
       !running &&
@@ -141,7 +141,7 @@ function drawOverlay(
   if (!twister) return;
   const now = performance.now();
   const ms = now - twister.startedAt;
-  const { formMs, suckMs, payoutMs } = CONFIG.twisterEvent;
+  const { formMs, suckMs, payoutMs } = meta.values;
   twister.workers.forEach(({ floor, workerIndex }, i) => {
     const rect = getFloorRect(floor);
     if (!rect) return;
@@ -207,7 +207,7 @@ function startTwister(floor: Floor, context: EventProcContext): void {
     suckMs,
     payoutMs,
     maxWorkers,
-  } = CONFIG.twisterEvent;
+  } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const floorTop = context.getOnScreenFloors!().find(
     (entry) => entry.floor === floor,

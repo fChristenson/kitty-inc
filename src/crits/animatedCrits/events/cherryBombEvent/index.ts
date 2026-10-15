@@ -7,7 +7,7 @@
 // each a blast, a jolt and a spray of coins, meeting in the middle in a
 // colossal blast; then the total goes up in a huge blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -58,10 +58,10 @@ interface Blast {
 export const forceCherryBombEvent = registerWispEvent(
   KEY,
   "Cherry Bomb",
-  () => CONFIG.cherryBombEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { swingMs, flightMs, chainMs, holdMs, mergeMs } =
-      CONFIG.cherryBombEvent;
+      meta.values;
     const total = totalSpot(area);
     const cx = (area.left + area.right) / 2;
     const pivot: Point = { x: cx, y: area.top + PIVOT_Y };

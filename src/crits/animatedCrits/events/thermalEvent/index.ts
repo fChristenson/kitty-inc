@@ -6,7 +6,7 @@
 // of coins, ever faster; then the whole screen overheats in a white flash
 // and snaps back in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -90,10 +90,10 @@ function thermalOf(shot: ScreenCopy): ScreenCopy {
 export const forceThermalEvent = registerWispEvent(
   KEY,
   "Thermal",
-  () => CONFIG.thermalEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { washMs, flaresMs, overheatMs, holdMs, mergeMs } =
-      CONFIG.thermalEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

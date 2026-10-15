@@ -6,7 +6,7 @@
 // and a new worker forms there; it skates on ever faster, the last stop a
 // huge blast and shake as the coins sweep into the total. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -43,9 +43,9 @@ const STOP_SHAKE: [number, number] = [0.5, 1.3];
 export const forceHockeyStopEvent = registerWispEvent(
   KEY,
   "Hockey Stop",
-  () => CONFIG.hockeyStopEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { glidesMs, holdMs, mergeMs } = CONFIG.hockeyStopEvent;
+    const { glidesMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context)
       .slice(0, MAX_HIRES)
       .sort((a, b) => a.y - b.y || a.x - b.x);

@@ -5,7 +5,7 @@
 // a jolt and splashes the cash on into the total, until the last and biggest,
 // high over the rest, goes up in a huge blast and shake, and the coins sweep
 // into the total. Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,10 +51,10 @@ const HIT_SHAKE = 1.6;
 export const forceCashCannonEvent = registerWispEvent(
   KEY,
   "Cash Cannon",
-  () => CONFIG.cashCannonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { leadMs, gapsMs, slugMs, travelMs, holdMs, mergeMs } =
-      CONFIG.cashCannonEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

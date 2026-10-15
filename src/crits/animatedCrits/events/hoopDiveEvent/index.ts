@@ -7,7 +7,7 @@
 // bar, quicker each time, the last dive a huge blast and shake as all the
 // cash pours into the total. Pays floor income × floor number × REWARD,
 // plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,9 +52,9 @@ interface Hoop {
 export const forceHoopDiveEvent = registerWispEvent(
   KEY,
   "Hoop Dive",
-  () => CONFIG.hoopDiveEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { legsMs, formMs, holdMs, mergeMs } = CONFIG.hoopDiveEvent;
+    const { legsMs, formMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

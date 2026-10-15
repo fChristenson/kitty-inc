@@ -4,7 +4,7 @@
 // and jumps a crit tier, then whips across the frozen screen to the next
 // bar, faster each time; after the last it snaps back out to the whole
 // screen in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ interface Key {
 export const forceWhipZoomEvent = registerWispEvent(
   KEY,
   "Whip Zoom",
-  () => CONFIG.whipZoomEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { whipMs, holdsMs, outMs, holdMs, mergeMs } = CONFIG.whipZoomEvent;
+    const { whipMs, holdsMs, outMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const left = area.left;

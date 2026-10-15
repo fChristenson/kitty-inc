@@ -5,7 +5,7 @@
 // income bar dead centre: "PINNED!", a bang and a big jolt as the bar jumps
 // a crit tier; it's spun again for the next bar, each stagger quicker, the
 // last pin landing in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const PIN_SHAKE: [number, number] = [0.9, 1.5];
 export const forcePinTheTailEvent = registerWispEvent(
   KEY,
   "Pin the Tail",
-  () => CONFIG.pinTheTailEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { wanderMs, holdMs, mergeMs } = CONFIG.pinTheTailEvent;
+    const { wanderMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

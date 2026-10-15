@@ -5,7 +5,7 @@
 // flash: every hit a flash, a bang and a jolt as a new worker forms; the
 // last shot lands in a huge blast and shake as the gun drops back to the
 // button. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -56,9 +56,9 @@ interface Shot {
 export const forceGunslingerEvent = registerWispEvent(
   KEY,
   "Gunslinger",
-  () => CONFIG.gunslingerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { twirlMs, shotsMs, holdMs, mergeMs } = CONFIG.gunslingerEvent;
+    const { twirlMs, shotsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context)
       .slice(0, MAX_HIRES)
       .sort((a, b) => a.x - b.x);

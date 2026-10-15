@@ -5,7 +5,7 @@
 // climbs a perma tier with a flare, a bang and a jolt; cue after cue down the
 // line, quicker each time, and on the last every footlight fires on the
 // final worker in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ interface Cue {
 export const forceFootlightsEvent = registerWispEvent(
   KEY,
   "Footlights",
-  () => CONFIG.footlightsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { cuesMs, holdMs, mergeMs } = CONFIG.footlightsEvent;
+    const { cuesMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

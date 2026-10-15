@@ -6,7 +6,7 @@
 // pass each other in the middle the bar flashes with a bang and a jolt and
 // jumps a crit tier; pass after pass, bar after bar, ever faster, the last
 // crossing a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ interface Pass {
 export const forceCrisscrossEvent = registerWispEvent(
   KEY,
   "Crisscross",
-  () => CONFIG.crisscrossEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { passesMs, holdMs, mergeMs } = CONFIG.crisscrossEvent;
+    const { passesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

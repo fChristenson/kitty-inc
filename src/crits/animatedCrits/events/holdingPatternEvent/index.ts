@@ -5,7 +5,7 @@
 // at its end with a flash and a jolt of free levels and skids along it in a
 // spray of glitter, while the stack above steps down an oval; the last
 // touchdown lands in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,7 +51,7 @@ interface Landing {
 export const forceHoldingPatternEvent = registerWispEvent(
   KEY,
   "Holding Pattern",
-  () => CONFIG.holdingPatternEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       circleMs,
@@ -61,7 +61,7 @@ export const forceHoldingPatternEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.holdingPatternEvent;
+    } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const width = area.right - area.left;

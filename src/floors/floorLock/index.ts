@@ -181,7 +181,7 @@ export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
     // every floor the building ever grows, not just the ones that existed yet
     defaultCritTier: getUniformCritTier(deps.floors),
     // same idea for a seasonal-sale discount (see crits/critTypes'
-    // SEASONAL_SALE_DISCOUNT_MULTIPLIER) — every floor in a building is kept
+    // SALE_DISCOUNT_MULTIPLIERS) — every floor in a building is kept
     // in sync on this value (applySeasonalSaleCrit applies it to all of them
     // at once), so the ground floor's own copy is always this building's
     // current accumulated discount, and a freshly queued floor should start

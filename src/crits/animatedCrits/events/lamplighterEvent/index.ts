@@ -5,7 +5,7 @@
 // a flash and a jolt that lights its worker up a perma tier; at the last
 // lamp every lamp flares at once in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ interface Lamp {
 export const forceLamplighterEvent = registerWispEvent(
   KEY,
   "Lamplighter",
-  () => CONFIG.lamplighterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { appearMs, hopMs, holdMs, mergeMs } = CONFIG.lamplighterEvent;
+    const { appearMs, hopMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     // left to right, nearest first from the side it comes in

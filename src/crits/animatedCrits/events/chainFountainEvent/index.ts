@@ -6,7 +6,7 @@
 // side to side, until the rope rears up over the whole screen and whips
 // over into the total in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ function arch(from: Point, to: Point, height: number): Point[] {
 export const forceChainFountainEvent = registerWispEvent(
   KEY,
   "Chain Fountain",
-  () => CONFIG.chainFountainEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { archesMs, travelMs, holdMs, mergeMs } = CONFIG.chainFountainEvent;
+    const { archesMs, travelMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     const landY = Math.min(area.bottom - 80, button.y + 60);

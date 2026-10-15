@@ -7,7 +7,7 @@
 // a crit tier with a bang and a jolt, bar after bar, ever faster; the last
 // burst ends in a huge blast and shake that slams every bar. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceAkimboEvent = registerWispEvent(
   KEY,
   "Akimbo",
-  () => CONFIG.akimboEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { splitMs, movesMs, holdMs, mergeMs } = CONFIG.akimboEvent;
+    const { splitMs, movesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

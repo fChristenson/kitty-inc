@@ -6,7 +6,7 @@
 // into the building's locked floor, which bursts open in a huge blast and
 // shake, unlocked for free as the screen unfreezes. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -37,9 +37,9 @@ const STEP_SHAKE: [number, number] = [0.3, 0.9];
 export const forceStairwayEvent = registerWispEvent(
   KEY,
   "Stairway",
-  () => CONFIG.stairwayEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { hopsMs, holdMs, mergeMs } = CONFIG.stairwayEvent;
+    const { hopsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

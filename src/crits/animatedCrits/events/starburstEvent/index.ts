@@ -5,7 +5,7 @@
 // jolt; burst after burst, ever bigger, until a giant shell bursts in the
 // middle into a star that fills the screen in a huge blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const BURST_SHAKE: [number, number] = [0.6, 1.2];
 export const forceStarburstEvent = registerWispEvent(
   KEY,
   "Starburst",
-  () => CONFIG.starburstEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shellsMs, riseMs, holdMs, mergeMs } = CONFIG.starburstEvent;
+    const { shellsMs, riseMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

@@ -7,7 +7,7 @@
 // dropping onto a worker, who climbs a perma tier; the last shot blows the
 // head apart in a huge blast and its pieces rain onto every worker left.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -73,9 +73,9 @@ interface Drop {
 export const forceCentipedeEvent = registerWispEvent(
   KEY,
   "Centipede",
-  () => CONFIG.centipedeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { crawlMs, dropMs, holdMs, mergeMs } = CONFIG.centipedeEvent;
+    const { crawlMs, dropMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context);
     if (workers.length < 2) return;
     const body = Math.min(MAX_BODY, workers.length - 1);

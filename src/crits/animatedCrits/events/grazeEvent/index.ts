@@ -6,7 +6,7 @@
 // it dives through onto an income bar the bar jumps a crit tier with a bang
 // and a big jolt; the last dive ends in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const HIT_SHAKE: [number, number] = [0.8, 1.4];
 export const forceGrazeEvent = registerWispEvent(
   KEY,
   "Graze",
-  () => CONFIG.grazeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, holdMs, mergeMs } = CONFIG.grazeEvent;
+    const { runMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

@@ -6,7 +6,7 @@
 // the next bar down, boring every bar in the stack one after another, each
 // quicker than the last, the last punching through in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,10 +39,10 @@ interface Core {
 export const forceCoreSampleEvent = registerWispEvent(
   KEY,
   "Core Sample",
-  () => CONFIG.coreSampleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { approachMs, boresMs, levelShare, holdMs, mergeMs } =
-      CONFIG.coreSampleEvent;
+      meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => a.box.y - b.box.y);

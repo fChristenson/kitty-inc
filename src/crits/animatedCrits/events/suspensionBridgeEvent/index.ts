@@ -5,7 +5,7 @@
 // with a twang, a flare and a jolt, until every bar is slung from it and
 // jolts with free levels; then every cable heaves tight at once in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,10 +47,10 @@ interface Cable {
 export const forceSuspensionBridgeEvent = registerWispEvent(
   KEY,
   "Suspension Bridge",
-  () => CONFIG.suspensionBridgeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { cablesMs, tautGapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.suspensionBridgeEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     // the pylon stands on the side nearer the bars' ends

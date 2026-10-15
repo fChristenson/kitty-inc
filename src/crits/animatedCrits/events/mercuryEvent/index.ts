@@ -6,7 +6,7 @@
 // up into the total-income readout in a huge blast and shake, and the coins
 // sweep into the total. Pays floor income × floor number × REWARD (see
 // ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -42,10 +42,10 @@ const MERGE_SHAKE: [number, number] = [1, 2];
 export const forceMercuryEvent = registerWispEvent(
   KEY,
   "Mercury",
-  () => CONFIG.mercuryEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spillMs, mergeGapMs, slideMs, flightMs, holdMs, mergeMs } =
-      CONFIG.mercuryEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

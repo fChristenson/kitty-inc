@@ -6,7 +6,7 @@
 // crit tier; the salute swings up to the next bar, quicker each time, the
 // last crash a huge blast and shake as all the cash pours into the total.
 // Pays floor income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,9 +51,9 @@ function jet(from: Point, peak: Point, to: Point): Point[] {
 export const forceWaterSaluteEvent = registerWispEvent(
   KEY,
   "Water Salute",
-  () => CONFIG.waterSaluteEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { salutesMs, travelMs, holdMs, mergeMs } = CONFIG.waterSaluteEvent;
+    const { salutesMs, travelMs, holdMs, mergeMs } = meta.values;
     // the lowest bar first, the salute climbing the stack
     const bars = findRewardBars(floor, context).slice(-MAX_BARS).reverse();
     if (bars.length === 0) return;

@@ -5,7 +5,7 @@
 // empty spot on the floors in view, each popping there with a flash, a bloop
 // and a jolt as a new worker forms; the last lands in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -33,9 +33,9 @@ const LAND_SHAKE: [number, number] = [0.4, 1.2];
 export const forceTadpolesEvent = registerWispEvent(
   KEY,
   "Tadpoles",
-  () => CONFIG.tadpolesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swimMs, gapsMs, wriggleMs, holdMs, mergeMs } = CONFIG.tadpolesEvent;
+    const { swimMs, gapsMs, wriggleMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

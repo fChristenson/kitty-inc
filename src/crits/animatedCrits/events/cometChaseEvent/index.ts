@@ -4,8 +4,8 @@
 // rush at the view and the guns pop them one after another, each paying
 // into the live total; then both beams lock on and blow it apart from the
 // end of its tail up to its head in a rattling chain, a huge blast last
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { multiply } from "../../../../shared/bigNumber";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
@@ -101,7 +101,7 @@ interface Chunk {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.cometChaseEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startCometChase,
@@ -136,7 +136,7 @@ function chunkAt(view: FlightView, chunk: Chunk, ms: number): Point {
 }
 
 function startCometChase(floor: Floor, context: EventProcContext): void {
-  const { payoutsPerChunk, payoutsComet } = CONFIG.cometChaseEvent;
+  const { payoutsPerChunk, payoutsComet } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const chunks: Chunk[] = Array.from({ length: CHUNKS }, (_, k) => {
     const shed = FIRST_SHED + k * SHED_EVERY;

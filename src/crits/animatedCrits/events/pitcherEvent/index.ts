@@ -6,8 +6,8 @@
 // up; the full number then merges into the total, its lines breaking up into
 // sparkles that fly in with the money, which pays like Draw: times that number
 // (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   playBoostEventStream,
@@ -91,7 +91,7 @@ function pourPath(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.pitcherEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
@@ -106,7 +106,7 @@ registerEventProc(
         mergeMs,
         breakSpreadMs,
         breakFlyMs,
-      } = CONFIG.pitcherEvent;
+      } = meta.values;
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const tier = context.critTier ?? pickCritTierByOdds();

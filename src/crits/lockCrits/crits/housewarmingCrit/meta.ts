@@ -6,4 +6,8 @@ export default {
   label: "Housewarming",
   chance: 0.03,
   style: "snowball",
+  values: {
+    // the floor it opens pays double this many payouts
+    payouts: 5,
+  },
 } satisfies CritMeta;

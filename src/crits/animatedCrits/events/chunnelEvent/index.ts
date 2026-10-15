@@ -7,7 +7,7 @@
 // them, every shove a jolt of free levels; they meet in its middle and
 // break through into each other in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,10 +44,10 @@ const PUSH_SHAKE: [number, number] = [0.35, 0.8];
 export const forceChunnelEvent = registerWispEvent(
   KEY,
   "Chunnel",
-  () => CONFIG.chunnelEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { approachMs, stallMs, boreMs, levelShare, holdMs, mergeMs } =
-      CONFIG.chunnelEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

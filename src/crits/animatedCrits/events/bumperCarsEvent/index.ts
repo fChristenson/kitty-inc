@@ -5,7 +5,7 @@
 // pop, a bloop and a burst of coins, faster and faster; then they all spin
 // in and pile up in the middle in a huge blast and shake. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -42,9 +42,9 @@ const CRASH_SHAKE: [number, number] = [0.3, 1.1];
 export const forceBumperCarsEvent = registerWispEvent(
   KEY,
   "Bumper Cars",
-  () => CONFIG.bumperCarsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { driveMs, holdMs, mergeMs } = CONFIG.bumperCarsEvent;
+    const { driveMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

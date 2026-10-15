@@ -6,7 +6,7 @@
 // readout; then all three swing round and lock onto the total, which goes
 // off in a huge blast and shake, and the coins sweep into the total. Pays
 // floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -43,10 +43,10 @@ const CATCH_SHAKE = 1.5;
 export const forceSearchlightsEvent = registerWispEvent(
   KEY,
   "Searchlights",
-  () => CONFIG.searchlightsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { searchMs, lockMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.searchlightsEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

@@ -3,8 +3,8 @@
 // the total-income readout, all of them flashing white and wiggling. Once the
 // stream ends the total is multiplied by one more than how many took part (a
 // lone worker doubles it) and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { randomInt } from "../../../../utils";
 import { isFloorLocked } from "../../../../shared/detachedJob";
@@ -88,7 +88,7 @@ function findParticipants(
 registerEventProc(
   {
     key: "kickback",
-    chance: () => CONFIG.kickbackEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (_floor, { getOnScreenFloors }) =>
       !running &&
@@ -134,7 +134,7 @@ function startKickback(floor: Floor, context: EventProcContext): void {
     candidates,
     randomInt(
       1,
-      Math.min(CONFIG.kickbackEvent.maxParticipants, candidates.length),
+      Math.min(meta.values.maxParticipants, candidates.length),
     ),
   );
   const kickback: RunningKickback = {

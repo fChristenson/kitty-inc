@@ -4,7 +4,7 @@
 // like a slinky tumbling, every loop a flash and a jolt; when the last of the
 // cash lands, the total goes off in a huge blast and shake. Pays floor income
 // × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -35,9 +35,9 @@ const LOOP_SHAKE: [number, number] = [0.6, 1.6];
 export const forceSlinkyEvent = registerWispEvent(
   KEY,
   "Slinky",
-  () => CONFIG.slinkyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.slinkyEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);

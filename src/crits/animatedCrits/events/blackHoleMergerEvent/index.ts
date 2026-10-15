@@ -6,7 +6,7 @@
 // collide in the middle in a blinding flash and merge into one big hole
 // holding the whole mess, which sinks onto the clicked floor's bar, the bar
 // jumping a crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -57,10 +57,10 @@ const MERGE_SHAKE = 1.5;
 export const forceBlackHoleMergerEvent = registerWispEvent(
   KEY,
   "Black Hole Merger",
-  () => CONFIG.blackHoleMergerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { rippleMs, spiralMs, sinkMs, holdMs, mergeMs } =
-      CONFIG.blackHoleMergerEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

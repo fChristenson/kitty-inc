@@ -7,7 +7,7 @@
 // trailing long tails of cash, flat out up into the total, the leader in a
 // big burst and the chaser right after in a huge blast, their tails pouring
 // in behind them. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,9 +52,9 @@ interface Racer {
 export const forcePitStopEvent = registerWispEvent(
   KEY,
   "Pit Stop",
-  () => CONFIG.pitStopEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { raceMs, gapMs, pitMs, holdMs, mergeMs } = CONFIG.pitStopEvent;
+    const { raceMs, gapMs, pitMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const top = bars[0];
     if (!top) return;

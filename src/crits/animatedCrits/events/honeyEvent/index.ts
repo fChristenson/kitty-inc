@@ -6,7 +6,7 @@
 // and the thread swings on to the next, quicker each time; then every heap
 // slurps up into the total in a huge blast and shake. Pays floor income ×
 // floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -41,7 +41,7 @@ const HEAP_SHAKE: [number, number] = [0.8, 1.6];
 export const forceHoneyEvent = registerWispEvent(
   KEY,
   "Honey",
-  () => CONFIG.honeyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       poursMs,
@@ -51,7 +51,7 @@ export const forceHoneyEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.honeyEvent;
+    } = meta.values;
     const fallback = totalSpot(area);
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;

@@ -6,7 +6,7 @@
 // income bar the bar jumps a crit tier with a bang and a big jolt, and it's
 // shot back up; the last knock-down ends in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const HIT_SHAKE: [number, number] = [0.8, 1.4];
 export const forceTinCanEvent = registerWispEvent(
   KEY,
   "Tin Can",
-  () => CONFIG.tinCanEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hopsMs, holdMs, mergeMs } = CONFIG.tinCanEvent;
+    const { hopsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

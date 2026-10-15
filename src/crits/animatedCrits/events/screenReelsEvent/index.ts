@@ -6,7 +6,7 @@
 // with a bang, a jolt and a spray of coins; the last stop lines the screen
 // up whole again in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,10 +34,10 @@ const STOP_SHAKE: [number, number] = [0.6, 1.4];
 export const forceScreenReelsEvent = registerWispEvent(
   KEY,
   "Screen Reels",
-  () => CONFIG.screenReelsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spinMs, stopGapMs, speed, holdMs, mergeMs } =
-      CONFIG.screenReelsEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

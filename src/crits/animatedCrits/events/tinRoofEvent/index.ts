@@ -6,7 +6,7 @@
 // a jolt, and when the last one's been pelted all the cash pours into the
 // total in a huge blast and shake. Pays floor income × floor number ×
 // REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ const DRUM_SHAKE: [number, number] = [0.7, 1.4];
 export const forceTinRoofEvent = registerWispEvent(
   KEY,
   "Tin Roof",
-  () => CONFIG.tinRoofEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { barGapMs, rainMs, levelShare, holdMs, mergeMs } =
-      CONFIG.tinRoofEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const total = totalSpot(area);

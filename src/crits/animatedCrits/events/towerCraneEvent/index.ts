@@ -6,7 +6,7 @@
 // straining and flaring hotter at every heave, each a jolt; on the last it
 // rips the lock clean out in a colossal blast and shake and the floor
 // bursts open, unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,10 +41,10 @@ const HEAVE_SHAKE: [number, number] = [0.6, 1.3];
 export const forceTowerCraneEvent = registerWispEvent(
   KEY,
   "Tower Crane",
-  () => CONFIG.towerCraneEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { raiseMs, swingMs, dropMs, heavesMs, ripMs, holdMs, mergeMs } =
-      CONFIG.towerCraneEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

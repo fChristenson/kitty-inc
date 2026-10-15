@@ -3,7 +3,7 @@
 // thick jet of cash gushes out of it, whipping wildly side to side across the
 // screen as the hose bucks and the screen rumbles, the gushing cash curling
 // round and pouring on into the total (see ../moneyCover's flow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -37,9 +37,9 @@ const RUMBLE: [number, number] = [0.3, 0.9];
 export const forceFireHoseEvent = registerWispEvent(
   KEY,
   "Fire Hose",
-  () => CONFIG.fireHoseEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { sprayMs, travelMs } = CONFIG.fireHoseEvent;
+    const { sprayMs, travelMs } = meta.values;
     const height = area.bottom - area.top;
     const durationMs =
       sprayMs + travelMs * 1.03 + FLOW_FLIGHT_MS + END_PAUSE_MS;

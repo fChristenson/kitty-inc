@@ -5,7 +5,7 @@
 // a bloop, a jolt and a pop of coins, the tune ever faster; at the end of
 // the bar five notes ring out at once in a chord, a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -37,10 +37,10 @@ const STAFF = 5;
 export const forceSheetMusicEvent = registerWispEvent(
   KEY,
   "Sheet Music",
-  () => CONFIG.sheetMusicEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { staffMs, tuneMs, chordMs, holdMs, mergeMs } =
-      CONFIG.sheetMusicEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const mid = (area.top + area.bottom) / 2;
     const span = (area.bottom - area.top) * SPAN;

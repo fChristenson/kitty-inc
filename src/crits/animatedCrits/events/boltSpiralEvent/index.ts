@@ -5,7 +5,7 @@
 // every time its tip crosses an income bar it cracks down on it in a flash,
 // a ping and a jolt with free levels; at full stretch every bar slams and
 // the hub blows in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -40,9 +40,9 @@ interface Hit {
 export const forceBoltSpiralEvent = registerWispEvent(
   KEY,
   "Bolt Spiral",
-  () => CONFIG.boltSpiralEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, levelShare, holdMs, mergeMs } = CONFIG.boltSpiralEvent;
+    const { spinMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const hub: Point = {

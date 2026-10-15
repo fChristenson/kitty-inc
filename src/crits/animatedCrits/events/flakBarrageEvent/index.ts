@@ -6,7 +6,7 @@
 // rains cash; then all three fire one last shell together that meets in
 // the sky and goes off in a huge blast and shake, and the cash sweeps into
 // the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,10 +46,10 @@ const POP_SHAKE = 0.35;
 export const forceFlakBarrageEvent = registerWispEvent(
   KEY,
   "Flak Barrage",
-  () => CONFIG.flakBarrageEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { plantMs, fireMs, firesMs, holdMs, mergeMs } =
-      CONFIG.flakBarrageEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;
     const height = area.bottom - area.top;

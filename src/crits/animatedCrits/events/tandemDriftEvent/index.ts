@@ -7,7 +7,7 @@
 // climbs a perma tier with a screech and a jolt; out of the last bend they
 // slam into the last worker, the leader in a big burst and the chaser right
 // after in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -62,9 +62,9 @@ interface Bend {
 export const forceTandemDriftEvent = registerWispEvent(
   KEY,
   "Tandem Drift",
-  () => CONFIG.tandemDriftEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { raceMs, gapMs, holdMs, mergeMs } = CONFIG.tandemDriftEvent;
+    const { raceMs, gapMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context);
     if (workers.length < 2) return;
     const button = getButtonCenter(context.isGroundFloor);

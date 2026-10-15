@@ -6,7 +6,7 @@
 // of each volley landing with a flash and a jolt as the worker climbs a
 // perma tier; the volleys come ever faster, the last one ending in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -63,9 +63,9 @@ function homingRound(
 export const forceHomingRoundsEvent = registerWispEvent(
   KEY,
   "Homing Rounds",
-  () => CONFIG.homingRoundsEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { volleysMs, flightMs, holdMs, mergeMs } = CONFIG.homingRoundsEvent;
+    const { volleysMs, flightMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const gun = getButtonCenter(context.isGroundFloor);

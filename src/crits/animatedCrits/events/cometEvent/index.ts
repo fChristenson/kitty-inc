@@ -3,8 +3,8 @@
 // into a worker and explodes: every climbable worker caught in the blast
 // lights up, plays its boost and climbs one perma tier. Then the screen
 // unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -120,7 +120,7 @@ function planComet(floor: Floor, context: EventProcContext): CometPlan | null {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.cometEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running && !isScreenFrozen() && planComet(floor, context) !== null,
@@ -137,7 +137,7 @@ export function forceCometEvent(floor: Floor): void {
 
 // speeding up as it comes down
 function headAt(comet: RunningComet, ms: number): Point {
-  const t = Math.min(1, Math.max(0, ms / CONFIG.cometEvent.streakMs)) ** 1.5;
+  const t = Math.min(1, Math.max(0, ms / meta.values.streakMs)) ** 1.5;
   return {
     x: comet.from.x + (comet.impact.x - comet.from.x) * t,
     y: comet.from.y + (comet.impact.y - comet.from.y) * t,
@@ -150,7 +150,7 @@ function drawComet(
   ms: number,
   now: number,
 ): void {
-  const { streakMs } = CONFIG.cometEvent;
+  const { streakMs } = meta.values;
   const dx = comet.impact.x - comet.from.x;
   const dy = comet.impact.y - comet.from.y;
   const length = Math.hypot(dx, dy);
@@ -250,7 +250,7 @@ function startComet(floor: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen()) return;
   const plan = planComet(floor, context);
   if (!plan) return;
-  const { streakMs, holdMs } = CONFIG.cometEvent;
+  const { streakMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const comet: RunningComet = {
     ...plan,

@@ -127,7 +127,7 @@ export interface BuildFloorOptions {
   // (see floorLock.ts's ensureLockedFloorAbove, the only real caller of this)
   defaultCritTier?: CritTier | null;
   // this building's own accumulated seasonal-sale discount (see crits/critTypes'
-  // SEASONAL_SALE_DISCOUNT_MULTIPLIER) — a freshly created floor starts already
+  // SALE_DISCOUNT_MULTIPLIERS) — a freshly created floor starts already
   // discounted by this same amount instead of resetting to 1, so a locked floor
   // queued AFTER a seasonal sale already procced still gets it (see
   // floorLock.ts's ensureLockedFloorAbove, the only real caller of this)

@@ -5,7 +5,7 @@
 // bang and a jolt, ever harder; off the last bank it tears straight into
 // the total in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const BANK_SHAKE: [number, number] = [0.6, 1.4];
 export const forcePinballRiverEvent = registerWispEvent(
   KEY,
   "Pinball River",
-  () => CONFIG.pinballRiverEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { travelMs, holdMs, mergeMs } = CONFIG.pinballRiverEvent;
+    const { travelMs, holdMs, mergeMs } = meta.values;
     const box = {
       left: area.left + EDGE,
       right: area.right - EDGE,

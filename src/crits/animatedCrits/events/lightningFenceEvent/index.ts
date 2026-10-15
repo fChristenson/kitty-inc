@@ -7,7 +7,7 @@
 // the last bolt leaps into the lock in a huge blast and shake; the floor
 // bursts open, unlocked for free, as the screen unfreezes. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,9 +34,9 @@ const JUMP_SHAKE: [number, number] = [0.4, 1.2];
 export const forceLightningFenceEvent = registerWispEvent(
   KEY,
   "Lightning Fence",
-  () => CONFIG.lightningFenceEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { plantMs, jumpsMs, holdMs, mergeMs } = CONFIG.lightningFenceEvent;
+    const { plantMs, jumpsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -4,7 +4,7 @@
 // landing dot by dot into a giant crown in the middle of the screen; the
 // crown blazes, then drops onto the dark locked floor faster and faster and
 // crowns it, bursting it open, unlocked for free as the screen unfreezes
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import {
@@ -52,9 +52,9 @@ const CROWN = shapeFill(SHAPES.crown, DOTS, { x: 0, y: 0 }, SIZE);
 export const forceCoronationEvent = registerWispEvent(
   KEY,
   "Coronation",
-  () => CONFIG.coronationEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { firstMs, gapsMs, holdMs, mergeMs } = CONFIG.coronationEvent;
+    const { firstMs, gapsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

@@ -5,7 +5,7 @@
 // base, a bang and a jolt as the worker climbs a perma tier, each quicker;
 // then every pillar widens together into a blinding blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -29,9 +29,9 @@ const SLAM_SHAKE: [number, number] = [0.7, 1.3];
 export const forcePillarsEvent = registerWispEvent(
   KEY,
   "Pillars",
-  () => CONFIG.pillarsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { aimsMs, dropMs, blazeMs, holdMs, mergeMs } = CONFIG.pillarsEvent;
+    const { aimsMs, dropMs, blazeMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const n = workers.length;

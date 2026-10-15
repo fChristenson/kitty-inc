@@ -3,8 +3,8 @@
 // floor's button, which then fires them all as one big stream into the total.
 // It pays the floor's payout once per worker that chipped in, then the crit's
 // tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSold } from "../../../../sound";
 import {
@@ -73,7 +73,7 @@ let running: RunningPayday | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.paydayEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, { getOnScreenFloors }) =>
       !running &&
@@ -133,7 +133,7 @@ function startPayday(floor: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen()) return;
   const found = findWorkers(floor, context.getOnScreenFloors);
   if (!found || found.length === 0) return;
-  const { gatherMs, payoutMs, maxWorkers } = CONFIG.paydayEvent;
+  const { gatherMs, payoutMs, maxWorkers } = meta.values;
   const workers = pickAtMost(found, maxWorkers);
   const tier = context.critTier ?? pickCritTierByOdds();
   const floorTop = context.getOnScreenFloors!().find(

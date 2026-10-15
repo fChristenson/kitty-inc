@@ -5,7 +5,7 @@
 // lashes down into the building's locked floor in a huge blast and shake,
 // and the floor bursts open, unlocked for free, as the screen unfreezes.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -27,9 +27,9 @@ const WHIP_SHAKE: [number, number] = [0.4, 1.2];
 export const forceLiveWireEvent = registerWispEvent(
   KEY,
   "Live Wire",
-  () => CONFIG.liveWireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { thrashMs, lashMs, holdMs, mergeMs } = CONFIG.liveWireEvent;
+    const { thrashMs, lashMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const door: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

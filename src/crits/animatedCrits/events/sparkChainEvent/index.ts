@@ -4,8 +4,8 @@
 // each worker it strikes climbs one perma tier, and the chain fizzles out on
 // the first maxed worker it reaches. Then the screen unfreezes and the crit's
 // tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   playBloop,
@@ -106,7 +106,7 @@ function planStops(floor: Floor, context: EventProcContext): Stop[] | null {
     .getOnScreenFloors?.()
     .find((entry) => entry.floor === floor)?.top;
   if (!found || found.length === 0 || top === undefined) return null;
-  const { firstJumpMs, speedUp, maxJumps } = CONFIG.sparkChainEvent;
+  const { firstJumpMs, speedUp, maxJumps } = meta.values;
   const button = getButtonCenter(context.isGroundFloor);
   const chain = nearestChain(
     { x: button.x, y: button.y + top },
@@ -145,7 +145,7 @@ function planStops(floor: Floor, context: EventProcContext): Stop[] | null {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.sparkChainEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running && !isScreenFrozen() && planStops(floor, context) !== null,
@@ -381,7 +381,7 @@ function startSparkChain(floor: Floor, context: EventProcContext): void {
     }, stop.landAt);
   });
 
-  const endAt = stops[stops.length - 1].landAt + CONFIG.sparkChainEvent.holdMs;
+  const endAt = stops[stops.length - 1].landAt + meta.values.holdMs;
   setTimeout(() => {
     if (!isLive()) return;
     running = null;

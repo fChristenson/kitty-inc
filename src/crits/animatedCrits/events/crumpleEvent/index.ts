@@ -5,7 +5,7 @@
 // bursts in a colossal blast and shake, flinging rivers of cash looping into
 // the total as the pieces fly back out and smooth flat into place. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,10 +53,10 @@ const SETTLE_SHAKE = 0.8;
 export const forceCrumpleEvent = registerWispEvent(
   KEY,
   "Crumple",
-  () => CONFIG.crumpleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { crumpleMs, trembleMs, tossMs, unfoldMs, holdMs, mergeMs } =
-      CONFIG.crumpleEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

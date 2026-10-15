@@ -6,7 +6,7 @@
 // and a jolt; it swings to the next bar and the next, ever quicker; then it
 // spins and sprays a ring of bullets every way at once in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,10 +45,10 @@ const BURST_SHAKE: [number, number] = [0.6, 1.3];
 export const forceSentryTurretEvent = registerWispEvent(
   KEY,
   "Sentry Turret",
-  () => CONFIG.sentryTurretEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { dropMs, swingsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.sentryTurretEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

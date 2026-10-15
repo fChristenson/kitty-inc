@@ -6,7 +6,7 @@
 // jolt; spot after spot, ever faster; then it throws every beam at once in
 // a blinding volley and blows in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const HIRE_SHAKE: [number, number] = [0.9, 1.6];
 export const forceProjectorEvent = registerWispEvent(
   KEY,
   "Projector",
-  () => CONFIG.projectorEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { riseMs, aimMs, beamsMs, holdMs, mergeMs } = CONFIG.projectorEvent;
+    const { riseMs, aimMs, beamsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context)
       .sort(() => Math.random() - 0.5)
       .slice(0, MAX_HIRES);

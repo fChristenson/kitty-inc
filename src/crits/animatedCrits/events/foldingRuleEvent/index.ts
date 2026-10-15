@@ -6,7 +6,7 @@
 // full length and flashes, jumping the bar a crit tier; then the next bar's
 // rule unfolds, the last flashing in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ interface Rule {
 export const forceFoldingRuleEvent = registerWispEvent(
   KEY,
   "Folding Rule",
-  () => CONFIG.foldingRuleEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { hingesMs, holdMs, mergeMs } = CONFIG.foldingRuleEvent;
+    const { hingesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

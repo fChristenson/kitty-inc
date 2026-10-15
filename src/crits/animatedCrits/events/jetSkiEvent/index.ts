@@ -6,7 +6,7 @@
 // bar to tear back the other way, ever faster, the last run ending in a
 // huge blast and shake as the cash sweeps into the total. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const RUN_SHAKE: [number, number] = [0.6, 1.2];
 export const forceJetSkiEvent = registerWispEvent(
   KEY,
   "Jet Ski",
-  () => CONFIG.jetSkiEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { runsMs, jumpMs, holdMs, mergeMs } = CONFIG.jetSkiEvent;
+    const { runsMs, jumpMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

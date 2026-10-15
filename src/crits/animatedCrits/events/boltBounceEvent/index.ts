@@ -5,7 +5,7 @@
 // each leg striking quicker than the last; the final leg cracks back into
 // the middle of the screen in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -31,9 +31,9 @@ const BOUNCE_SHAKE: [number, number] = [0.5, 1.3];
 export const forceBoltBounceEvent = registerWispEvent(
   KEY,
   "Bolt Bounce",
-  () => CONFIG.boltBounceEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { legsMs, holdMs, mergeMs } = CONFIG.boltBounceEvent;
+    const { legsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const box = {
       left: area.left + EDGE,

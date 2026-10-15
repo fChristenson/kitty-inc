@@ -6,7 +6,7 @@
 // faster; then every ball lands at once with a slam and they all spring up
 // onto the income bars, each bar jumping a crit tier as its balls land, the
 // last in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const UP = -Math.PI / 2;
 export const forceBounceWaveEvent = registerWispEvent(
   KEY,
   "Bounce Wave",
-  () => CONFIG.bounceWaveEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { waveMs, holdMs, mergeMs } = CONFIG.bounceWaveEvent;
+    const { waveMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const floorY = area.bottom - LOW;

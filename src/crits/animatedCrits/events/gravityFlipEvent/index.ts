@@ -5,7 +5,7 @@
 // bottom edge, piling against the ceiling with a crash and a jolt; then
 // gravity flips back and the screen drops back down into place, slamming
 // home in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,10 +33,10 @@ const GLOW = fadeStops(COLOR.heavenlyGold);
 export const forceGravityFlipEvent = registerWispEvent(
   KEY,
   "Gravity Flip",
-  () => CONFIG.gravityFlipEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fallMs, riseMs, hangMs, dropMs, holdMs, mergeMs } =
-      CONFIG.gravityFlipEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

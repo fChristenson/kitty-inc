@@ -6,7 +6,7 @@
 // flaring with a bang and a jolt as the worker lights up a perma tier; worker
 // after worker, ever faster, the last pounce a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,9 +45,9 @@ interface Stop {
 export const forceLaserPointerEvent = registerWispEvent(
   KEY,
   "Laser Pointer",
-  () => CONFIG.laserPointerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dartsMs, holdsMs, holdMs, mergeMs } = CONFIG.laserPointerEvent;
+    const { dartsMs, holdsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .sort((a, b) => a.at.y - b.at.y)
       .slice(0, MAX_WORKERS);

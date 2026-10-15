@@ -5,7 +5,7 @@
 // it pulls up into the total-income readout in a huge blast and shake, and
 // the whole heap of cash sweeps up after it into the total. Pays floor
 // income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -42,10 +42,10 @@ const PASS_SHAKE = 1.1;
 export const forceCropDusterEvent = registerWispEvent(
   KEY,
   "Crop Duster",
-  () => CONFIG.cropDusterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { passMs, fallMs, climbMs, sweepMs, flightMs, holdMs, mergeMs } =
-      CONFIG.cropDusterEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

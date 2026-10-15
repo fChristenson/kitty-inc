@@ -6,7 +6,7 @@
 // bulging and buckling, glitter oozing out, giving in jolts closer and
 // closer until it crumbles, and a wisp flies out of the rubble onto each
 // worker, striking it up a perma tier
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import {
@@ -84,9 +84,9 @@ const TIER_SHAKE = 1;
 export const forceUnderPressureEvent = registerWispEvent(
   KEY,
   "Under Pressure",
-  () => CONFIG.underPressureEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { firstMs, holdMs, mergeMs } = CONFIG.underPressureEvent;
+    const { firstMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const width = area.right - area.left;

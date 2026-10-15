@@ -7,7 +7,7 @@
 // straight strings bow in from the corners and frame a glowing hollow; the
 // web blazes, then every string folds flat down onto its bar in a sweep
 // and both bars blast and slam. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -46,7 +46,7 @@ interface Thread {
 export const forceStringArtEvent = registerWispEvent(
   KEY,
   "String Art",
-  () => CONFIG.stringArtEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const {
       pinMs,
@@ -57,7 +57,7 @@ export const forceStringArtEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.stringArtEvent;
+    } = meta.values;
     const bars = findRewardBars(floor, context);
     const near = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!near) return;

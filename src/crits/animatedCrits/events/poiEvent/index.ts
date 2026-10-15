@@ -6,7 +6,7 @@
 // flowers close and the poi slam together in the middle in a huge blast and
 // shake as the coins sweep into the total. Pays floor income × floor number
 // × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -41,9 +41,9 @@ const TIP_SHAKE: [number, number] = [0.3, 1.1];
 export const forcePoiEvent = registerWispEvent(
   KEY,
   "Poi",
-  () => CONFIG.poiEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.poiEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

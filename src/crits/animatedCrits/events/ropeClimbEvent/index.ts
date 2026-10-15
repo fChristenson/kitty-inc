@@ -5,7 +5,7 @@
 // quicker as it nears the top; at the top it swings in and smashes into the
 // lock in a huge blast and shake, and the floor bursts open, unlocked for
 // free, as the screen unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const PULL_SHAKE: [number, number] = [0.35, 0.9];
 export const forceRopeClimbEvent = registerWispEvent(
   KEY,
   "Rope Climb",
-  () => CONFIG.ropeClimbEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { pullsMs, holdMs, mergeMs } = CONFIG.ropeClimbEvent;
+    const { pullsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

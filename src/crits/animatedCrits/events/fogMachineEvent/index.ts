@@ -5,7 +5,7 @@
 // income bar the bar is coated gold and flashes with a jolt of free levels,
 // the last as the fog tops the screen in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ const HIT_SHAKE: [number, number] = [0.5, 1.1];
 export const forceFogMachineEvent = registerWispEvent(
   KEY,
   "Fog Machine",
-  () => CONFIG.fogMachineEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { riseMs, levelShare, holdMs, mergeMs } = CONFIG.fogMachineEvent;
+    const { riseMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const width = area.right - area.left;

@@ -5,7 +5,7 @@
 // splash of coins, a bang and a jolt; at the bottom it hits a ramp and
 // launches in a huge soaring arc up into the total in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const RAMP = 160;
 export const forceBobsledEvent = registerWispEvent(
   KEY,
   "Bobsled",
-  () => CONFIG.bobsledEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, launchMs, holdMs, mergeMs } = CONFIG.bobsledEvent;
+    const { runMs, launchMs, holdMs, mergeMs } = meta.values;
     const cx = (area.left + area.right) / 2;
     const top = area.top + TOP;
     const bottom = area.bottom - BOTTOM;

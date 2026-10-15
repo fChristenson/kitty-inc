@@ -6,7 +6,7 @@
 // floors in view, each a pop and a jolt as a new worker forms; then the
 // foam overflows into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD, plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -41,9 +41,9 @@ const POP_SHAKE: [number, number] = [0.5, 1.1];
 export const forceFizzEvent = registerWispEvent(
   KEY,
   "Fizz",
-  () => CONFIG.fizzEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fizzMs, bubblesMs, flightMs, holdMs, mergeMs } = CONFIG.fizzEvent;
+    const { fizzMs, bubblesMs, flightMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     const fallback = totalSpot(area);
     const width = area.right - area.left;

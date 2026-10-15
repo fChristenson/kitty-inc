@@ -5,7 +5,7 @@
 // flare, a bang and a big jolt and the bar jumps a crit tier; curtain after
 // curtain ripples down onto the next bars, ever quicker, the last coming
 // down in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -29,9 +29,9 @@ const HIT_SHAKE: [number, number] = [0.9, 1.4];
 export const forceAuroraEvent = registerWispEvent(
   KEY,
   "Aurora",
-  () => CONFIG.auroraEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { curtainsMs, fallMs, holdMs, mergeMs } = CONFIG.auroraEvent;
+    const { curtainsMs, fallMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

@@ -5,7 +5,7 @@
 // coins off the lip; at the far side the wave rears up and breaks, pouring up
 // into the total behind the surfer, which goes off in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -45,9 +45,9 @@ const TURN_SHAKE: [number, number] = [0.5, 1.4];
 export const forceSurfEvent = registerWispEvent(
   KEY,
   "Surf",
-  () => CONFIG.surfEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { rollMs, drainMs, flightMs, holdMs, mergeMs } = CONFIG.surfEvent;
+    const { rollMs, drainMs, flightMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const dir = Math.random() < 0.5 ? 1 : -1;
     const base = area.bottom - 30;

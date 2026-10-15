@@ -4,7 +4,7 @@
 // hotter each lap; it burns into the middle, trembling and charging, and
 // the cut-out disc blasts out of the floor, which bursts open: its button's
 // next taps cost half
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { addHalfTaps } from "../../../buttonCrits/buttonBonus";
 import { COLOR } from "../../../../palette";
 import {
@@ -80,7 +80,7 @@ const atEmitter = () => emitter;
 registerFloorCrit("burnThroughCrit", {
   // half-price taps on the floor it opened
   reward(t) {
-    addHalfTaps(t.floor, t.count * CONFIG.crit.burnThroughTaps);
+    addHalfTaps(t.floor, t.count * meta.values.taps);
     t.flipButton();
   },
   plan(r, _bars, hit) {

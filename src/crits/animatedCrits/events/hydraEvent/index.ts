@@ -6,7 +6,7 @@
 // off a burst that takes all four at once, the body blowing in a huge blast
 // while the severed heads arc down onto the empty spots, a new worker
 // forming where each lands. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -79,10 +79,10 @@ interface Head {
 export const forceHydraEvent = registerWispEvent(
   KEY,
   "Hydra",
-  () => CONFIG.hydraEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, gapMs, sproutMs, volleyGapMs, dropMs, holdMs, mergeMs } =
-      CONFIG.hydraEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, 4);
     if (hires.length === 0) return;
     const gun = getButtonCenter(context.isGroundFloor);

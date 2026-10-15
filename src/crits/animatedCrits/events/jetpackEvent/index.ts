@@ -5,7 +5,7 @@
 // screen rumbles and slams into the total-income readout in a huge blast and
 // shake, and the whole pool of cash erupts up after it into the total. Pays
 // floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -49,9 +49,9 @@ const RUMBLE: [number, number] = [0.4, 1.3];
 export const forceJetpackEvent = registerWispEvent(
   KEY,
   "Jetpack",
-  () => CONFIG.jetpackEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flyMs, sweepMs, flightMs, holdMs, mergeMs } = CONFIG.jetpackEvent;
+    const { flyMs, sweepMs, flightMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

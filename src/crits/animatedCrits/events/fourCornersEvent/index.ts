@@ -7,7 +7,7 @@
 // up onto the building's locked floor, which bursts open in a huge blast
 // and shake, unlocked for free as the screen unfreezes. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -32,10 +32,10 @@ const CRACK_SHAKE: [number, number] = [0.6, 1.2];
 export const forceFourCornersEvent = registerWispEvent(
   KEY,
   "Four Corners",
-  () => CONFIG.fourCornersEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spreadMs, cracksMs, climbMs, holdMs, mergeMs } =
-      CONFIG.fourCornersEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -6,7 +6,7 @@
 // open, the hidden mines lighting up as wisps; when the board is cleared
 // every mine goes off at once in a huge blast and shake. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -57,9 +57,9 @@ interface Cell {
 export const forceSweeperEvent = registerWispEvent(
   KEY,
   "Sweeper",
-  () => CONFIG.sweeperEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spreadMs, floodMs, holdMs, mergeMs } = CONFIG.sweeperEvent;
+    const { spreadMs, floodMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const cols = Math.max(4, Math.floor((area.right - area.left) / CELL));
     const rows = Math.max(4, Math.floor((area.bottom - area.top) / CELL));

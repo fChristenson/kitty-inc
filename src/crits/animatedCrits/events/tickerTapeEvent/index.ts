@@ -5,7 +5,7 @@
 // splash and a jolt; ever faster, until every band swings round at once and
 // they all pour together into the total in a huge blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const BAND_SHAKE: [number, number] = [0.5, 1.1];
 export const forceTickerTapeEvent = registerWispEvent(
   KEY,
   "Ticker Tape",
-  () => CONFIG.tickerTapeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { bandsMs, crossMs, holdMs, mergeMs } = CONFIG.tickerTapeEvent;
+    const { bandsMs, crossMs, holdMs, mergeMs } = meta.values;
     const left = area.left + EDGE;
     const right = area.right - EDGE;
     const top = area.top + TOP;

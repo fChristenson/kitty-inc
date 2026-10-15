@@ -5,7 +5,7 @@
 // inward, the bar jolting at every quarter turn as its gold coat builds up
 // thicker and brighter, until it's plated all over, flashes white and jumps
 // a crit tier in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -44,9 +44,9 @@ const TURN_SHAKE: [number, number] = [0.25, 0.8];
 export const forceGoldPlatingEvent = registerWispEvent(
   KEY,
   "Gold Plating",
-  () => CONFIG.goldPlatingEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { flyMs, sprayMs, holdMs, mergeMs } = CONFIG.goldPlatingEvent;
+    const { flyMs, sprayMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

@@ -6,7 +6,7 @@
 // stroke, the bar flashing for free levels with a jolt; then the platform
 // drops to the next bar and does it again, floor after floor, the last wipe
 // slamming its bar. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -45,10 +45,10 @@ const WIPE_SHAKE: [number, number] = [0.5, 0.9];
 export const forceWindowWasherEvent = registerWispEvent(
   KEY,
   "Window Washer",
-  () => CONFIG.windowWasherEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { enterMs, sprayMs, wipeMs, dropMs, levelShare, holdMs, mergeMs } =
-      CONFIG.windowWasherEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_STOPS);
     if (bars.length === 0) return;
     const left = Math.min(...bars.map((b) => b.box.x)) - OVERHANG;

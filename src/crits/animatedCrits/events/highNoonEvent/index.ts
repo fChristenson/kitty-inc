@@ -6,7 +6,7 @@
 // into income bars, each hit a bang, a jolt and a crit tier; they fire one
 // last pair that meets in a huge blast and shake. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const HIT_SHAKE: [number, number] = [0.7, 1.4];
 export const forceHighNoonEvent = registerWispEvent(
   KEY,
   "Duel",
-  () => CONFIG.highNoonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { skidMs, duelsMs, turnMs, holdMs, mergeMs } = CONFIG.highNoonEvent;
+    const { skidMs, duelsMs, turnMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

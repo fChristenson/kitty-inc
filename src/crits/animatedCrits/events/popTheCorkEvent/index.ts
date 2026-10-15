@@ -5,7 +5,7 @@
 // out in arcs that sweep back and forth across the screen, faster and
 // wilder, the last a huge gush into the total in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,10 +39,10 @@ const GUSH_SHAKE: [number, number] = [0.3, 0.9];
 export const forcePopTheCorkEvent = registerWispEvent(
   KEY,
   "Pop the Cork",
-  () => CONFIG.popTheCorkEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { shakeMs, gushesMs, travelMs, holdMs, mergeMs } =
-      CONFIG.popTheCorkEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     const left = area.left + EDGE;

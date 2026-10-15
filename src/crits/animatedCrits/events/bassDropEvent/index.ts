@@ -6,7 +6,7 @@
 // the drop hits in a huge blast and shake that sprays hundreds of coins over
 // the whole screen, and the coins sweep into the total. Pays floor income ×
 // floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -30,9 +30,9 @@ const DROP_REACH: [number, number] = [0.08, 0.6];
 export const forceBassDropEvent = registerWispEvent(
   KEY,
   "Bass Drop",
-  () => CONFIG.bassDropEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { beatMs, silenceMs, holdMs, mergeMs } = CONFIG.bassDropEvent;
+    const { beatMs, silenceMs, holdMs, mergeMs } = meta.values;
     const span = Math.min(area.right - area.left, area.bottom - area.top);
     const mid = {
       x: (area.left + area.right) / 2,

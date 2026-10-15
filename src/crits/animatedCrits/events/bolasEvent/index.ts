@@ -6,7 +6,7 @@
 // then the rope wraps tight as it slams into the total-income readout in a
 // huge blast and shake, and the coins sweep into the total. Pays floor
 // income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,9 +45,9 @@ const BANK_SHAKE = 1.8;
 export const forceBolasEvent = registerWispEvent(
   KEY,
   "Bolas",
-  () => CONFIG.bolasEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flightMs, flowMs, holdMs, mergeMs } = CONFIG.bolasEvent;
+    const { flightMs, flowMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const rope = Math.min(width, height) * ROPE;

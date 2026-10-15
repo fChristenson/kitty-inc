@@ -5,7 +5,7 @@
 // a new worker beams in; spot after spot beams in, each quicker than the
 // last, the last landing in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -38,9 +38,9 @@ const LAND_SHAKE: [number, number] = [0.6, 1.3];
 export const forceTeleporterEvent = registerWispEvent(
   KEY,
   "Teleporter",
-  () => CONFIG.teleporterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spotMs, holdMs, mergeMs } = CONFIG.teleporterEvent;
+    const { spotMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     let clock = 0;

@@ -6,4 +6,8 @@ export default {
   label: "Burn Through",
   chance: 0.03,
   style: "beam",
+  values: {
+    // the floor it opens gets this many half-price taps per the crit's multiple
+    taps: 2,
+  },
 } satisfies CritMeta;

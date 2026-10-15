@@ -5,7 +5,7 @@
 // "SHOOT!" the results come in down the line, worker after worker winning
 // with a "WIN!", a pop and a jolt as they climb a perma tier, the last win
 // landing in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const WIN_SHAKE: [number, number] = [0.5, 1.2];
 export const forceRockPaperScissorsEvent = registerWispEvent(
   KEY,
   "Rock Paper Scissors",
-  () => CONFIG.rockPaperScissorsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { beatMs, winsMs, holdMs, mergeMs } = CONFIG.rockPaperScissorsEvent;
+    const { beatMs, winsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

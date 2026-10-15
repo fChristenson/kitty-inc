@@ -6,7 +6,7 @@
 // end in a blinding strike, a crack and a jolt, and the bar jumps a crit
 // tier; on to the next bar, quicker each time, the last discharge a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,9 +52,9 @@ interface Charge {
 export const forceCapacitorEvent = registerWispEvent(
   KEY,
   "Capacitor",
-  () => CONFIG.capacitorEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { chargesMs, holdMs, mergeMs } = CONFIG.capacitorEvent;
+    const { chargesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -8,7 +8,7 @@
 // shake; the last flame runs out of the maze's far corner along a final
 // cord into the locked floor's lock, which blows open in a huge blast: the
 // floor unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const SOUND_GAP_MS = 60;
 export const forceFuseMazeEvent = registerWispEvent(
   KEY,
   "Fuse Maze",
-  () => CONFIG.fuseMazeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, stepMs, finalMs, holdMs, mergeMs } = CONFIG.fuseMazeEvent;
+    const { growMs, stepMs, finalMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

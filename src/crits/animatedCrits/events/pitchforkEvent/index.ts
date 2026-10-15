@@ -4,7 +4,7 @@
 // income bar at once in a blinding flash, a crack and a jolt that lands free
 // levels; it strikes again and again, ever harder and faster, the last time
 // in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -27,9 +27,9 @@ const STRIKE_SHAKE: [number, number] = [0.8, 1.5];
 export const forcePitchforkEvent = registerWispEvent(
   KEY,
   "Pitchfork",
-  () => CONFIG.pitchforkEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { leadMs, roundsMs, holdMs, mergeMs } = CONFIG.pitchforkEvent;
+    const { leadMs, roundsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const cx = (area.left + area.right) / 2;

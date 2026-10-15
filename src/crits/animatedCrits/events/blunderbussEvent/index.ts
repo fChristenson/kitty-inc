@@ -7,7 +7,7 @@
 // screen on its own recoil, until a last double-wide blast sprays cash
 // everywhere in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const SHOT_SHAKE: [number, number] = [0.8, 1.4];
 export const forceBlunderbussEvent = registerWispEvent(
   KEY,
   "Blunderbuss",
-  () => CONFIG.blunderbussEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotsMs, kickMs, holdMs, mergeMs } = CONFIG.blunderbussEvent;
+    const { shotsMs, kickMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const box = {
       left: area.left + EDGE,

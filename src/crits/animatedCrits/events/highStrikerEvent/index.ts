@@ -7,7 +7,7 @@
 // again, harder, the puck flying higher, and on the third strike it rings
 // the bell with a "DING!" in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -47,9 +47,9 @@ const STRIKE_SHAKE: [number, number] = [0.7, 1.2];
 export const forceHighStrikerEvent = registerWispEvent(
   KEY,
   "High Striker",
-  () => CONFIG.highStrikerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { strikesMs, holdMs, mergeMs } = CONFIG.highStrikerEvent;
+    const { strikesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const cx = (area.left + area.right) / 2;

@@ -5,7 +5,7 @@
 // a spray of coins, ever harder; the last impact blows the button in a huge
 // blast and shake, and the coins sweep into the total. Pays floor income ×
 // floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const HIT_BURST: [number, number] = [0.7, 1.2];
 export const forceDiveBombEvent = registerWispEvent(
   KEY,
   "Dive Bomb",
-  () => CONFIG.diveBombEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { circleMs, gapsMs, diveMs, holdMs, mergeMs } = CONFIG.diveBombEvent;
+    const { circleMs, gapsMs, diveMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

@@ -6,7 +6,7 @@
 // screen into a line under the lock, then in from the left and the right
 // into one heap, which settles with a jolt and is shoved up into the lock,
 // bursting it open in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -60,10 +60,10 @@ const GATHER_SHAKE = 0.8;
 export const forceGlitterSpillEvent = registerWispEvent(
   KEY,
   "Glitter Spill",
-  () => CONFIG.glitterSpillEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spillMs, dragMs, liftMs, holdMs, mergeMs } =
-      CONFIG.glitterSpillEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

@@ -5,7 +5,7 @@
 // a flash, a crack and a jolt as the worker climbs a perma tier, a fading
 // afterimage left wherever it was; every blink quicker, the last in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -32,9 +32,9 @@ const BLINK_SHAKE: [number, number] = [0.5, 1.3];
 export const forceBlinkEvent = registerWispEvent(
   KEY,
   "Blink",
-  () => CONFIG.blinkEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { staysMs, holdMs, mergeMs } = CONFIG.blinkEvent;
+    const { staysMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

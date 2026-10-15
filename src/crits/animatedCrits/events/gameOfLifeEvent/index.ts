@@ -6,7 +6,7 @@
 // blinkers flickering across the screen; then every living cell bursts into
 // cash at once in a huge blast and shake. Pays floor income × floor number
 // × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,9 +55,9 @@ function step(cells: Uint8Array, cols: number, rows: number): Uint8Array {
 export const forceGameOfLifeEvent = registerWispEvent(
   KEY,
   "Game of Life",
-  () => CONFIG.gameOfLifeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gensMs, holdMs, mergeMs } = CONFIG.gameOfLifeEvent;
+    const { gensMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

@@ -5,7 +5,7 @@
 // crack and a jolt, its arms cracking down onto the workers below, who climb
 // a perma tier; each shell quicker than the last, the last bursting in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,9 +49,9 @@ interface Shell {
 export const forceThunderShellEvent = registerWispEvent(
   KEY,
   "Thunder Shell",
-  () => CONFIG.thunderShellEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shellsMs, riseMs, holdMs, mergeMs } = CONFIG.thunderShellEvent;
+    const { shellsMs, riseMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

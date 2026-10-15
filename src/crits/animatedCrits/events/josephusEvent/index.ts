@@ -8,7 +8,7 @@
 // be, swallows the hunter, flares and rockets into the lock, blowing it
 // open in a huge blast: the floor unlocked for free. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -61,9 +61,9 @@ interface Hop {
 export const forceJosephusEvent = registerWispEvent(
   KEY,
   "Josephus",
-  () => CONFIG.josephusEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, hopMs, flyMs, holdMs, mergeMs } = CONFIG.josephusEvent;
+    const { growMs, hopMs, flyMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

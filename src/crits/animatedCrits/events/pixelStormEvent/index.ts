@@ -6,7 +6,7 @@
 // stream back home row by row, each row clicking into place with a bloop,
 // a jolt and coins, until the screen is whole again in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -46,9 +46,9 @@ const ROW_SHAKE: [number, number] = [0.4, 1.1];
 export const forcePixelStormEvent = registerWispEvent(
   KEY,
   "Pixel Storm",
-  () => CONFIG.pixelStormEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swirlMs, rowGapMs, holdMs, mergeMs } = CONFIG.pixelStormEvent;
+    const { swirlMs, rowGapMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

@@ -5,8 +5,8 @@
 // then the bar explodes back out in a huge blast, throwing the plates back
 // off the screen and bursting coins every way, which merge into the total.
 // Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   playExplosion,
@@ -72,7 +72,7 @@ const BLAST_R: [number, number] = [120, 460];
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.pressEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) &&
@@ -82,7 +82,7 @@ registerEventProc(
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { slamMs, bounceMs, reslamMs, grindMs, retractMs, holdMs, mergeMs } =
-        CONFIG.pressEvent;
+        meta.values;
       const box = getIncomeBarBox(context.isGroundFloor);
       const cx = box.x + box.width / 2;
       const cy = box.y + box.height / 2;

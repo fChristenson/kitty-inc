@@ -7,7 +7,7 @@
 // and dive onto another worker, the leader in a big burst and the chaser
 // right after in a huge blast, a perma tier each. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const FINISH_SHAKE = 1.3;
 export const forceRallyJumpEvent = registerWispEvent(
   KEY,
   "Rally Jump",
-  () => CONFIG.rallyJumpEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { raceMs, gapMs, holdMs, mergeMs } = CONFIG.rallyJumpEvent;
+    const { raceMs, gapMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const top = bars[0];
     const workers = findRewardWorkers(floor, context);

@@ -3,7 +3,7 @@
 // slamming in quicker and harder each, squeezing it thinner and taller,
 // glitter spurting out above and below; the last squeeze crushes it to a
 // sliver and it bursts, the floor opening, its button charged with levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { addButtonCharge } from "../../../buttonCrits/buttonBonus";
 import {
   crushAt,
@@ -79,7 +79,7 @@ const atOrigin = () => ORIGIN;
 registerFloorCrit("viceCrit", {
   // the floor it opened has its button charged with levels
   reward(t) {
-    addButtonCharge(t.floor, t.count * CONFIG.crit.viceCharge);
+    addButtonCharge(t.floor, t.count * meta.values.charge);
     t.flipButton();
   },
   plan(r, _bars, hit) {

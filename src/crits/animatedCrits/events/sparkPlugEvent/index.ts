@@ -5,7 +5,7 @@
 // blinding flash, a crack and a jolt and a new worker forms there, ever
 // faster spot after spot; the last fires in a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const FIRE_SHAKE: [number, number] = [0.5, 1.3];
 export const forceSparkPlugEvent = registerWispEvent(
   KEY,
   "Spark Plug",
-  () => CONFIG.sparkPlugEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { flyMs, firesMs, holdMs, mergeMs } = CONFIG.sparkPlugEvent;
+    const { flyMs, firesMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

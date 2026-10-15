@@ -6,7 +6,7 @@
 // soaking its worker with a splash, a bloop and a jolt as they climb a perma
 // tier; the last lands in a huge blast and shake and the coins sweep into
 // the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -40,10 +40,10 @@ const LAND_SHAKE: [number, number] = [0.5, 1.3];
 export const forceWaterPistolEvent = registerWispEvent(
   KEY,
   "Water Pistol",
-  () => CONFIG.waterPistolEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { diveMs, drinkMs, gapsMs, squirtMs, holdMs, mergeMs } =
-      CONFIG.waterPistolEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

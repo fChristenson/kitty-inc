@@ -2,8 +2,8 @@
 // the button pours a river of coins and bills that winds across the whole
 // screen, looping the loop along the way, then flows into the total (see
 // ../moneyCover and ../riverPaths)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -26,11 +26,11 @@ const RIVER: RiverOptions = { wander: [1.4, 2], loops: [1, 1], startWidth: 60 };
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.streamEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const { travelMs } = CONFIG.streamEvent;
+      const { travelMs } = meta.values;
       // the button pours until the river's head reaches the total, then the
       // event ends as its tail does
       const streamMs = travelMs + FLOW_FLIGHT_MS;

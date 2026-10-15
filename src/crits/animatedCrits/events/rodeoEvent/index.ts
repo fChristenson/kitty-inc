@@ -4,7 +4,7 @@
 // screen, kicking higher with every leap, every buck a whoop, a bloop and a
 // jolt; then it rears up off the far side into the total and throws its
 // rider in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -37,9 +37,9 @@ const BUCK_SHAKE: [number, number] = [0.4, 1.3];
 export const forceRodeoEvent = registerWispEvent(
   KEY,
   "Rodeo",
-  () => CONFIG.rodeoEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.rodeoEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const ltr = button.x < (area.left + area.right) / 2;
     const far = ltr ? area.right - EDGE : area.left + EDGE;

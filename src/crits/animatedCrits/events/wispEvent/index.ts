@@ -4,8 +4,8 @@
 // glitter on it: a worker climbs one perma tier, a floor's income bar climbs
 // one crit tier, and a floor's "Lvl N" label gains free levels. Then it flits
 // off, the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { randomInt } from "../../../../utils";
 import { playSwoosh, startBoostEventStreamLoop } from "../../../../sound";
@@ -170,7 +170,7 @@ function findTargets(floor: Floor, context: EventProcContext): Stop[] {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.wispEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -202,7 +202,7 @@ function hoverPoints(
 // the wisp `ms` in: swooping to each stop in turn, sweeping back and forth
 // over it while it sprinkles, then swooping off the screen
 function wispAt(wisp: RunningWisp, hovers: Point[], ms: number): Point {
-  const { flyMs, sprinkleMs } = CONFIG.wispEvent;
+  const { flyMs, sprinkleMs } = meta.values;
   const legMs = flyMs + sprinkleMs;
   const k = Math.min(hovers.length, Math.floor(Math.max(0, ms) / legMs));
   const within = Math.max(0, ms) - k * legMs;
@@ -242,7 +242,7 @@ function drawSprinkle(
   ms: number,
   now: number,
 ): void {
-  const { flyMs, sprinkleMs } = CONFIG.wispEvent;
+  const { flyMs, sprinkleMs } = meta.values;
   const start = k * (flyMs + sprinkleMs) + flyMs;
   const targetY = hovers[k].y + HOVER_RISE;
   for (
@@ -347,7 +347,7 @@ function startWisp(floor: Floor, context: EventProcContext): void {
   const targets = findTargets(floor, context);
   if (!rect || !area || targets.length === 0) return;
   const { flyMs, sprinkleMs, holdMs, minStops, maxStops, levels } =
-    CONFIG.wispEvent;
+    meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const onScreen = context.getOnScreenFloors?.() ?? [];
   const worldOf = (s: Stop): Point => ({

@@ -6,7 +6,7 @@
 // button in a bang, a jolt and a spray of coins; strike after strike, ever
 // quicker, the last a monster bolt whose spark bursts in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,10 +40,10 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceStormKiteEvent = registerWispEvent(
   KEY,
   "Storm Kite",
-  () => CONFIG.stormKiteEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { climbMs, strikesMs, runMs, holdMs, mergeMs } =
-      CONFIG.stormKiteEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const high: Point = {
       x: (button.x + (area.left + area.right) / 2) / 2,

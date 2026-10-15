@@ -24,9 +24,7 @@ import {
   armGuaranteedMegaCrit,
 } from "./upgradeCrit";
 import {
-  SEASONAL_SALE_DISCOUNT_MULTIPLIER,
-  HALLOWEEN_SALE_DISCOUNT_MULTIPLIER,
-  EASTER_SALE_DISCOUNT_MULTIPLIER,
+  SALE_DISCOUNT_MULTIPLIERS,
   POKER_HAND_CRIT_COUNTS,
   nextCritTier,
   triggerFrozenCrit,
@@ -1142,8 +1140,7 @@ function applyPayoutCrit(): void {
 // "winter sale"/"spring sale"/"summer sale"/"autumn sale"/"halloween sale"
 // crits (see crits/critTypes's isWinterSaleCrit etc.) — all five share this
 // exact reward shape, only their icon/label/color AND discount size differ
-// (halloween's own HALLOWEEN_SALE_DISCOUNT_MULTIPLIER is steeper than the 4
-// seasonal ones' shared SEASONAL_SALE_DISCOUNT_MULTIPLIER, so this takes the
+// (each its meta.ts discount, in SALE_DISCOUNT_MULTIPLIERS, so this takes the
 // discount as a param instead of hardcoding one constant): permanently cuts
 // EVERY floor's own upgrade cost, worker/office chairs/supplies/manager
 // costs (via Floor.priceDiscountMultiplier, folded into hud/upgradeMenu's
@@ -1396,17 +1393,17 @@ const CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   chairGiveaway: (c) => applyChairGiveawayCrit(c.floor),
   suppliesGiveaway: (c) => applySuppliesGiveawayCrit(c.floor),
   winterSale: (c) =>
-    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+    applySeasonalSaleCrit(c.floors, SALE_DISCOUNT_MULTIPLIERS.winterSale),
   springSale: (c) =>
-    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+    applySeasonalSaleCrit(c.floors, SALE_DISCOUNT_MULTIPLIERS.springSale),
   summerSale: (c) =>
-    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+    applySeasonalSaleCrit(c.floors, SALE_DISCOUNT_MULTIPLIERS.summerSale),
   autumnSale: (c) =>
-    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+    applySeasonalSaleCrit(c.floors, SALE_DISCOUNT_MULTIPLIERS.autumnSale),
   halloweenSale: (c) =>
-    applySeasonalSaleCrit(c.floors, HALLOWEEN_SALE_DISCOUNT_MULTIPLIER),
+    applySeasonalSaleCrit(c.floors, SALE_DISCOUNT_MULTIPLIERS.halloweenSale),
   easterSale: (c) =>
-    applySeasonalSaleCrit(c.floors, EASTER_SALE_DISCOUNT_MULTIPLIER),
+    applySeasonalSaleCrit(c.floors, SALE_DISCOUNT_MULTIPLIERS.easterSale),
   sunshine: (c) => applySunshineCrit(c.floors),
   snowday: (c) => applySnowdayCrit(c.floors),
   fastForward: (c) => applyFastForwardCrit(c.floors),

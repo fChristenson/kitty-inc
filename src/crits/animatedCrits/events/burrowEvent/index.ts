@@ -4,8 +4,8 @@
 // middle ever deeper as it trembles and the screen rumbles, until it explodes
 // in a huge blast, springing back, and money bursts out of it to merge into
 // the total. Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   playExplosion,
@@ -123,7 +123,7 @@ function drawBentButton(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.burrowEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) &&
@@ -132,7 +132,7 @@ registerEventProc(
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { fallMs, pushMs, holdMs, mergeMs } = CONFIG.burrowEvent;
+      const { fallMs, pushMs, holdMs, mergeMs } = meta.values;
       const { isGroundFloor } = context;
       const top = getBtnY(isGroundFloor);
       const center = { x: BTN_X + BTN_W / 2, y: top + BTN_H / 2 };

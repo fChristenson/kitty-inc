@@ -6,7 +6,7 @@
 // weight lurching and swinging on what's left; the last shot drops it onto
 // the bar in a huge blast and shake, and the bar jumps a crit tier. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -59,9 +59,9 @@ interface Cut {
 export const forceCutTheRopeEvent = registerWispEvent(
   KEY,
   "Cut the Rope",
-  () => CONFIG.cutTheRopeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotsMs, dropMs, holdMs, mergeMs } = CONFIG.cutTheRopeEvent;
+    const { shotsMs, dropMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

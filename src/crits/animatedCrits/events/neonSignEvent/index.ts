@@ -4,7 +4,7 @@
 // sputtering and flickering on with a buzz, a jolt and a puff of coins,
 // ever faster; then the whole sign surges blinding bright and blows in a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
@@ -94,9 +94,9 @@ const LIGHT_SHAKE: [number, number] = [0.4, 1.1];
 export const forceNeonSignEvent = registerWispEvent(
   KEY,
   "Neon Sign",
-  () => CONFIG.neonSignEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, holdMs, mergeMs } = CONFIG.neonSignEvent;
+    const { gapsMs, holdMs, mergeMs } = meta.values;
     const count = LETTERS.length;
     const size = Math.min(
       MAX_LETTER,

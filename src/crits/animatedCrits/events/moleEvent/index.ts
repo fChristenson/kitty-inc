@@ -6,7 +6,7 @@
 // hole; then it dives back down and tunnels on to the next spot, quicker
 // each time, the last breaking out in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -58,9 +58,9 @@ interface Dig {
 export const forceMoleEvent = registerWispEvent(
   KEY,
   "Mole",
-  () => CONFIG.moleEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { divesMs, boresMs, holdMs, mergeMs } = CONFIG.moleEvent;
+    const { divesMs, boresMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context)
       .slice(0, MAX_HIRES)
       .sort((a, b) => a.x - b.x);

@@ -5,7 +5,7 @@
 // big blasts, each bursting into a cluster of little blasts as a new
 // worker forms in the smoke, every blast its own bang and shake, the last
 // mine going up in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ interface Blast {
 export const forceSpiderMinesEvent = registerWispEvent(
   KEY,
   "Spider Mines",
-  () => CONFIG.spiderMinesEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { scuttleMs, chainMs, holdMs, mergeMs } = CONFIG.spiderMinesEvent;
+    const { scuttleMs, chainMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

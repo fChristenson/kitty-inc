@@ -7,7 +7,7 @@
 // switchback; off the top bar's hairpin they sprint and slam into it, the
 // leader jumping it a crit tier in a big blast, the chaser right behind with
 // free levels in a huge one. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,10 +52,10 @@ interface Hit {
 export const forceHillClimbEvent = registerWispEvent(
   KEY,
   "Hill Climb",
-  () => CONFIG.hillClimbEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { raceMs, gapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.hillClimbEvent;
+      meta.values;
     // bottom up
     const bars = findRewardBars(floor, context).slice(-MAX_BARS).reverse();
     if (bars.length === 0) return;

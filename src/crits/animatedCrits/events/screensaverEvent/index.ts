@@ -5,7 +5,7 @@
 // hits a corner dead on and the corner blows in a huge blast and shake, and
 // the coins sweep into the total. Pays floor income × floor number × REWARD
 // (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -45,9 +45,9 @@ function fold(u: number, lo: number, span: number): number {
 export const forceScreensaverEvent = registerWispEvent(
   KEY,
   "Screensaver",
-  () => CONFIG.screensaverEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flightMs, holdMs, mergeMs } = CONFIG.screensaverEvent;
+    const { flightMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const size = Math.max(WISP_SIZE, width * WISP);
     const margin = width * MARGIN;

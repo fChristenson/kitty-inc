@@ -5,7 +5,7 @@
 // every peg jumped bursts into a spray of coins with a pop and a jolt, the
 // hops ever quicker; when no jumps are left the board bursts in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -50,9 +50,9 @@ interface Hop {
 export const forcePegSolitaireEvent = registerWispEvent(
   KEY,
   "Peg Solitaire",
-  () => CONFIG.pegSolitaireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { setMs, jumpsMs, holdMs, mergeMs } = CONFIG.pegSolitaireEvent;
+    const { setMs, jumpsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const cx = (area.left + area.right) / 2;
     const top = (area.top + area.bottom) / 2 - GAP * 1.5;

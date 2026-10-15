@@ -3,8 +3,8 @@
 // on every floor in view on their way down, hopping off each one, until they
 // settle in the pool along the screen's bottom and drain into the total
 // (see ../rain)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
@@ -78,7 +78,7 @@ function bouncePath({ from, land }: RainDrop, ledges: number[]): CoinPath {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.trickleEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
@@ -87,7 +87,7 @@ registerEventProc(
         KEY,
         floor,
         context,
-        CONFIG.trickleEvent,
+        meta.values,
         (drop) => bouncePath(drop, ledges),
         // inside the building's walls, settling below every floor in view so
         // no drop rests on one

@@ -7,7 +7,7 @@
 // wherever the front sweeps over an income bar it lands free levels on it
 // in a flash, and as the last trees flare the clicked floor's bar slams in
 // a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,10 +38,10 @@ const BAR_SHAKE = 0.8;
 export const forceWildfireEvent = registerWispEvent(
   KEY,
   "Wildfire",
-  () => CONFIG.wildfireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, stepMs, levelShare, holdMs, mergeMs } =
-      CONFIG.wildfireEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

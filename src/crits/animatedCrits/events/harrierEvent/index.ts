@@ -8,8 +8,8 @@
 // quicker each wave; a wisp serpent last, blown apart head to tail in a chain
 // of blasts and a big payout. A giant screen of the floors stands at the
 // horizon and the ship flies into it, the view after it
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playCoinDrop, playSwoosh } from "../../../../sound";
 import { rewardPayoutAmount } from "../../../../floors/incomePanel";
@@ -53,6 +53,7 @@ import {
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -165,7 +166,7 @@ interface Foe {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.harrierEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startHarrier,
@@ -184,8 +185,8 @@ function startHarrier(floor: Floor, context: EventProcContext): void {
   if (!area) return;
   const aspect = (area.bottom - area.top) / (area.right - area.left);
   const { splitMs, flyMs, payoutsPerKill, payoutsSerpent } =
-    CONFIG.harrierEvent;
-  const { arriveMs } = CONFIG.flightStage;
+    meta.values;
+  const { arriveMs } = FLIGHT_STAGE;
   const tier = context.critTier ?? pickCritTierByOdds();
 
   // the ship's run, from the click: weaving, then pulling ahead into the

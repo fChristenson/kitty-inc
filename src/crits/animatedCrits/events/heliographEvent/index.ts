@@ -6,7 +6,7 @@
 // jolt as they climb a perma tier, the mirror flicking faster and faster,
 // the last flash blazing in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const FLASH_SHAKE: [number, number] = [0.5, 1.2];
 export const forceHeliographEvent = registerWispEvent(
   KEY,
   "Heliograph",
-  () => CONFIG.heliographEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swingsMs, holdMs, mergeMs } = CONFIG.heliographEvent;
+    const { swingsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

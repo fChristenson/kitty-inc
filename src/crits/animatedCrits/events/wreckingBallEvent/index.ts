@@ -6,8 +6,8 @@
 // touch is a hit as strong as its impact: levels, flash, sparks, shake and
 // the bar jolting, so the last little bounces are minor. Then the
 // screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh, startBoostEventStreamLoop } from "../../../../sound";
 import {
@@ -115,7 +115,7 @@ let running: RunningBall | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.wreckingBallEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -165,7 +165,7 @@ function ballAt(ball: RunningBall, ms: number): Point | null {
       y: impactY + SQUAT * charge + Math.cos(ms * 1.3) * TREMBLE * charge,
     };
   }
-  const { jumpMs, jumpHeight } = CONFIG.wreckingBallEvent;
+  const { jumpMs, jumpHeight } = meta.values;
   const apex = impactY - jumpHeight;
   if (ms < jumpAt + jumpMs) {
     const u = (ms - jumpAt) / jumpMs;
@@ -293,7 +293,7 @@ function startWreckingBall(floor: Floor, context: EventProcContext): void {
     holdMs,
     levelShare,
     minLevels,
-  } = CONFIG.wreckingBallEvent;
+  } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const box = getIncomeBarBox(context.isGroundFloor);
   const cx = box.x + box.width / 2;

@@ -5,7 +5,7 @@
 // light grows out of the button, ever faster, every spurt a click and a
 // jolt; then the whole coral blazes and bursts into cash in a huge blast.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -33,9 +33,9 @@ const SPURT_SHAKE: [number, number] = [0.25, 0.7];
 export const forceCoralEvent = registerWispEvent(
   KEY,
   "Coral",
-  () => CONFIG.coralEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, holdMs, mergeMs } = CONFIG.coralEvent;
+    const { growMs, holdMs, mergeMs } = meta.values;
     const cols = Math.ceil((area.right - area.left) / CELL);
     const rows = Math.ceil((area.bottom - area.top) / CELL);
     const button = getButtonCenter(context.isGroundFloor);

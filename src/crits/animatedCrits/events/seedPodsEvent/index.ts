@@ -7,7 +7,7 @@
 // quicker, every blast its own bang and shake, until the top pod's seeds
 // all slam into the lock at once in a cluster of blasts and it bursts open
 // in a huge one: the floor unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -70,9 +70,9 @@ interface Blast {
 export const forceSeedPodsEvent = registerWispEvent(
   KEY,
   "Seed Pods",
-  () => CONFIG.seedPodsEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { growMs, fuseMs, seedMs, holdMs, mergeMs } = CONFIG.seedPodsEvent;
+    const { growMs, fuseMs, seedMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

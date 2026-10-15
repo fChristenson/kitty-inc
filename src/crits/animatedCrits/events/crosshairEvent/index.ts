@@ -5,7 +5,7 @@
 // crossing flaring as the bar blazes with a flash and a jolt and jumps a
 // crit tier, each lock quicker; the last locks on in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -26,9 +26,9 @@ const LOCK_SHAKE: [number, number] = [0.8, 1.4];
 export const forceCrosshairEvent = registerWispEvent(
   KEY,
   "Crosshair",
-  () => CONFIG.crosshairEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { sweepMs, huntsMs, holdMs, mergeMs } = CONFIG.crosshairEvent;
+    const { sweepMs, huntsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -5,7 +5,7 @@
 // jolt and a coin, until it settles in one and that pocket hits the jackpot
 // in a huge blast and shake, and the coins sweep into the total. Pays floor
 // income × floor number × REWARD (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -46,9 +46,9 @@ const JACKPOT_COINS = 30;
 export const forceRouletteEvent = registerWispEvent(
   KEY,
   "Roulette",
-  () => CONFIG.rouletteEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, dropMs, hopMs, holdMs, mergeMs } = CONFIG.rouletteEvent;
+    const { spinMs, dropMs, hopMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const middle = {

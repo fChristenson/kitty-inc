@@ -6,8 +6,8 @@
 // pay into the total, quicker and quicker; a huge ghost rises at the end of
 // the hall and takes three, bursting into a shower of coins and a big payout.
 // The view rushes into the great portrait at the end, the floors in its frame
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playCoinDrop, playSwoosh } from "../../../../sound";
 import { rewardPayoutAmount } from "../../../../floors/incomePanel";
@@ -45,6 +45,7 @@ import { drawWisp, type Point } from "../../../../shared/wisp";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -142,7 +143,7 @@ interface Ghost {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.ghostHallEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startGhostHall,
@@ -232,8 +233,8 @@ function startGhostHall(floor: Floor, context: EventProcContext): void {
   if (!area) return;
   const aspect = (area.bottom - area.top) / (area.right - area.left);
   const { dropMs, glideMs, flyMs, payoutsPerGhost, payoutsBig } =
-    CONFIG.ghostHallEvent;
-  const { arriveMs } = CONFIG.flightStage;
+    meta.values;
+  const { arriveMs } = FLIGHT_STAGE;
   const tier = context.critTier ?? pickCritTierByOdds();
   // the great portrait's width, so it fits under the ceiling
   const greatW = Math.min(GREAT_W, (HIGH - GREAT_SILL - GREAT_ROOM) / aspect);

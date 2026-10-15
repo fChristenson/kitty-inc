@@ -5,7 +5,7 @@
 // gap with a "HOW LOW?!" and a jolt as the bar lands free levels; on every
 // bar down the pole sits lower and the dancer slides faster, the last
 // squeeze landing in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const SQUEEZE_SHAKE: [number, number] = [0.6, 1.3];
 export const forceLimboEvent = registerWispEvent(
   KEY,
   "Limbo",
-  () => CONFIG.limboEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { slidesMs, holdMs, mergeMs } = CONFIG.limboEvent;
+    const { slidesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

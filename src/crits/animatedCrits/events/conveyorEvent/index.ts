@@ -4,8 +4,8 @@
 // is missing some. Each hook stops over its spot and drops its worker, which
 // lands with a slam, then glides on off the screen: the floor fills up to its
 // worker cap. Then the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -71,7 +71,7 @@ let running: RunningConveyor | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.conveyorEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -157,7 +157,7 @@ function startConveyor(clicked: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen()) return;
   const floor = findUnderstaffedFloor(clicked, context.getOnScreenFloors);
   if (!floor) return;
-  const { crossMs, staggerMs, holdMs } = CONFIG.conveyorEvent;
+  const { crossMs, staggerMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   // every missing worker is hired at once, each where it'll be dropped
   const drops = recruitToCap(floor, Date.now());

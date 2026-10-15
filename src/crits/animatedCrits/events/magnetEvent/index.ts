@@ -2,8 +2,8 @@
 // a wisp (shared/wisp) hangs over the screen's middle and coins and bills pop up all
 // over the screen, get yanked in to cling around it, then are all flung into
 // the total (see ../moneyCover). Pays once per floor on screen
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -52,11 +52,11 @@ function pullPath(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.magnetEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const { streamMs, travelMs, mergeMs } = CONFIG.magnetEvent;
+      const { streamMs, travelMs, mergeMs } = meta.values;
       const pullMs = streamMs + travelMs * 1.03;
       const fx = createEventFx(pullMs);
       let orb = { x: 0, y: 0 };

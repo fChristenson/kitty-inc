@@ -6,7 +6,7 @@
 // shake and a spray of coins; the last generation all goes off in a
 // ripple, and a river of cash slams into the total in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -70,9 +70,9 @@ interface Blast {
 export const forceSplitterEvent = registerWispEvent(
   KEY,
   "Splitter",
-  () => CONFIG.splitterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flightMs, rippleMs, holdMs, mergeMs } = CONFIG.splitterEvent;
+    const { flightMs, rippleMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;
     const height = area.bottom - area.top;

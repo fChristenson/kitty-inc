@@ -5,7 +5,7 @@
 // up with it into one line that it rams into the total-income readout in a
 // huge blast and shake, and the coins sweep into the total. Pays floor
 // income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -34,9 +34,9 @@ const TURN_SHAKE = 1.8;
 export const forceScannerEvent = registerWispEvent(
   KEY,
   "Scanner",
-  () => CONFIG.scannerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { scanMs, pauseMs, sweepMs, holdMs, mergeMs } = CONFIG.scannerEvent;
+    const { scanMs, pauseMs, sweepMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

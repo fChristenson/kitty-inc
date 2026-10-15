@@ -7,7 +7,7 @@
 // they dive off the track onto empty spots, the leader slamming in with a
 // big blast and a new worker, the chaser right after in a huge one. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -54,9 +54,9 @@ const FIRST_SHAKE = 1.8;
 export const forceFigureEightEvent = registerWispEvent(
   KEY,
   "Figure Eight",
-  () => CONFIG.figureEightEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { raceMs, gapMs, holdMs, mergeMs } = CONFIG.figureEightEvent;
+    const { raceMs, gapMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, 2);
     if (hires.length === 0) return;
     const w = area.right - area.left;

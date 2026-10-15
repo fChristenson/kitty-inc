@@ -7,8 +7,8 @@
 // and the screen rumbles, and all three blow at once in a huge blast and
 // shake, and the coins sweep into the total. Pays floor income × floor
 // number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import {
@@ -92,14 +92,14 @@ interface Hit {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.bumpersEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { launchMs, shotMs, chargeMs, holdMs, mergeMs } =
-        CONFIG.bumpersEvent;
+        meta.values;
       const width = area.right - area.left;
       const height = area.bottom - area.top;
       const button = getButtonCenter(context.isGroundFloor);

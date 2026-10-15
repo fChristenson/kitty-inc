@@ -6,8 +6,8 @@
 // the nucleus as it trembles and the screen rumbles, and it splits in a huge
 // blast and shake, and the coins sweep into the total. Pays floor income ×
 // floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import {
@@ -78,13 +78,13 @@ interface Whip {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.atomEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { spinMs, collapseMs, holdMs, mergeMs } = CONFIG.atomEvent;
+      const { spinMs, collapseMs, holdMs, mergeMs } = meta.values;
       const width = area.right - area.left;
       const height = area.bottom - area.top;
       const middle = {

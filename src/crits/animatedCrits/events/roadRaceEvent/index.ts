@@ -5,8 +5,8 @@
 // buildings, weaving through a snake of coins, each paying into the live
 // total, round a bend and faster and faster down the straight to the finish
 // gate, where the floors fill its window and the view rushes through onto them
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playCoinDrop, playSwoosh } from "../../../../sound";
 import { multiply } from "../../../../shared/bigNumber";
@@ -42,6 +42,7 @@ import { rewardPayoutAmount } from "../../../../floors/incomePanel";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -102,7 +103,7 @@ interface Coin {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.roadRaceEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startRoadRace,
@@ -123,10 +124,10 @@ const laneX = (z: number) => SNAKE * Math.sin((z - COIN_FROM) * SNAKE_RATE);
 const openHigh = (view: FpsScreen) => (OPEN_W * view.h) / view.w;
 
 function startRoadRace(floor: Floor, context: EventProcContext): void {
-  const { enterMs, flyMs, payoutsPerCoin } = CONFIG.roadRaceEvent;
+  const { enterMs, flyMs, payoutsPerCoin } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   // the race's clock runs from the click, through the way in, to the crash
-  const raceMs = enterMs + flyMs + CONFIG.flightStage.arriveMs;
+  const raceMs = enterMs + flyMs + FLIGHT_STAGE.arriveMs;
   const landZ = GATE_Z - FOCAL * OPEN_W;
   const coins: Coin[] = [];
   for (let z = COIN_FROM, i = 0; z <= COIN_TO; z += COIN_EVERY, i++)

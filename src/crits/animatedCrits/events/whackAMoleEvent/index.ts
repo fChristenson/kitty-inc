@@ -5,8 +5,8 @@
 // The last pops up huge in the middle hole; the mallet swells, rears back and
 // smashes it in a huge blast and shake, and the coins sweep into the total.
 // Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import {
@@ -87,14 +87,14 @@ interface Mole {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.whackAMoleEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { firstWhackMs, gapMs, finalMs, holdMs, mergeMs } =
-        CONFIG.whackAMoleEvent;
+        meta.values;
       const width = area.right - area.left;
       const height = area.bottom - area.top;
       const center = {

@@ -5,7 +5,7 @@
 // jolt and a bang, landing a crit tier; it bounces back to the button for
 // the next put, each farther and harder, own floor's bar first; the last
 // put lands in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ interface Piece {
 export const forceShotPutEvent = registerWispEvent(
   KEY,
   "Shot Put",
-  () => CONFIG.shotPutEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { spinsMs, flightsMs, bounceMs, holdMs, mergeMs } =
-      CONFIG.shotPutEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const rank = (b: { floor: unknown; center: Point }) =>
       b.floor === floor ? -1 : Math.abs(b.center.y - button.y);

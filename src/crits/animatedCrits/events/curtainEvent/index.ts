@@ -6,7 +6,7 @@
 // rows first, into the total-income readout in a huge blast and shake, and
 // the coins sweep into the total. Pays floor income × floor number × REWARD
 // (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,10 +45,10 @@ const OPEN_SHAKE = 1.3;
 export const forceCurtainEvent = registerWispEvent(
   KEY,
   "Curtain",
-  () => CONFIG.curtainEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { dropMs, hangMs, openMs, sweepMs, flightMs, holdMs, mergeMs } =
-      CONFIG.curtainEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

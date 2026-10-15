@@ -6,7 +6,7 @@
 // rolling to a stop where it hit; it flicks again from there, quicker each
 // time, every crack a splash, a click and a jolt, until the ring is cleared,
 // the last landing in a big blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -64,10 +64,10 @@ interface Shot {
 export const forceMarblesEvent = registerWispEvent(
   KEY,
   "Marbles",
-  () => CONFIG.marblesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, shotMs, pauseMs, knockMs, dropMs, holdMs, mergeMs } =
-      CONFIG.marblesEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_MARBLES);
     if (hires.length === 0) return;
     const centre: Point = {

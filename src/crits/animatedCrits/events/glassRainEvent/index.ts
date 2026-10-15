@@ -5,7 +5,7 @@
 // downpour of glass, every income bar it rains past jolting with a flash, a
 // crack and free levels; as the last shards fall away every bar slams in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,10 +39,10 @@ const RAIN_SHAKE: [number, number] = [0.6, 1.4];
 export const forceGlassRainEvent = registerWispEvent(
   KEY,
   "Glass Rain",
-  () => CONFIG.glassRainEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { knocksMs, fallMs, levelShare, holdMs, mergeMs } =
-      CONFIG.glassRainEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const own = bars.find((b) => b.floor === floor) ?? bars[bars.length - 1];

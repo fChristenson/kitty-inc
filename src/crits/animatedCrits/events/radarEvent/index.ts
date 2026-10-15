@@ -6,7 +6,7 @@
 // and climbs a perma tier; the sweep spins ever faster, and on its last
 // lap the whole scope flares white in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const PING_SHAKE: [number, number] = [0.4, 1];
 export const forceRadarEvent = registerWispEvent(
   KEY,
   "Radar",
-  () => CONFIG.radarEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dimMs, sweepMs, holdMs, mergeMs } = CONFIG.radarEvent;
+    const { dimMs, sweepMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const hub: Point = getButtonCenter(context.isGroundFloor);

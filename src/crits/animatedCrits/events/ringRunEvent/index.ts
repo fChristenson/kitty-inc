@@ -4,8 +4,8 @@
 // and faster. Every hoop it passes through bursts into a ring of blasts
 // racing round the screen's edge, paying into the live total; the last is a
 // huge golden hoop going off all the way round, then the view crash-lands
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { multiply } from "../../../../shared/bigNumber";
 import { createBeats } from "../../../../shared/eventBeats";
@@ -89,7 +89,7 @@ interface Burst {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.ringRunEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startRingRun,
@@ -131,7 +131,7 @@ const rimAt = (view: FlightView, hoop: Hoop, angle: number, z: number): Point =>
   );
 
 function startRingRun(floor: Floor, context: EventProcContext): void {
-  const { payoutsPerHoop, payoutsBigHoop } = CONFIG.ringRunEvent;
+  const { payoutsPerHoop, payoutsBigHoop } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const hoops = planHoops();
   const bursts: Burst[] = hoops.flatMap((hoop) => {

@@ -7,7 +7,7 @@
 // row that goes up lands its bar free levels, and the last row ends in a
 // cluster of blasts round one huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -54,9 +54,9 @@ interface Blast {
 export const forcePowderKegsEvent = registerWispEvent(
   KEY,
   "Powder Kegs",
-  () => CONFIG.powderKegsEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { chainsMs, holdMs, mergeMs } = CONFIG.powderKegsEvent;
+    const { chainsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

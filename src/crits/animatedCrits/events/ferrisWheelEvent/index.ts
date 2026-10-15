@@ -7,7 +7,7 @@
 // lands with a pop and a jolt as a new worker; then the wheel spins off
 // its axle into the total in a huge blast and shake. Pays floor income ×
 // floor number × REWARD, plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -46,10 +46,10 @@ const LAND_SHAKE: [number, number] = [0.6, 1.2];
 export const forceFerrisWheelEvent = registerWispEvent(
   KEY,
   "Ferris Wheel",
-  () => CONFIG.ferrisWheelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { buildMs, gapsMs, spinOffMs, flightMs, holdMs, mergeMs } =
-      CONFIG.ferrisWheelEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const fallback = totalSpot(area);

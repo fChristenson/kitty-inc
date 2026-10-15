@@ -5,7 +5,7 @@
 // fills to its tip flares with a bloop and a jolt; the last, deepest one
 // bursts in a huge blast and shake and the coins sweep into the total.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
@@ -27,9 +27,9 @@ const TIP_SHAKE: [number, number] = [0.4, 1.2];
 export const forceFoundryEvent = registerWispEvent(
   KEY,
   "Foundry",
-  () => CONFIG.foundryEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, holdMs, mergeMs } = CONFIG.foundryEvent;
+    const { streamMs, holdMs, mergeMs } = meta.values;
     const cx = (area.left + area.right) / 2;
     const sprue: Point = { x: cx, y: area.top + TOP };
     const channels = Array.from({ length: CHANNELS * 2 }, (_, i) => {

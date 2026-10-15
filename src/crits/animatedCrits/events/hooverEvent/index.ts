@@ -6,7 +6,7 @@
 // jolt, then rockets the whole hoard into the total-income readout in a huge
 // blast and shake, and the coins sweep into the total. Pays floor income ×
 // floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -54,10 +54,10 @@ const GULP_SHAKE: [number, number] = [0.6, 1.8];
 export const forceHooverEvent = registerWispEvent(
   KEY,
   "Hoover",
-  () => CONFIG.hooverEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapMs, jetMs, flyMs, leadMs, vacuumMs, holdMs, mergeMs } =
-      CONFIG.hooverEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

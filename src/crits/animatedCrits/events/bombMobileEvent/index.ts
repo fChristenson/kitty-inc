@@ -7,7 +7,7 @@
 // bursting into a cluster, then the two big ones go up harder; the strings
 // burn through and the giant drops onto the bar in a colossal blast ringed
 // by more, and the bar jumps a crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -68,10 +68,10 @@ interface Blast {
 export const forceBombMobileEvent = registerWispEvent(
   KEY,
   "Bomb Mobile",
-  () => CONFIG.bombMobileEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { dropMs, spinMs, tipGapMs, midGapMs, fallMs, holdMs, mergeMs } =
-      CONFIG.bombMobileEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

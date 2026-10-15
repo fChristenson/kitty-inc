@@ -9,5 +9,4 @@ export default {
   // the first payout's multiple, shrinking towards 1 over the next payouts
   // (its own over ownPayouts)
   values: { payout: 5, payouts: 5, ownPayouts: 10 },
-  isNew: true,
 } satisfies CritMeta;

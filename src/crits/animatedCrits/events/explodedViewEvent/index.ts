@@ -5,7 +5,7 @@
 // the widening cracks and cash gushing out of them into the total with a
 // bang and a shake; then every tile slams back into place at once in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -54,9 +54,9 @@ const SLAM_SHAKE = 2.4;
 export const forceExplodedViewEvent = registerWispEvent(
   KEY,
   "Exploded View",
-  () => CONFIG.explodedViewEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pulseGapMs, openMs, holdMs, mergeMs } = CONFIG.explodedViewEvent;
+    const { pulseGapMs, openMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

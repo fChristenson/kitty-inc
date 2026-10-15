@@ -5,7 +5,7 @@
 // bang and a hard jolt each, as the worker climbs a perma tier; it bounces
 // on to the next worker in lower, quicker leaps, and its last pound is a
 // colossal blast and the biggest shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ interface Leap {
 export const forceGroundPoundEvent = registerWispEvent(
   KEY,
   "Ground Pound",
-  () => CONFIG.groundPoundEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { leapsMs, holdMs, mergeMs } = CONFIG.groundPoundEvent;
+    const { leapsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

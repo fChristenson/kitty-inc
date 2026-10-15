@@ -6,7 +6,7 @@
 // perch over the next bar, each dive quicker and steeper; after the last bar
 // it climbs and dives into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -52,9 +52,9 @@ const flat = (t: number) => t;
 export const forceKingfisherEvent = registerWispEvent(
   KEY,
   "Kingfisher",
-  () => CONFIG.kingfisherEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { divesMs, finalMs, holdMs, mergeMs } = CONFIG.kingfisherEvent;
+    const { divesMs, finalMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

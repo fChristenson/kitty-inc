@@ -5,8 +5,8 @@
 // once in a blinding flare, bang and huge shake, blasting coins out along
 // every cut, which sweep into the total. Pays floor income × floor number
 // × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -53,13 +53,13 @@ interface Cut {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.slashEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { slashMs, gapMs, smoulderMs, holdMs, mergeMs } = CONFIG.slashEvent;
+      const { slashMs, gapMs, smoulderMs, holdMs, mergeMs } = meta.values;
       const width = area.right - area.left;
       const height = area.bottom - area.top;
       const half = Math.hypot(width, height) / 2 + 80;

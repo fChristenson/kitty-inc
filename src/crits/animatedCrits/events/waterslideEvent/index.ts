@@ -5,7 +5,7 @@
 // its bar free levels with a splash, a bloop and a jolt, and the last loop
 // slams its bar in a huge blast and shake as the coins sweep into the total.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -30,9 +30,9 @@ const LOOP_SHAKE: [number, number] = [0.5, 1.3];
 export const forceWaterslideEvent = registerWispEvent(
   KEY,
   "Waterslide",
-  () => CONFIG.waterslideEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.waterslideEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -5,7 +5,7 @@
 // its top, shooting onto a bar with its levels; then the drum bursts and
 // every wisp left pours onto the clicked bar in a rattle of blasts, the last
 // huge as it climbs a crit tier
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSpinTick } from "../../../../sound";
 import { clamp01, lerp } from "../../../../shared/easing";
@@ -71,7 +71,7 @@ const SOUND_GAP_MS = 55;
 export const forceLottoDrumEvent = registerWispEvent(
   KEY,
   "Lotto Drum",
-  () => CONFIG.lottoDrumEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       firstDrawMs,
@@ -82,7 +82,7 @@ export const forceLottoDrumEvent = registerWispEvent(
       winnerShare,
       holdMs,
       mergeMs,
-    } = CONFIG.lottoDrumEvent;
+    } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

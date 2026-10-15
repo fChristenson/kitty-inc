@@ -5,7 +5,7 @@
 // going off on them in a white blast, a bang and a big jolt as they climb a
 // perma tier; they launch ever faster, and the last goes off in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,9 +33,9 @@ const HIT_SHAKE: [number, number] = [0.7, 1.4];
 export const forceWhistlersEvent = registerWispEvent(
   KEY,
   "Whistlers",
-  () => CONFIG.whistlersEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, flightMs, holdMs, mergeMs } = CONFIG.whistlersEvent;
+    const { gapsMs, flightMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     let clock = 0;

@@ -6,7 +6,7 @@
 // the rungs right behind; at the top the whole ladder fires into the lock at
 // once, blasting it open in a huge blast and shake, and the floor is
 // unlocked for free as the screen unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const CLIMBER = 0.5;
 export const forceLaserLadderEvent = registerWispEvent(
   KEY,
   "Laser Ladder",
-  () => CONFIG.laserLadderEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { rungsMs, fireMs, holdMs, mergeMs } = CONFIG.laserLadderEvent;
+    const { rungsMs, fireMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

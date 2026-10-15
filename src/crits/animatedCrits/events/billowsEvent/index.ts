@@ -7,7 +7,7 @@
 // whoosh and a jolt; then the billows peel off one after another and roll
 // up into the total-income readout, the last in a huge blast. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
@@ -36,10 +36,10 @@ const PEEL_SHAKE = 0.6;
 export const forceBillowsEvent = registerWispEvent(
   KEY,
   "Billows",
-  () => CONFIG.billowsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { floodMs, rollMs, peelMs, riseMs, holdMs, mergeMs } =
-      CONFIG.billowsEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const mid = (area.top + area.bottom) / 2;
     const left = area.left - WAVELENGTH / 2;

@@ -6,7 +6,7 @@
 // along the bar as it jumps a crit tier; the flail swings on to the next
 // bar, whirling quicker each time, the last smash a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ interface Swing {
 export const forceFlailEvent = registerWispEvent(
   KEY,
   "Flail",
-  () => CONFIG.flailEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { whirlsMs, holdMs, mergeMs } = CONFIG.flailEvent;
+    const { whirlsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

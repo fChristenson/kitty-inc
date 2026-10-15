@@ -7,8 +7,8 @@
 // time, round a bend and down the straight; leading at last, it shoots
 // through the finish gate's window in a chain of blasts, the view rushes
 // through onto the floors and every bar in view goes a crit tier up
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import {
@@ -42,6 +42,7 @@ import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { findRewardBars } from "../../eventRewards";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -132,7 +133,7 @@ const FINISH_BIG_SHAKE = 3;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.overtakeEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -153,10 +154,10 @@ export function forceOvertakeEvent(floor: Floor): void {
 const openHigh = (view: FpsScreen) => (OPEN_W * view.h) / view.w;
 
 function startOvertake(floor: Floor, context: EventProcContext): void {
-  const { enterMs, flyMs, tierGapMs } = CONFIG.overtakeEvent;
+  const { enterMs, flyMs, tierGapMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   // the race's clock runs from the click, through the way in, to the crash
-  const raceMs = enterMs + flyMs + CONFIG.flightStage.arriveMs;
+  const raceMs = enterMs + flyMs + FLIGHT_STAGE.arriveMs;
   const landZ = GATE_Z - FOCAL * OPEN_W;
   const u = (ms: number) => clamp01(ms / raceMs);
   const camZ = (ms: number) =>

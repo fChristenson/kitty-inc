@@ -5,7 +5,7 @@
 // each striking a worker in view in a blinding flash, a crack and a jolt as
 // they climb a perma tier, ever faster; the last bolt strikes in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ const STRIKE_SHAKE: [number, number] = [0.7, 1.4];
 export const forceThunderheadEvent = registerWispEvent(
   KEY,
   "Thunderhead",
-  () => CONFIG.thunderheadEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gatherMs, strikesMs, holdMs, mergeMs } = CONFIG.thunderheadEvent;
+    const { gatherMs, strikesMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

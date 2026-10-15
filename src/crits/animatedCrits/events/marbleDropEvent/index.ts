@@ -7,7 +7,7 @@
 // floors in view, each landing with a pop and a jolt as a new worker forms
 // there; the last rod pulls in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -40,9 +40,9 @@ const LAND_SHAKE: [number, number] = [0.5, 1.3];
 export const forceMarbleDropEvent = registerWispEvent(
   KEY,
   "Marble Drop",
-  () => CONFIG.marbleDropEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fillMs, pullsMs, dropMs, holdMs, mergeMs } = CONFIG.marbleDropEvent;
+    const { fillMs, pullsMs, dropMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

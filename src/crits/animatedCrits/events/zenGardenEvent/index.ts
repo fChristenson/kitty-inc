@@ -6,7 +6,7 @@
 // with a soft chime and free levels, ever faster; at the bottom the whole
 // garden lifts into the total in a huge blast and shake. Pays floor income
 // × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -44,10 +44,10 @@ const BAR_SHAKE: [number, number] = [0.5, 1.1];
 export const forceZenGardenEvent = registerWispEvent(
   KEY,
   "Zen Garden",
-  () => CONFIG.zenGardenEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { rakeMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.zenGardenEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const top = area.top + EDGE;
     const bottom = area.bottom - EDGE;

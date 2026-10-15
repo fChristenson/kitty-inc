@@ -6,7 +6,7 @@
 // free levels on its bar; then a huge return stroke shoots from the ground
 // up through every bar into the sky, blasting each one, and the clicked bar
 // climbs a crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -58,9 +58,9 @@ interface Strike {
 export const forceForkStormEvent = registerWispEvent(
   KEY,
   "Fork Storm",
-  () => CONFIG.forkStormEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { levelShare, holdMs, mergeMs } = CONFIG.forkStormEvent;
+    const { levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

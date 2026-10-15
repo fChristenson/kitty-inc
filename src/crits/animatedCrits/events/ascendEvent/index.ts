@@ -3,8 +3,8 @@
 // building, touching each floor's income bar on its way: every bar it touches
 // slams and climbs one perma crit tier. Then the orb floats off, the screen
 // unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { isFloorLocked } from "../../../../shared/detachedJob";
@@ -72,7 +72,7 @@ function findRungs(context: EventProcContext): Rung[] {
       );
     })
     .sort((a, b) => b.top - a.top)
-    .slice(0, CONFIG.ascendEvent.maxFloors)
+    .slice(0, meta.values.maxFloors)
     .map((entry) => ({
       floor: entry.floor,
       isGroundFloor: context.floors.indexOf(entry.floor) === 0,
@@ -83,7 +83,7 @@ function findRungs(context: EventProcContext): Rung[] {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.ascendEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -119,7 +119,7 @@ function orbAt(
   stops: { x: number; y: number }[],
   elapsed: number,
 ): { x: number; y: number } {
-  const { hopMs } = CONFIG.ascendEvent;
+  const { hopMs } = meta.values;
   const hop = Math.max(0, elapsed) / hopMs;
   const k = Math.min(stops.length - 2, Math.floor(hop));
   const t = easeInOut(Math.min(1, hop - k));
@@ -168,7 +168,7 @@ function drawOverlay(
     { x: last.x, y: last.y - EXIT_RISE },
   ];
   const elapsed = now - event.startedAt;
-  const totalMs = (stops.length - 1) * CONFIG.ascendEvent.hopMs;
+  const totalMs = (stops.length - 1) * meta.values.hopMs;
   // grows in at the start and shrinks away on its way out
   const grow = Math.min(
     1,
@@ -188,7 +188,7 @@ function startAscend(floor: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen()) return;
   const rungs = findRungs(context);
   if (rungs.length === 0) return;
-  const { hopMs } = CONFIG.ascendEvent;
+  const { hopMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const event: RunningAscend = { rungs, startedAt: performance.now() };
   running = event;

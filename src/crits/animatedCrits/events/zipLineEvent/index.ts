@@ -7,7 +7,7 @@
 // the total; the last zips onto the clicked floor's bar and every bar slams
 // in a huge blast and shake. Pays floor income × floor number × REWARD, plus
 // the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const LAND_SHAKE: [number, number] = [0.7, 1.5];
 export const forceZipLineEvent = registerWispEvent(
   KEY,
   "Zip Line",
-  () => CONFIG.zipLineEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { zipsMs, levelShare, holdMs, mergeMs } = CONFIG.zipLineEvent;
+    const { zipsMs, levelShare, holdMs, mergeMs } = meta.values;
     const top = totalSpot(area);
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     const own = bars.find((b) => b.floor === floor);

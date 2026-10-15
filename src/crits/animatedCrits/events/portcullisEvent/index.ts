@@ -6,7 +6,7 @@
 // every income bar in view, top to bottom, each bar jolting with a clang
 // and free levels; the whole gate blazes and every bar slams in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -31,10 +31,10 @@ const CROSS_SHAKE: [number, number] = [0.8, 1.4];
 export const forcePortcullisEvent = registerWispEvent(
   KEY,
   "Portcullis",
-  () => CONFIG.portcullisEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { postsMs, crossesMs, levelShare, holdMs, mergeMs } =
-      CONFIG.portcullisEvent;
+      meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => a.center.y - b.center.y);

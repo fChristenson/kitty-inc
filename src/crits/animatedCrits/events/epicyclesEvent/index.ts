@@ -6,7 +6,7 @@
 // coins, with a jolt as it closes; the heart blazes, bursts outward in a
 // blast and shake and its coins pour into the total. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -90,9 +90,9 @@ function fourier(): Term[] {
 export const forceEpicyclesEvent = registerWispEvent(
   KEY,
   "Epicycles",
-  () => CONFIG.epicyclesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { drawMs, holdMs, mergeMs } = CONFIG.epicyclesEvent;
+    const { drawMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const centre: Point = {

@@ -6,7 +6,7 @@
 // wisp hops on to dance over the next spot, quicker each time, the last
 // hire landing in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -60,9 +60,9 @@ interface Dance {
 export const forceRainDanceEvent = registerWispEvent(
   KEY,
   "Rain Dance",
-  () => CONFIG.rainDanceEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { dancesMs, hopMs, holdMs, mergeMs } = CONFIG.rainDanceEvent;
+    const { dancesMs, hopMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context)
       .slice(0, MAX_HIRES)
       .sort((a, b) => a.x - b.x);

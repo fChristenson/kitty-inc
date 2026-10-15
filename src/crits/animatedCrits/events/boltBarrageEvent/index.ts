@@ -4,7 +4,7 @@
 // crack and a burst of coins, slow at first, then faster and faster into a
 // crackling barrage, until one monster bolt splits the sky down the middle
 // in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -29,9 +29,9 @@ const BANG_GAP_MS = 60;
 export const forceBoltBarrageEvent = registerWispEvent(
   KEY,
   "Bolt Barrage",
-  () => CONFIG.boltBarrageEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { barrageMs, holdMs, mergeMs } = CONFIG.boltBarrageEvent;
+    const { barrageMs, holdMs, mergeMs } = meta.values;
     const left = area.left + EDGE;
     const right = area.right - EDGE;
     const top = area.top + TOP;

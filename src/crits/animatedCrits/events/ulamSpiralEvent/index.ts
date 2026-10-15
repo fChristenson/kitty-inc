@@ -7,7 +7,7 @@
 // then every prime streaks off onto a worker in view, each worker lighting
 // up a perma tier as its sparks land, the last in a huge blast. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -75,9 +75,9 @@ function spiral(count: number): [number, number][] {
 export const forceUlamSpiralEvent = registerWispEvent(
   KEY,
   "Ulam Spiral",
-  () => CONFIG.ulamSpiralEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { stepMs, flyMs, holdMs, mergeMs } = CONFIG.ulamSpiralEvent;
+    const { stepMs, flyMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const count = SIDE * SIDE;

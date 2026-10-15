@@ -7,7 +7,7 @@
 // quicker, each blast its own bang and shake and free levels on the bars
 // it lands on; the last 27 go up together in a cluster and the clicked
 // floor's bar slams in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -67,10 +67,10 @@ const centroid = ([a, b, c]: Triangle): Point => ({
 export const forceFractalChargeEvent = registerWispEvent(
   KEY,
   "Fractal Charge",
-  () => CONFIG.fractalChargeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { lobMs, flyMs, fuseMs, levelShare, holdMs, mergeMs } =
-      CONFIG.fractalChargeEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

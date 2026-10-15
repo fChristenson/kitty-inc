@@ -6,7 +6,7 @@
 // splash, a jolt and a new worker forms there; then back for the next scoop,
 // each trip quicker, the last dump landing in a big blast. Pays floor income
 // × floor number × REWARD, plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -62,9 +62,9 @@ const flat = (t: number) => t;
 export const forcePelicanEvent = registerWispEvent(
   KEY,
   "Pelican",
-  () => CONFIG.pelicanEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fillMs, tripsMs, gushMs, holdMs, mergeMs } = CONFIG.pelicanEvent;
+    const { fillMs, tripsMs, gushMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -6,7 +6,7 @@
 // side in one wave and surges up the far wall into the total-income readout
 // in a huge blast, and the coins sweep into the total. Pays floor income ×
 // floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const BURST_SHAKE = 2.6;
 export const forceDamBurstEvent = registerWispEvent(
   KEY,
   "Dam Burst",
-  () => CONFIG.damBurstEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fillMs, spreadMs, floodMs, holdMs, mergeMs } = CONFIG.damBurstEvent;
+    const { fillMs, spreadMs, floodMs, holdMs, mergeMs } = meta.values;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);

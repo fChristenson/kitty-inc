@@ -6,7 +6,7 @@
 // snaps back into the button in a blinding flash and a bang, and it fires
 // one colossal beam up into the total, all the cash riding it in, in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,10 +40,10 @@ const RUMBLE_SHAKE: [number, number] = [0.4, 1.4];
 export const forceHyperspaceEvent = registerWispEvent(
   KEY,
   "Hyperspace",
-  () => CONFIG.hyperspaceEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { chargeMs, warpMs, dropMs, fireMs, holdMs, mergeMs } =
-      CONFIG.hyperspaceEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const c = getButtonCenter(context.isGroundFloor);
     const warpEnd = chargeMs + warpMs;

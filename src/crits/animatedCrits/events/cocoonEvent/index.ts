@@ -6,7 +6,7 @@
 // their cash outward, and a new worker stands in each; the last bursts in a
 // huge blast and shake, and the cash sweeps into the total. Pays floor income
 // × floor number × REWARD, plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,10 +37,10 @@ const BURST_SHAKE: [number, number] = [1.1, 1.8];
 export const forceCocoonEvent = registerWispEvent(
   KEY,
   "Cocoon",
-  () => CONFIG.cocoonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { streamMs, flyMs, gapMs, flingMs, holdMs, mergeMs } =
-      CONFIG.cocoonEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const spots: Point[] = hires.map((h) => ({ x: h.x, y: h.y }));

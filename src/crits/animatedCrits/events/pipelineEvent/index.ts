@@ -5,7 +5,7 @@
 // a flash and a jolt; it bursts out into the total-income readout in a huge
 // blast and shake, and the coins sweep into the total. Pays floor income ×
 // floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const BEND_SHAKE: [number, number] = [0.8, 1.8];
 export const forcePipelineEvent = registerWispEvent(
   KEY,
   "Pipeline",
-  () => CONFIG.pipelineEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.pipelineEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);

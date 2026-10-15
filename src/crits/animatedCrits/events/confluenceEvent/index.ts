@@ -3,7 +3,7 @@
 // another, each winding in to the same spot in the middle, where they crash
 // together in a splash and a jolt and swell into one fat roaring river that
 // surges up into the total (see ../moneyCover's flow and ../riverPaths)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const STEPS = 60;
 export const forceConfluenceEvent = registerWispEvent(
   KEY,
   "Confluence",
-  () => CONFIG.confluenceEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { staggerMs, pourMs, travelMs } = CONFIG.confluenceEvent;
+    const { staggerMs, pourMs, travelMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const flip = Math.random() < 0.5;

@@ -6,7 +6,7 @@
 // floor in view and lands as a new worker with a flash and a bang; then the
 // whole waterfall surges up into the total in a huge blast and shake. Pays
 // floor income × floor number × REWARD, plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,10 +48,10 @@ const LAND_SHAKE: [number, number] = [0.6, 1.4];
 export const forceSalmonRunEvent = registerWispEvent(
   KEY,
   "Salmon Run",
-  () => CONFIG.salmonRunEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pourMs, startsMs, leapMs, arcMs, flightMs, holdMs, mergeMs } =
-      CONFIG.salmonRunEvent;
+      meta.values;
     const hires = findRewardHires(floor, context)
       .sort((a, b) => a.x - b.x)
       .slice(0, MAX_HIRES);

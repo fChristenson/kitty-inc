@@ -5,7 +5,7 @@
 // far end the bar lands free levels with a bang and a jolt and the tape
 // snaps back with a whip-crack; it measures bar after bar ever faster, the
 // last snap a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -42,9 +42,9 @@ const DONE_SHAKE: [number, number] = [0.5, 1.3];
 export const forceTapeMeasureEvent = registerWispEvent(
   KEY,
   "Tape Measure",
-  () => CONFIG.tapeMeasureEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { pullsMs, holdMs, mergeMs } = CONFIG.tapeMeasureEvent;
+    const { pullsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

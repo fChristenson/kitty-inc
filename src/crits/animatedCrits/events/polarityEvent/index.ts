@@ -7,7 +7,7 @@
 // middle in a huge blast and shake, and the coins sweep into the
 // total-income readout. Pays floor income × floor number × REWARD (see
 // ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -50,10 +50,10 @@ const FLIP_SHAKE: [number, number] = [0.9, 2];
 export const forcePolarityEvent = registerWispEvent(
   KEY,
   "Polarity",
-  () => CONFIG.polarityEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gatherMs, flipGapsMs, dashMs, slamMs, holdMs, mergeMs } =
-      CONFIG.polarityEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

@@ -5,7 +5,7 @@
 // bloop and a jolt, harder as it goes; the last curl bursts in a huge blast
 // and shake and the coins sweep into the total. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -30,9 +30,9 @@ const CURL_SHAKE: [number, number] = [0.25, 1];
 export const forceFunnelCakeEvent = registerWispEvent(
   KEY,
   "Funnel Cake",
-  () => CONFIG.funnelCakeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.funnelCakeEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

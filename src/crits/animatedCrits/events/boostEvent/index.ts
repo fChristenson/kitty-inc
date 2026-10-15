@@ -5,8 +5,8 @@
 // into the next crit tier's color over EVENT_STREAM_DURATION_MS. It then
 // unfreezes with the normal worker boost jump, one crit tier higher for good:
 // while boosted it multiplies its floor's speed by that tier's crit multiplier
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { randomInt } from "../../../../utils";
 import { isFloorLocked } from "../../../../shared/detachedJob";
 import { playBoostEventStream } from "../../../../sound";
@@ -55,7 +55,7 @@ let running: RunningBoost | null = null;
 // only while this floor still has a worker the event could pick
 registerEventProc({
   key: "boost",
-  chance: () => CONFIG.boostEvent.chance,
+  chance: () => meta.chance,
   isInProgress: (floor) => running !== null || isBoostEventArmed(floor),
   canArm: (floor) => getBoostEventCandidates(floor).length > 0,
   arm: armBoostEvent,

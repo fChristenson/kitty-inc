@@ -5,7 +5,7 @@
 // bloop and a jolt, harder each time; as it closes the last petal it bursts
 // in the middle in a huge blast and shake and the coins sweep into the
 // total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -28,9 +28,9 @@ const TIP_SHAKE: [number, number] = [0.5, 1.3];
 export const forceCloverleafEvent = registerWispEvent(
   KEY,
   "Cloverleaf",
-  () => CONFIG.cloverleafEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.cloverleafEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

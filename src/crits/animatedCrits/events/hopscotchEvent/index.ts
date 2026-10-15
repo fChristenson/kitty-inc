@@ -6,7 +6,7 @@
 // thud, a pop and a jolt as the bar lands free levels, each hop quicker; the
 // last landing slams its bar in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -39,9 +39,9 @@ interface Hop {
 export const forceHopscotchEvent = registerWispEvent(
   KEY,
   "Hopscotch",
-  () => CONFIG.hopscotchEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { hopsMs, holdMs, mergeMs } = CONFIG.hopscotchEvent;
+    const { hopsMs, holdMs, mergeMs } = meta.values;
     // bottom bar first, hopping up the screen
     const bars = findRewardBars(floor, context).slice(-MAX_BARS).reverse();
     if (bars.length === 0) return;

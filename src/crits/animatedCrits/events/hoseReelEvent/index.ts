@@ -5,7 +5,7 @@
 // round and reels the whole hose back in at double speed, the cash rushing
 // back along it and up into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -39,9 +39,9 @@ const LOOP_SHAKE: [number, number] = [0.4, 1.1];
 export const forceHoseReelEvent = registerWispEvent(
   KEY,
   "Hose Reel",
-  () => CONFIG.hoseReelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { unreelMs, reelMs, holdMs, mergeMs } = CONFIG.hoseReelEvent;
+    const { unreelMs, reelMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     const y = (area.top + area.bottom) / 2;

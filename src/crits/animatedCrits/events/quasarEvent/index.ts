@@ -6,7 +6,7 @@
 // light blast out of its poles, one up off the screen and one straight down
 // onto the bar, which jumps a crit tier in a huge blast. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -53,10 +53,10 @@ const SOUND_GAP_MS = 70;
 export const forceQuasarEvent = registerWispEvent(
   KEY,
   "Quasar",
-  () => CONFIG.quasarEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, feedMs, jetMs, blazeMs, holdMs, mergeMs } =
-      CONFIG.quasarEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

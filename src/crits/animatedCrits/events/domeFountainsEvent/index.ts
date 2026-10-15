@@ -6,7 +6,7 @@
 // dome, quicker each time, and the last splashes down in a huge blast and
 // shake as the cash pours into the total. Pays floor income × floor number
 // × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ interface Dome {
 export const forceDomeFountainsEvent = registerWispEvent(
   KEY,
   "Dome Fountains",
-  () => CONFIG.domeFountainsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { domesMs, streamMs, travelMs, levelShare, holdMs, mergeMs } =
-      CONFIG.domeFountainsEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const total = totalSpot(area);

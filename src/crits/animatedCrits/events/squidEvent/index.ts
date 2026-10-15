@@ -5,7 +5,7 @@
 // jolt, the spurts ever quicker; the last fires it up into the total in a
 // huge blast and shake as the cash sweeps in after it. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -38,9 +38,9 @@ const SPURT_SHAKE: [number, number] = [0.3, 1];
 export const forceSquidEvent = registerWispEvent(
   KEY,
   "Squid",
-  () => CONFIG.squidEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spurtsMs, squirtMs, travelMs, holdMs, mergeMs } = CONFIG.squidEvent;
+    const { spurtsMs, squirtMs, travelMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     const left = area.left + EDGE;

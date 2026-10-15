@@ -7,7 +7,7 @@
 // landing in a flash and a jolt as a new worker forms; then the pan
 // tips the rest into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD, plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,9 +53,9 @@ interface Nugget {
 export const forceGoldRushEvent = registerWispEvent(
   KEY,
   "Gold Rush",
-  () => CONFIG.goldRushEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { panMs, flicksMs, flightMs, holdMs, mergeMs } = CONFIG.goldRushEvent;
+    const { panMs, flicksMs, flightMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

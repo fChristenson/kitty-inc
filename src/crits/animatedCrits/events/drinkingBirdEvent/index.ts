@@ -6,7 +6,7 @@
 // plunges all the way down onto its worker in a flash and a jolt that
 // lights it up a perma tier, the last in a huge blast and shake. Pays floor
 // income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,10 +46,10 @@ interface Bird {
 export const forceDrinkingBirdEvent = registerWispEvent(
   KEY,
   "Drinking Bird",
-  () => CONFIG.drinkingBirdEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pourMs, dipsMs, staggerMs, holdMs, mergeMs } =
-      CONFIG.drinkingBirdEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

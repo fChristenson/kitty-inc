@@ -5,7 +5,7 @@
 // splash, a bloop and a jolt, the arcs tumbling into the total; at the far
 // side the wheel's hub launches a river of cash straight up into the total
 // in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -42,9 +42,9 @@ const FLING_SHAKE: [number, number] = [0.3, 0.8];
 export const forcePaddleSteamerEvent = registerWispEvent(
   KEY,
   "Paddle Steamer",
-  () => CONFIG.paddleSteamerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { crossMs, holdMs, mergeMs } = CONFIG.paddleSteamerEvent;
+    const { crossMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const x0 = area.left + EDGE;
     const x1 = area.right - EDGE;

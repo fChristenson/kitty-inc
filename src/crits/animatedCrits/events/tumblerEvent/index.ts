@@ -6,7 +6,7 @@
 // the wall; then the drum bursts, flinging the cash out every way and on
 // into the total in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -40,9 +40,9 @@ const TURN_SHAKE: [number, number] = [0.3, 1.0];
 export const forceTumblerEvent = registerWispEvent(
   KEY,
   "Tumbler",
-  () => CONFIG.tumblerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, holdMs, mergeMs } = CONFIG.tumblerEvent;
+    const { spinMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const radius = Math.min(width * 0.32, height * 0.25, 300);

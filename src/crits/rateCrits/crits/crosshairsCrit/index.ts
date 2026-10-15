@@ -3,8 +3,8 @@
 // snapping onto every bar's readout as it crosses; it charges, trembling and
 // glowing, light racing in, then fires every beam at once: each bar's next
 // payout pays five times, its own ten
+import meta from "./meta";
 import { defineBarEffect } from "../../rateBonus";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   drawAimLaser,
@@ -101,8 +101,8 @@ registerFloorCrit("crosshairsCrit", {
   // the next payout five times as big, its own ten
   reward(t) {
     const times = t.own
-      ? CONFIG.crit.crosshairsOwnPayout
-      : CONFIG.crit.crosshairsPayout;
+      ? meta.values.ownPayout
+      : meta.values.payout;
     aimed.set(t.floor, (aimed.get(t.floor) ?? 1) * times);
   },
   plan(r, bars, hit) {

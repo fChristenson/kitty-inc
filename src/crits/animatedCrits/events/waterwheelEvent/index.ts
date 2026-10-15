@@ -7,7 +7,7 @@
 // apart in a huge blast and shake, its paddles flung off, and the coins
 // sweep into the total. Pays floor income × floor number × REWARD (see
 // ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -54,9 +54,9 @@ const SPLASH_SHAKE: [number, number] = [0.4, 1.4];
 export const forceWaterwheelEvent = registerWispEvent(
   KEY,
   "Waterwheel",
-  () => CONFIG.waterwheelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.waterwheelEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const total = totalSpot(area);

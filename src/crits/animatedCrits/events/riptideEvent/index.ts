@@ -4,7 +4,7 @@
 // current tears up through the middle and every band bends into it, the
 // whole lot sucked into one roaring jet that shoots up into the total in a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -32,9 +32,9 @@ const RIP_SHAKE = 1.4;
 export const forceRiptideEvent = registerWispEvent(
   KEY,
   "Riptide",
-  () => CONFIG.riptideEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, ripMs, pullMs, holdMs, mergeMs } = CONFIG.riptideEvent;
+    const { streamMs, ripMs, pullMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const width = area.right - area.left;
     const height = area.bottom - area.top;

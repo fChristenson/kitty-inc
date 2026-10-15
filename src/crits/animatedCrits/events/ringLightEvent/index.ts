@@ -5,7 +5,7 @@
 // and every income bar it passes through flashes with a crack and a jolt
 // and free levels; at the bottom it cinches tight to a point and blows in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,10 +41,10 @@ const PASS_SHAKE: [number, number] = [0.6, 1.3];
 export const forceRingLightEvent = registerWispEvent(
   KEY,
   "Ring Light",
-  () => CONFIG.ringLightEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { formMs, dropMs, cinchMs, levelShare, holdMs, mergeMs } =
-      CONFIG.ringLightEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

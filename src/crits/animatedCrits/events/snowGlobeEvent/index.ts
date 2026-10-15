@@ -6,7 +6,7 @@
 // it shatters in a huge blast, the cash flying out, and flakes of light
 // drift down onto every empty spot as new workers. Pays floor income × floor
 // number × REWARD, plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -44,9 +44,9 @@ const SHAKE: [number, number] = [0.5, 1.2];
 export const forceSnowGlobeEvent = registerWispEvent(
   KEY,
   "Snow Globe",
-  () => CONFIG.snowGlobeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shakeMs, holdMs, mergeMs } = CONFIG.snowGlobeEvent;
+    const { shakeMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     const width = area.right - area.left;
     const r = Math.min(width * RADIUS, (area.bottom - area.top) * 0.25);

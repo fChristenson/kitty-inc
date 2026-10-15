@@ -6,7 +6,7 @@
 // cluster, a tick, a bang and a jolt, spraying coins; on the last hour the
 // centre goes up in a colossal blast with the biggest shake and a river of
 // cash slams into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -67,9 +67,9 @@ interface Blast {
 export const forceFuseClockEvent = registerWispEvent(
   KEY,
   "Fuse Clock",
-  () => CONFIG.fuseClockEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hoursMs, holdMs, mergeMs } = CONFIG.fuseClockEvent;
+    const { hoursMs, holdMs, mergeMs } = meta.values;
     const center: Point = {
       x: (area.left + area.right) / 2,
       y: (area.top + area.bottom) / 2 + 40,

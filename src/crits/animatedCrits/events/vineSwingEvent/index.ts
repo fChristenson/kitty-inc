@@ -6,7 +6,7 @@
 // every grab a blinding strike, a crack and a jolt, zigzagging higher and
 // faster up the screen; off the last vine it flings itself into the total
 // in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -60,10 +60,10 @@ interface Vine {
 export const forceVineSwingEvent = registerWispEvent(
   KEY,
   "Vine Swing",
-  () => CONFIG.vineSwingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { swingsMs, leapMs, finalMs, holdMs, mergeMs } =
-      CONFIG.vineSwingEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     const across = VINE * Math.sin(SWING);

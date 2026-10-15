@@ -6,7 +6,7 @@
 // in a bang and a big shake; then the whole heap surges up into the total,
 // which goes off in a huge blast and shake. Pays floor income × floor number
 // × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,10 +40,10 @@ const HIT_SHAKE: [number, number] = [0.9, 1.6];
 export const forceAvalancheEvent = registerWispEvent(
   KEY,
   "Avalanche",
-  () => CONFIG.avalancheEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { streamMs, fallMs, drainMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.avalancheEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const width = area.right - area.left;
     const height = area.bottom - area.top;

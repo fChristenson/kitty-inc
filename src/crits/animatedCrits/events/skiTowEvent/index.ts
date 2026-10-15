@@ -5,7 +5,7 @@
 // faster; each worker the cable snags is yanked up a perma tier with a bang
 // and a jolt, and at the top the tow drags the whole cable into the total in
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ const SNAG_SHAKE: [number, number] = [0.6, 1.3];
 export const forceSkiTowEvent = registerWispEvent(
   KEY,
   "Ski Tow",
-  () => CONFIG.skiTowEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { towMs, holdMs, mergeMs } = CONFIG.skiTowEvent;
+    const { towMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => b.at.y - a.at.y || a.at.x - b.at.x);

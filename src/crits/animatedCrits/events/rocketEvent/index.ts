@@ -5,8 +5,8 @@
 // into a firework of coins and bills that merge into the total. Pays the
 // floor's income times its floor number once per floor it flew past
 // (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -199,7 +199,7 @@ function findPad(floor: Floor, context: EventProcContext): Pt | null {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.rocketEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) && findPad(floor, context) !== null,
@@ -207,7 +207,7 @@ registerEventProc(
       const pad = findPad(floor, context);
       const area = context.getScreenAreaLocal?.(floor);
       if (!pad || !area) return;
-      const { fillMs, flyMs, mergeMs } = CONFIG.rocketEvent;
+      const { fillMs, flyMs, mergeMs } = meta.values;
       const burst = burstPoint(area);
       // every floor between its pad and the burst, its own included
       const floorsPassed = findFloorLines(floor, context.getOnScreenFloors)
@@ -226,7 +226,7 @@ registerEventProc(
         KEY,
         floor,
         context,
-        { durationMs: fillMs + flyMs + CONFIG.rocketEvent.durationMs, mergeMs },
+        { durationMs: fillMs + flyMs + meta.values.durationMs, mergeMs },
         {
           layout: fireworkSpots,
           rewardMultiplier: Math.max(1, floorsPassed.length),

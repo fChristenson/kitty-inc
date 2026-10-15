@@ -6,7 +6,7 @@
 // whole length and a jolt, landing free levels; the cutter hops to the next
 // bar's end and chops again, quicker each time, the last chop a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,9 +49,9 @@ interface Cut {
 export const forcePaperCutterEvent = registerWispEvent(
   KEY,
   "Paper Cutter",
-  () => CONFIG.paperCutterEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { cutsMs, levelShare, holdMs, mergeMs } = CONFIG.paperCutterEvent;
+    const { cutsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

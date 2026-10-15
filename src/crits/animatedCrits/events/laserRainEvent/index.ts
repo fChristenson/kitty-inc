@@ -5,7 +5,7 @@
 // every bar jolting with free levels as its share lands; then the whole sky
 // comes down at once, a curtain of beams onto every bar in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -31,9 +31,9 @@ const BANG_GAP_MS = 60;
 export const forceLaserRainEvent = registerWispEvent(
   KEY,
   "Laser Rain",
-  () => CONFIG.laserRainEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { rainMs, levelShare, holdMs, mergeMs } = CONFIG.laserRainEvent;
+    const { rainMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const top = area.top + TOP;

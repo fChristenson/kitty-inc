@@ -4,8 +4,8 @@
 // a flash, a rattle and a jolt and knocking coins out round it; the last
 // round hits hard in a blast that bursts a ring of coins, and they all merge
 // into the total. Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -73,13 +73,13 @@ function around(button: Point, reach: number, angle: number): Point {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.gatlingEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { fireMs, travelMs, holdMs, mergeMs } = CONFIG.gatlingEvent;
+      const { fireMs, travelMs, holdMs, mergeMs } = meta.values;
       const button = getButtonCenter(context.isGroundFloor);
       const fromLeft = button.x - area.left > area.right - button.x;
       const gun = {

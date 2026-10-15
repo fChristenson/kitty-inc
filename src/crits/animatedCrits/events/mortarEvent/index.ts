@@ -6,7 +6,7 @@
 // every shell a white blast, a bang, a jolt and cash blown everywhere; the
 // last and biggest lands at the top in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ const BOOM_SHAKE: [number, number] = [0.8, 1.6];
 export const forceMortarEvent = registerWispEvent(
   KEY,
   "Mortar",
-  () => CONFIG.mortarEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapsMs, upMs, hangMs, downMs, holdMs, mergeMs } =
-      CONFIG.mortarEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;
     const height = area.bottom - area.top;

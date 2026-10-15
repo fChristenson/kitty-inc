@@ -6,7 +6,7 @@
 // carriage return whips it back to type the next row down, ever faster;
 // the last ding goes off in a huge blast and shake. Pays floor income ×
 // floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -38,9 +38,9 @@ const DING_SHAKE: [number, number] = [0.8, 1.5];
 export const forceTypewriterEvent = registerWispEvent(
   KEY,
   "Typewriter",
-  () => CONFIG.typewriterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { linesMs, returnMs, holdMs, mergeMs } = CONFIG.typewriterEvent;
+    const { linesMs, returnMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.y - b.at.y);

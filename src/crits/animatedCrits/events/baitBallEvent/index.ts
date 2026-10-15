@@ -6,7 +6,7 @@
 // each with a flash, a whoosh and a jolt and swirling shut behind it; then
 // the whole shoal streams up into the total, the last hunter chasing it in,
 // in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -46,10 +46,10 @@ const SLASH_SHAKE: [number, number] = [0.8, 1.5];
 export const forceBaitBallEvent = registerWispEvent(
   KEY,
   "Bait Ball",
-  () => CONFIG.baitBallEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { formMs, slashesMs, dashMs, flightMs, holdMs, mergeMs } =
-      CONFIG.baitBallEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const middle: Point = {

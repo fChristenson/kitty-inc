@@ -5,7 +5,7 @@
 // view with a flash, a bloop and a jolt as a new worker forms there, ever
 // quicker; the last lands in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -31,9 +31,9 @@ const LAND_SHAKE: [number, number] = [0.5, 1.2];
 export const forceRingTossEvent = registerWispEvent(
   KEY,
   "Ring Toss",
-  () => CONFIG.ringTossEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { gapsMs, flightMs, holdMs, mergeMs } = CONFIG.ringTossEvent;
+    const { gapsMs, flightMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

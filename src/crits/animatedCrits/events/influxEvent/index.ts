@@ -5,7 +5,7 @@
 // arrival is a splash, a bang and a jolt; the heap swells and quakes, then
 // erupts straight up into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const BANG_GAP_MS = 60;
 export const forceInfluxEvent = registerWispEvent(
   KEY,
   "Influx",
-  () => CONFIG.influxEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { riverMs, churnMs, eruptMs, holdMs, mergeMs } = CONFIG.influxEvent;
+    const { riverMs, churnMs, eruptMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const center: Point = {
       x: (area.left + area.right) / 2,

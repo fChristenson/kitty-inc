@@ -5,7 +5,7 @@
 // over layer, ever faster and wilder; then the whole splattered canvas
 // slides off into the total in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -46,9 +46,9 @@ const SPLAT_SHAKE: [number, number] = [0.4, 1.1];
 export const forceDripPaintingEvent = registerWispEvent(
   KEY,
   "Drip Painting",
-  () => CONFIG.dripPaintingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, flightMs, holdMs, mergeMs } = CONFIG.dripPaintingEvent;
+    const { gapsMs, flightMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const w = area.right - area.left;

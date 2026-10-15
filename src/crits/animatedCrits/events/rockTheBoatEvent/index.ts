@@ -6,7 +6,7 @@
 // tilt a swoosh and a rumble, bunching tighter each time; on the last roll
 // it all pours together into the lock in a heap, which blows open in a huge
 // blast: the floor unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -44,9 +44,9 @@ const LAND_SHAKE = 0.4;
 export const forceRockTheBoatEvent = registerWispEvent(
   KEY,
   "Rock the Boat",
-  () => CONFIG.rockTheBoatEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dumpMs, tiltMs, pourMs, holdMs, mergeMs } = CONFIG.rockTheBoatEvent;
+    const { dumpMs, tiltMs, pourMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

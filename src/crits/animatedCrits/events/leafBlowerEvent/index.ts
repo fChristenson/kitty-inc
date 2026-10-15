@@ -5,7 +5,7 @@
 // roaring over to the far wall with a whoosh and smashing into it with a
 // jolt, then swept up the wall into the total; the last gust hits in a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,10 +38,10 @@ const HIT_SHAKE: [number, number] = [0.6, 1.4];
 export const forceLeafBlowerEvent = registerWispEvent(
   KEY,
   "Leaf Blower",
-  () => CONFIG.leafBlowerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { flyMs, gapsMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.leafBlowerEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const ltr = button.x > (area.left + area.right) / 2;
     const near = ltr ? area.left + EDGE : area.right - EDGE;

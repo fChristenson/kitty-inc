@@ -7,8 +7,8 @@
 // huge blast, flash, bang and shake that flings its coins outward, then they
 // merge into the total. Pays floor income × floor number × REWARD (see
 // ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -109,7 +109,7 @@ function pickSnacks(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.snakeEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) &&
@@ -118,7 +118,7 @@ registerEventProc(
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { runMs, holdMs, mergeMs } = CONFIG.snakeEvent;
+      const { runMs, holdMs, mergeMs } = meta.values;
       const button = getButtonCenter(context.isGroundFloor);
       const start = { x: area.left - OUT, y: button.y };
       const targets = [...pickSnacks(area, start, button), button];

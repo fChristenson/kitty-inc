@@ -6,7 +6,7 @@
 // with a jolt and a spray of cash; then the whole bed bulges out in a wave
 // from the middle and slams back flat in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const PUNCH_SHAKE: [number, number] = [0.5, 1.1];
 export const forcePinArtEvent = registerWispEvent(
   KEY,
   "Pin Art",
-  () => CONFIG.pinArtEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { traceMs, waveMs, holdMs, mergeMs } = CONFIG.pinArtEvent;
+    const { traceMs, waveMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

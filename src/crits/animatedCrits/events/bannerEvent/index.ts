@@ -5,7 +5,7 @@
 // below it, then a third, each wider and quicker, and the last one cracks
 // like a whip in a huge blast and shake as the coins sweep into the total.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
@@ -33,9 +33,9 @@ const SMACK_SHAKE: [number, number] = [0.5, 1.2];
 export const forceBannerEvent = registerWispEvent(
   KEY,
   "Banner",
-  () => CONFIG.bannerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, streamMs, travelMs, holdMs, mergeMs } = CONFIG.bannerEvent;
+    const { gapsMs, streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const height = area.bottom - area.top;
     const ltr0 = Math.random() < 0.5;
     let clock = 0;

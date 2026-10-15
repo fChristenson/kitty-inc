@@ -6,7 +6,7 @@
 // worker's feet it leaps up through them in a flash and a jolt as they
 // climb a perma tier, the nearest first; the last one reached goes up in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ interface Leg {
 export const forceGroundCurrentEvent = registerWispEvent(
   KEY,
   "Ground Current",
-  () => CONFIG.groundCurrentEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { crawlMs, holdMs, mergeMs } = CONFIG.groundCurrentEvent;
+    const { crawlMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const ground: Point = {

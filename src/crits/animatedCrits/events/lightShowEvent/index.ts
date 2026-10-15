@@ -6,7 +6,7 @@
 // off every beam's tip, ever faster; then every beam swings onto the total
 // at once and blasts it in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -46,9 +46,9 @@ const PATTERNS: Pattern[] = [
 export const forceLightShowEvent = registerWispEvent(
   KEY,
   "Light Show",
-  () => CONFIG.lightShowEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { beatsMs, lockMs, holdMs, mergeMs } = CONFIG.lightShowEvent;
+    const { beatsMs, lockMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const reach = area.bottom - area.top + 100;
     const emitters: Point[] = Array.from({ length: EMITTERS }, (_, i) => ({

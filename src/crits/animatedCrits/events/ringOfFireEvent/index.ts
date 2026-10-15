@@ -6,7 +6,7 @@
 // sets the next ring going, quicker each time; the last ring ends in one
 // colossal blast with the hardest shake of all. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -54,10 +54,10 @@ interface Ring {
 export const forceRingOfFireEvent = registerWispEvent(
   KEY,
   "Ring of Fire",
-  () => CONFIG.ringOfFireEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { fuseMs, popsMs, coreGapMs, holdMs, mergeMs } =
-      CONFIG.ringOfFireEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     let clock: number = fuseMs;

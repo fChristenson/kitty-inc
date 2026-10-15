@@ -6,7 +6,7 @@
 // beam up into the total-income readout, a torrent of cash roaring up inside
 // it, in a huge blast and shake, and the coins sweep into the total. Pays
 // floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,10 +50,10 @@ const RUMBLE = 1.2;
 export const forceSuperlaserEvent = registerWispEvent(
   KEY,
   "Superlaser",
-  () => CONFIG.superlaserEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { aimMs, gapMs, chargeMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.superlaserEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

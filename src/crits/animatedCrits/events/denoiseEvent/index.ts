@@ -6,7 +6,7 @@
 // out of the noise snaps a giant crown; it blazes, sprays coins, and its
 // dots pour into the total in a huge blast. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
@@ -42,10 +42,10 @@ const gauss = () =>
 export const forceDenoiseEvent = registerWispEvent(
   KEY,
   "Denoise",
-  () => CONFIG.denoiseEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fogMs, stepsMs, blazeMs, flightMs, holdMs, mergeMs } =
-      CONFIG.denoiseEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const w = area.right - area.left;
     const h = area.bottom - area.top;

@@ -6,7 +6,7 @@
 // jolt, then the lock itself goes up in a colossal blast and the biggest
 // shake, and the floor bursts open, unlocked for free, as the screen
 // unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const CHAIN_SHAKE: [number, number] = [0.5, 1.1];
 export const forceBombCrownEvent = registerWispEvent(
   KEY,
   "Bomb Crown",
-  () => CONFIG.bombCrownEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { spinMs, holdMs, mergeMs } = CONFIG.bombCrownEvent;
+    const { spinMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

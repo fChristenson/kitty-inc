@@ -4,7 +4,7 @@
 // to every empty spot in view; as each channel floods its spot, a worker
 // sprouts there with a splash, a bang and a jolt, the farthest last in a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const HIRE_SHAKE: [number, number] = [0.6, 1.3];
 export const forceIrrigationEvent = registerWispEvent(
   KEY,
   "Irrigation",
-  () => CONFIG.irrigationEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { speed, holdMs, mergeMs } = CONFIG.irrigationEvent;
+    const { speed, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

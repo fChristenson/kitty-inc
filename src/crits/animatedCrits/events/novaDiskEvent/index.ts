@@ -6,7 +6,7 @@
 // dozens of its stars are flung off along their orbits onto the bars in a
 // rattling storm of blasts, each landing free levels, the last slamming
 // every bar. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -83,10 +83,10 @@ interface Flung {
 export const forceNovaDiskEvent = registerWispEvent(
   KEY,
   "Nova Disk",
-  () => CONFIG.novaDiskEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, fuseMs, levelShare, holdMs, mergeMs } =
-      CONFIG.novaDiskEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     if (bars.length === 0) return;
     const w = area.right - area.left;

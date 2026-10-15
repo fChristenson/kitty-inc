@@ -6,4 +6,8 @@ export default {
   label: "Shift Up",
   chance: 0.01,
   style: "race",
+  values: {
+    // a bar this many times as fast for good
+    speed: 2,
+  },
 } satisfies CritMeta;

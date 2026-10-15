@@ -6,7 +6,7 @@
 // other end clacking down on a glowing stone with a jolt; again and again,
 // faster each time, the heap growing; then the whole heap surges into the
 // total in a huge blast. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -60,10 +60,10 @@ const SURGE_LAG = 160;
 export const forceShishiOdoshiEvent = registerWispEvent(
   KEY,
   "Shishi-odoshi",
-  () => CONFIG.shishiOdoshiEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, pourMs, surgeMs, liftMs, holdMs, mergeMs } =
-      CONFIG.shishiOdoshiEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

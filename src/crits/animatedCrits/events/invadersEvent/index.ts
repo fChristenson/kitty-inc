@@ -5,7 +5,7 @@
 // them, picking them off one by one with wisp bullets straight up, each kill
 // a flash, a pop and a burst of coins, ever faster; the last one goes in a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const KILL_SHAKE: [number, number] = [0.25, 0.9];
 export const forceInvadersEvent = registerWispEvent(
   KEY,
   "Invaders",
-  () => CONFIG.invadersEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { formMs, killsMs, holdMs, mergeMs } = CONFIG.invadersEvent;
+    const { formMs, killsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const cx = (area.left + area.right) / 2;
     const gunY = area.bottom - GUN_UP;

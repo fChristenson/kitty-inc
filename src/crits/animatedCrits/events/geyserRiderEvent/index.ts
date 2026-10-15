@@ -5,7 +5,7 @@
 // jolt, and the bar jumps a crit tier; a new geyser erupts for the next
 // bar, quicker each time, the last ride ending in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const HIT_SHAKE: [number, number] = [0.7, 1.5];
 export const forceGeyserRiderEvent = registerWispEvent(
   KEY,
   "Geyser Rider",
-  () => CONFIG.geyserRiderEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { eruptsMs, riseMs, holdMs, mergeMs } = CONFIG.geyserRiderEvent;
+    const { eruptsMs, riseMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (found.length === 0) return;
     // bottom bar first: each geyser has further to climb

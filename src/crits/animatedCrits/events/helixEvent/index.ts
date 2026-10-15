@@ -6,8 +6,8 @@
 // flung out. At the top they fuse into the total and explode in a huge blast
 // and shake, coins bursting out of it, and all the coins sweep into the
 // total. Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -65,13 +65,13 @@ const SPARK_SIZE = 22;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.helixEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { riseMs, holdMs, mergeMs } = CONFIG.helixEvent;
+      const { riseMs, holdMs, mergeMs } = meta.values;
       const width = area.right - area.left;
       const amp = width * AMP;
       const size = Math.max(WISP_SIZE, width * WISP);

@@ -6,7 +6,7 @@
 // thumps, each a burst and a jolt, until it strikes the treasure: a geyser
 // of cash erupts out of the ground in a huge blast and shake and gushes up
 // into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ const DIG_SHAKE: [number, number] = [0.6, 1.2];
 export const forceBuriedTreasureEvent = registerWispEvent(
   KEY,
   "Buried Treasure",
-  () => CONFIG.buriedTreasureEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { walkMs, digsMs, gushMs, holdMs, mergeMs } =
-      CONFIG.buriedTreasureEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const h = area.bottom - area.top;
     const left = area.left + EDGE;

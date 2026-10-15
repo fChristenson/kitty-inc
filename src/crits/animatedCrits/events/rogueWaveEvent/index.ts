@@ -5,7 +5,7 @@
 // towering rogue wave whose peak shoots straight up the screen past every
 // bar, each a jolt of free levels, and on into the total, the rest of the
 // sea rushing up after it. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,10 +46,10 @@ const PASS_SHAKE: [number, number] = [0.6, 1.1];
 export const forceRogueWaveEvent = registerWispEvent(
   KEY,
   "Rogue Wave",
-  () => CONFIG.rogueWaveEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { floodMs, swellMs, spoutMs, leapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.rogueWaveEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const bottom = area.bottom - MARGIN;

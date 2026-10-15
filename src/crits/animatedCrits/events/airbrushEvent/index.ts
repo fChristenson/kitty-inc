@@ -5,7 +5,7 @@
 // turn a jolt; fully coated, it flashes white and jumps a crit tier, and the
 // airbrush moves on to the next bar, quicker each time, the last coat
 // finishing in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,9 +53,9 @@ interface Coat {
 export const forceAirbrushEvent = registerWispEvent(
   KEY,
   "Airbrush",
-  () => CONFIG.airbrushEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { passesMs, holdMs, mergeMs } = CONFIG.airbrushEvent;
+    const { passesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

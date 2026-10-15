@@ -5,7 +5,7 @@
 // onto the bar with a crack and a jolt as the bar jumps a crit tier; the
 // wisps spring out of it into a web round the next bar, quicker each time,
 // the last cinching in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ interface Web {
 export const forceLaserWebEvent = registerWispEvent(
   KEY,
   "Laser Web",
-  () => CONFIG.laserWebEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { websMs, holdMs, mergeMs } = CONFIG.laserWebEvent;
+    const { websMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let from: Point = getButtonCenter(context.isGroundFloor);

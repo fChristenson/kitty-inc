@@ -8267,6 +8267,30 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 103
+  // tornado, levels: src/crits/animatedCrits/events/outbreakEvent ("Outbreak"): a small twister touches down on every bar of the frozen screen and tears along it (levels), then they all race down to one spot and swell into a giant funnel that whips round and flings everything back onto the bars (levels), collapsing in a huge blast
+  outbreakEvent: {
+    chance: 0.01,
+    firstMs: 220, // from the click till the first twister touches down
+    touchGapMs: 60, // between the twisters touching down, top first
+    runMs: 480, // a twister's run along its bar, quickening
+    driftMs: 260, // its race down to the meeting spot
+    whipMs: 450, // the giant whipping round flat out
+    flingMs: 300, // the glitter flung back onto the bars
+    flingGapMs: 50, // between the bars' glitter landing, top first, the clicked one last
+    levelShare: 0.03, // per bar, as its twister rips into it and as its glitter lands
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // charge, free floors: src/crits/animatedCrits/events/fullyChargedEvent ("Fully Charged"): a spark under the dark locked floor draws streams of light up off every bar, a trickle quickening to a flood, swelling, glowing and trembling harder, then punches up into the lock and bursts the floor open
+  fullyChargedEvent: {
+    chance: 0.01,
+    firstMs: 200, // from the click till the spark lights up
+    chargeMs: 1300, // its charging, till it's full
+    punchMs: 140, // punching up into the lock
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 102
   // tornado, levels: src/crits/animatedCrits/events/tornadoAlleyEvent ("Tornado Alley"): a funnel of glitter touches down at the bottom corner of the frozen screen and swells up the whole building, its foot tearing across the screen and back, quicker each way, tearing the glitter off every bar it sweeps (levels); it whips round under the clicked bar and flings it all back down onto the bars (levels), collapsing in a huge blast
   tornadoAlleyEvent: {

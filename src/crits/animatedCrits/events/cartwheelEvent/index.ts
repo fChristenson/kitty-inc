@@ -5,7 +5,7 @@
 // and faster; every landing a thump, a jolt and coins flung off its rim;
 // the last bound carries it into the total, where it flies apart in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -38,9 +38,9 @@ const LAND_SHAKE: [number, number] = [0.6, 1.4];
 export const forceCartwheelEvent = registerWispEvent(
   KEY,
   "Cartwheel",
-  () => CONFIG.cartwheelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hopsMs, holdMs, mergeMs } = CONFIG.cartwheelEvent;
+    const { hopsMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;

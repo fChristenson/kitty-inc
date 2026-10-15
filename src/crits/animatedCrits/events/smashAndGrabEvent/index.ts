@@ -6,7 +6,7 @@
 // into the total-income readout with a flash and a bloop, until the last goes
 // in with a huge blast and shake, and the cash sweeps into the total. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,10 +39,10 @@ const GONE = 1e6;
 export const forceSmashAndGrabEvent = registerWispEvent(
   KEY,
   "Smash and Grab",
-  () => CONFIG.smashAndGrabEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { knocksMs, grabMs, flyMs, holdMs, mergeMs } =
-      CONFIG.smashAndGrabEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const impact = getButtonCenter(context.isGroundFloor);
     const pane = createPane(impact, area, {

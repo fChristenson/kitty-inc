@@ -6,7 +6,7 @@
 // diamond ring flashes on its rim, then every beam fires outward at once,
 // spraying a sea of cash, and it all collapses into the total in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,10 +53,10 @@ const BANG_GAP_MS = 60;
 export const forceCoronaEvent = registerWispEvent(
   KEY,
   "Corona",
-  () => CONFIG.coronaEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { swellMs, eclipseMs, ringMs, fireMs, collapseMs, holdMs, mergeMs } =
-      CONFIG.coronaEvent;
+      meta.values;
     const sun: Point = {
       x: (area.left + area.right) / 2,
       y: (area.top + area.bottom) / 2 - 40,

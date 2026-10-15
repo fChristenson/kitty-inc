@@ -15,7 +15,7 @@ Everything (crits, events, spawns, menus, HUD, startup, the first tap) holds 60f
 - One folder per module under `src/`, one `index.ts`. Shared code in `src/shared/<name>/`; modules import each other only through `shared/`. Reusable code, never duplicated.
 - `src/crits/`: `critTypes` (tiers, procs, rolling), `critFlash`, `floorCrits` (tier crits, rewards, `critPlayer`), `incomeCrits`, `buttonCrits`, `lockCrits`, `rateCrits`, `badgeCrits`, `animatedCrits` (events, stages), `critKit` (played crits' registry, reward targets). Outside `src/crits` import only its `index.ts` and `crits/config.ts`.
 - Startup: `src/boot.ts` stays tiny and free of game imports; what the first frame doesn't draw loads after it (`afterStartup`, `prepareSoon`, `loadWhenIdle`); heavy first-seconds work runs behind the splash (`shared/preheat`). Static DOM is in `index.html`. The badge catalog is lazy (`critData/kinds.ts` at startup, `loadBadgeCatalog` later); no module-level tables over every crit kind. Measure startup on `npm run perf:build` + `npx vite preview --mode perf`.
-- Crit amounts in `CONFIG.crit` (`src/crits/config.ts`; badge values in `badgeCrits/balance/`); a played crit's odds and own amounts (`values`) in its `meta.ts`.
+- Global crit amounts (tiers, payouts, the gateway) in `CONFIG.crit` (`src/crits/config.ts`; badge values in `badgeCrits/balance/`); a proc's odds, display and own amounts in `floorCrits/procs/<kind>/meta.ts` (`ProcMeta`); a played crit's or event's odds and own amounts (`values`) in its `meta.ts`, never in `CONFIG`.
 - Every orb, wisp or travelling light is `shared/wisp`; every tap/swipe target hit-tests through `shared/tapTarget`.
 
 ## Look and feel
@@ -49,7 +49,7 @@ Everything (crits, events, spawns, menus, HUD, startup, the first tap) holds 60f
 
 ## Events
 
-A slot-machine lever pull: only beneficial, no waiting or input, about 1.5–2.5s (screen-game worlds longer). Each event in `src/crits/animatedCrits/events/<name>Event` with a `meta.ts` (`EventMeta`, `isNew` on the latest batch); never confusable with another. Rewards vary (cash, levels, crit tiers, perma tiers, hires, free floors) and land on screen on the hit that gives them (`animatedCrits/eventRewards`, `wispCover`). Tag the CONFIG comment `<style>, <reward>: src/...`. Each batch covers the styles plus a few experiments (simulations, puzzles, algorithms, self-playing games).
+A slot-machine lever pull: only beneficial, no waiting or input, about 1.5–2.5s (screen-game worlds longer). Each event in `src/crits/animatedCrits/events/<name>Event` with a `meta.ts` (`EventMeta`: label, `style`, `reward`, `chance`, its own `values`, `isNew` on the latest batch), imported into the last `eventLoader` part; never confusable with another. Rewards vary (cash, levels, crit tiers, perma tiers, hires, free floors) and land on screen on the hit that gives them (`animatedCrits/eventRewards`, `wispCover`). Each batch covers the styles plus a few experiments (simulations, puzzles, algorithms, self-playing games).
 
 ## Animation styles
 

@@ -5,7 +5,7 @@
 // over the top with a tick and a jolt, until it's a blur; then the wheel
 // bursts apart, every rim wisp flying off into the total, the last in a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const TICK_SHAKE: [number, number] = [0.2, 0.8];
 export const forceHamsterWheelEvent = registerWispEvent(
   KEY,
   "Hamster Wheel",
-  () => CONFIG.hamsterWheelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, flyMs, holdMs, mergeMs } = CONFIG.hamsterWheelEvent;
+    const { spinMs, flyMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const hub: Point = {
       x: (area.left + area.right) / 2,

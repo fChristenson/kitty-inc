@@ -5,7 +5,7 @@
 // one each launches off in a towering leap onto an empty spot, landing in
 // a flash and a jolt as a new worker forms there, the last in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -57,9 +57,9 @@ interface Kid {
 export const forceBouncyCastleEvent = registerWispEvent(
   KEY,
   "Bouncy Castle",
-  () => CONFIG.bouncyCastleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { staggerMs, hopMs, holdMs, mergeMs } = CONFIG.bouncyCastleEvent;
+    const { staggerMs, hopMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const width = area.right - area.left;

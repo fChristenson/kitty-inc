@@ -6,7 +6,7 @@
 // after pair at the two crossings in a rolling chain, quicker and quicker,
 // until the last pairs meet at both crossings at once round one colossal
 // blast in the middle. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -57,9 +57,9 @@ interface Blast {
 export const forceCollisionCourseEvent = registerWispEvent(
   KEY,
   "Collision Course",
-  () => CONFIG.collisionCourseEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { firstMs, gapsMs, holdMs, mergeMs } = CONFIG.collisionCourseEvent;
+    const { firstMs, gapsMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const radius = Math.min(width * 0.22, height * 0.18, 240);

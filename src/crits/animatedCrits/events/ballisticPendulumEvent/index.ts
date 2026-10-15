@@ -6,7 +6,7 @@
 // a crack and a jolt, jumping it a crit tier, then swings on loose; the
 // next bob is shot quicker, the last in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -59,10 +59,10 @@ interface Shot {
 export const forceBallisticPendulumEvent = registerWispEvent(
   KEY,
   "Ballistic Pendulum",
-  () => CONFIG.ballisticPendulumEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { firstMs, shotsMs, aimMs, holdMs, mergeMs } =
-      CONFIG.ballisticPendulumEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock: number = firstMs;

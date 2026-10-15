@@ -5,7 +5,7 @@
 // shoves rattling round the ring; they punch through one after another in a
 // chain of blasts, then the button blows in a huge one and the clicked
 // floor's bar jumps a crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -56,10 +56,10 @@ const SOUND_GAP_MS = 60;
 export const forcePincushionEvent = registerWispEvent(
   KEY,
   "Pincushion",
-  () => CONFIG.pincushionEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { approachMs, arriveGapMs, stallMs, boreMs, holdMs, mergeMs } =
-      CONFIG.pincushionEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor);
     if (!bar) return;

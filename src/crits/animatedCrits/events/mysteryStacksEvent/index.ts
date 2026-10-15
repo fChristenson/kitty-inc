@@ -5,7 +5,7 @@
 // each with a blast and a jolt; once the last lands, beams join them all and
 // every bar blows in a run of blasts taking its levels, the clicked one
 // climbing a crit tier in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playCoinDrop } from "../../../../sound";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
@@ -73,7 +73,7 @@ function spriteOf(label: string, color: string, height: number) {
 export const forceMysteryStacksEvent = registerWispEvent(
   KEY,
   "Mystery Stacks",
-  () => CONFIG.mysteryStacksEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const {
       flipMs,
@@ -84,7 +84,7 @@ export const forceMysteryStacksEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.mysteryStacksEvent;
+    } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

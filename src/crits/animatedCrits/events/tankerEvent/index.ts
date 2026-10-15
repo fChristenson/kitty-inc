@@ -6,7 +6,7 @@
 // flash and a jolt of free levels that sprays their cash out over it, the
 // last in a huge blast and shake; the cash then flows into the total. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,10 +53,10 @@ const LAND_SHAKE: [number, number] = [0.8, 1.2];
 export const forceTankerEvent = registerWispEvent(
   KEY,
   "Tanker",
-  () => CONFIG.tankerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { flyMs, hoseMs, diveMs, levelShare, holdMs, mergeMs } =
-      CONFIG.tankerEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const height = area.bottom - area.top;

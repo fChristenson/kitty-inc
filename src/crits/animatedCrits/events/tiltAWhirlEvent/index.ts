@@ -6,7 +6,7 @@
 // worker with a bang and a jolt as it climbs a perma tier, and whirls off to
 // the next; the last snap blows in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ interface Ride {
 export const forceTiltAWhirlEvent = registerWispEvent(
   KEY,
   "Tilt-a-Whirl",
-  () => CONFIG.tiltAWhirlEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { spinsMs, hopMs, holdMs, mergeMs } = CONFIG.tiltAWhirlEvent;
+    const { spinsMs, hopMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

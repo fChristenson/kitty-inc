@@ -5,8 +5,8 @@
 // bang, a shake and the bar jolted, landing free upgrade levels tallied over
 // it; the last hits hardest. Then the screen unfreezes and the crit's tier
 // pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import {
@@ -134,7 +134,7 @@ function targetsInView(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.missileBarrageEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -285,7 +285,7 @@ function startBarrage(floor: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen() || !area || !upgradeFloorFree) return;
   if (found.length === 0) return;
   const { gapMs, flightMs, holdMs, levelShare, minLevels } =
-    CONFIG.missileBarrageEvent;
+    meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const targets: Target[] = found.map((t) => ({
     ...t,

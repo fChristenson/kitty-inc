@@ -6,7 +6,7 @@
 // it lets go and the whole bucketful flies out in a great arcing river into
 // the total in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -39,10 +39,10 @@ const SWINGER = 0.6;
 export const forceBucketSwingEvent = registerWispEvent(
   KEY,
   "Bucket Swing",
-  () => CONFIG.bucketSwingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { scoopMs, loopsMs, flingMs, holdMs, mergeMs } =
-      CONFIG.bucketSwingEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     const hub: Point = {

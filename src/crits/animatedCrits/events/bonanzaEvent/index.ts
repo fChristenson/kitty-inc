@@ -7,7 +7,7 @@
 // out of the heap's foot in a blast; the whole heap then surges up into
 // the total, the last of it in a huge blast. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,7 +45,7 @@ const THROUGH_SHAKE = 1.4;
 export const forceBonanzaEvent = registerWispEvent(
   KEY,
   "Bonanza",
-  () => CONFIG.bonanzaEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       pileMs,
@@ -56,7 +56,7 @@ export const forceBonanzaEvent = registerWispEvent(
       liftMs,
       holdMs,
       mergeMs,
-    } = CONFIG.bonanzaEvent;
+    } = meta.values;
     const fallback = totalSpot(area);
     const total = () => cover?.total() ?? fallback;
     const w = area.right - area.left;

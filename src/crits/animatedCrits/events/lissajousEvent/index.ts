@@ -6,7 +6,7 @@
 // flashes with a pop, a jolt and free levels; on its last loop it dives to
 // the figure's heart and blows in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const POP_GAP_MS = 50;
 export const forceLissajousEvent = registerWispEvent(
   KEY,
   "Lissajous",
-  () => CONFIG.lissajousEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { traceMs, levelShare, holdMs, mergeMs } = CONFIG.lissajousEvent;
+    const { traceMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

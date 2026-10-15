@@ -6,7 +6,7 @@
 // be smacked again, harder and faster each time; the last smack slams the
 // lock open in a huge blast and shake, the floor unlocked for free. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.2];
 export const forcePaddleBallEvent = registerWispEvent(
   KEY,
   "Paddle Ball",
-  () => CONFIG.paddleBallEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { tripsMs, holdMs, mergeMs } = CONFIG.paddleBallEvent;
+    const { tripsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

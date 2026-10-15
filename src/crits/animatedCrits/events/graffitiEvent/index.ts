@@ -5,7 +5,7 @@
 // and faster, the lock coating thicker and brighter until it's covered,
 // flashes white and bursts open in a huge blast and shake, unlocked for
 // free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -43,9 +43,9 @@ const HIT_SHAKE = 2.4;
 export const forceGraffitiEvent = registerWispEvent(
   KEY,
   "Graffiti",
-  () => CONFIG.graffitiEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { strokesMs, holdMs, mergeMs } = CONFIG.graffitiEvent;
+    const { strokesMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

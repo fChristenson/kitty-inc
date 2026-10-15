@@ -6,7 +6,7 @@
 // flurry of pops that lights it up a perma tier; it pumps and blasts the
 // next and the next, ever faster; the last shot goes off in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ const HIT_SHAKE: [number, number] = [0.9, 1.6];
 export const forceShotgunEvent = registerWispEvent(
   KEY,
   "Shotgun",
-  () => CONFIG.shotgunEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { moveMs, pumpMs, holdMs, mergeMs } = CONFIG.shotgunEvent;
+    const { moveMs, pumpMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

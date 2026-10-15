@@ -7,7 +7,7 @@
 // ahead, with a whoosh and a jolt halfway; it lands on the bar
 // first for a crit tier in a big blast, the others slamming in behind it,
 // the last in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -65,9 +65,9 @@ function cycloidTurn(dx: number, dy: number): number {
 export const forceBrachistochroneEvent = registerWispEvent(
   KEY,
   "Brachistochrone",
-  () => CONFIG.brachistochroneEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, raceMs, holdMs, mergeMs } = CONFIG.brachistochroneEvent;
+    const { growMs, raceMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

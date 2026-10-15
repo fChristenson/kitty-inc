@@ -6,7 +6,7 @@
 // jumps a crit tier; it winds up and sneezes again onto the next, then a
 // colossal sneeze onto the clicked floor's bar, which lands in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -56,9 +56,9 @@ interface Sneeze {
 export const forceSneezeEvent = registerWispEvent(
   KEY,
   "Sneeze",
-  () => CONFIG.sneezeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { windupMs, gapMs, burstMs, holdMs, mergeMs } = CONFIG.sneezeEvent;
+    const { windupMs, gapMs, burstMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

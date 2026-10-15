@@ -6,7 +6,7 @@
 // flies in a white blast, a bang, a jolt and cash blown everywhere; the
 // last and biggest goes off in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,10 +45,10 @@ const BOOM_SHAKE: [number, number] = [0.8, 1.6];
 export const forceBombPinwheelEvent = registerWispEvent(
   KEY,
   "Bomb Pinwheel",
-  () => CONFIG.bombPinwheelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spinUpMs, gapsMs, flingMs, holdMs, mergeMs } =
-      CONFIG.bombPinwheelEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const hub: Point = {
       x: (area.left + area.right) / 2,

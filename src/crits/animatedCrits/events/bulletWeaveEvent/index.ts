@@ -6,7 +6,7 @@
 // the worker flashes, a bang and a jolt, and climbs a perma tier; worker
 // after worker, each weave quicker, the last one tightening and blasting in
 // a huge flash and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -86,9 +86,9 @@ function wavingBullet(
 export const forceBulletWeaveEvent = registerWispEvent(
   KEY,
   "Bullet Weave",
-  () => CONFIG.bulletWeaveEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { weavesMs, holdMs, mergeMs } = CONFIG.bulletWeaveEvent;
+    const { weavesMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

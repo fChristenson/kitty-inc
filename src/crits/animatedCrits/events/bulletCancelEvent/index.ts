@@ -8,8 +8,8 @@
 // coin, the coins sucked into the ship paying into the live total; the boss,
 // caught in it, blows apart in a chain of blasts, and the stage lands back on
 // the floors
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playCoinDrop, playSwoosh } from "../../../../sound";
 import { multiply } from "../../../../shared/bigNumber";
@@ -159,7 +159,7 @@ interface Plan {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.bulletCancelEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startBulletCancel,
@@ -174,7 +174,7 @@ export function forceBulletCancelEvent(floor: Floor): void {
 }
 
 function startBulletCancel(floor: Floor, context: EventProcContext): void {
-  const { enterMs, payouts, payoutsBoss } = CONFIG.bulletCancelEvent;
+  const { enterMs, payouts, payoutsBoss } = meta.values;
   const flyMs = SUCK + SUCK_MS + END_LAG;
   const tier = context.critTier ?? pickCritTierByOdds();
 

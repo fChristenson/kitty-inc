@@ -5,7 +5,7 @@
 // tall round the button, wobbling as the screen shakes, every thump a bang
 // and a spray of cash; on the last it wobbles wildly, sets dead still and
 // goes off in a huge blast. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,9 +34,9 @@ const THUMP_SHAKE: [number, number] = [0.8, 1.6];
 export const forceJellyEvent = registerWispEvent(
   KEY,
   "Jelly",
-  () => CONFIG.jellyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { thumpsMs, holdMs, mergeMs } = CONFIG.jellyEvent;
+    const { thumpsMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

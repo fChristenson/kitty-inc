@@ -5,7 +5,7 @@
 // blast and shake, loops of cash gushing out of it and pouring back in, and
 // the screen genies back out of it into place. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const BACK_SHAKE = 0.8;
 export const forceMinimizeEvent = registerWispEvent(
   KEY,
   "Minimize",
-  () => CONFIG.minimizeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { suckMs, gapMs, outMs, holdMs, mergeMs } = CONFIG.minimizeEvent;
+    const { suckMs, gapMs, outMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

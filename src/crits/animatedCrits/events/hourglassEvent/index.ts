@@ -3,8 +3,8 @@
 // into it, filling its lower bulb with gold. It turns over, and the gold
 // trickles back down through its neck as the coins trickle out of it into the
 // total, which pays a minute of the building's income. Then the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { playBoostEventStream, playSold } from "../../../../sound";
 import { COLOR } from "../../../../palette";
 import { multiply } from "../../../../shared/bigNumber";
@@ -80,7 +80,7 @@ let running: RunningHourglass | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.hourglassEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (_floor, context) =>
       !running && !isScreenFrozen() && context.getScreenAreaLocal !== undefined,
@@ -97,7 +97,7 @@ export function forceHourglassEvent(floor: Floor): void {
 
 // how far (0..1) it's filled and turned over, and drained, `now`
 function progressAt(event: RunningHourglass, now: number) {
-  const { fillMs, flipMs, drainMs } = CONFIG.hourglassEvent;
+  const { fillMs, flipMs, drainMs } = meta.values;
   const ms = now - event.startedAt;
   const filled =
     event.firstHitAt === null
@@ -147,7 +147,7 @@ function drawOverlay(
   if (!event) return;
   const rect = getFloorRect(event.floor);
   if (rect) {
-    const { fillMs, flipMs } = CONFIG.hourglassEvent;
+    const { fillMs, flipMs } = meta.values;
     const now = performance.now();
     const ms = now - event.startedAt;
     const scale = SCALE * ease(clamp01(ms / APPEAR_MS));
@@ -195,7 +195,7 @@ function drawOverlay(
 function startHourglass(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   if (running || isScreenFrozen() || !area) return;
-  const { fillMs, flipMs, drainMs, seconds } = CONFIG.hourglassEvent;
+  const { fillMs, flipMs, drainMs, seconds } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const event: RunningHourglass = {
     floor,

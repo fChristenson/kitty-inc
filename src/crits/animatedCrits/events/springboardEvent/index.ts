@@ -6,8 +6,8 @@
 // a big imp on the highest taking two. The last bounce flies it through a lit
 // window high in the back wall onto the floors, and every bar in view takes
 // its levels
+import meta from "./meta";
 import { levelsFor, type Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import {
@@ -43,6 +43,7 @@ import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { findRewardBars } from "../../eventRewards";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -136,7 +137,7 @@ interface Foe {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.springboardEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -310,8 +311,8 @@ function startSpringboard(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   if (!area) return;
   const aspect = (area.bottom - area.top) / (area.right - area.left);
-  const { bowMs, flyMs, levelShare, levelGapMs } = CONFIG.springboardEvent;
-  const { arriveMs } = CONFIG.flightStage;
+  const { bowMs, flyMs, levelShare, levelGapMs } = meta.values;
+  const { arriveMs } = FLIGHT_STAGE;
   const tier = context.critTier ?? pickCritTierByOdds();
   const land = fpsOpeningLanding(FOCAL, BACK_Z, WIN_W, SILL, aspect);
   // each bounce up to its apex and back down, its half in ms

@@ -3,7 +3,7 @@
 // with it; it rolls back lower down, bigger and quicker, a jolt at each wall,
 // and in the middle it bursts the floor open: its new bar's first payouts
 // pay double
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { bankDoublePayout } from "../../../rateCrits/barEffects";
 import { COLOR } from "../../../../palette";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
@@ -81,7 +81,7 @@ const head: Point = { x: 0, y: 0 };
 registerFloorCrit("housewarmingCrit", {
   // double payouts banked on the floor it opened
   reward(t) {
-    const payouts = CONFIG.crit.housewarmingPayouts;
+    const payouts = meta.values.payouts;
     bankDoublePayout(t.floor, payouts);
     t.flipRate();
     t.punch(`2x Pay x${payouts}`);

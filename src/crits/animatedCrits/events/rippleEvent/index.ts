@@ -7,8 +7,8 @@
 // and settling as the ring weakens, behind its own fading white wave line.
 // Then the coins sweep from wherever they are into the total. Pays once per
 // ring (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -73,7 +73,7 @@ interface Ring {
 // a wide band, then one or two thin rings close behind, then the next wide
 // one; each rolling its own way
 function planRings(): Ring[] {
-  const { rings, wideGapMs, thinGapMs } = CONFIG.rippleEvent;
+  const { rings, wideGapMs, thinGapMs } = meta.values;
   const ring = (at: number, wide: boolean, reach: number): Ring => ({
     at,
     wide,
@@ -145,11 +145,11 @@ function coinPath(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.rippleEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const { rippleMs, mergeMs } = CONFIG.rippleEvent;
+      const { rippleMs, mergeMs } = meta.values;
       const rings = planRings();
       const startedAt = performance.now();
       let center: Point = { x: 0, y: 0 };

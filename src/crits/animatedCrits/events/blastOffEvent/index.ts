@@ -5,7 +5,7 @@
 // and fountains of cash, leaving a dark gold-lit void; then it falls back
 // down and slams home in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,10 +39,10 @@ const RUMBLE_SHAKE: [number, number] = [0.3, 0.9];
 export const forceBlastOffEvent = registerWispEvent(
   KEY,
   "Blast Off",
-  () => CONFIG.blastOffEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { shudderMs, launchMs, awayMs, dropMs, holdMs, mergeMs } =
-      CONFIG.blastOffEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

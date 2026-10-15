@@ -5,7 +5,7 @@
 // the screen, each landing in a flare, a burst of coins and a jolt; they
 // come ever faster, until the sun erupts, flinging arches every way at once
 // in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.2];
 export const forceSolarFlareEvent = registerWispEvent(
   KEY,
   "Solar Flare",
-  () => CONFIG.solarFlareEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { riseMs, flaresMs, arcMs, holdMs, mergeMs } = CONFIG.solarFlareEvent;
+    const { riseMs, flaresMs, arcMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const sun: Point = {
       x: (area.left + area.right) / 2,

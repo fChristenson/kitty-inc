@@ -5,7 +5,7 @@
 // the distance and hurtles in again somewhere else, ever faster and harder;
 // the last slams dead center in a huge blast, and the coins sweep into the
 // total. Pays floor income × floor number × REWARD (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -37,9 +37,9 @@ const SPLASH: [number, number] = [60, 240];
 export const forceSplatEvent = registerWispEvent(
   KEY,
   "Splat",
-  () => CONFIG.splatEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { rushMs, holdMs, mergeMs } = CONFIG.splatEvent;
+    const { rushMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const edge = width * EDGE;
     const middle = {

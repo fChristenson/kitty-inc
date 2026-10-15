@@ -2,8 +2,8 @@
 // glimmer lights stream in from the screen's edges to an empty spot on a floor
 // in view, where a new worker forms out of their glow and lands with a slam: a
 // free hire. Then the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -70,7 +70,7 @@ function findSpot(floor: Floor, context: EventProcContext): Spot | null {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.recruitEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running && !isScreenFrozen() && findSpot(floor, context) !== null,
@@ -96,7 +96,7 @@ function drawOverlay(
   if (rect) {
     const now = performance.now();
     const ms = now - event.startedAt;
-    const form = ease(clamp01(ms / CONFIG.recruitEvent.streamMs));
+    const form = ease(clamp01(ms / meta.values.streamMs));
     const pulse = Math.max(0, 1 - (now - event.lastLandedAt) / PULSE_MS);
     ctx.save();
     ctx.translate(rect.left, rect.top);
@@ -137,7 +137,7 @@ function startRecruit(floor: Floor, context: EventProcContext): void {
   if (!spot) return;
   const workerIndex = recruitWorker(spot.floor, spot.x, Date.now());
   if (workerIndex === null) return;
-  const { streamMs, holdMs } = CONFIG.recruitEvent;
+  const { streamMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const event: RunningRecruit = {
     spot,

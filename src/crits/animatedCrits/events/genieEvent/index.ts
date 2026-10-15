@@ -5,7 +5,7 @@
 // onto every empty spot, each landing with a flash, a pop and a jolt as a
 // new worker forms there; the last lands in a huge blast and shake as the
 // cash sweeps into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const LAND_SHAKE: [number, number] = [0.6, 1.3];
 export const forceGenieEvent = registerWispEvent(
   KEY,
   "Genie",
-  () => CONFIG.genieEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { riseMs, flingsMs, flightMs, holdMs, mergeMs } = CONFIG.genieEvent;
+    const { riseMs, flingsMs, flightMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

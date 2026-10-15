@@ -2,8 +2,8 @@
 // while the button streams coins into a wisp (shared/wisp) in the screen's middle that
 // swells and wiggles until it bursts, showering the screen with coins that
 // merge into the total (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -30,12 +30,12 @@ const POP_MS = 400;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.piggyBankEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const { fillMs, durationMs, mergeMs, rewardMultiplier } =
-        CONFIG.piggyBankEvent;
+        meta.values;
       const fx = createEventFx(fillMs);
       const burstDueAt = performance.now() + fillMs;
       let piggy = { x: 0, y: 0 };

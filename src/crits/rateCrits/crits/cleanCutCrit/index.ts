@@ -3,7 +3,7 @@
 // moment later the cut welds shut in a gold seam and the bar pays more for
 // good, its readout turning over; quicker bar by bar, its own last, cut end
 // to end, paying half as much again
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import {
   drawSlash,
   drawSliceSpill,
@@ -65,7 +65,7 @@ registerFloorCrit("cleanCutCrit", {
   reward(t) {
     t.floor.payoutMultiplier =
       (t.floor.payoutMultiplier ?? 1) *
-      (t.own ? CONFIG.crit.cleanCutOwnPayout : CONFIG.crit.cleanCutPayout);
+      (t.own ? meta.values.ownPayout : meta.values.payout);
   },
   plan(r, bars, hit) {
     const half = r.play.barHalfWidth;

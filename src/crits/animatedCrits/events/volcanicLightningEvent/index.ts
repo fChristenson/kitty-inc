@@ -6,7 +6,7 @@
 // lands free levels; ever quicker, until the whole plume discharges at once,
 // a bolt onto every bar in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,10 +40,10 @@ const HIT_SHAKE: [number, number] = [0.8, 1.4];
 export const forceVolcanicLightningEvent = registerWispEvent(
   KEY,
   "Volcanic Lightning",
-  () => CONFIG.volcanicLightningEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { eruptMs, boltsMs, holdMs, mergeMs, levelShare } =
-      CONFIG.volcanicLightningEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

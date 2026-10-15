@@ -3,7 +3,7 @@
 // shoots the price on every button in view in quick fire; each price jolts
 // with every hit, then flips over onto a cheaper one, its cut popping over
 // it, the clicked floor's own last with the biggest cut in the huge blast
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { multiply } from "../../../../shared/bigNumber";
@@ -74,10 +74,10 @@ interface Target {
 export const forceMarkdownEvent = registerWispEvent(
   KEY,
   "Markdown",
-  () => CONFIG.markdownEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { firstShotMs, flyMs, gapMs, cut, ownCut, holdMs, mergeMs } =
-      CONFIG.markdownEvent;
+      meta.values;
     const buttons = findOnScreenButtons(floor, context).filter(
       (b) => !isFloorMaxed(b.floor),
     );

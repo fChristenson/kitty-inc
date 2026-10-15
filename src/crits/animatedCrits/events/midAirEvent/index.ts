@@ -6,7 +6,7 @@
 // collide together in a row of blasts, and a colossal one in the middle
 // gives the hardest shake before the cash pours into the total. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,10 +49,10 @@ interface Clash {
 export const forceMidAirEvent = registerWispEvent(
   KEY,
   "Mid-Air",
-  () => CONFIG.midAirEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { flightMs, clashesMs, volleyGapMs, holdMs, mergeMs } =
-      CONFIG.midAirEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const corners: Point[] = [

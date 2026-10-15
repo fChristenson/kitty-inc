@@ -6,8 +6,8 @@
 // other side in a big blast, spraying coins, and shoots on off the screen.
 // The coins merge into the total. Pays floor income × floor number × REWARD
 // (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   playExplosion,
@@ -75,7 +75,7 @@ const COIN_R: [number, number] = [80, 420];
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.drillEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) &&
@@ -85,7 +85,7 @@ registerEventProc(
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { approachMs, drillMs, exitMs, holdMs, mergeMs } =
-        CONFIG.drillEvent;
+        meta.values;
       const { isGroundFloor } = context;
       const box = getIncomeBarBox(isGroundFloor);
       const y = box.y + box.height / 2;

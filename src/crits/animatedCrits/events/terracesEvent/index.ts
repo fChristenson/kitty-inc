@@ -6,7 +6,7 @@
 // ever faster, every bar the cash lands on jolting with a splash, a bloop
 // and free levels; the lowest bar fills last and every bar slams in a huge
 // blast and shake. Pays floor income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -35,10 +35,10 @@ const LAND_SHAKE: [number, number] = [0.6, 1.4];
 export const forceTerracesEvent = registerWispEvent(
   KEY,
   "Terraces",
-  () => CONFIG.terracesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pourMs, fallsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.terracesEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const curve = (a: Point, control: Point, b: Point) =>

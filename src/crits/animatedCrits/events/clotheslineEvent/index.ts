@@ -6,7 +6,7 @@
 // settling onto a worker in view with a flash and a jolt that lights it up
 // a perma tier, ever faster; the last lands in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,10 +40,10 @@ const LAND_SHAKE: [number, number] = [0.5, 1.2];
 export const forceClotheslineEvent = registerWispEvent(
   KEY,
   "Clothesline",
-  () => CONFIG.clotheslineEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { stringMs, gapsMs, fallMs, holdMs, mergeMs } =
-      CONFIG.clotheslineEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

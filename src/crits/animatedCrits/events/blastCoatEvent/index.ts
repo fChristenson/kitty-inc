@@ -5,7 +5,7 @@
 // coat goes off, a blast rolling along each bar the way it was sprayed,
 // bar after bar, each bar's crit tier climbing as its roll ends; a huge
 // blast on the clicked bar slams every bar. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -86,9 +86,9 @@ interface Roll {
 export const forceBlastCoatEvent = registerWispEvent(
   KEY,
   "Blast Coat",
-  () => CONFIG.blastCoatEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { arriveMs, sweepMs, hopMs, holdMs, mergeMs } = CONFIG.blastCoatEvent;
+    const { arriveMs, sweepMs, hopMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

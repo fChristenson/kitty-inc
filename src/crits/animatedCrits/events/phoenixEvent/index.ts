@@ -5,7 +5,7 @@
 // glow bigger and brighter, the bar jumping a crit tier, then it soars up
 // and dives on the next bar, quicker each time, the last rebirth going off
 // in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -49,9 +49,9 @@ interface Dive {
 export const forcePhoenixEvent = registerWispEvent(
   KEY,
   "Phoenix",
-  () => CONFIG.phoenixEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swoopsMs, reformMs, holdMs, mergeMs } = CONFIG.phoenixEvent;
+    const { swoopsMs, reformMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let from: Point = { x: area.left - 60, y: area.top + 60 };

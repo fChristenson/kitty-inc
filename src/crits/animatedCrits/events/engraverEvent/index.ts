@@ -6,7 +6,7 @@
 // jumps a crit tier with a flash, a bang and a jolt; bar after bar, ever
 // faster; the last one done, every bar slams in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const CUT_SHAKE: [number, number] = [0.9, 1.5];
 export const forceEngraverEvent = registerWispEvent(
   KEY,
   "Engraver",
-  () => CONFIG.engraverEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { moveMs, rastersMs, holdMs, mergeMs } = CONFIG.engraverEvent;
+    const { moveMs, rastersMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

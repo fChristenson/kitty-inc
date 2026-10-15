@@ -5,4 +5,9 @@ export default {
   label: "Nail Gun",
   chance: 0.03,
   style: "gunfire",
+  values: {
+    // the taps a crit landing on a Nail Gun's button plays for (twice on its
+    // own)
+    taps: 3,
+  },
 } satisfies CritMeta;

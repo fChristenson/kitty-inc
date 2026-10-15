@@ -6,7 +6,7 @@
 // crackling chain, each a pop and a spray of coins; shot after shot banks in
 // off alternate walls, ever faster, until the last patch goes in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const POP_SHAKE: [number, number] = [0.6, 1.3];
 export const forceBubbleShooterEvent = registerWispEvent(
   KEY,
   "Bubble Shooter",
-  () => CONFIG.bubbleShooterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fillMs, shotsMs, holdMs, mergeMs } = CONFIG.bubbleShooterEvent;
+    const { fillMs, shotsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const cx = (area.left + area.right) / 2;
     const shooter: Point = { x: cx, y: area.bottom - 80 };

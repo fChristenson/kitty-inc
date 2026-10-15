@@ -5,7 +5,7 @@
 // pass climbing higher; on the last pass it launches clean off the lip in a
 // soaring arc into the total in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const LIP_SHAKE: [number, number] = [0.5, 1.2];
 export const forceHalfPipeEvent = registerWispEvent(
   KEY,
   "Half-Pipe",
-  () => CONFIG.halfPipeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { passesMs, launchMs, holdMs, mergeMs } = CONFIG.halfPipeEvent;
+    const { passesMs, launchMs, holdMs, mergeMs } = meta.values;
     const left = area.left + EDGE;
     const right = area.right - EDGE;
     const cx = (left + right) / 2;

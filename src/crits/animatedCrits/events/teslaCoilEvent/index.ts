@@ -7,7 +7,7 @@
 // worker a perma tier; then it overloads, arcing to everything at once, and
 // blows in a huge blast and shake as every bar slams. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -54,10 +54,10 @@ type Target = { at: Point; bar?: RewardBar; worker?: RewardWorker };
 export const forceTeslaCoilEvent = registerWispEvent(
   KEY,
   "Tesla Coil",
-  () => CONFIG.teslaCoilEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pulseGapsMs, arcMs, overloadMs, levelShare, holdMs, mergeMs } =
-      CONFIG.teslaCoilEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const coil = {
       x: button.x,

@@ -6,4 +6,8 @@ export default {
   label: "Shortcut",
   chance: 0.03,
   style: "portal",
+  values: {
+    // each pass banks one payout this many times as big
+    payout: 2,
+  },
 } satisfies CritMeta;

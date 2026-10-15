@@ -5,8 +5,8 @@
 // in a huge slam, blast and shake, squashing and springing back, and lands
 // with a pile of free upgrade levels. Then the screen unfreezes and the
 // crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import {
@@ -78,7 +78,7 @@ let running: RunningUppercut | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.uppercutEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -99,7 +99,7 @@ export function forceUppercutEvent(floor: Floor): void {
 }
 
 function beats() {
-  const { swoopMs, riseMs, hangMs, fallMs } = CONFIG.uppercutEvent;
+  const { swoopMs, riseMs, hangMs, fallMs } = meta.values;
   const hit = swoopMs;
   const apex = hit + riseMs;
   const drop = apex + hangMs;
@@ -245,7 +245,7 @@ function startUppercut(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   const upgradeFloorFree = context.upgradeFloorFree;
   if (running || isScreenFrozen() || !area || !upgradeFloorFree) return;
-  const { holdMs, levelShare, minLevels } = CONFIG.uppercutEvent;
+  const { holdMs, levelShare, minLevels } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const levels = Math.max(
     minLevels,

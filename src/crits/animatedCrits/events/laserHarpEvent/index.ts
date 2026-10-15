@@ -6,7 +6,7 @@
 // on the income bar under its finger; then every string blazes at once, the
 // clicked floor's bar takes a pile more and every bar slams in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -37,10 +37,10 @@ const PLUCK_BURST: [number, number] = [0.35, 0.7];
 export const forceLaserHarpEvent = registerWispEvent(
   KEY,
   "Laser Harp",
-  () => CONFIG.laserHarpEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { igniteMs, entryMs, gapsMs, finaleMs, levelShare, holdMs, mergeMs } =
-      CONFIG.laserHarpEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const own = bars.find((b) => b.floor === floor) ?? bars[bars.length - 1];

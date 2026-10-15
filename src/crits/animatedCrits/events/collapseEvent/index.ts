@@ -5,7 +5,7 @@
 // ever faster, until the whole screen lies crushed in a heap at the bottom;
 // then it springs back up into place in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -32,9 +32,9 @@ const LAND_SHAKE: [number, number] = [0.8, 1.6];
 export const forceCollapseEvent = registerWispEvent(
   KEY,
   "Collapse",
-  () => CONFIG.collapseEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, fallMs, springMs, holdMs, mergeMs } = CONFIG.collapseEvent;
+    const { gapsMs, fallMs, springMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

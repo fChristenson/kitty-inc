@@ -5,7 +5,7 @@
 // springing back with a bloop and a coin flicked off its top; then every
 // key slams down at once and springs back in a huge blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const RUN_SHAKE: [number, number] = [0.3, 0.9];
 export const forceGlissandoEvent = registerWispEvent(
   KEY,
   "Glissando",
-  () => CONFIG.glissandoEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runsMs, slamMs, holdMs, mergeMs } = CONFIG.glissandoEvent;
+    const { runsMs, slamMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

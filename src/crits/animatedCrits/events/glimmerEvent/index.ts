@@ -4,8 +4,8 @@
 // worker or manager it passes lights up, plays its boost and climbs one perma
 // tier, while top-tier ones stay dimmed. Once it's across the screen unfreezes
 // and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { randomInt } from "../../../../utils";
 import { isFloorLocked } from "../../../../shared/detachedJob";
@@ -139,7 +139,7 @@ function hopLegs(
 const hopRolls = new WeakMap<Floor, boolean>();
 function rollHop(floor: Floor, context: EventProcContext): boolean {
   if (context.critTier === undefined || !hopRolls.has(floor))
-    hopRolls.set(floor, Math.random() < CONFIG.glimmerEvent.moveFloorChance);
+    hopRolls.set(floor, Math.random() < meta.values.moveFloorChance);
   return hopRolls.get(floor)!;
 }
 
@@ -157,7 +157,7 @@ function canStart(floor: Floor, context: EventProcContext): boolean {
 registerEventProc(
   {
     key: "glimmer",
-    chance: () => CONFIG.glimmerEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running && !isScreenFrozen() && canStart(floor, context),
@@ -249,7 +249,7 @@ function drawIntroBalls(
 // the whole sweep: each leg, with a hop between floors
 function sweepTotalMs(glimmer: RunningGlimmer): number {
   const legs = glimmer.legs.length;
-  return CONFIG.glimmerEvent.sweepMs * legs + HOP_MS * (legs - 1);
+  return meta.values.sweepMs * legs + HOP_MS * (legs - 1);
 }
 
 // the light t (0..1) through leg, in world space
@@ -284,7 +284,7 @@ function lightAt(
   elapsed: number,
   getFloorRect: FloorRectResolver,
 ): LightPose | null {
-  const sweepMs = CONFIG.glimmerEvent.sweepMs;
+  const sweepMs = meta.values.sweepMs;
   const legMs = sweepMs + HOP_MS;
   const i = Math.min(glimmer.legs.length - 1, Math.floor(elapsed / legMs));
   const inLeg = elapsed - i * legMs;
@@ -392,7 +392,7 @@ function drawOverlay(
   const remaining = sweepTotalMs(glimmer) - elapsed;
   const growth = Math.max(
     0,
-    Math.min(1, remaining / (CONFIG.glimmerEvent.sweepMs * FADE_OUT)),
+    Math.min(1, remaining / (meta.values.sweepMs * FADE_OUT)),
   );
   const light = lightAt(glimmer, elapsed, getFloorRect);
   if (!light) return;
@@ -437,7 +437,7 @@ function passWorker(glimmer: RunningGlimmer, leg: Leg, index: number): void {
 
 function startSweep(glimmer: RunningGlimmer, onEnd: () => void): void {
   glimmer.sweepAt = performance.now();
-  const sweepMs = CONFIG.glimmerEvent.sweepMs;
+  const sweepMs = meta.values.sweepMs;
   glimmer.legs.forEach((leg, i) => {
     const legStart = i * (sweepMs + HOP_MS);
     if (i > 0) {

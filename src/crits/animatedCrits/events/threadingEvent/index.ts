@@ -5,7 +5,7 @@
 // every pass over a bar's front a jolt of free levels; then it
 // shoots up into the total-income readout in a huge blast. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -54,10 +54,10 @@ interface Crash {
 export const forceThreadingEvent = registerWispEvent(
   KEY,
   "Threading",
-  () => CONFIG.threadingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { streamMs, pathMs, levelShare, holdMs, mergeMs } =
-      CONFIG.threadingEvent;
+      meta.values;
     const total = totalSpot(area);
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];

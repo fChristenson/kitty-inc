@@ -5,7 +5,7 @@
 // in a blinding flash and a big jolt and they climb a perma tier; the fire
 // leaps from worker to worker, each catching quicker, the last strike a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const STRIKE_SHAKE: [number, number] = [0.7, 1.4];
 export const forceStElmosFireEvent = registerWispEvent(
   KEY,
   "St. Elmo's Fire",
-  () => CONFIG.stElmosFireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { coronaMs, gapsMs, holdMs, mergeMs } = CONFIG.stElmosFireEvent;
+    const { coronaMs, gapsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     let clock = 0;

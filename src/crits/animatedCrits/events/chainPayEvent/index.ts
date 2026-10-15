@@ -3,8 +3,8 @@
 // on-screen worker, then on worker to worker, each one slamming as it's paid,
 // and the last one fires it all into the total. The n-th worker reached pays
 // the floor's payout n times over, then the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSold } from "../../../../sound";
 import {
@@ -72,7 +72,7 @@ type Stop = { floor: Floor; top: number; x: number; y: number };
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.chainPayEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, { getOnScreenFloors }) =>
       !running &&
@@ -118,7 +118,7 @@ function startChain(floor: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen()) return;
   const found = findOnScreenWorkers(floor, context.getOnScreenFloors);
   if (!found || found.length === 0) return;
-  const { hopMs, payoutMs, maxWorkers } = CONFIG.chainPayEvent;
+  const { hopMs, payoutMs, maxWorkers } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const floorTop = context.getOnScreenFloors!().find(
     (entry) => entry.floor === floor,

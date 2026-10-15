@@ -6,7 +6,7 @@
 // explosions cascading down the screen tier by tier, each with its own bang,
 // shake and spray of coins, the last tier going off in a rolling chain into
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,9 +49,9 @@ interface Blast {
 export const forceCascadeEvent = registerWispEvent(
   KEY,
   "Cascade",
-  () => CONFIG.cascadeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { chainMs, fallMs, holdMs, mergeMs } = CONFIG.cascadeEvent;
+    const { chainMs, fallMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const top = area.top + TOP;
     const h = area.bottom - EDGE - top;

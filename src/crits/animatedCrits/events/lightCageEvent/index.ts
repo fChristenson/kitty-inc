@@ -5,7 +5,7 @@
 // lights the worker up a perma tier; the cage bursts open and snaps round
 // the next worker, quicker each time; the last slams shut in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,9 +30,9 @@ const SHUT_SHAKE: [number, number] = [0.7, 1.4];
 export const forceLightCageEvent = registerWispEvent(
   KEY,
   "Light Cage",
-  () => CONFIG.lightCageEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { closesMs, holdMs, mergeMs } = CONFIG.lightCageEvent;
+    const { closesMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     let clock = 0;

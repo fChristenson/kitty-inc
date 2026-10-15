@@ -6,7 +6,7 @@
 // big blast, a bang and a shake spraying cash, the far side bursting in
 // clusters; then the cloud's heart blows in a colossal blast. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -54,9 +54,9 @@ interface Blast {
 export const forceVaporCloudEvent = registerWispEvent(
   KEY,
   "Vapor Cloud",
-  () => CONFIG.vaporCloudEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spreadMs, frontMs, holdMs, mergeMs } = CONFIG.vaporCloudEvent;
+    const { spreadMs, frontMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const centre: Point = {

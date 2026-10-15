@@ -5,7 +5,7 @@
 // and a jolt, quicker pin by pin, until the tension beam under the lock
 // wrenches round and the floor bursts open in a huge blast and shake,
 // unlocked for free, as the screen unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const PIN_SHAKE: [number, number] = [0.35, 0.9];
 export const forceLockPickEvent = registerWispEvent(
   KEY,
   "Lock Pick",
-  () => CONFIG.lockPickEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pinsMs, holdMs, mergeMs } = CONFIG.lockPickEvent;
+    const { pinsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

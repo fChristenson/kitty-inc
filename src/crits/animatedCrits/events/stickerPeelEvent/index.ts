@@ -6,7 +6,7 @@
 // bursting out from under the fold; once it's nearly all peeled it snaps
 // back down flat in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -64,9 +64,9 @@ function trace(ctx: CanvasRenderingContext2D, poly: Point[]): void {
 export const forceStickerPeelEvent = registerWispEvent(
   KEY,
   "Sticker Peel",
-  () => CONFIG.stickerPeelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { peelMs, snapMs, holdMs, mergeMs } = CONFIG.stickerPeelEvent;
+    const { peelMs, snapMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

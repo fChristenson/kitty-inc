@@ -7,7 +7,7 @@
 // corner to the other, and shoots up into the total-income readout in a
 // huge blast as the cash pours in after it. Pays floor income × floor
 // number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -67,10 +67,10 @@ function hilbertCell(side: number, d: number): [number, number] {
 export const forceHilbertCurveEvent = registerWispEvent(
   KEY,
   "Hilbert Curve",
-  () => CONFIG.hilbertCurveEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { refineMs, traceMs, streamMs, flyMs, holdMs, mergeMs } =
-      CONFIG.hilbertCurveEvent;
+      meta.values;
     const left = area.left + MARGIN;
     const width = area.right - MARGIN - left;
     const bottom = area.bottom - MARGIN;

@@ -7,7 +7,7 @@
 // state, faster and faster; when it halts in a bang the tape holds 13 gold
 // marks, which fly off onto the empty spots in view, each landing as a new
 // worker, the last in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -100,9 +100,9 @@ function run(): { steps: Omit<Step, "ms">[]; cells: number } {
 export const forceBusyBeaverEvent = registerWispEvent(
   KEY,
   "Busy Beaver",
-  () => CONFIG.busyBeaverEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { bootMs, stepMs, flyMs, holdMs, mergeMs } = CONFIG.busyBeaverEvent;
+    const { bootMs, stepMs, flyMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const machine = run();

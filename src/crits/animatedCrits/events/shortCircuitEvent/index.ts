@@ -5,7 +5,7 @@
 // faster, every arc a blinding flash, a crack and a jolt that lands free
 // levels on the bar it hits; then every gap arcs at once in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,9 +30,9 @@ const ARC_SHAKE: [number, number] = [0.3, 1.1];
 export const forceShortCircuitEvent = registerWispEvent(
   KEY,
   "Short Circuit",
-  () => CONFIG.shortCircuitEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { arcsMs, holdMs, mergeMs } = CONFIG.shortCircuitEvent;
+    const { arcsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length < 2) return;
     const button = getButtonCenter(context.isGroundFloor);

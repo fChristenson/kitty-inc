@@ -5,7 +5,7 @@
 // it schusses out of the last turn and slams into the clicked floor's button
 // in a huge blast and shake, and the coins sweep into the total. Pays floor
 // income × floor number × REWARD (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -43,9 +43,9 @@ const SNOW_SPAN = 1.3;
 export const forceSlalomEvent = registerWispEvent(
   KEY,
   "Slalom",
-  () => CONFIG.slalomEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gateMs, holdMs, mergeMs } = CONFIG.slalomEvent;
+    const { gateMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const middleX = (area.left + area.right) / 2;

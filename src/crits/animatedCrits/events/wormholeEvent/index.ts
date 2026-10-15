@@ -6,7 +6,7 @@
 // total-income readout and it shoots up into it in a huge blast and shake,
 // and the coins sweep into the total. Pays floor income × floor number ×
 // REWARD (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -59,9 +59,9 @@ interface Jump {
 export const forceWormholeEvent = registerWispEvent(
   KEY,
   "Wormhole",
-  () => CONFIG.wormholeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { jumpMs, finalMs, holdMs, mergeMs } = CONFIG.wormholeEvent;
+    const { jumpMs, finalMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const size = Math.max(WISP_SIZE, width * WISP);

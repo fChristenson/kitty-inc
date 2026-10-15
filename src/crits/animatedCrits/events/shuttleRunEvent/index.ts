@@ -5,7 +5,7 @@
 // jolt as they climb a perma tier, and a sprint straight back to the line;
 // each shuttle further and faster, the last tag landing in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,9 +30,9 @@ const TAG_SHAKE: [number, number] = [0.5, 1.2];
 export const forceShuttleRunEvent = registerWispEvent(
   KEY,
   "Shuttle Run",
-  () => CONFIG.shuttleRunEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runsMs, holdMs, mergeMs } = CONFIG.shuttleRunEvent;
+    const { runsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const ltr = button.x < (area.left + area.right) / 2;
     const lineX = ltr ? area.left + EDGE : area.right - EDGE;

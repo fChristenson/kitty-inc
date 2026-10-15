@@ -7,7 +7,7 @@
 // a line over the clicked floor's bar, then down and up along it into one
 // heap, which settles with a jolt and drops onto the bar in a huge blast of
 // free levels. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -63,10 +63,10 @@ const GATHER_SHAKE = 0.8;
 export const forcePillowFightEvent = registerWispEvent(
   KEY,
   "Pillow Fight",
-  () => CONFIG.pillowFightEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { swingMs, flutterMs, dragMs, liftMs, levelShare, holdMs, mergeMs } =
-      CONFIG.pillowFightEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

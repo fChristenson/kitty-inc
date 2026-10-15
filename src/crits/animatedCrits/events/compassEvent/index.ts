@@ -5,7 +5,7 @@
 // worker in a flare, a crack and a jolt as they climb a perma tier, and the
 // compass hops to the next worker, swinging quicker each time, the last in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ interface Scribe {
 export const forceCompassEvent = registerWispEvent(
   KEY,
   "Compass",
-  () => CONFIG.compassEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { sweepsMs, holdMs, mergeMs } = CONFIG.compassEvent;
+    const { sweepsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     let clock = 0;

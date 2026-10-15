@@ -8,7 +8,7 @@
 // it dives for cover in the clicked floor's bar, but a colossal bolt
 // catches it there and the bar jumps a crit tier in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -56,9 +56,9 @@ type Target =
 export const forceStormChaserEvent = registerWispEvent(
   KEY,
   "Storm Chaser",
-  () => CONFIG.stormChaserEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, levelShare, holdMs, mergeMs } = CONFIG.stormChaserEvent;
+    const { runMs, levelShare, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

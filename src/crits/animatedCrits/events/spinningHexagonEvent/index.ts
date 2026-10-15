@@ -6,7 +6,7 @@
 // and faster and the ball rattling round ever wilder; then the walls burst
 // apart and the ball shoots off into the total in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -46,9 +46,9 @@ const BOUNCE_SHAKE: [number, number] = [0.2, 0.6];
 export const forceSpinningHexagonEvent = registerWispEvent(
   KEY,
   "Spinning Hexagon",
-  () => CONFIG.spinningHexagonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, holdMs, mergeMs } = CONFIG.spinningHexagonEvent;
+    const { spinMs, holdMs, mergeMs } = meta.values;
     const centre: Point = {
       x: (area.left + area.right) / 2,
       y: area.top + (area.bottom - area.top) * 0.45,

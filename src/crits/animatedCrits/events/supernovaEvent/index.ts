@@ -4,8 +4,8 @@
 // detonates: a blinding flash, a huge shake and a shockwave ring racing out
 // across the screen. Every climbable worker it sweeps over lights up and
 // climbs one perma tier. Then the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -83,7 +83,7 @@ let running: RunningNova | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.supernovaEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -102,13 +102,13 @@ export function forceSupernovaEvent(floor: Floor): void {
 }
 
 function blastMs(): number {
-  const { chargeMs, collapseMs } = CONFIG.supernovaEvent;
+  const { chargeMs, collapseMs } = meta.values;
   return chargeMs + collapseMs;
 }
 
 // the wisp's size ms in: swelling and pulsing ever faster, then collapsing
 function novaSize(ms: number): number {
-  const { chargeMs, collapseMs } = CONFIG.supernovaEvent;
+  const { chargeMs, collapseMs } = meta.values;
   if (ms >= blastMs()) return 0;
   const u = clamp01(ms / chargeMs);
   const sec = ms / 1000;
@@ -121,7 +121,7 @@ function novaSize(ms: number): number {
 
 // the shockwave's radius since the blast, or null once it's past the corners
 function ringRadius(nova: RunningNova, since: number): number | null {
-  const t = since / CONFIG.supernovaEvent.ringMs;
+  const t = since / meta.values.ringMs;
   if (t >= 1) return null;
   return nova.reach * (1 - (1 - t) ** 2);
 }
@@ -133,7 +133,7 @@ function drawInflow(
   ms: number,
   now: number,
 ): void {
-  const { chargeMs } = CONFIG.supernovaEvent;
+  const { chargeMs } = meta.values;
   const strength = clamp01(ms / chargeMs) * (ms < chargeMs ? 1 : 0);
   if (strength <= 0) return;
   for (let i = 0; i < INFLOW; i++) {
@@ -230,7 +230,7 @@ function drawOverlay(
     ms,
     now,
     novaSize(ms),
-    clamp01(ms / CONFIG.supernovaEvent.chargeMs),
+    clamp01(ms / meta.values.chargeMs),
   );
   if (since === null) return;
   drawExplosion(
@@ -271,7 +271,7 @@ function startNova(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   const workers = findClimbers(floor, context.getOnScreenFloors);
   if (running || isScreenFrozen() || !area || workers.length === 0) return;
-  const { chargeMs, ringMs, holdMs } = CONFIG.supernovaEvent;
+  const { chargeMs, ringMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const center = {
     x: (area.left + area.right) / 2,

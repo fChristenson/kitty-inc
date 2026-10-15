@@ -4,7 +4,7 @@
 // their own pace, ever further, cash dripping off the sagging edge with a
 // bloop and a jolt; then it snaps back up solid in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -30,9 +30,9 @@ const DRIP_SHAKE: [number, number] = [0.5, 1.2];
 export const forceMeltEvent = registerWispEvent(
   KEY,
   "Melt",
-  () => CONFIG.meltEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { meltMs, drips, holdMs, mergeMs } = CONFIG.meltEvent;
+    const { meltMs, drips, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

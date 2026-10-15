@@ -5,7 +5,7 @@
 // curl round eddies and braid together, every gust a whoosh and a jolt;
 // then the whole field bends toward the total and every stream pours into
 // it in a huge blast. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
@@ -33,10 +33,10 @@ const GUST_SHAKE: [number, number] = [0.3, 0.7];
 export const forceFlowFieldEvent = registerWispEvent(
   KEY,
   "Flow Field",
-  () => CONFIG.flowFieldEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { scatterMs, flowMs, pourMs, holdMs, mergeMs } =
-      CONFIG.flowFieldEvent;
+      meta.values;
     const target = totalSpot(area);
     const box = {
       left: area.left + MARGIN,

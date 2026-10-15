@@ -5,7 +5,7 @@
 // glowing tree of beams; its last branches lash out onto the income bars,
 // each striking its bar with a jolt of free levels, the last in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,10 +42,10 @@ interface Branch {
 export const forceFractalTreeEvent = registerWispEvent(
   KEY,
   "Fractal Tree",
-  () => CONFIG.fractalTreeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growsMs, lashMs, levelShare, holdMs, mergeMs } =
-      CONFIG.fractalTreeEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

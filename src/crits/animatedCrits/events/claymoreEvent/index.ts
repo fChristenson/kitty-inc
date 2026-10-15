@@ -6,7 +6,7 @@
 // quicker each time; then every bomb goes off again at once with one
 // colossal blast in the middle and the hardest shake of all. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -64,10 +64,10 @@ interface Blast {
 export const forceClaymoreEvent = registerWispEvent(
   KEY,
   "Claymore",
-  () => CONFIG.claymoreEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fuseMs, chainMs, levelShare, holdMs, mergeMs } =
-      CONFIG.claymoreEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     // bottom up

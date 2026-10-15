@@ -4,8 +4,8 @@
 // corkscrews, rings and trails and are picked up as they fly past, each paying
 // into the live total, until the view crash-lands back on the floors and the
 // crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playCoinDrop } from "../../../../sound";
 import { multiply } from "../../../../shared/bigNumber";
@@ -73,7 +73,7 @@ interface Coin {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.lightspeedEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startLightspeed,
@@ -123,7 +123,7 @@ function planCoins(approachMs: number): Coin[] {
 }
 
 function startLightspeed(floor: Floor, context: EventProcContext): void {
-  const { flyMs, coinApproachMs, payoutsPerCoin } = CONFIG.lightspeedEvent;
+  const { flyMs, coinApproachMs, payoutsPerCoin } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const coins = planCoins(coinApproachMs);
   let picked = 0;

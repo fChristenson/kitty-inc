@@ -6,7 +6,7 @@
 // bumps into it and the floor bursts open in a huge blast and shake,
 // unlocked for free as the screen unfreezes. Pays floor income × floor
 // number × REWARD, plus the floor
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -45,9 +45,9 @@ const BLAST_SHAKE: [number, number] = [0.4, 1];
 export const forceHotAirBalloonEvent = registerWispEvent(
   KEY,
   "Hot Air Balloon",
-  () => CONFIG.hotAirBalloonEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { blastsMs, liftMs, holdMs, mergeMs } = CONFIG.hotAirBalloonEvent;
+    const { blastsMs, liftMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

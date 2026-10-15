@@ -5,7 +5,7 @@
 // a bang and a big jolt, and the bar jumps a crit tier; they sweep on to
 // cross on the next bar, ever faster, the last crossing burning out in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -27,9 +27,9 @@ const HIT_SHAKE: [number, number] = [0.9, 1.5];
 export const forceCrossCutEvent = registerWispEvent(
   KEY,
   "Cross-Cut",
-  () => CONFIG.crossCutEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { sweepsMs, holdMs, mergeMs } = CONFIG.crossCutEvent;
+    const { sweepsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

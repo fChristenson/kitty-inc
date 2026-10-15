@@ -6,7 +6,7 @@
 // and converge on the total-income readout, each diving in with a flash and
 // the last in a huge blast and shake, and the coins sweep into the total.
 // Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ const DIVE_SHAKE = 1.2;
 export const forceBranchesEvent = registerWispEvent(
   KEY,
   "Branches",
-  () => CONFIG.branchesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.branchesEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);

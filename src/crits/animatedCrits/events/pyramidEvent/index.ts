@@ -6,7 +6,7 @@
 // a high arc onto an empty spot, landing with a bang and a jolt as a new
 // worker forms there; the last landing in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,10 +39,10 @@ const LAND_SHAKE: [number, number] = [0.6, 1.3];
 export const forcePyramidEvent = registerWispEvent(
   KEY,
   "Pyramid",
-  () => CONFIG.pyramidEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { climbMs, vaultMs, teeterMs, flingGapMs, flingMs, holdMs, mergeMs } =
-      CONFIG.pyramidEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

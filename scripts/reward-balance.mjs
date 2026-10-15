@@ -215,17 +215,18 @@ async function main() {
       };
     });
 
-    // ---------- legacy procs: hand-modelled from src/crits/floorCrits/balance ----------
+    // ---------- legacy procs: hand-modelled from src/crits/floorCrits/procs ----------
     const badgeKinds = new Set(Object.keys(crit.BADGE_CRITS));
     const legacy = crit.CRIT_PROC_KINDS.filter((k) => !badgeKinds.has(k)).map(
       (kind) => {
         const model = LEGACY[kind];
+        const v = crit.PROC_METAS[kind].values ?? {};
         return {
           source: "legacy",
           kind,
-          label: crit.CRIT_PROC_INFO[kind]?.label ?? kind,
-          chance: c[`${kind}Chance`] ?? 0,
-          effects: model ? model({ tierLevels, c }) : [],
+          label: crit.PROC_METAS[kind].label,
+          chance: crit.getCritProcChance(kind),
+          effects: model ? model({ tierLevels, c, v }) : [],
           modelled: !!model,
         };
       },
@@ -448,8 +449,8 @@ function badgeEffects(source, c, tierLevels) {
   return out.filter((e) => Number.isFinite(e.perm) && Number.isFinite(e.once));
 }
 
-// ---------- legacy procs (from the comments in src/crits/floorCrits/balance) ----------
-// ~ marks a guess where the balance file doesn't give the size
+// ---------- legacy procs (from their src/crits/floorCrits/procs/<kind>/meta.ts) ----------
+// ~ marks a guess where the meta doesn't give the size
 const LEGACY = {
   // payouts
   booty: () => [bank(1)],
@@ -466,7 +467,7 @@ const LEGACY = {
   overflow: () => [payouts(5, 1)],
   performanceBonus: () => [payouts(W + S.managers, F)],
   goldenParachute: () => [cash(15)],
-  rainCheck: ({ c }) => [cash(c.rainCheckSeconds ?? 5)],
+  rainCheck: ({ v }) => [cash(v.seconds)],
   executiveBonus: () => [assets(0.25)],
   payout: () => [bank(1), assets(1)],
   shareholders: () => [cash(10)], // ~
@@ -489,7 +490,7 @@ const LEGACY = {
   sunshine: () => [boost(30, F)],
   snowday: () => [boost(45, F)],
   nightShift: () => [boost(10, F, 1)],
-  rushHour: ({ c }) => [rushHour((c.rushHourDurationMs ?? 15000) / 1000)],
+  rushHour: ({ v }) => [rushHour(v.durationMs / 1000)],
   rateLock: () => [fx("boost", 10, 0, 10 / F)],
   espressoShot: () => [boost(15, F)],
   coffeeRun: () => [boost(60, F)],
@@ -509,12 +510,12 @@ const LEGACY = {
   grandOpening: () => [unlock(S.maxFloors)],
   firstClass: () => [unlock(1)], // ~
   // sales
-  winterSale: ({ c }) => [discount(c.seasonalSaleDiscount ?? 0.25)],
-  springSale: ({ c }) => [discount(c.seasonalSaleDiscount ?? 0.25)],
-  summerSale: ({ c }) => [discount(c.seasonalSaleDiscount ?? 0.25)],
-  autumnSale: ({ c }) => [discount(c.seasonalSaleDiscount ?? 0.25)],
-  halloweenSale: ({ c }) => [discount(c.halloweenSaleDiscount ?? 0.5)],
-  easterSale: ({ c }) => [discount(c.easterSaleDiscount ?? 0.5)],
+  winterSale: ({ v }) => [discount(v.discount)],
+  springSale: ({ v }) => [discount(v.discount)],
+  summerSale: ({ v }) => [discount(v.discount)],
+  autumnSale: ({ v }) => [discount(v.discount)],
+  halloweenSale: ({ v }) => [discount(v.discount)],
+  easterSale: ({ v }) => [discount(v.discount)],
   frozen: () => [priceLock(5)],
   spendingFreeze: () => [priceLock(5 * F)],
   priceMatch: () => [priceLock(5)],

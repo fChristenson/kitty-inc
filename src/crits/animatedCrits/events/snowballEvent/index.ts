@@ -6,7 +6,7 @@
 // bar, each landing a bang, a jolt and free levels; it rolls onto the
 // clicked floor's bar and smashes into it so hard the bar jumps a crit tier
 // in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,10 +46,10 @@ interface Leg {
 export const forceSnowballEvent = registerWispEvent(
   KEY,
   "Snowball",
-  () => CONFIG.snowballEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { rollsMs, dropMs, levelShare, holdMs, mergeMs } =
-      CONFIG.snowballEvent;
+      meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

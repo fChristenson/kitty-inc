@@ -5,8 +5,8 @@
 // total explodes in a flash, a bang and a big shake, and coins burst out of
 // it, which then merge back into the total. Pays floor income × floor number
 // × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop, playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -56,7 +56,7 @@ const COIN_SIDE = 420;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.slamDunkEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) &&
@@ -66,7 +66,7 @@ registerEventProc(
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { bounceMs, riseMs, dunkMs, holdMs, mergeMs } =
-        CONFIG.slamDunkEvent;
+        meta.values;
       const floorY = WORKER_FEET_Y - BALL_R;
       const startX = area.left - OUT;
       // each bounce's length, and when the ball touches down after it

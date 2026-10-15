@@ -7,7 +7,6 @@
 // crash-lands back onto them in a blinding blast, the screen unfreezes and the
 // event pays out. The event only draws what it flies past and times its beats
 import type { Floor } from "../../../gameState";
-import { CONFIG } from "../../../config";
 import { COLOR } from "../../../palette";
 import { playSwoosh, startBoostEventStreamLoop } from "../../../sound";
 import { drawBeam } from "../../../shared/animationStyles/beam";
@@ -31,6 +30,13 @@ import {
 import type { Point } from "../../../shared/wisp";
 import type { EventProcContext } from "../eventProcs";
 import { drawStageBackdrop } from "../revealStage/backdrop";
+
+export const FLIGHT_STAGE = {
+  windUpMs: 250, // the frozen floors rumbling before the dive
+  diveMs: 350, // the floors zooming away as the stage's blue takes over
+  arriveMs: 650, // the floors rushing up out of the distance until the crash
+  holdMs: 350, // the crash's flash and blast before the screen unfreezes
+} as const;
 
 // the screen in the game canvas's world space, and its middle
 export interface FlightView {
@@ -138,7 +144,7 @@ export function canStartFlightStage(context: EventProcContext): boolean {
 // the way in, before the flight's ms 0: an entrance after the frozen floors'
 // rumble on the dark overlay, or the wind-up and dive
 function enterMs(content: FlightContent): number {
-  const { windUpMs, diveMs } = CONFIG.flightStage;
+  const { windUpMs, diveMs } = FLIGHT_STAGE;
   return windUpMs + (content.enter?.ms ?? diveMs);
 }
 
@@ -166,7 +172,7 @@ export function project(
 
 // how fast the view's flying, 0..ARRIVE_WARP; ms from the stage starting
 function warpAt(ms: number, content: FlightContent): number {
-  const { windUpMs, diveMs: dive, arriveMs } = CONFIG.flightStage;
+  const { windUpMs, diveMs: dive, arriveMs } = FLIGHT_STAGE;
   const flyAt = enterMs(content);
   const arriveAt = flyAt + content.flyMs;
   if (ms >= arriveAt + arriveMs) return 0;
@@ -180,7 +186,7 @@ function warpAt(ms: number, content: FlightContent): number {
 // the frozen floors rumbling, then zooming and blurring as the view dives in;
 // before an entrance they only rumble, which draws the floors itself after
 function frameMotion(ms: number, entrance: boolean): FrameMotion {
-  const { windUpMs, diveMs: dive } = CONFIG.flightStage;
+  const { windUpMs, diveMs: dive } = FLIGHT_STAGE;
   if (ms < windUpMs) {
     const p = smoothstep(clamp01(ms / windUpMs));
     const zoom = entrance ? 0 : WIND_ZOOM;
@@ -260,7 +266,7 @@ function drawOverlay(
   stage.shot ??= copyScreen(ctx);
   const now = performance.now();
   const ms = now - stage.startedAt;
-  const { windUpMs, diveMs: dive, arriveMs } = CONFIG.flightStage;
+  const { windUpMs, diveMs: dive, arriveMs } = FLIGHT_STAGE;
   const { content } = stage;
   const flyAt = enterMs(content);
   const arriveAt = flyAt + content.flyMs;
@@ -374,7 +380,7 @@ export function startFlightStage(
       },
       enterMs(content) + ms,
     );
-  const { windUpMs, arriveMs, holdMs } = CONFIG.flightStage;
+  const { windUpMs, arriveMs, holdMs } = FLIGHT_STAGE;
   let stopSound: (() => void) | null = null;
   if (content.enter) beat(0, () => (stopSound = startBoostEventStreamLoop()));
   else

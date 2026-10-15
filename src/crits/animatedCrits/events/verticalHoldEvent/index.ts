@@ -6,7 +6,7 @@
 // with a jolt every time it rolls past; then the picture locks back in place
 // with a thunk in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,10 +48,10 @@ const LOCK_SHAKE = 2.3;
 export const forceVerticalHoldEvent = registerWispEvent(
   KEY,
   "Vertical Hold",
-  () => CONFIG.verticalHoldEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { slipMs, rollsMs, lockMs, holdMs, mergeMs } =
-      CONFIG.verticalHoldEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

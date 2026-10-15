@@ -7,7 +7,7 @@
 // sprays cash everywhere, the bars sliding away, and the coins sweep into
 // the total-income readout. Pays floor income × floor number × REWARD (see
 // ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -44,10 +44,10 @@ const FINAL_REACH: [number, number] = [0.08, 0.6];
 export const forceCinematicEvent = registerWispEvent(
   KEY,
   "Cinematic",
-  () => CONFIG.cinematicEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { barsMs, punchGapsMs, punchMs, holdMs, mergeMs } =
-      CONFIG.cinematicEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const span = Math.min(width, height);

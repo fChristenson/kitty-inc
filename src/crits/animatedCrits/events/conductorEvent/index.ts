@@ -6,7 +6,7 @@
 // crack and a big jolt, and the bar jumps a crit tier; the tempo quickens
 // bar by bar, the last downbeat a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const HIT_SHAKE: [number, number] = [0.8, 1.5];
 export const forceConductorEvent = registerWispEvent(
   KEY,
   "Conductor",
-  () => CONFIG.conductorEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { barsMs, holdMs, mergeMs } = CONFIG.conductorEvent;
+    const { barsMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

@@ -5,7 +5,7 @@
 // "1!", "2!", "3!" …, the kicks ever higher and quicker, until "10!" and a
 // mighty volley blasts the ball up to the top of the screen in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -43,9 +43,9 @@ const TOUCH_SHAKE: [number, number] = [0.3, 0.9];
 export const forceKeepyUppyEvent = registerWispEvent(
   KEY,
   "Keepy Uppy",
-  () => CONFIG.keepyUppyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { touchesMs, holdMs, mergeMs } = CONFIG.keepyUppyEvent;
+    const { touchesMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const foot: Point = {
       x: (area.left + area.right) / 2,

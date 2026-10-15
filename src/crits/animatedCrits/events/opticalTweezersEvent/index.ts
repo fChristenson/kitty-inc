@@ -6,7 +6,7 @@
 // air onto a worker and presses it in, the worker climbing a perma tier;
 // then back for the next, ever faster; on the last worker all three beams
 // blaze wide in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -56,9 +56,9 @@ interface Leg {
 export const forceOpticalTweezersEvent = registerWispEvent(
   KEY,
   "Optical Tweezers",
-  () => CONFIG.opticalTweezersEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { growMs, carryMs, holdMs, mergeMs } = CONFIG.opticalTweezersEvent;
+    const { growMs, carryMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_BEADS)
       .sort((a, b) => a.at.x - b.at.x);

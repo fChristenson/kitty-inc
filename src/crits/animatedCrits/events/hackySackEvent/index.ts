@@ -5,7 +5,7 @@
 // last player smashes it straight down onto the worker, who lights up a
 // perma tier with a jolt, then the circle moves on to the next worker, the
 // last smash landing in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -56,9 +56,9 @@ interface Circle {
 export const forceHackySackEvent = registerWispEvent(
   KEY,
   "Hacky Sack",
-  () => CONFIG.hackySackEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { kicksMs, holdMs, mergeMs } = CONFIG.hackySackEvent;
+    const { kicksMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     let from: Point = getButtonCenter(context.isGroundFloor);

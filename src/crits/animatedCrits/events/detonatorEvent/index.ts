@@ -7,7 +7,7 @@
 // crit tier; then the plunger slams again and every charge goes off at once
 // with one colossal blast and the hardest shake of all. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -67,9 +67,9 @@ interface Blast {
 export const forceDetonatorEvent = registerWispEvent(
   KEY,
   "Detonator",
-  () => CONFIG.detonatorEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { plungeMs, againMs, holdMs, mergeMs } = CONFIG.detonatorEvent;
+    const { plungeMs, againMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const plunger: Point = {

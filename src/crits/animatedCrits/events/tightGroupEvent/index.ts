@@ -6,7 +6,7 @@
 // flare, a bang and a jolt, and the gun swings to the next bar, grouping
 // quicker each time, the last in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,10 +49,10 @@ interface Group {
 export const forceTightGroupEvent = registerWispEvent(
   KEY,
   "Tight Group",
-  () => CONFIG.tightGroupEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { firstMs, shotGapMs, groupsMs, holdMs, mergeMs } =
-      CONFIG.tightGroupEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock: number = firstMs;

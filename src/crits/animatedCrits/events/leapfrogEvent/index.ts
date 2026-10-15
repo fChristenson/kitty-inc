@@ -6,7 +6,7 @@
 // the total-income readout and explode in a huge blast and shake, and the
 // coins sweep into the total. Pays floor income × floor number × REWARD (see
 // ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const KICK_SPAN = 1.3;
 export const forceLeapfrogEvent = registerWispEvent(
   KEY,
   "Leapfrog",
-  () => CONFIG.leapfrogEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { vaultMs, finalMs, holdMs, mergeMs } = CONFIG.leapfrogEvent;
+    const { vaultMs, finalMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const size = Math.max(WISP_SIZE, width * WISP);

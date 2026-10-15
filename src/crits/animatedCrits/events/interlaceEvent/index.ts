@@ -6,7 +6,7 @@
 // gaps and cash gushing out of the screen's ragged edges with each; then
 // every line snaps back into place at once in a huge blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -54,9 +54,9 @@ const SNAP_SHAKE = 2.3;
 export const forceInterlaceEvent = registerWispEvent(
   KEY,
   "Interlace",
-  () => CONFIG.interlaceEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { joltsMs, tornMs, holdMs, mergeMs } = CONFIG.interlaceEvent;
+    const { joltsMs, tornMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

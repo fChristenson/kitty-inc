@@ -6,7 +6,7 @@
 // jolt and free levels piling up; the volleys come ever faster until the
 // whole line fires at once in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,9 +45,9 @@ const VOLLEY_SHAKE: [number, number] = [0.4, 1.1];
 export const forceHailfireEvent = registerWispEvent(
   KEY,
   "Hailfire",
-  () => CONFIG.hailfireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spreadMs, volleysMs, holdMs, mergeMs } = CONFIG.hailfireEvent;
+    const { spreadMs, volleysMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -6,4 +6,8 @@ export default {
   label: "Sweep Clean",
   chance: 0.03,
   style: "clutter",
+  values: {
+    // the next locked floor's price, times this
+    price: 0.5,
+  },
 } satisfies CritMeta;

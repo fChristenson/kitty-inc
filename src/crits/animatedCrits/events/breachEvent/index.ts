@@ -5,7 +5,7 @@
 // sparks spraying, every quarter a bang and a jolt, faster and faster; they
 // meet at its foot in a huge blast and shake, and as the screen unfreezes
 // the floor breaks open: unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -29,9 +29,9 @@ const QUARTER_SHAKE: [number, number] = [0.8, 1.5];
 export const forceBreachEvent = registerWispEvent(
   KEY,
   "Breach",
-  () => CONFIG.breachEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { aimMs, cutMs, holdMs, mergeMs } = CONFIG.breachEvent;
+    const { aimMs, cutMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

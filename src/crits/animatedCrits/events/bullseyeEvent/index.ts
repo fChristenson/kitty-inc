@@ -5,8 +5,8 @@
 // and a jolt, spraying coins. The last, biggest target dead center blows in a
 // huge blast and shake, and the coins sweep into the total. Pays floor income
 // × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import {
@@ -125,14 +125,14 @@ function popScale(u: number): number {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.bullseyeEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { popMs, aimMs, travelMs, gapMs, holdMs, mergeMs } =
-        CONFIG.bullseyeEvent;
+        meta.values;
       const button = getButtonCenter(context.isGroundFloor);
       const center = {
         x: (area.left + area.right) / 2,

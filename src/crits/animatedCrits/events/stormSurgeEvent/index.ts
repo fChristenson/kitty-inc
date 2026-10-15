@@ -5,7 +5,7 @@
 // flash, a bang and a big jolt that blasts a geyser of coins up out of the
 // river; the river swings up into the total, which goes off in a huge blast
 // and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const STRIKE_SHAKE: [number, number] = [0.9, 1.9];
 export const forceStormSurgeEvent = registerWispEvent(
   KEY,
   "Storm Surge",
-  () => CONFIG.stormSurgeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.stormSurgeEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const width = area.right - area.left;
     const height = area.bottom - area.top;

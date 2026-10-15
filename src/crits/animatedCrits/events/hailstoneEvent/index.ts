@@ -7,7 +7,7 @@
 // a glimmer left behind, tracing the sequence's jagged chart, quicker and
 // quicker, its peak a bang; when the number falls to 1 it slams onto the
 // bar for free levels in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,9 +55,9 @@ function collatz(n: number): number[] {
 export const forceHailstoneEvent = registerWispEvent(
   KEY,
   "Hailstone",
-  () => CONFIG.hailstoneEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { stepMs, levelShare, holdMs, mergeMs } = CONFIG.hailstoneEvent;
+    const { stepMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

@@ -6,7 +6,7 @@
 // rocket faster; the warhead slams into the lock in a colossal blast and
 // shake and the floor bursts open, unlocked for free, as the screen
 // unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const STAGE_SHAKE: [number, number] = [1, 1.8];
 export const forceMultistageEvent = registerWispEvent(
   KEY,
   "Multistage",
-  () => CONFIG.multistageEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flightMs, holdMs, mergeMs } = CONFIG.multistageEvent;
+    const { flightMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

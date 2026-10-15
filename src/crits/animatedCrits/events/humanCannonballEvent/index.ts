@@ -6,7 +6,7 @@
 // shoots through, and smashes into the building's locked floor in a huge
 // blast and shake, and the floor bursts open, unlocked for free, as the
 // screen unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const BOOM_SHAKE = 1.3;
 export const forceHumanCannonballEvent = registerWispEvent(
   KEY,
   "Human Cannonball",
-  () => CONFIG.humanCannonballEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { fuseMs, flightMs, holdMs, mergeMs } = CONFIG.humanCannonballEvent;
+    const { fuseMs, flightMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -6,7 +6,7 @@
 // climbs a perma tier; the gun circles the next worker, quicker each time,
 // and the last cage closes in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -57,9 +57,9 @@ interface Cage {
 export const forceBulletCageEvent = registerWispEvent(
   KEY,
   "Bullet Cage",
-  () => CONFIG.bulletCageEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { cagesMs, holdMs, mergeMs } = CONFIG.bulletCageEvent;
+    const { cagesMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

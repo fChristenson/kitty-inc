@@ -6,7 +6,7 @@
 // back along over it, then dive down onto it: the leader slams in with a
 // big blast, the chaser with a huge one, and the lock bursts open, the
 // floor unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ const FIRST_SHAKE = 1.8;
 export const forcePolePositionEvent = registerWispEvent(
   KEY,
   "Pole Position",
-  () => CONFIG.polePositionEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { raceMs, gapMs, holdMs, mergeMs } = CONFIG.polePositionEvent;
+    const { raceMs, gapMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const width = area.right - area.left;

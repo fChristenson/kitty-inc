@@ -5,7 +5,7 @@
 // the star closes it flashes white and the worker lights up a perma tier
 // with a jolt, then the next worker gets its star, quicker each time, the
 // last closing in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ interface Star {
 export const forceStarPolygonEvent = registerWispEvent(
   KEY,
   "Star Polygon",
-  () => CONFIG.starPolygonEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { edgesMs, overlap, holdMs, mergeMs } = CONFIG.starPolygonEvent;
+    const { edgesMs, overlap, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     let clock = 0;

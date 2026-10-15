@@ -5,7 +5,7 @@
 // and the sheet snaps back up past flat, flinging a geyser of cash into the
 // total in a huge blast and shake, then wobbles to rest. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -54,10 +54,10 @@ const FLING_SHAKE = 2.4;
 export const forceRubberSheetEvent = registerWispEvent(
   KEY,
   "Rubber Sheet",
-  () => CONFIG.rubberSheetEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { diveMs, pullMs, holdTautMs, settleMs, holdMs, mergeMs } =
-      CONFIG.rubberSheetEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

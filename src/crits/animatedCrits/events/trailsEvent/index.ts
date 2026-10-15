@@ -1,8 +1,8 @@
 // the "Trails" event: like Stream, but its crit's click sends many short
 // coin streams off from the button in every direction, one after another,
 // each winding its own short way into the total (see ../riverPaths)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { randomInt } from "../../../../utils";
 import { playBoostEventStream } from "../../../../sound";
@@ -30,11 +30,11 @@ const TRAIL: RiverOptions = {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.trailsEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const { spreadMs, pourMs, travelMs } = CONFIG.trailsEvent;
+      const { spreadMs, pourMs, travelMs } = meta.values;
       const durationMs =
         spreadMs + pourMs + travelMs * 1.03 + FLOW_FLIGHT_MS + END_PAUSE_MS;
       const cover = startMoneyCover(KEY, floor, context, { durationMs }, {});

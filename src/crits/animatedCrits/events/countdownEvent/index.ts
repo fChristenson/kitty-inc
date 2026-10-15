@@ -5,7 +5,7 @@
 // huge blast and shake and a geyser of cash roars up out of it into the
 // total-income readout, and the coins sweep into the total. Pays floor
 // income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -54,10 +54,10 @@ const SLAM_SHAKE: [number, number] = [1.4, 2.4];
 export const forceCountdownEvent = registerWispEvent(
   KEY,
   "Countdown",
-  () => CONFIG.countdownEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { beatMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.countdownEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const total = totalSpot(area);

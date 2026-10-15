@@ -5,7 +5,7 @@
 // erupts behind it in a rolling wall of white blasts, each a bang, a jolt
 // and a spray of coins; the spark reaches the start and it all goes up in a
 // huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const BLAST_SHAKE: [number, number] = [0.3, 1.2];
 export const forceDetcordEvent = registerWispEvent(
   KEY,
   "Detcord",
-  () => CONFIG.detcordEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { layMs, burnMs, holdMs, mergeMs } = CONFIG.detcordEvent;
+    const { layMs, burnMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const mid = (area.top + area.bottom) / 2 + 60;
     const ltr = button.x < (area.left + area.right) / 2;

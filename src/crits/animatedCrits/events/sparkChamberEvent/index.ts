@@ -7,7 +7,7 @@
 // streaks through the other way, faster, then a third, faster still, the
 // last spark slamming into the clicked bar in a huge blast. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,10 +52,10 @@ interface Spark {
 export const forceSparkChamberEvent = registerWispEvent(
   KEY,
   "Spark Chamber",
-  () => CONFIG.sparkChamberEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { trackMs, gapMs, levelShare, holdMs, mergeMs } =
-      CONFIG.sparkChamberEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

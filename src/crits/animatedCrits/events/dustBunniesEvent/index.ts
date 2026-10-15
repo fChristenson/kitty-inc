@@ -7,7 +7,7 @@
 // view, every stroke a swoosh and a jolt; each bunny then hops up onto its
 // worker in a flash, lighting up a perma tier, the last in a huge blast.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,10 +49,10 @@ const HOP_SHAKE = 0.9;
 export const forceDustBunniesEvent = registerWispEvent(
   KEY,
   "Dust Bunnies",
-  () => CONFIG.dustBunniesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { blowMs, dragMs, liftMs, gatherMs, hopMs, holdMs, mergeMs } =
-      CONFIG.dustBunniesEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

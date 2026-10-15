@@ -4,7 +4,7 @@
 // after another in a flash, a pop and a jolt, a new worker hatching out of
 // each, quicker every time, the last in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -53,10 +53,10 @@ interface Egg {
 export const forceHatchlingsEvent = registerWispEvent(
   KEY,
   "Hatchlings",
-  () => CONFIG.hatchlingsEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { dropGapMs, rockMs, hatchesMs, holdMs, mergeMs } =
-      CONFIG.hatchlingsEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const eggs: Egg[] = hires.map((hire, k) => {

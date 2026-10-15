@@ -4,7 +4,7 @@
 // and screw down onto a worker with a bang and a jolt as it climbs a perma
 // tier; the next gyre drops onto the next worker, faster each time, the
 // last landing in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,9 +30,9 @@ const LAND_SHAKE: [number, number] = [0.6, 1.3];
 export const forceGyreEvent = registerWispEvent(
   KEY,
   "Gyre",
-  () => CONFIG.gyreEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dropsMs, overlap, holdMs, mergeMs } = CONFIG.gyreEvent;
+    const { dropsMs, overlap, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

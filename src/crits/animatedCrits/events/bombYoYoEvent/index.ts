@@ -6,7 +6,7 @@
 // its fuse sparking alight again, and flings it at the next bar, faster
 // each time, the last throw blowing in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ interface Throw {
 export const forceBombYoYoEvent = registerWispEvent(
   KEY,
   "Bomb Yo-Yo",
-  () => CONFIG.bombYoYoEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { throwsMs, holdMs, mergeMs } = CONFIG.bombYoYoEvent;
+    const { throwsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const hand: Point = { x: bars[0].center.x, y: area.top + HAND_Y };

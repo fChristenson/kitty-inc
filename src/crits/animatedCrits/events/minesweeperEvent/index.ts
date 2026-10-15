@@ -7,7 +7,7 @@
 // another in a chain of big blasts, each its own bang and shake and a spray
 // of coins, until "CLEARED!" and the coins slam into the total in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -81,9 +81,9 @@ interface Blast {
 export const forceMinesweeperEvent = registerWispEvent(
   KEY,
   "Minesweeper",
-  () => CONFIG.minesweeperEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { waveMs, chainMs, holdMs, mergeMs } = CONFIG.minesweeperEvent;
+    const { waveMs, chainMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;
     const size = width / COLS;

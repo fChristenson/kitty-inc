@@ -5,7 +5,7 @@
 // big fluffy cloud of cash that swells with every puff, each a whoosh and a
 // jolt, ever faster; then the whole fluffy cloud is whisked up into the
 // total in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -45,10 +45,10 @@ const PUFF_SHAKE: [number, number] = [0.4, 1.2];
 export const forceCandyFlossEvent = registerWispEvent(
   KEY,
   "Candy Floss",
-  () => CONFIG.candyFlossEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, spinMs, flightMs, holdMs, mergeMs } =
-      CONFIG.candyFlossEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const hub: Point = {

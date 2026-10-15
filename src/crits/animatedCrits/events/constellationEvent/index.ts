@@ -3,8 +3,8 @@
 // glowing lines linking them into a star pattern. Once it closes, each linked
 // worker flares in turn, plays its boost and climbs one perma tier; then the
 // screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { pickAtMost, pickCritTierByOdds } from "../../../critTypes";
@@ -101,7 +101,7 @@ function starPath(points: { x: number; y: number }[]): number[] {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.constellationEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -138,7 +138,7 @@ function drawOverlay(
 ): void {
   const event = running;
   if (!event) return;
-  const { appearMs, linkMs } = CONFIG.constellationEvent;
+  const { appearMs, linkMs } = meta.values;
   const now = performance.now();
   const elapsed = now - event.startedAt;
   const drawStar = (
@@ -257,7 +257,7 @@ function startConstellation(floor: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen()) return;
   const found = findCandidates(floor, context);
   if (found.length < 3) return;
-  const { appearMs, linkMs, flareGapMs, maxStars } = CONFIG.constellationEvent;
+  const { appearMs, linkMs, flareGapMs, maxStars } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const workers = pickAtMost(found, maxStars);
   const stars: Star[] = workers.map((worker) => ({ worker, flaredAt: null }));

@@ -6,7 +6,7 @@
 // crease; then it all springs open in a white flash and a huge blast that
 // sprays cash everywhere, and the coins sweep into the total. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -32,9 +32,9 @@ const FOLD_SHAKE = [1.3, 1.8];
 export const forceFoldEvent = registerWispEvent(
   KEY,
   "Fold",
-  () => CONFIG.foldEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { foldMs, gapMs, holdOpenMs, holdMs, mergeMs } = CONFIG.foldEvent;
+    const { foldMs, gapMs, holdOpenMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

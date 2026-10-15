@@ -6,7 +6,7 @@
 // another, each landing in a flash and a jolt that jumps its bar a crit
 // tier, the last in a huge blast and shake. Pays floor income × floor number
 // × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceCottonCandyEvent = registerWispEvent(
   KEY,
   "Cotton Candy",
-  () => CONFIG.cottonCandyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, puffsMs, flyMs, holdMs, mergeMs } = CONFIG.cottonCandyEvent;
+    const { spinMs, puffsMs, flyMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -6,7 +6,7 @@
 // rattling chain from one end of the row to the other, every blast a bang
 // and a jolt that lights its worker up a perma tier; the last goes off in
 // a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,10 +39,10 @@ const BOOM_SHAKE: [number, number] = [0.7, 1.4];
 export const forceStickyBombsEvent = registerWispEvent(
   KEY,
   "Sticky Bombs",
-  () => CONFIG.stickyBombsEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { flickMs, flyMs, fuseMs, chainMs, holdMs, mergeMs } =
-      CONFIG.stickyBombsEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

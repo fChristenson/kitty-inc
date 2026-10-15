@@ -4,7 +4,7 @@
 // middle into two towering walls of cash, which stand trembling as the
 // screen rumbles, then crash back together in a huge blast and spout a
 // geyser of cash up into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,7 +51,7 @@ const CRASH_SHAKE = 2.1;
 export const forcePartingEvent = registerWispEvent(
   KEY,
   "Parting",
-  () => CONFIG.partingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       floodMs,
@@ -62,7 +62,7 @@ export const forcePartingEvent = registerWispEvent(
       leapMs,
       holdMs,
       mergeMs,
-    } = CONFIG.partingEvent;
+    } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const mid = (area.left + area.right) / 2;

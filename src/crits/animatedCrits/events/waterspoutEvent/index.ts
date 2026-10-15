@@ -5,7 +5,7 @@
 // narrowing as it climbs; it bores into the building's locked floor in a
 // huge blast and shake, and the floor bursts open, unlocked for free, as
 // the screen unfreezes. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -33,9 +33,9 @@ const FLOOR_SHAKE: [number, number] = [0.4, 1.2];
 export const forceWaterspoutEvent = registerWispEvent(
   KEY,
   "Waterspout",
-  () => CONFIG.waterspoutEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { climbMs, holdMs, mergeMs } = CONFIG.waterspoutEvent;
+    const { climbMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

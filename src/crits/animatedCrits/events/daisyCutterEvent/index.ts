@@ -5,7 +5,7 @@
 // blasts, and every bar it sweeps through erupts in a chain of blasts along
 // its length, each a bang and a hard jolt, landing free levels; the last
 // ring slams every bar. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,10 +44,10 @@ interface Blast {
 export const forceDaisyCutterEvent = registerWispEvent(
   KEY,
   "Daisy Cutter",
-  () => CONFIG.daisyCutterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { dropMs, waveMs, levelShare, holdMs, mergeMs } =
-      CONFIG.daisyCutterEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const ground: Point = {

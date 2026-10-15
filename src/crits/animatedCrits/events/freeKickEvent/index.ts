@@ -7,7 +7,7 @@
 // readout like the top corner of a goal, in a huge blast and shake, and the
 // coins sweep into the total. Pays floor income × floor number × REWARD (see
 // ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const BLOCK_SPAN = 2;
 export const forceFreeKickEvent = registerWispEvent(
   KEY,
   "Free Kick",
-  () => CONFIG.freeKickEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { kickMs, reboundMs, curlMs, holdMs, mergeMs } = CONFIG.freeKickEvent;
+    const { kickMs, reboundMs, curlMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const middleX = (area.left + area.right) / 2;

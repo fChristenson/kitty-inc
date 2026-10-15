@@ -6,7 +6,7 @@
 // jolt and free levels; the circles grow and merge until the whole screen
 // is gold, then it flashes back in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ interface Touch {
 export const forceGoldLeafEvent = registerWispEvent(
   KEY,
   "Gold Leaf",
-  () => CONFIG.goldLeafEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dartsMs, levelShare, holdMs, mergeMs } = CONFIG.goldLeafEvent;
+    const { dartsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

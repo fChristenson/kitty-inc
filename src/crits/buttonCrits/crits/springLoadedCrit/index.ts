@@ -3,8 +3,8 @@
 // quicker, the rumble building, until it bursts with a bang and darts into
 // the button, which turns over gold: each of its next taps also hires a
 // worker; quicker button by button, its own last and biggest
+import meta from "./meta";
 import { defineTapPerk } from "../../buttonBonus";
-import { CONFIG } from "../../../../config";
 import {
   chargeAt,
   drawChargeGlow,
@@ -74,7 +74,7 @@ const hireTaps = defineTapPerk("Hire", (t) => t.hire(t.floor));
 registerFloorCrit("springLoadedCrit", {
   // hiring taps, twice as many on its own
   reward(t) {
-    const taps = Math.max(1, Math.round(t.count * CONFIG.crit.springLoadedHires));
+    const taps = Math.max(1, Math.round(t.count * meta.values.hires));
     hireTaps.add(t.floor, t.own ? taps * 2 : taps);
     t.flipButton();
   },

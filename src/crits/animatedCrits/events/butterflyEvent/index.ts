@@ -6,7 +6,7 @@
 // fold back in and rise up its body into the total-income readout in a
 // huge blast and shake, and the coins sweep into the total. Pays floor
 // income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -47,9 +47,9 @@ const TIP_SHAKE: [number, number] = [1.2, 1.8];
 export const forceButterflyEvent = registerWispEvent(
   KEY,
   "Butterfly",
-  () => CONFIG.butterflyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.butterflyEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

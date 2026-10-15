@@ -2,8 +2,8 @@
 // while glimmer lights rise from every worker on the clicked floor into its
 // income bar, which builds up, slams and climbs one crit tier, its new tier's
 // label popping above it. Then the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { isFloorLocked } from "../../../../shared/detachedJob";
@@ -80,7 +80,7 @@ function canStart(floor: Floor, context: EventProcContext): boolean {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.promotionDayEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: canStart,
     arm: startPromotion,
@@ -107,7 +107,7 @@ function drawOverlay(
       event.promotedAt === null
         ? Math.min(
             1,
-            (now - event.startedAt) / CONFIG.promotionDayEvent.streamMs,
+            (now - event.startedAt) / meta.values.streamMs,
           )
         : 0;
     ctx.save();
@@ -142,7 +142,7 @@ function drawOverlay(
 
 function startPromotion(floor: Floor, context: EventProcContext): void {
   if (!canStart(floor, context)) return;
-  const { streamMs, holdMs } = CONFIG.promotionDayEvent;
+  const { streamMs, holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const workers: RunningPromotion["workers"] = [];
   for (let i = 0; i < getRenderedWorkerCount(floor); i++) {

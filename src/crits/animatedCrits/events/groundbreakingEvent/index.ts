@@ -6,7 +6,7 @@
 // and rides up the building, a blast and a jolt at every floor it passes,
 // until it bursts the locked floor open, unlocked for free as the screen
 // unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   drawSummon,
@@ -46,9 +46,9 @@ const OPEN_FADE_MS = 400;
 export const forceGroundbreakingEvent = registerWispEvent(
   KEY,
   "Groundbreaking",
-  () => CONFIG.groundbreakingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { eruptMs, riseMs, holdMs, mergeMs } = CONFIG.groundbreakingEvent;
+    const { eruptMs, riseMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const top: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

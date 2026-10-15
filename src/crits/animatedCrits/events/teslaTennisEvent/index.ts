@@ -6,7 +6,7 @@
 // off the ball, the rally ever faster and harder; then the last return is
 // smashed up into the total in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ interface Hit {
 export const forceTeslaTennisEvent = registerWispEvent(
   KEY,
   "Tesla Tennis",
-  () => CONFIG.teslaTennisEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotsMs, holdMs, mergeMs } = CONFIG.teslaTennisEvent;
+    const { shotsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     const xs = [area.left + SIDE, area.right - SIDE];

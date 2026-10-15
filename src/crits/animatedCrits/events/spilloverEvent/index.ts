@@ -3,8 +3,8 @@
 // floor's income bar, filling it to the brim; it slams full and the overflow
 // spills out of it in a stream into the total. Pays the full bar plus bonus
 // payouts, restarts the bar, then the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSold } from "../../../../sound";
 import {
@@ -106,7 +106,7 @@ function canStart(floor: Floor, context: EventProcContext): boolean {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.spilloverEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: canStart,
     arm: startSpill,
@@ -131,7 +131,7 @@ function drawOverlay(
   if (rect) {
     const t = Math.min(
       1,
-      (performance.now() - spill.startedAt) / CONFIG.spilloverEvent.fillMs,
+      (performance.now() - spill.startedAt) / meta.values.fillMs,
     );
     const fill = spill.startFill + (1 - spill.startFill) * (1 - (1 - t) ** 2);
     ctx.save();
@@ -150,7 +150,7 @@ function drawOverlay(
 
 function startSpill(floor: Floor, context: EventProcContext): void {
   if (!canStart(floor, context)) return;
-  const { fillMs, spillMs, bonusPayouts } = CONFIG.spilloverEvent;
+  const { fillMs, spillMs, bonusPayouts } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const bar = getIncomeBarCenter(context.isGroundFloor);
   const spill: RunningSpill = {

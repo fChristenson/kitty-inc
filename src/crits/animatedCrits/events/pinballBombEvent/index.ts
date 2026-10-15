@@ -7,7 +7,7 @@
 // a crit tier; out of the cluster it shoots off again for the next bar, the
 // last cluster bursting round a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,9 +48,9 @@ interface Blast {
 export const forcePinballBombEvent = registerWispEvent(
   KEY,
   "Pinball Bomb",
-  () => CONFIG.pinballBombEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { speed, speedUp, holdMs, mergeMs } = CONFIG.pinballBombEvent;
+    const { speed, speedUp, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

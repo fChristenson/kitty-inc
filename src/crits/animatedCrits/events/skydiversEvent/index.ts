@@ -6,7 +6,7 @@
 // chute just over it with a pop, floating down and landing as a new worker
 // with a flash, a bang and a jolt; the last lands in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,10 +38,10 @@ const LAND_SHAKE: [number, number] = [0.6, 1.3];
 export const forceSkydiversEvent = registerWispEvent(
   KEY,
   "Skydivers",
-  () => CONFIG.skydiversEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fallMs, holdLinkMs, divesMs, floatMs, holdMs, mergeMs } =
-      CONFIG.skydiversEvent;
+      meta.values;
     const hires = findRewardHires(floor, context)
       .sort((a, b) => a.x - b.x)
       .slice(0, MAX_HIRES);

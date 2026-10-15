@@ -6,7 +6,7 @@
 // worker, who climbs a perma tier with a flash, a pop and a jolt; the last
 // wish lands in a huge blast and shake as the cash sweeps into the total.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,10 +41,10 @@ const LAND_SHAKE: [number, number] = [0.5, 1.2];
 export const forceMakeAWishEvent = registerWispEvent(
   KEY,
   "Make a Wish",
-  () => CONFIG.makeAWishEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pourMs, travelMs, wishesMs, flightMs, holdMs, mergeMs } =
-      CONFIG.makeAWishEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

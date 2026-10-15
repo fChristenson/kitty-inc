@@ -6,7 +6,7 @@
 // a perma tier, springing back up between slaps, flailing faster each
 // time, the last slap in a huge blast and shake. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,9 +45,9 @@ interface Slap {
 export const forceTubeManEvent = registerWispEvent(
   KEY,
   "Tube Man",
-  () => CONFIG.tubeManEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { riseMs, slapsMs, holdMs, mergeMs } = CONFIG.tubeManEvent;
+    const { riseMs, slapsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const base = getButtonCenter(context.isGroundFloor);

@@ -7,7 +7,7 @@
 // out of the noise, a jolt with every surge; then the whole fractal bursts
 // into cash in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const FINAL_SHAKE = 2.0;
 export const forceChaosGameEvent = registerWispEvent(
   KEY,
   "Chaos Game",
-  () => CONFIG.chaosGameEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hopMs, pourMs, holdMs, mergeMs } = CONFIG.chaosGameEvent;
+    const { hopMs, pourMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

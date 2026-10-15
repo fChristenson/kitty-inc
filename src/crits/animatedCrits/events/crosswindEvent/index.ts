@@ -7,7 +7,7 @@
 // a whoosh and a jolt; the heap bursts and its glitter streaks off onto the
 // workers in view, one after another, each lighting up a perma tier, the
 // last in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,10 +49,10 @@ const HIT_SHAKE: [number, number] = [0.5, 1.0];
 export const forceCrosswindEvent = registerWispEvent(
   KEY,
   "Crosswind",
-  () => CONFIG.crosswindEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spillMs, gustMs, gapMs, gatherMs, flyMs, holdMs, mergeMs } =
-      CONFIG.crosswindEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

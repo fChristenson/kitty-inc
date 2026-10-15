@@ -6,7 +6,7 @@
 // once, and the main charge goes up in a huge blast and shake, blowing the
 // floor open, unlocked for free, as the screen unfreezes. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,10 +45,10 @@ interface Blast {
 export const forceBreachingChargeEvent = registerWispEvent(
   KEY,
   "Breaching Charge",
-  () => CONFIG.breachingChargeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { setupMs, chainMs, coreMs, holdMs, mergeMs } =
-      CONFIG.breachingChargeEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

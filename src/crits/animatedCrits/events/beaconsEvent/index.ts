@@ -5,7 +5,7 @@
 // and lands on its spot in a flash, a bang and a jolt as a new worker,
 // ever faster; the last lands in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,9 +33,9 @@ const LAND_SHAKE: [number, number] = [0.6, 1.3];
 export const forceBeaconsEvent = registerWispEvent(
   KEY,
   "Beacons",
-  () => CONFIG.beaconsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, waitMs, fallMs, holdMs, mergeMs } = CONFIG.beaconsEvent;
+    const { gapsMs, waitMs, fallMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     let clock = 0;

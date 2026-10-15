@@ -6,4 +6,9 @@ export default {
   label: "Clean Cut",
   chance: 0.01,
   style: "slice",
+  values: {
+    // a bar's payouts this many times as big for good (its own ownPayout)
+    payout: 1.25,
+    ownPayout: 1.5,
+  },
 } satisfies CritMeta;

@@ -6,7 +6,7 @@
 // levels; trace after trace to bar after bar, ever faster; then the whole
 // board lights up at once and every bar slams in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,9 +30,9 @@ const BAR_SHAKE: [number, number] = [0.6, 1.3];
 export const forceCircuitBoardEvent = registerWispEvent(
   KEY,
   "Circuit Board",
-  () => CONFIG.circuitBoardEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { tracesMs, levelShare, holdMs, mergeMs } = CONFIG.circuitBoardEvent;
+    const { tracesMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

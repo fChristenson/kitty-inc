@@ -6,7 +6,7 @@
 // ways, each swing a whoosh, a jolt and coins bursting out of the mirror
 // line; then the mirrors shatter back to the plain screen in a huge blast
 // and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -40,9 +40,9 @@ const SWING_SHAKE: [number, number] = [0.5, 1.3];
 export const forceMirrorBoxEvent = registerWispEvent(
   KEY,
   "Mirror Box",
-  () => CONFIG.mirrorBoxEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swingsMs, holdMs, mergeMs } = CONFIG.mirrorBoxEvent;
+    const { swingsMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const right = area.right;

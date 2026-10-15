@@ -6,8 +6,8 @@
 // right into the total and explodes in a huge blast and shake, coins
 // bursting out of it, and all the coins sweep into the total. Pays floor
 // income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import {
@@ -71,13 +71,13 @@ interface Throw {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.yoYoEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { throwMs, holdMs, mergeMs } = CONFIG.yoYoEvent;
+      const { throwMs, holdMs, mergeMs } = meta.values;
       const width = area.right - area.left;
       const size = Math.max(WISP_SIZE, width * WISP);
       const button = getButtonCenter(context.isGroundFloor);

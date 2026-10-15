@@ -7,7 +7,7 @@
 // then the planets break orbit one after another and arc down onto the
 // empty spots, a new worker forming where each lands, the last in a big
 // blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -66,10 +66,10 @@ interface Planet {
 export const forceAccretionEvent = registerWispEvent(
   KEY,
   "Accretion",
-  () => CONFIG.accretionEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, accreteMs, gapMs, dropMs, holdMs, mergeMs } =
-      CONFIG.accretionEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_PLANETS);
     if (hires.length === 0) return;
     const star: Point = {

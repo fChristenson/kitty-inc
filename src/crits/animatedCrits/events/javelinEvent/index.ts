@@ -7,7 +7,7 @@
 // biggest spears the clicked floor's bar, then every javelin discharges at
 // once, forking, and the clicked bar jumps a crit tier in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ const HIT_SHAKE: [number, number] = [0.8, 1.6];
 export const forceJavelinEvent = registerWispEvent(
   KEY,
   "Javelin",
-  () => CONFIG.javelinEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapsMs, flyMs, chargeMs, levelShare, holdMs, mergeMs } =
-      CONFIG.javelinEvent;
+      meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

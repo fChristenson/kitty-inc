@@ -7,7 +7,7 @@
 // erupts back out of it in a fountain; the last slams every bar in a huge
 // blast and shake, and the cash sweeps on into the total. Pays floor income
 // × floor number × REWARD, plus the levels and the tier
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -33,10 +33,10 @@ const SOAK_SHAKE: [number, number] = [0.9, 1.7];
 export const forceStockpileEvent = registerWispEvent(
   KEY,
   "Stockpile",
-  () => CONFIG.stockpileEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { rainMs, soakMs, gapMs, eruptMs, levelShare, holdMs, mergeMs } =
-      CONFIG.stockpileEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const crowned = bars.find((b) => b.floor === floor) ?? bars[0];

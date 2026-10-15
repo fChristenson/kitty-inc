@@ -1,8 +1,8 @@
 // the "Burst" event: it covers its crit, whose click freezes the screen while
 // the button blows out one instant explosion of coins and bills covering the
 // whole screen, which then merge into the total (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
@@ -18,7 +18,7 @@ const KEY = "burst";
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.burstEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {

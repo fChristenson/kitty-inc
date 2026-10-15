@@ -5,7 +5,7 @@
 // splash of coins, a bang and a jolt, harder each time, until they braid
 // into one and slam into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const CROSS_SHAKE: [number, number] = [0.6, 1.5];
 export const forceCrosscurrentsEvent = registerWispEvent(
   KEY,
   "Crosscurrents",
-  () => CONFIG.crosscurrentsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { travelMs, holdMs, mergeMs } = CONFIG.crosscurrentsEvent;
+    const { travelMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const cx = (area.left + area.right) / 2;
     const halfW = (area.right - area.left) * REACH;

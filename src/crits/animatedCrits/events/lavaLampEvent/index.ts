@@ -6,7 +6,7 @@
 // and a jolt; then every blob oozes together into one huge blob that
 // surges into the total in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -45,10 +45,10 @@ const PEAK_SHAKE: [number, number] = [0.5, 1.1];
 export const forceLavaLampEvent = registerWispEvent(
   KEY,
   "Lava Lamp",
-  () => CONFIG.lavaLampEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pourMs, gapsMs, riseMs, joinMs, flightMs, holdMs, mergeMs } =
-      CONFIG.lavaLampEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;

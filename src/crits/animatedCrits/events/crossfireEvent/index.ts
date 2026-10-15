@@ -6,7 +6,7 @@
 // riding its crest into the total-income readout in a huge blast and shake,
 // and the coins sweep into the total. Pays floor income × floor number ×
 // REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,10 +47,10 @@ const CRASH_SHAKE = 2.2;
 export const forceCrossfireEvent = registerWispEvent(
   KEY,
   "Crossfire",
-  () => CONFIG.crossfireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { fireMs, travelMs, geyserMs, holdMs, mergeMs } =
-      CONFIG.crossfireEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);

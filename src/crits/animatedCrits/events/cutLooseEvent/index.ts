@@ -4,7 +4,7 @@
 // out of every cut; then a cross of two long cuts tears through it with the
 // hardest shake and the floor bursts open, unlocked for free as the screen
 // unfreezes. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import {
   drawSlash,
@@ -50,10 +50,10 @@ const OPEN_SHAKE = 3;
 export const forceCutLooseEvent = registerWispEvent(
   KEY,
   "Cut Loose",
-  () => CONFIG.cutLooseEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { firstMs, gapsMs, crossGapMs, holdMs, mergeMs } =
-      CONFIG.cutLooseEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const top = locked.offsetY;

@@ -6,7 +6,7 @@
 // harder; with all three blasting at once the floor bursts open in a huge
 // blast and shake, unlocked for free, as the screen unfreezes. Pays floor
 // income × floor number × REWARD, plus the floor
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,10 +37,10 @@ const JET: Pour = { coinsAlong: 160, width: 30, streamMs: 0, travelMs: 0 };
 export const forceFireBrigadeEvent = registerWispEvent(
   KEY,
   "Fire Brigade",
-  () => CONFIG.fireBrigadeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { opensMs, travelMs, blastMs, holdMs, mergeMs } =
-      CONFIG.fireBrigadeEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

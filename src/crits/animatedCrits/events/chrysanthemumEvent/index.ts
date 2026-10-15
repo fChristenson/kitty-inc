@@ -7,7 +7,7 @@
 // bloop and a jolt as a new worker forms there; the last lands in a huge
 // blast and shake and the coins sweep into the total. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,10 +39,10 @@ const LAND_SHAKE: [number, number] = [0.5, 1.3];
 export const forceChrysanthemumEvent = registerWispEvent(
   KEY,
   "Chrysanthemum",
-  () => CONFIG.chrysanthemumEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, streamMs, droopMs, holdMs, mergeMs } =
-      CONFIG.chrysanthemumEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

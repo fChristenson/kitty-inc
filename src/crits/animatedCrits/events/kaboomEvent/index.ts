@@ -7,7 +7,7 @@
 // together in a row of blasts and a colossal one under them, the hardest
 // shake, before the cash pours into the total. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ const LOAD_SHAKE = 2;
 export const forceKaboomEvent = registerWispEvent(
   KEY,
   "Kaboom",
-  () => CONFIG.kaboomEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dropsMs, fallMs, loadGapMs, holdMs, mergeMs } = CONFIG.kaboomEvent;
+    const { dropsMs, fallMs, loadGapMs, holdMs, mergeMs } = meta.values;
     const mid = (area.left + area.right) / 2;
     const span = (area.right - area.left) * SPAN;
     const topY = area.top + TOP;

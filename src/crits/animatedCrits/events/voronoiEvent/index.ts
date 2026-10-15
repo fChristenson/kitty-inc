@@ -6,7 +6,7 @@
 // until the whole screen is cut into a stained-glass of cells; then every
 // seed bursts into cash in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -35,9 +35,9 @@ const FINAL_SHAKE = 2.0;
 export const forceVoronoiEvent = registerWispEvent(
   KEY,
   "Voronoi",
-  () => CONFIG.voronoiEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { growMs, holdMs, mergeMs } = CONFIG.voronoiEvent;
+    const { growMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

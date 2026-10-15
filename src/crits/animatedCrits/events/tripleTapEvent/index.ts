@@ -6,7 +6,7 @@
 // blink round the next spot and the next, quicker each time; the last
 // triple tap goes off in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceTripleTapEvent = registerWispEvent(
   KEY,
   "Triple Tap",
-  () => CONFIG.tripleTapEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { aimsMs, holdMs, mergeMs } = CONFIG.tripleTapEvent;
+    const { aimsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

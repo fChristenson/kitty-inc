@@ -5,7 +5,7 @@
 // hit a flash, a pop and a jolt landing free levels; it lands at the bottom
 // and fires one last volley at every bar at once, which all slam in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,9 +52,9 @@ interface Burst {
 export const forceTumbleFireEvent = registerWispEvent(
   KEY,
   "Tumble Fire",
-  () => CONFIG.tumbleFireEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { fallMs, levelShare, holdMs, mergeMs } = CONFIG.tumbleFireEvent;
+    const { fallMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const midX = (area.left + area.right) / 2;

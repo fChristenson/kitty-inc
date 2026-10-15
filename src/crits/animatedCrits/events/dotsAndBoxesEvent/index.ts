@@ -6,7 +6,7 @@
 // and bursting into coins with a pop and a jolt, until the endgame's long
 // chains are taken in rippling runs, every capture shaking harder; then the
 // whole board blows in a huge blast. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -87,9 +87,9 @@ function playGame(): { line: number; captures: number[] }[] {
 export const forceDotsAndBoxesEvent = registerWispEvent(
   KEY,
   "Dots and Boxes",
-  () => CONFIG.dotsAndBoxesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { movesMs, holdMs, mergeMs } = CONFIG.dotsAndBoxesEvent;
+    const { movesMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const gap = Math.min((width * 0.8) / COLS, (height * 0.5) / ROWS);

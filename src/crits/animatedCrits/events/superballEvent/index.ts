@@ -5,7 +5,7 @@
 // each bounce a pop, a boing, a jolt and a burst of coins, until it's a
 // blur and bursts in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -38,9 +38,9 @@ const BOUNCE_SHAKE: [number, number] = [0.3, 1.2];
 export const forceSuperballEvent = registerWispEvent(
   KEY,
   "Superball",
-  () => CONFIG.superballEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { bounceMs, holdMs, mergeMs } = CONFIG.superballEvent;
+    const { bounceMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

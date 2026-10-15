@@ -7,7 +7,7 @@
 // faster; the last pass slams home in a huge blast and shake and the coins
 // sweep into the total. Pays floor income × floor number × REWARD, plus
 // the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -41,10 +41,10 @@ const PASS_SHAKE: [number, number] = [0.5, 1.3];
 export const forceLoomEvent = registerWispEvent(
   KEY,
   "Loom",
-  () => CONFIG.loomEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { warpMs, warpTravelMs, passesMs, holdMs, mergeMs } =
-      CONFIG.loomEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -5,7 +5,7 @@
 // readout, each hit a flash, a pop and coins bursting out of it, the last a
 // huge blast and shake, and the coins sweep into the total. Pays floor
 // income × floor number × REWARD (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -53,9 +53,9 @@ interface Runner {
 export const forceStampedeEvent = registerWispEvent(
   KEY,
   "Stampede",
-  () => CONFIG.stampedeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, chargeMs, holdMs, mergeMs } = CONFIG.stampedeEvent;
+    const { runMs, chargeMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const size = Math.max(WISP_SIZE, width * WISP);

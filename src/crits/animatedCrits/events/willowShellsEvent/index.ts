@@ -6,7 +6,7 @@
 // each its own shake, and every one that lands on an empty spot on a floor
 // in view forms a new worker there; the last lands in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -57,10 +57,10 @@ interface Blast {
 export const forceWillowShellsEvent = registerWispEvent(
   KEY,
   "Willow Shells",
-  () => CONFIG.willowShellsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapsMs, riseMs, droopMs, holdMs, mergeMs } =
-      CONFIG.willowShellsEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -5,8 +5,8 @@
 // in view on the way: each squashes flat with a flash, a bang and a jolt and
 // lands free upgrade levels. It craters into the bottom of the screen in a
 // huge blast and shake. Then the screen unfreezes and the crit's tier pays
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh, startBoostEventStreamLoop } from "../../../../sound";
 import {
@@ -121,7 +121,7 @@ function findButtons(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.piledriverEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -141,12 +141,12 @@ export function forcePiledriverEvent(floor: Floor): void {
 
 // how far down its fall the wisp is, 0..1, ms in: accelerating like a drop
 function fallShare(ms: number): number {
-  const { chargeMs, fallMs } = CONFIG.piledriverEvent;
+  const { chargeMs, fallMs } = meta.values;
   return clamp01((ms - chargeMs) / fallMs) ** 2;
 }
 
 function wispAt(pd: RunningPiledriver, ms: number, heat: number): Point {
-  const { chargeMs } = CONFIG.piledriverEvent;
+  const { chargeMs } = meta.values;
   if (ms < chargeMs)
     return {
       x: pd.x + Math.sin(ms * 0.9) * TREMBLE * heat,
@@ -169,7 +169,7 @@ function landBeats(
   now: number,
   upgradeFloorFree: (floor: Floor, levels: number) => void,
 ): void {
-  const { chargeMs, fallMs } = CONFIG.piledriverEvent;
+  const { chargeMs, fallMs } = meta.values;
   if (ms < chargeMs && now - pd.lastRumble >= RUMBLE_MS) {
     pd.lastRumble = now;
     shakeScreen(lerp(RUMBLE, ms / chargeMs));
@@ -199,7 +199,7 @@ function startPiledriver(floor: Floor, context: EventProcContext): void {
   const found = findButtons(floor, context);
   if (!area || !upgradeFloorFree || found.length === 0) return;
   const { chargeMs, fallMs, holdMs, levelShare, minLevels } =
-    CONFIG.piledriverEvent;
+    meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const top = area.top + CHARGE_DROP;
   const bottom = area.bottom + FALL_OUT;
@@ -262,7 +262,7 @@ function drawOverlay(
   const now = performance.now();
   const ms = now - pd.startedAt;
   landBeats(pd, ms, now, upgradeFloorFree);
-  const { chargeMs } = CONFIG.piledriverEvent;
+  const { chargeMs } = meta.values;
 
   const drawButton = (c: CanvasRenderingContext2D, hit: Hit) => {
     const own = getFloorRect(hit.floor);

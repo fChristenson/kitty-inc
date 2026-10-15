@@ -6,7 +6,7 @@
 // targets flung off the rim onto the income bars, each landing a crit tier
 // with a jolt, the last in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -58,9 +58,9 @@ interface Fling {
 export const forceTargetWheelEvent = registerWispEvent(
   KEY,
   "Target Wheel",
-  () => CONFIG.targetWheelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotsMs, holdMs, mergeMs } = CONFIG.targetWheelEvent;
+    const { shotsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const width = area.right - area.left;

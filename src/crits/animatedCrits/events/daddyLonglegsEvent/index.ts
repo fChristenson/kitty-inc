@@ -5,7 +5,7 @@
 // jolt, its legs scrabbling ever faster; at the top it rears up and bursts
 // in a huge blast and shake as the coins sweep into the total. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -53,9 +53,9 @@ interface Step {
 export const forceDaddyLonglegsEvent = registerWispEvent(
   KEY,
   "Daddy Longlegs",
-  () => CONFIG.daddyLonglegsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { walkMs, holdMs, mergeMs } = CONFIG.daddyLonglegsEvent;
+    const { walkMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

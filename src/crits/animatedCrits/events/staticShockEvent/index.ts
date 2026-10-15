@@ -6,7 +6,7 @@
 // leaps across the gap in a flash, a crack and a jolt that shocks the
 // worker up a perma tier, ever faster; the last zap goes off in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const ZAP_SHAKE: [number, number] = [0.6, 1.3];
 export const forceStaticShockEvent = registerWispEvent(
   KEY,
   "Static Shock",
-  () => CONFIG.staticShockEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { scuffMs, dartsMs, holdMs, mergeMs } = CONFIG.staticShockEvent;
+    const { scuffMs, dartsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

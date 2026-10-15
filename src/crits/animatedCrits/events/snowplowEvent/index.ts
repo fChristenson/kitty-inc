@@ -7,7 +7,7 @@
 // the ridge from the bottom and the other down from the top, heaping it all
 // onto the locked floor's lock, which bursts open in a huge blast: the
 // floor unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -97,10 +97,10 @@ function route(legs: Leg[], lift: number) {
 export const forceSnowplowEvent = registerWispEvent(
   KEY,
   "Snowplow",
-  () => CONFIG.snowplowEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { snowMs, passMs, liftMs, ridgeMs, gatherMs, holdMs, mergeMs } =
-      CONFIG.snowplowEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

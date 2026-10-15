@@ -6,7 +6,7 @@
 // tinkles into a burst of coins with a pop and a jolt; the burst speeds up
 // into a roar of fire and a rain of casings, and the last shot goes off in
 // a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -49,9 +49,9 @@ const BANG_GAP_MS = 60;
 export const forceShellCasingsEvent = registerWispEvent(
   KEY,
   "Shell Casings",
-  () => CONFIG.shellCasingsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotMs, casingMs, holdMs, mergeMs } = CONFIG.shellCasingsEvent;
+    const { shotMs, casingMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const gunSpot: Point = {
       x: (area.left + area.right) / 2,

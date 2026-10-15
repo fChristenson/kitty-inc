@@ -6,7 +6,7 @@
 // faster, every blast a bang, a spray of coins and its own shake; then the
 // whole outer ring goes up at once in a cluster round one huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,9 +52,9 @@ interface Bomb {
 export const forceConcentricEvent = registerWispEvent(
   KEY,
   "Concentric",
-  () => CONFIG.concentricEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { ringsMs, holdMs, mergeMs } = CONFIG.concentricEvent;
+    const { ringsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

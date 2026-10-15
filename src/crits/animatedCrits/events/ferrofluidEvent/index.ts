@@ -6,7 +6,7 @@
 // and a jolt that lands free levels; then the spikes slump back and the
 // whole pool surges up into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,7 +42,7 @@ const STAB_SHAKE: [number, number] = [0.8, 1.6];
 export const forceFerrofluidEvent = registerWispEvent(
   KEY,
   "Ferrofluid",
-  () => CONFIG.ferrofluidEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       pourMs,
@@ -53,7 +53,7 @@ export const forceFerrofluidEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.ferrofluidEvent;
+    } = meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const surface = area.bottom - SURFACE;

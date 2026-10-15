@@ -6,7 +6,7 @@
 // each bar it rakes jolts with a bang and free levels; it pulls up off the
 // last pass over the clicked floor's bar as every bar slams in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,10 +45,10 @@ const RAKE_SHAKE: [number, number] = [0.6, 1.3];
 export const forceStrafingRunEvent = registerWispEvent(
   KEY,
   "Strafing Run",
-  () => CONFIG.strafingRunEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { passesMs, turnMs, levelShare, holdMs, mergeMs } =
-      CONFIG.strafingRunEvent;
+      meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

@@ -6,7 +6,7 @@
 // free levels; they charge again, quicker, and shock it again, harder; the
 // third shock forks out to every bar in view, each jolting with free levels,
 // and the clicked bar jumps a crit tier as every bar slams in a huge blast
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,10 +40,10 @@ const SHOCK_SHAKE: [number, number] = [1.2, 1.8];
 export const forceClearEvent = registerWispEvent(
   KEY,
   "Clear!",
-  () => CONFIG.clearEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { swoopMs, chargesMs, levelShare, holdMs, mergeMs } =
-      CONFIG.clearEvent;
+      meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

@@ -7,7 +7,7 @@
 // over and erupt, their hot grains streaming out in arcs onto the workers,
 // each climbing a perma tier as its stream lands. Then the crit's tier pays
 // out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -59,10 +59,10 @@ interface Throw {
 export const forceConvectionEvent = registerWispEvent(
   KEY,
   "Convection",
-  () => CONFIG.convectionEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { settleMs, boilMs, gapMs, dropMs, holdMs, mergeMs } =
-      CONFIG.convectionEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const left = area.left + MARGIN;

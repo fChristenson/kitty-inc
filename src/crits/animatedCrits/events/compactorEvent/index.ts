@@ -6,7 +6,7 @@
 // the bar in a burst and a jolt of free levels; then the ball hops on to
 // the next bar, quicker each time, the last crush landing in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -58,9 +58,9 @@ interface Press {
 export const forceCompactorEvent = registerWispEvent(
   KEY,
   "Compactor",
-  () => CONFIG.compactorEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { closesMs, levelShare, holdMs, mergeMs } = CONFIG.compactorEvent;
+    const { closesMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = DROP_MS;

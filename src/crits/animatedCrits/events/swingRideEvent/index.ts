@@ -6,7 +6,7 @@
 // flung off along its swing, curving down onto a worker that lights up a
 // perma tier with a flash, a bang and a jolt; the last lands in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const LAND_SHAKE: [number, number] = [0.6, 1.4];
 export const forceSwingRideEvent = registerWispEvent(
   KEY,
   "Swing Ride",
-  () => CONFIG.swingRideEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinMs, snapsMs, flyMs, holdMs, mergeMs } = CONFIG.swingRideEvent;
+    const { spinMs, snapsMs, flyMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

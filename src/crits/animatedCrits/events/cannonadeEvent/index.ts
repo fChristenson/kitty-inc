@@ -6,7 +6,7 @@
 // that jumps the bar a crit tier; it fires again and again, ever faster,
 // bar after bar; the last shell slams every bar in a huge blast and shake.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ const HIT_SHAKE: [number, number] = [1, 1.6];
 export const forceCannonadeEvent = registerWispEvent(
   KEY,
   "Cannonade",
-  () => CONFIG.cannonadeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { rollMs, gapsMs, flightMs, holdMs, mergeMs } = CONFIG.cannonadeEvent;
+    const { rollMs, gapsMs, flightMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

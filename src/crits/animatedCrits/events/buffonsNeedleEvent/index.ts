@@ -6,7 +6,7 @@
 // white and lands free levels on that bar, one that misses dims; when the
 // last has landed every needle across a bar flashes at once and the
 // clicked floor's bar slams in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ interface Needle {
 export const forceBuffonsNeedleEvent = registerWispEvent(
   KEY,
   "Buffon's Needle",
-  () => CONFIG.buffonsNeedleEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { dropMs, fallMs, levelShare, holdMs, mergeMs } =
-      CONFIG.buffonsNeedleEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

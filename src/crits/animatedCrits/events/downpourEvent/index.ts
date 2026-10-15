@@ -2,8 +2,8 @@
 // while coins and bills rain down from above the screen and pool along its
 // bottom, the pool rising as they land, then it all drains into the total
 // (see ../rain)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
@@ -16,7 +16,7 @@ const KEY = "downpour";
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.downpourEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) =>
@@ -25,7 +25,7 @@ registerEventProc(
         KEY,
         floor,
         context,
-        CONFIG.downpourEvent,
+        meta.values,
         ({ from, land }) =>
           (t) => ({
             x: from.x + (land.x - from.x) * t,

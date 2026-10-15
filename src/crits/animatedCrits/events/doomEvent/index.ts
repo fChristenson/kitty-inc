@@ -7,8 +7,8 @@
 // exit door at the end slides up into the ceiling, the floors behind it, and
 // the view rushes through it back onto them, promoting the floor's perma
 // crit tier
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
@@ -42,6 +42,7 @@ import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { canPromote, promotedTier } from "../../eventRewards";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -172,7 +173,7 @@ interface Demon {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.doomEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -390,9 +391,9 @@ export function drawCorridor(
 }
 
 function startDoom(floor: Floor, context: EventProcContext): void {
-  const { doorMs, walkMs, flyMs } = CONFIG.doomEvent;
+  const { doorMs, walkMs, flyMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
-  const landMs = flyMs + CONFIG.flightStage.arriveMs;
+  const landMs = flyMs + FLIGHT_STAGE.arriveMs;
   const landZ = END - FOCAL * OPEN_W;
   const marchTo = landZ - RUSH;
   const walkZ = (ms: number) =>

@@ -7,7 +7,7 @@
 // still rolling, until the last arrives in a huge blast and shake and they
 // all pour into the total. Pays floor income × floor number × REWARD, plus
 // the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,10 +41,10 @@ const PASS_SHAKE: [number, number] = [0.6, 1.4];
 export const forceSmokeRingsEvent = registerWispEvent(
   KEY,
   "Smoke Rings",
-  () => CONFIG.smokeRingsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { puffsMs, riseMs, levelShare, holdMs, mergeMs } =
-      CONFIG.smokeRingsEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const midX = (area.left + area.right) / 2;
     let clock = 0;

@@ -6,7 +6,7 @@
 // dragon rears up and dives into the total-income readout in a huge blast
 // and shake, its whole body pouring in after it. Pays floor income × floor
 // number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -51,9 +51,9 @@ const ROAR_SHAKE: [number, number] = [1, 2];
 export const forceDragonEvent = registerWispEvent(
   KEY,
   "Dragon",
-  () => CONFIG.dragonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flightMs, bodyMs, holdMs, mergeMs } = CONFIG.dragonEvent;
+    const { flightMs, bodyMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

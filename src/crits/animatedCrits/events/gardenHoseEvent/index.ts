@@ -6,7 +6,7 @@
 // and a jolt, ever faster; then the jet swings up onto the total and hoses
 // the last of the cash into it in a huge blast and shake. Pays floor income
 // × floor number × REWARD, plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,10 +41,10 @@ const SOAK_SHAKE: [number, number] = [0.9, 1.6];
 export const forceGardenHoseEvent = registerWispEvent(
   KEY,
   "Garden Hose",
-  () => CONFIG.gardenHoseEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { swingMs, dwellsMs, flightMs, holdMs, mergeMs } =
-      CONFIG.gardenHoseEvent;
+      meta.values;
     const hires = findRewardHires(floor, context)
       .sort((a, b) => a.x - b.x)
       .slice(0, MAX_HIRES);

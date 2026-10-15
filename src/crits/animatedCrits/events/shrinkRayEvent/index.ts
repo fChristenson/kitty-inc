@@ -5,7 +5,7 @@
 // smaller into the middle of the dark; then it springs back to full size in a
 // white flash and a huge blast and shake, and the clicked floor's income bar
 // jumps one crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const ZAP_SHAKE: [number, number] = [0.8, 1.5];
 export const forceShrinkRayEvent = registerWispEvent(
   KEY,
   "Shrink Ray",
-  () => CONFIG.shrinkRayEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { zapsMs, smallMs, popMs, holdMs, mergeMs } = CONFIG.shrinkRayEvent;
+    const { zapsMs, smallMs, popMs, holdMs, mergeMs } = meta.values;
     const own = findRewardBars(floor, context).find((b) => b.floor === floor);
     if (!own) return;
     const width = area.right - area.left;

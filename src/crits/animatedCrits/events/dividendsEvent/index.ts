@@ -3,8 +3,8 @@
 // lowest-tier worker in view; it climbs one perma tier, then sprays a coin
 // stream into the total, paying its floor's payout a few times. Then the
 // crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSold, startBoostEventStreamLoop } from "../../../../sound";
 import { multiply } from "../../../../shared/bigNumber";
@@ -92,7 +92,7 @@ function findWorker(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.dividendsEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running && !isScreenFrozen() && findWorker(floor, context) !== null,
@@ -120,7 +120,7 @@ function drawOverlay(
     const now = performance.now();
     const lift = Math.min(
       1,
-      (now - event.startedAt) / CONFIG.dividendsEvent.liftMs,
+      (now - event.startedAt) / meta.values.liftMs,
     );
     const pulse = Math.max(0, 1 - (now - event.lastLandedAt) / PULSE_MS);
     ctx.save();
@@ -151,7 +151,7 @@ function startDividends(floor: Floor, context: EventProcContext): void {
     .getOnScreenFloors?.()
     .find((entry) => entry.floor === floor)?.top;
   if (!worker || floorTop === undefined) return;
-  const { liftMs, sprayMs, payouts } = CONFIG.dividendsEvent;
+  const { liftMs, sprayMs, payouts } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const event: RunningDividends = {
     worker,

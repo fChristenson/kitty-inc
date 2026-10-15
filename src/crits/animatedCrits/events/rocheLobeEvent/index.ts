@@ -6,7 +6,7 @@
 // pops coming faster; then the disk blows in a nova, a blinding flash and a
 // shake that sprays its glitter out as a burst of coins, and the coins pour
 // into the total in a huge blast. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -54,10 +54,10 @@ interface Grain {
 export const forceRocheLobeEvent = registerWispEvent(
   KEY,
   "Roche Lobe",
-  () => CONFIG.rocheLobeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, feedMs, flowMs, liftMs, holdMs, mergeMs } =
-      CONFIG.rocheLobeEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const total = () => cover?.total() ?? fallback;
     const big: Point = {

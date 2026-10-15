@@ -7,7 +7,7 @@
 // rumble and a jolt; then the heaps surge up into the total one after
 // another, the tall middle one last in a huge blast. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -48,7 +48,7 @@ const LIFT_LAG = 120;
 export const forceGaltonBoardEvent = registerWispEvent(
   KEY,
   "Galton Board",
-  () => CONFIG.galtonBoardEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       growMs,
@@ -60,7 +60,7 @@ export const forceGaltonBoardEvent = registerWispEvent(
       liftMs,
       holdMs,
       mergeMs,
-    } = CONFIG.galtonBoardEvent;
+    } = meta.values;
     const fallback = totalSpot(area);
     const total = () => cover?.total() ?? fallback;
     const button = getButtonCenter(context.isGroundFloor);

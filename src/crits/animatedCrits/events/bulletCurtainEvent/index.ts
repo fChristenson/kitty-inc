@@ -6,7 +6,7 @@
 // jolt that lands free levels, ever faster; the last curtain rips up
 // through every bar to the top in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,10 +41,10 @@ const VOLLEY_SHAKE: [number, number] = [0.6, 1.3];
 export const forceBulletCurtainEvent = registerWispEvent(
   KEY,
   "Bullet Curtain",
-  () => CONFIG.bulletCurtainEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, gapsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.bulletCurtainEvent;
+      meta.values;
     // nearest the bottom first, so the curtains climb
     const bars = findRewardBars(floor, context)
       .sort((a, b) => b.center.y - a.center.y)

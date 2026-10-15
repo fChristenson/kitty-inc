@@ -6,7 +6,7 @@
 // after bar, ever faster and bigger; off the last bar it bounces up and
 // hurls itself into the total in a huge blast, its coins pouring in. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
@@ -43,10 +43,10 @@ interface Run {
 export const forceKatamariEvent = registerWispEvent(
   KEY,
   "Katamari",
-  () => CONFIG.katamariEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { dropMs, rollMs, fallMs, launchMs, holdMs, mergeMs } =
-      CONFIG.katamariEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const fallback = totalSpot(area);

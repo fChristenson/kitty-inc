@@ -7,7 +7,7 @@
 // heap flying up into the total; bar after bar, ever faster, the last
 // heap in a huge blast and shake. Pays floor income × floor number ×
 // REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,10 +45,10 @@ const SHOVE_SHAKE: [number, number] = [0.7, 1.4];
 export const forceBulldozerEvent = registerWispEvent(
   KEY,
   "Bulldozer",
-  () => CONFIG.bulldozerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pushesMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.bulldozerEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const fallback = totalSpot(area);

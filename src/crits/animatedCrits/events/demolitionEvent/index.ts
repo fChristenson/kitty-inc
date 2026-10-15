@@ -6,7 +6,7 @@
 // each a big jolt, then a colossal charge in its middle blows in a huge
 // blast and shake, and as the screen unfreezes the floor bursts open:
 // unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ const BLAST_SHAKE: [number, number] = [1, 1.8];
 export const forceDemolitionEvent = registerWispEvent(
   KEY,
   "Demolition",
-  () => CONFIG.demolitionEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { flyMs, fuseMs, gapMs, finalGapMs, holdMs, mergeMs } =
-      CONFIG.demolitionEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

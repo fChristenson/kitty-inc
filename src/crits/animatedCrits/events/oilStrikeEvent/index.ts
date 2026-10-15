@@ -6,7 +6,7 @@
 // are sunk one after another, each quicker and each gusher bigger, the last
 // striking in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ interface Well {
 export const forceOilStrikeEvent = registerWispEvent(
   KEY,
   "Oil Strike",
-  () => CONFIG.oilStrikeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { approachMs, boresMs, holdMs, mergeMs } = CONFIG.oilStrikeEvent;
+    const { approachMs, boresMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const total = totalSpot(area);
     const into: Point = { x: 0, y: 0 };

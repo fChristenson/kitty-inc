@@ -6,7 +6,7 @@
 // the shredded ribbons into the total; then the shredder jams and spits
 // the whole screen back out in one piece in a huge blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const JERK_SHAKE: [number, number] = [0.6, 1.3];
 export const forceShredderEvent = registerWispEvent(
   KEY,
   "Shredder",
-  () => CONFIG.shredderEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { jerksMs, spitMs, holdMs, mergeMs } = CONFIG.shredderEvent;
+    const { jerksMs, spitMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

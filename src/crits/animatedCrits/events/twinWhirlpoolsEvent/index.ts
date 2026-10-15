@@ -6,7 +6,7 @@
 // merge into one giant whirlpool in a huge blast and shake as the cash
 // pours into the total. Pays floor income × floor number × REWARD, plus the
 // tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ interface Pool {
 export const forceTwinWhirlpoolsEvent = registerWispEvent(
   KEY,
   "Twin Whirlpools",
-  () => CONFIG.twinWhirlpoolsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { formMs, orbitMs, holdMs, mergeMs } = CONFIG.twinWhirlpoolsEvent;
+    const { formMs, orbitMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, 2);
     if (bars.length === 0) return;
     // a second whirlpool mirrors the first when only one bar is in view

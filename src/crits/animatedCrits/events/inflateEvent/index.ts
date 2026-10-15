@@ -5,7 +5,7 @@
 // colossal blast and shake, its pieces flying off every way over a blaze of
 // gold and a burst of cash pouring into the total, and the pieces fly back
 // together into place. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,9 +51,9 @@ const BACK_SHAKE = 0.8;
 export const forceInflateEvent = registerWispEvent(
   KEY,
   "Inflate",
-  () => CONFIG.inflateEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { breathMs, poppedMs, backMs, holdMs, mergeMs } = CONFIG.inflateEvent;
+    const { breathMs, poppedMs, backMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

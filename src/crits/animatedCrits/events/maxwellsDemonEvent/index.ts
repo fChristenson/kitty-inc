@@ -8,7 +8,7 @@
 // seething white-hot, then the gate slams shut, the right wall bursts and
 // the hot gas blasts out onto the workers, each climbing a perma tier.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -56,10 +56,10 @@ interface Flight {
 export const forceMaxwellsDemonEvent = registerWispEvent(
   KEY,
   "Maxwell's Demon",
-  () => CONFIG.maxwellsDemonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, sortMs, slamMs, burstMs, gapMs, holdMs, mergeMs } =
-      CONFIG.maxwellsDemonEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const w = (area.right - area.left) * BOX_W;

@@ -7,7 +7,7 @@
 // jumps a crit tier; the sling reloads and swings round to the next bar,
 // each shot harder, the last landing in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,9 +55,9 @@ interface Shot {
 export const forceBoltSlingEvent = registerWispEvent(
   KEY,
   "Bolt Sling",
-  () => CONFIG.boltSlingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pullMs, flyMs, holdMs, mergeMs } = CONFIG.boltSlingEvent;
+    const { pullMs, flyMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

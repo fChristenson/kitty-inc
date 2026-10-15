@@ -8,7 +8,7 @@
 // salvo of shells landing on the bar together in clusters of blasts and
 // heavy shakes, and the last salvo blows it up a crit tier in a huge
 // blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -72,10 +72,10 @@ interface Blast {
 export const forceFireForEffectEvent = registerWispEvent(
   KEY,
   "Fire for Effect",
-  () => CONFIG.fireForEffectEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { readyMs, rangeGapMs, flightMs, salvoGapMs, holdMs, mergeMs } =
-      CONFIG.fireForEffectEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

@@ -8,7 +8,7 @@
 // whipped up into the total-income readout in a huge blast and shake, the
 // coins sweeping in after them. Pays floor income × floor number × REWARD
 // (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,7 +46,7 @@ const TUG_SHAKE = [0.9, 1.4];
 export const forceHarpoonEvent = registerWispEvent(
   KEY,
   "Harpoon",
-  () => CONFIG.harpoonEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       fireGapMs,
@@ -57,7 +57,7 @@ export const forceHarpoonEvent = registerWispEvent(
       levelShare,
       holdMs,
       mergeMs,
-    } = CONFIG.harpoonEvent;
+    } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const fallback = totalSpot(area);
     const width = area.right - area.left;

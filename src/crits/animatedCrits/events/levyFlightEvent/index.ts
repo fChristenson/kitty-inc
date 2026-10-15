@@ -5,7 +5,7 @@
 // every dash is a whoosh and a jolt and lands it on an empty spot in view,
 // where its flurry of hops roots out a new worker in a flash; the last
 // hire lands in a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ interface Leg {
 export const forceLevyFlightEvent = registerWispEvent(
   KEY,
   "Lévy Flight",
-  () => CONFIG.levyFlightEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { hopMs, dashMs, holdMs, mergeMs } = CONFIG.levyFlightEvent;
+    const { hopMs, dashMs, holdMs, mergeMs } = meta.values;
     const found = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (found.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

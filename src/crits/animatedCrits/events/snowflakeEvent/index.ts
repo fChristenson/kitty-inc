@@ -5,7 +5,7 @@
 // at every tip and a jolt at every stage, until the whole six-pointed
 // flake of lightning blazes and shatters in a huge blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ interface Limb {
 export const forceSnowflakeEvent = registerWispEvent(
   KEY,
   "Snowflake",
-  () => CONFIG.snowflakeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { stageMs, blazeMs, holdMs, mergeMs } = CONFIG.snowflakeEvent;
+    const { stageMs, blazeMs, holdMs, mergeMs } = meta.values;
     const hub: Point = {
       x: (area.left + area.right) / 2,
       y: (area.top + area.bottom) / 2 + 30,

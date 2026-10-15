@@ -6,7 +6,7 @@
 // worker in a blinding flash, a jolt and a crack that shocks it up a perma
 // tier; worker after worker, ever faster; the last zap goes off in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,9 +36,9 @@ const ZAP_SHAKE: [number, number] = [0.8, 1.5];
 export const forceDefibrillatorEvent = registerWispEvent(
   KEY,
   "Defibrillator",
-  () => CONFIG.defibrillatorEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { moveMs, chargesMs, holdMs, mergeMs } = CONFIG.defibrillatorEvent;
+    const { moveMs, chargesMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

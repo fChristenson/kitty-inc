@@ -5,7 +5,7 @@
 // lights up a perma tier with a flash, a bloop and a jolt; at the far side
 // the storm whirls up into the total, which goes off in a huge blast and
 // shake. Pays floor income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -33,10 +33,10 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceSandstormEvent = registerWispEvent(
   KEY,
   "Sandstorm",
-  () => CONFIG.sandstormEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { streamMs, crossMs, flightMs, holdMs, mergeMs } =
-      CONFIG.sandstormEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;

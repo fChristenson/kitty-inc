@@ -6,4 +6,8 @@ export default {
   label: "Deep Bore",
   chance: 0.03,
   style: "drill",
+  values: {
+    // taps levelling the floor above per the crit's multiple (twice on its own)
+    taps: 1,
+  },
 } satisfies CritMeta;

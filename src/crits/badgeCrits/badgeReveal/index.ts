@@ -3,7 +3,7 @@
 // cartoon until it flips to its new face, which spins on, overshoots and turns
 // back to settle facing front. The Reveal event flips a silhouette to the art;
 // a badge reaching a new foil flips to its shimmering or glittering self
-import { CONFIG } from "../../../config";
+import reveal from "../../animatedCrits/events/revealEvent/meta";
 import { COLOR } from "../../../palette";
 import {
   playBloop,
@@ -112,8 +112,7 @@ const GLINT_GRID = 32;
 
 // when each beat starts, in ms from the stage being fully in
 export function badgeRevealTimeline() {
-  const { flyMs, hoverMs, bumpMs, spinUpMs, correctMs, holdMs } =
-    CONFIG.revealEvent;
+  const { flyMs, hoverMs, bumpMs, spinUpMs, correctMs, holdMs } = reveal.values;
   const bumpAt = flyMs + hoverMs;
   const spinAt = bumpAt + bumpMs * CONTACT;
   const swapAt = spinAt + spinUpMs;
@@ -235,7 +234,7 @@ function pickGlints(art: Art): Glint[] {
 }
 
 function spinAngle(ms: number, tl: Timeline): number {
-  const { spinUpMs, correctMs } = CONFIG.revealEvent;
+  const { spinUpMs, correctMs } = reveal.values;
   if (ms < tl.spinAt) return 0;
   if (ms < tl.swapAt) return SPIN_UP_ANGLE * ((ms - tl.spinAt) / spinUpMs) ** 2;
   if (ms < tl.settleAt)
@@ -257,7 +256,7 @@ function wispAt(
   headY: number,
   size: number,
 ): Point | null {
-  const { flyMs, bumpMs } = CONFIG.revealEvent;
+  const { flyMs, bumpMs } = reveal.values;
   if (ms < 0) return null;
   const hover = { x: cx, y: headY - HOVER_RISE };
   let bobShare = 1;

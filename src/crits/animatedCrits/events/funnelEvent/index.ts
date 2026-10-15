@@ -6,7 +6,7 @@
 // rumbles and the cash heaps up on the bar; then the bar swallows the lot and
 // jumps one crit tier in a huge blast and shake, and the cash sweeps into the
 // total. Pays floor income × floor number × REWARD, plus the levels and tier
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,10 +37,10 @@ const GULP_SHAKE: [number, number] = [0.6, 1.4];
 export const forceFunnelEvent = registerWispEvent(
   KEY,
   "Funnel",
-  () => CONFIG.funnelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { streamMs, fallMs, levelShare, holdMs, mergeMs } =
-      CONFIG.funnelEvent;
+      meta.values;
     const bar = findRewardBars(floor, context).find((b) => b.floor === floor);
     if (!bar) return;
     const width = area.right - area.left;

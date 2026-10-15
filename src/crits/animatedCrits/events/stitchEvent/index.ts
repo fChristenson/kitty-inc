@@ -7,7 +7,7 @@
 // thread pulls tight and every bar slams in a huge blast and shake, the cash
 // running on into the total. Pays floor income × floor number × REWARD, plus
 // the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -42,10 +42,10 @@ const PASS_SHAKE: [number, number] = [0.8, 1.6];
 export const forceStitchEvent = registerWispEvent(
   KEY,
   "Stitch",
-  () => CONFIG.stitchEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { travelMs, streamMs, levelShare, holdMs, mergeMs } =
-      CONFIG.stitchEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const first = Math.random() < 0.5 ? 1 : -1;

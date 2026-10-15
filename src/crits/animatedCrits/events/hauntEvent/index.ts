@@ -5,7 +5,7 @@
 // through the next, every pass a chill flash, a whoosh and a jolt as the
 // worker climbs a perma tier; it swoops ever faster, the last pass a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -32,9 +32,9 @@ const PASS_SHAKE: [number, number] = [0.5, 1.3];
 export const forceHauntEvent = registerWispEvent(
   KEY,
   "Haunt",
-  () => CONFIG.hauntEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hauntMs, holdMs, mergeMs } = CONFIG.hauntEvent;
+    const { hauntMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

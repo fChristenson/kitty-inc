@@ -5,7 +5,7 @@
 // through, which flashes with a bang, a jolt and free levels; it slams into
 // the ground in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const PLOW_SHAKE: [number, number] = [0.6, 1.4];
 export const forceCometPlowEvent = registerWispEvent(
   KEY,
   "Comet Plow",
-  () => CONFIG.cometPlowEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { plowMs, levelShare, holdMs, mergeMs } = CONFIG.cometPlowEvent;
+    const { plowMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const x = (area.left + area.right) / 2;

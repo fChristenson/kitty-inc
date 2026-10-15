@@ -7,7 +7,7 @@
 // jumps a crit tier with a flash and a jolt, the last in a huge blast and
 // shake as the comet flies off. Pays floor income × floor number × REWARD,
 // plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -45,9 +45,9 @@ const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 export const forceSungrazerEvent = registerWispEvent(
   KEY,
   "Sungrazer",
-  () => CONFIG.sungrazerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { passMs, holdMs, mergeMs } = CONFIG.sungrazerEvent;
+    const { passMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const sun = getButtonCenter(context.isGroundFloor);

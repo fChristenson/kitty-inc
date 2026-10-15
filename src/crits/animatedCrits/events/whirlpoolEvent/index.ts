@@ -6,7 +6,7 @@
 // bloop and a jolt with free levels, and the last swallow drains it dry: the
 // bar jumps a crit tier in a huge blast and shake. Pays floor income × floor
 // number × REWARD, plus the levels and tier
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -33,10 +33,10 @@ const GULP_SHAKE: [number, number] = [0.8, 1.5];
 export const forceWhirlpoolEvent = registerWispEvent(
   KEY,
   "Whirlpool",
-  () => CONFIG.whirlpoolEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { streamMs, spiralMs, levelShare, holdMs, mergeMs } =
-      CONFIG.whirlpoolEvent;
+      meta.values;
     const own = findRewardBars(floor, context).find((b) => b.floor === floor);
     if (!own) return;
     const eye = own.center;

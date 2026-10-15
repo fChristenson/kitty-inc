@@ -7,8 +7,8 @@
 // first, quicker and quicker, each paying into the live total, then pouring
 // into the bare core till it goes up in a chain of blasts; the ship streaks
 // off the top and the floors rush up onto the view
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { multiply } from "../../../../shared/bigNumber";
@@ -144,7 +144,7 @@ interface Plan {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.fortressEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startFortress,
@@ -160,7 +160,7 @@ export function forceFortressEvent(floor: Floor): void {
 
 function startFortress(floor: Floor, context: EventProcContext): void {
   const { enterMs, flyMs, leaveMs, payoutsPerNode, payoutsCore } =
-    CONFIG.fortressEvent;
+    meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
 
   // the ship's middle at ms on the flight's clock (negative on the way in)

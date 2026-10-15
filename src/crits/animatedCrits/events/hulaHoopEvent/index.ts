@@ -5,7 +5,7 @@
 // lights the worker up a perma tier; it sails over onto the next worker
 // and does it again, quicker each time; the last spin flings it off in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -35,9 +35,9 @@ const SPIN_SHAKE: [number, number] = [0.6, 1.3];
 export const forceHulaHoopEvent = registerWispEvent(
   KEY,
   "Hula Hoop",
-  () => CONFIG.hulaHoopEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dropMs, spinsMs, hopMs, holdMs, mergeMs } = CONFIG.hulaHoopEvent;
+    const { dropMs, spinsMs, hopMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

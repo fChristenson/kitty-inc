@@ -5,7 +5,7 @@
 // bottom the same way, leaving a four-way kaleidoscope with cash pouring
 // out of both seams; then it all snaps back to normal in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import {
   playExplosion,
@@ -45,10 +45,10 @@ const SNAP_SHAKE = 2.3;
 export const forceMirrorMirrorEvent = registerWispEvent(
   KEY,
   "Mirror Mirror",
-  () => CONFIG.mirrorMirrorEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { foldMs, gapMs, showMs, snapMs, holdMs, mergeMs } =
-      CONFIG.mirrorMirrorEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

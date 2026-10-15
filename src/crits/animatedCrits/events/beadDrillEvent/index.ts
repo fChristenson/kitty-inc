@@ -6,7 +6,7 @@
 // quicker each time, then bores into the lock and punches through it in a
 // huge blast and shake, the floor unlocked for free. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,9 +33,9 @@ const HIT_SHAKE = 2.4;
 export const forceBeadDrillEvent = registerWispEvent(
   KEY,
   "Bead Drill",
-  () => CONFIG.beadDrillEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { approachMs, boresMs, holdMs, mergeMs } = CONFIG.beadDrillEvent;
+    const { approachMs, boresMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

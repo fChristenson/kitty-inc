@@ -5,7 +5,7 @@
 // harder, every ram a flash, a bang and a big jolt; the last smashes in
 // with a huge blast and shake, and as the screen unfreezes the floor bursts
 // open: unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,10 +30,10 @@ const RAM_SHAKE: [number, number] = [1, 1.9];
 export const forceBatteringRamEvent = registerWispEvent(
   KEY,
   "Battering Ram",
-  () => CONFIG.batteringRamEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { swoopMs, drawsMs, strikeMs, holdMs, mergeMs } =
-      CONFIG.batteringRamEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const target: Point = {

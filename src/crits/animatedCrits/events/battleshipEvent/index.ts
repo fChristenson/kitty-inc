@@ -6,7 +6,7 @@
 // cell is hit it's "SUNK!" and the whole ship blows, cell by cell; the
 // second ship goes down in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const HIT_SHAKE: [number, number] = [0.5, 1];
 export const forceBattleshipEvent = registerWispEvent(
   KEY,
   "Battleship",
-  () => CONFIG.battleshipEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotsMs, flightMs, holdMs, mergeMs } = CONFIG.battleshipEvent;
+    const { shotsMs, flightMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

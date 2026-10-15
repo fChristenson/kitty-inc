@@ -7,7 +7,7 @@
 // the whole ledge gives way, both ends gushing at once in a huge blast and
 // shake as the coins sweep into the total. Pays floor income × floor number
 // × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -38,10 +38,10 @@ const SPILL_SHAKE: [number, number] = [0.5, 1.3];
 export const forceCoinPusherEvent = registerWispEvent(
   KEY,
   "Coin Pusher",
-  () => CONFIG.coinPusherEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pushesMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.coinPusherEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const y = (area.top + area.bottom) / 2;
     const ends: Point[] = [

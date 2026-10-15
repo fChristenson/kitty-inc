@@ -5,7 +5,7 @@
 // empty spots, and as the last flea lands on each, a new worker forms there
 // with a bang and a jolt; the very last in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const LAND_SHAKE: [number, number] = [0.6, 1.3];
 export const forceFleasEvent = registerWispEvent(
   KEY,
   "Fleas",
-  () => CONFIG.fleasEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { springGapMs, hopMs, holdMs, mergeMs } = CONFIG.fleasEvent;
+    const { springGapMs, hopMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

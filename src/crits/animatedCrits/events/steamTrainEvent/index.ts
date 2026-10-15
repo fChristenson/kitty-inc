@@ -6,7 +6,7 @@
 // new worker steps off, then steams on to the next, quicker each time, the
 // last stop landing in a huge blast and shake. Pays floor income × floor
 // number × REWARD, plus the hires
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -60,9 +60,9 @@ interface Stop {
 export const forceSteamTrainEvent = registerWispEvent(
   KEY,
   "Steam Train",
-  () => CONFIG.steamTrainEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { legsMs, dwellMs, holdMs, mergeMs } = CONFIG.steamTrainEvent;
+    const { legsMs, dwellMs, holdMs, mergeMs } = meta.values;
     const found = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (found.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

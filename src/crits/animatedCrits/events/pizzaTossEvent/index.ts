@@ -6,7 +6,7 @@
 // tier, as the wisp darts to the next bar with a fresh disc, quicker each
 // time; the last slap a huge blast and shake as all the cash pours into the
 // total. Pays floor income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -56,9 +56,9 @@ interface Toss {
 export const forcePizzaTossEvent = registerWispEvent(
   KEY,
   "Pizza Toss",
-  () => CONFIG.pizzaTossEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { formMs, spinsMs, tossMs, holdMs, mergeMs } = CONFIG.pizzaTossEvent;
+    const { formMs, spinsMs, tossMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -5,7 +5,7 @@
 // every arc a crack, a flash and coins popping out of its middle; then
 // every wisp arcs into the middle of the screen at once in a huge blast
 // and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,10 +37,10 @@ const EDGE = 0.1;
 export const forceArcFlashEvent = registerWispEvent(
   KEY,
   "Arc Flash",
-  () => CONFIG.arcFlashEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { scatterMs, arcsMs, finalGapMs, holdMs, mergeMs } =
-      CONFIG.arcFlashEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;
     const height = area.bottom - area.top;

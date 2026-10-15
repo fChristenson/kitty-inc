@@ -5,7 +5,7 @@
 // as the bar lands free levels, the passes zigzagging down the bars ever
 // harder, until the last catch is flung straight into the bar's middle in
 // a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,9 +34,9 @@ const CATCH_SHAKE: [number, number] = [0.6, 1.2];
 export const forceLacrosseEvent = registerWispEvent(
   KEY,
   "Lacrosse",
-  () => CONFIG.lacrosseEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { passesMs, holdMs, mergeMs } = CONFIG.lacrosseEvent;
+    const { passesMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

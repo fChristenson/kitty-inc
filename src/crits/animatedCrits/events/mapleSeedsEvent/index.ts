@@ -5,7 +5,7 @@
 // lands with a pop, a bloop, a jolt and a burst of coins, the landings
 // pattering ever faster, the last a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -35,9 +35,9 @@ const LAND_SHAKE: [number, number] = [0.3, 1.1];
 export const forceMapleSeedsEvent = registerWispEvent(
   KEY,
   "Maple Seeds",
-  () => CONFIG.mapleSeedsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flingMs, fallMs, holdMs, mergeMs } = CONFIG.mapleSeedsEvent;
+    const { flingMs, fallMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left - EDGE * 2;
     const height = area.bottom - area.top;

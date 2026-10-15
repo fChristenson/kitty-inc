@@ -4,8 +4,8 @@
 // blow the wisps riding its arms one after another from the core outward,
 // each paying into the live total, then the core goes up as the view
 // plunges through it
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { multiply } from "../../../../shared/bigNumber";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
@@ -83,7 +83,7 @@ const CORE_GLOW = fadeStops(COLOR.heavenlyGold);
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.galaxyFlightEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startGalaxyFlight,
@@ -120,7 +120,7 @@ const riderR = (k: number) => RIDER_FROM + k * RIDER_STEP;
 const shotAt = (k: number) => SHOOT_AT + k * SHOT_EVERY;
 
 function startGalaxyFlight(floor: Floor, context: EventProcContext): void {
-  const { payoutsPerRider, payoutsCore } = CONFIG.galaxyFlightEvent;
+  const { payoutsPerRider, payoutsCore } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const coreAt = shotAt(RIDERS - 1) + CORE_AFTER;
   const flyMs = coreAt + AFTER;

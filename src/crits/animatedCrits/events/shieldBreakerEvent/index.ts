@@ -6,7 +6,7 @@
 // and a jolt, the bubble flickering and trembling harder, until all three
 // fire one last volley together that shatters it in a huge blast and shake
 // and the bar jumps a crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,9 +55,9 @@ interface Shot {
 export const forceShieldBreakerEvent = registerWispEvent(
   KEY,
   "Shield Breaker",
-  () => CONFIG.shieldBreakerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotsMs, holdMs, mergeMs } = CONFIG.shieldBreakerEvent;
+    const { shotsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

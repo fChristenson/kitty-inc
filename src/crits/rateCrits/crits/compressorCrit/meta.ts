@@ -6,4 +6,9 @@ export default {
   label: "Compressor",
   chance: 0.01,
   style: "crush",
+  values: {
+    // a bar this many times as fast for good (its own ownSpeed)
+    speed: 1.2,
+    ownSpeed: 1.4,
+  },
 } satisfies CritMeta;

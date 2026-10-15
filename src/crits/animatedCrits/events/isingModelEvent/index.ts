@@ -7,7 +7,7 @@
 // flips and the whole grid blazes gold; then it's pulled into the lock like
 // iron filings to a magnet, which blows open in a huge blast: the floor
 // unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -40,10 +40,10 @@ const BLAZE_SHAKE = 0.9;
 export const forceIsingModelEvent = registerWispEvent(
   KEY,
   "Ising Model",
-  () => CONFIG.isingModelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, coolMs, blazeMs, pullMs, holdMs, mergeMs } =
-      CONFIG.isingModelEvent;
+      meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

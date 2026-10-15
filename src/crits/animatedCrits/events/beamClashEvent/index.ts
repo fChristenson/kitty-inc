@@ -6,7 +6,7 @@
 // blinding flash and blast, and a roaring geyser of cash bursts up out of
 // the clash into the total-income readout, which goes off in a huge blast
 // and shake. Pays floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,7 +44,7 @@ const SHOVE_SHAKE: [number, number] = [0.9, 2];
 export const forceBeamClashEvent = registerWispEvent(
   KEY,
   "Beam Clash",
-  () => CONFIG.beamClashEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const {
       aimMs,
@@ -55,7 +55,7 @@ export const forceBeamClashEvent = registerWispEvent(
       travelMs,
       holdMs,
       mergeMs,
-    } = CONFIG.beamClashEvent;
+    } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

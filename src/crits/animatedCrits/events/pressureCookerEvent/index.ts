@@ -6,7 +6,7 @@
 // rumbles, then blows in a huge blast and shake, its shockwave racing out
 // over the workers, each lighting up as it passes and climbing a perma
 // tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -35,10 +35,10 @@ const HISS_SHAKE: [number, number] = [0.2, 0.8];
 export const forcePressureCookerEvent = registerWispEvent(
   KEY,
   "Pressure Cooker",
-  () => CONFIG.pressureCookerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, steamsMs, boilMs, holdMs, mergeMs } =
-      CONFIG.pressureCookerEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -2,8 +2,8 @@
 // the button streams coins and bills out to draw the crit's own 5, 25 or 125
 // across the screen in the crit font; the payout is multiplied by that number
 // (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import {
@@ -143,13 +143,13 @@ export function numberSpots(text: string, area: CoverArea): Spot[] {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.drawEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const tier = context.critTier ?? pickCritTierByOdds();
       const { multiplier } = CRIT_TIER_CONFIG[tier];
-      const cover = startMoneyCover(KEY, floor, context, CONFIG.drawEvent, {
+      const cover = startMoneyCover(KEY, floor, context, meta.values, {
         layout: (area) => numberSpots(String(multiplier), area),
         tier,
         rewardMultiplier: multiplier,
@@ -158,7 +158,7 @@ registerEventProc(
       if (!cover) return;
       // left to right, so the number is drawn as it's read
       const spots = [...cover.spots].sort((a, b) => a.x - b.x);
-      cover.stream(spots, CONFIG.drawEvent.streamMs);
+      cover.stream(spots, meta.values.streamMs);
       playBoostEventStream();
     },
   },

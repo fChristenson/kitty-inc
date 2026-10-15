@@ -6,7 +6,7 @@
 // tier; then it folds its wings and dives into the clicked floor's bar,
 // which jumps a crit tier too in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const STRIKE_SHAKE: [number, number] = [1, 1.5];
 export const forceStormWingsEvent = registerWispEvent(
   KEY,
   "Storm Wings",
-  () => CONFIG.stormWingsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flyMs, diveMs, holdMs, mergeMs } = CONFIG.stormWingsEvent;
+    const { flyMs, diveMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     if (!own) return;

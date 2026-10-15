@@ -5,7 +5,7 @@
 // each thump a bang, a jolt and a ring of coins flung off its edges into
 // the dark; then the camera slams back in to fill the view in a huge blast
 // and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const THUMP_SHAKE: [number, number] = [0.6, 1.4];
 export const forcePullBackEvent = registerWispEvent(
   KEY,
   "Pull Back",
-  () => CONFIG.pullBackEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pullMs, thumpsMs, slamMs, holdMs, mergeMs } = CONFIG.pullBackEvent;
+    const { pullMs, thumpsMs, slamMs, holdMs, mergeMs } = meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

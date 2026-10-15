@@ -6,7 +6,7 @@
 // a cycle tears through lands free levels with a flash and a jolt; at the
 // bottom the walls blaze up in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -36,9 +36,9 @@ const HIT_SHAKE: [number, number] = [0.4, 1.1];
 export const forceLightCyclesEvent = registerWispEvent(
   KEY,
   "Light Cycles",
-  () => CONFIG.lightCyclesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { raceMs, holdMs, mergeMs } = CONFIG.lightCyclesEvent;
+    const { raceMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

@@ -5,7 +5,7 @@
 // worker in a flash, a bang and a jolt that lights it up a perma tier; then
 // every beam fires at once onto all of them in a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -30,9 +30,9 @@ const SHOT_BURST: [number, number] = [0.5, 0.9];
 export const forceLockOnEvent = registerWispEvent(
   KEY,
   "Lock-On",
-  () => CONFIG.lockOnEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { huntsMs, fireMs, volleyMs, holdMs, mergeMs } = CONFIG.lockOnEvent;
+    const { huntsMs, fireMs, volleyMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .sort(() => Math.random() - 0.5)
       .slice(0, MAX_WORKERS);

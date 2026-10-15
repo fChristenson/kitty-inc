@@ -5,7 +5,7 @@
 // whoosh and a jolt, ever faster; it signs off with a long flourish that
 // underlines the lot and goes off in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -36,10 +36,10 @@ const LOOP_SHAKE: [number, number] = [0.4, 1.1];
 export const forceSkyWriterEvent = registerWispEvent(
   KEY,
   "Sky Writer",
-  () => CONFIG.skyWriterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { climbMs, writeMs, flourishMs, holdMs, mergeMs } =
-      CONFIG.skyWriterEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const w = (area.right - area.left) * WIDE;
     const left = (area.left + area.right) / 2 - w / 2;

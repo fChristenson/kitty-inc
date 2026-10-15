@@ -6,8 +6,8 @@
 // coins at the top of it. The last leaps highest and blows in a huge blast
 // and shake, and the coins sweep into the total. Pays floor income × floor
 // number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -117,13 +117,13 @@ function twitchLift(kernel: Kernel, ms: number): number {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.popcornEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { heatMs, popMs, jumpMs, holdMs, mergeMs } = CONFIG.popcornEvent;
+      const { heatMs, popMs, jumpMs, holdMs, mergeMs } = meta.values;
       const left = Math.max(area.left, SIDE_WALL_WIDTH) + ROW_MARGIN;
       const right =
         Math.min(area.right, FLOOR_W - SIDE_WALL_WIDTH) - ROW_MARGIN;

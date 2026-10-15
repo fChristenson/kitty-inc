@@ -5,7 +5,7 @@
 // faster with a thud and a jolt; then it's hurled down onto the bar, which
 // jumps a crit tier in a huge blast and shake. Pays floor income × floor
 // number × REWARD, plus the tier
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -39,9 +39,9 @@ const PULSE_SHAKE: [number, number] = [0.25, 0.8];
 export const forceSpiritBombEvent = registerWispEvent(
   KEY,
   "Spirit Bomb",
-  () => CONFIG.spiritBombEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gatherMs, throwMs, holdMs, mergeMs } = CONFIG.spiritBombEvent;
+    const { gatherMs, throwMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

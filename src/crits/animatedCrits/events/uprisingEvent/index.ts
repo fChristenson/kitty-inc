@@ -6,7 +6,7 @@
 // they curl over toward each other and crash together in the middle, then
 // the whole lot pours up into the total in a huge blast and shake. Pays
 // floor income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,10 +39,10 @@ const SPRAY_SHAKE: [number, number] = [0.7, 1.5];
 export const forceUprisingEvent = registerWispEvent(
   KEY,
   "Uprising",
-  () => CONFIG.uprisingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, curlMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.uprisingEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const bars = context.upgradeFloorFree
       ? findRewardBars(floor, context).slice(-MAX_BARS)

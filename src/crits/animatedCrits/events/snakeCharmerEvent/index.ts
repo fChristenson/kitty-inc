@@ -7,7 +7,7 @@
 // strike, ever faster; then it rears up and dives into the total in a huge
 // blast and shake. Pays floor income × floor number × REWARD, plus the
 // tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,10 +44,10 @@ const STRIKE_SHAKE: [number, number] = [0.6, 1.3];
 export const forceSnakeCharmerEvent = registerWispEvent(
   KEY,
   "Snake Charmer",
-  () => CONFIG.snakeCharmerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, strikesMs, diveMs, holdMs, mergeMs } =
-      CONFIG.snakeCharmerEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const fallback = totalSpot(area);

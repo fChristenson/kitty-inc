@@ -6,7 +6,7 @@
 // fires the wisp up into the total-income readout in a huge blast and shake,
 // and the pool erupts up after it into the total. Pays floor income × floor
 // number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -42,10 +42,10 @@ const SURGE_SHAKE: [number, number] = [1.1, 1.9];
 export const forceBobberEvent = registerWispEvent(
   KEY,
   "Bobber",
-  () => CONFIG.bobberEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { levelMs, launchMs, sweepMs, flightMs, holdMs, mergeMs } =
-      CONFIG.bobberEvent;
+      meta.values;
     const width = area.right - area.left;
     const button = getButtonCenter(context.isGroundFloor);
     const fallback = totalSpot(area);

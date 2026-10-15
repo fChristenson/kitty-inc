@@ -6,7 +6,7 @@
 // time; it reaches the total-income readout and the beams slam together on
 // it in a huge blast and shake, and the coins sweep into the total. Pays
 // floor income × floor number × REWARD (see ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const CLASH_SHAKE = 2.2;
 export const forceScissorsEvent = registerWispEvent(
   KEY,
   "Scissors",
-  () => CONFIG.scissorsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swingMs, openMs, holdMs, mergeMs } = CONFIG.scissorsEvent;
+    const { swingMs, openMs, holdMs, mergeMs } = meta.values;
     const height = area.bottom - area.top;
     const width = area.right - area.left;
     const fallback = totalSpot(area);

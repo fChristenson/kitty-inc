@@ -6,7 +6,7 @@
 // the rings break on the screen's edges and all the cash surges back into
 // the total in a huge blast and shake. Pays floor income × floor number ×
 // REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -34,10 +34,10 @@ const RING_SHAKE: [number, number] = [0.8, 1.6];
 export const forceShockwaveEvent = registerWispEvent(
   KEY,
   "Shockwave",
-  () => CONFIG.shockwaveEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { gapsMs, expandMs, flightMs, levelShare, holdMs, mergeMs } =
-      CONFIG.shockwaveEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const bars = context.upgradeFloorFree

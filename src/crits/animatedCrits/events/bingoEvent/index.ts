@@ -5,7 +5,7 @@
 // faster, until a whole row is full: a wisp streaks along the winning line
 // lighting it up and BINGO! slams down over the screen in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const DAUB_SHAKE: [number, number] = [0.3, 0.9];
 export const forceBingoEvent = registerWispEvent(
   KEY,
   "Bingo",
-  () => CONFIG.bingoEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spreadMs, callsMs, holdMs, mergeMs } = CONFIG.bingoEvent;
+    const { spreadMs, callsMs, holdMs, mergeMs } = meta.values;
     const width = (area.right - area.left) * CARD;
     const height = (area.bottom - area.top) * CARD;
     const left = (area.left + area.right) / 2 - width / 2;

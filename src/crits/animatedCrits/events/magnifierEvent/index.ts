@@ -6,7 +6,7 @@
 // total-income readout and zooms in hard in a huge blast and shake, and the
 // coins sweep into the total. Pays floor income × floor number × REWARD (see
 // ../cashFlow)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -39,9 +39,9 @@ const STOP_SHAKE = [1.2, 1.6, 2];
 export const forceMagnifierEvent = registerWispEvent(
   KEY,
   "Magnifier",
-  () => CONFIG.magnifierEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { glideMs, zoomMs, holdMs, mergeMs } = CONFIG.magnifierEvent;
+    const { glideMs, zoomMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);

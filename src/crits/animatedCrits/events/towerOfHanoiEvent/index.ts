@@ -6,7 +6,7 @@
 // landing a pop and a jolt, the whole tower moving to the last peg in 31
 // moves; the finished tower blazes and hammers down into the bar, which
 // jumps a crit tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
@@ -51,10 +51,10 @@ interface Move {
 export const forceTowerOfHanoiEvent = registerWispEvent(
   KEY,
   "Tower of Hanoi",
-  () => CONFIG.towerOfHanoiEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, solveMs, hammerMs, holdMs, mergeMs } =
-      CONFIG.towerOfHanoiEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

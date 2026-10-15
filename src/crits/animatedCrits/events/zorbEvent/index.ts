@@ -5,7 +5,7 @@
 // and the ceiling, every bounce a splash of coins, a bang and a jolt, ever
 // faster; then it rockets up into the total and bursts there in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ const BOUNCE_SHAKE: [number, number] = [0.6, 1.5];
 export const forceZorbEvent = registerWispEvent(
   KEY,
   "Zorb",
-  () => CONFIG.zorbEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gatherMs, bounceMs, flightMs, holdMs, mergeMs } = CONFIG.zorbEvent;
+    const { gatherMs, bounceMs, flightMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const fallback = totalSpot(area);
     const box = {

@@ -5,7 +5,7 @@
 // a jolt; the last surges right up a wall and over into the total-income
 // readout in a huge blast and shake, and the coins sweep into the total. Pays
 // floor income × floor number × REWARD (see ../moneyCover)
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,10 +44,10 @@ const FINAL_COINS = 30;
 export const forceSloshEvent = registerWispEvent(
   KEY,
   "Slosh",
-  () => CONFIG.sloshEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { pourMs, fallMs, sloshMs, surgeMs, holdMs, mergeMs } =
-      CONFIG.sloshEvent;
+      meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const left = area.left + width * EDGE;

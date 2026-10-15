@@ -6,7 +6,7 @@
 // jolt with free levels; the last hop launches it into the total, which goes
 // off in a huge blast and shake. Pays floor income × floor number × REWARD,
 // plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import {
@@ -44,9 +44,9 @@ const LAND_BURST: [number, number] = [0.45, 0.8];
 export const forcePogoEvent = registerWispEvent(
   KEY,
   "Pogo",
-  () => CONFIG.pogoEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { hopsMs, levelShare, holdMs, mergeMs } = CONFIG.pogoEvent;
+    const { hopsMs, levelShare, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     // bottom first, so it pogos up the screen
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS).reverse();

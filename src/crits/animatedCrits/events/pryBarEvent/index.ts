@@ -7,7 +7,7 @@
 // harder; the last pump wrenches the lock open in a huge blast and shake;
 // the floor bursts open, unlocked for free, as the screen unfreezes. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const PUMP_SHAKE: [number, number] = [0.6, 1.4];
 export const forcePryBarEvent = registerWispEvent(
   KEY,
   "Pry Bar",
-  () => CONFIG.pryBarEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { pumpsMs, holdMs, mergeMs } = CONFIG.pryBarEvent;
+    const { pumpsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

@@ -5,7 +5,7 @@
 // big jolt and a spray of coins, ever higher and quicker across the screen;
 // the last leaps highest of all in the middle and blows in a huge blast and
 // shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ const BLAST_SHAKE: [number, number] = [0.6, 1.4];
 export const forceBouncingBettyEvent = registerWispEvent(
   KEY,
   "Bouncing Betty",
-  () => CONFIG.bouncingBettyEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { buryMs, minesMs, holdMs, mergeMs } = CONFIG.bouncingBettyEvent;
+    const { buryMs, minesMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const ground = area.bottom - LOW;
     const ltr = Math.random() < 0.5;

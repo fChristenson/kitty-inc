@@ -5,7 +5,7 @@
 // a bang and a jolt landing free levels on the bar inside it; off the last
 // loop it launches up into the total in a huge blast and shake. Pays floor
 // income × floor number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,10 +36,10 @@ const LOOP_SHAKE: [number, number] = [0.7, 1.4];
 export const forceStuntTrackEvent = registerWispEvent(
   KEY,
   "Stunt Track",
-  () => CONFIG.stuntTrackEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { streamMs, travelMs, levelShare, holdMs, mergeMs } =
-      CONFIG.stuntTrackEvent;
+      meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => b.center.y - a.center.y);

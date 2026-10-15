@@ -5,7 +5,7 @@
 // hole, until the bar's riddled and jolts with free levels; then the swarm
 // lifts off and drops on the next bar, quicker each time, the last bar
 // riddled in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,10 +37,10 @@ interface Riddle {
 export const forceWoodwormEvent = registerWispEvent(
   KEY,
   "Woodworm",
-  () => CONFIG.woodwormEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { approachMs, boresMs, levelShare, holdMs, mergeMs } =
-      CONFIG.woodwormEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

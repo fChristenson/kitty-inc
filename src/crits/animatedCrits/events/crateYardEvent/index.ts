@@ -7,8 +7,8 @@
 // a wall of crates, blown apart with him in a chain of blasts. The shutter at
 // the back rolls up on the floors, the view rushes through, and every bar in
 // view takes free levels as it lands
+import meta from "./meta";
 import { levelsFor, type Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
@@ -45,6 +45,7 @@ import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { findRewardBars } from "../../eventRewards";
 import {
+  FLIGHT_STAGE,
   canStartFlightStage,
   isFlightStageRunning,
   startFlightStage,
@@ -149,7 +150,7 @@ interface Fight {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.crateYardEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) =>
       floor.unlocked &&
@@ -281,8 +282,8 @@ function startCrateYard(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   if (!area) return;
   const aspect = (area.bottom - area.top) / (area.right - area.left);
-  const { slideMs, flyMs, levelShare, levelGapMs } = CONFIG.crateYardEvent;
-  const { arriveMs } = CONFIG.flightStage;
+  const { slideMs, flyMs, levelShare, levelGapMs } = meta.values;
+  const { arriveMs } = FLIGHT_STAGE;
   const tier = context.critTier ?? pickCritTierByOdds();
   const land = fpsOpeningLanding(FOCAL, BACK_Z, OUT_W, 0, aspect);
   const fights: Fight[] = CRATES.map((crate, k) => {

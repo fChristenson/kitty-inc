@@ -6,7 +6,7 @@
 // up the far side, and every income bar the big ghost crosses blazes with
 // a flash and a jolt and jumps a crit tier; the last flares out in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -40,9 +40,9 @@ const CROSS_SHAKE: [number, number] = [0.8, 1.5];
 export const forceLensFlareEvent = registerWispEvent(
   KEY,
   "Lens Flare",
-  () => CONFIG.lensFlareEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { riseMs, slideMs, holdMs, mergeMs } = CONFIG.lensFlareEvent;
+    const { riseMs, slideMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const top = area.top + EDGE;

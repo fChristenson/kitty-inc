@@ -5,7 +5,7 @@
 // over jolts with free levels, and at the top the whole wave breaks into
 // the total in a huge blast and shake. Pays floor income × floor number ×
 // REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,10 +33,10 @@ const SURGE_SHAKE = 0.6;
 export const forceTidalBoreEvent = registerWispEvent(
   KEY,
   "Tidal Bore",
-  () => CONFIG.tidalBoreEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, breakMs, levelShare, holdMs, mergeMs } =
-      CONFIG.tidalBoreEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     const width = area.right - area.left;
     const total = totalSpot(area);

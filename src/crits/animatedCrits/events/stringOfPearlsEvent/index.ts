@@ -5,7 +5,7 @@
 // fragments peel off and plunge onto the income bars below, each impact a
 // blast and a jolt of free levels, quicker and quicker, the last landing
 // in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ interface Pearl {
 export const forceStringOfPearlsEvent = registerWispEvent(
   KEY,
   "String of Pearls",
-  () => CONFIG.stringOfPearlsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { travelMs, holdMs, mergeMs } = CONFIG.stringOfPearlsEvent;
+    const { travelMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => a.box.y - b.box.y);

@@ -5,7 +5,7 @@
 // the worker jerking with a flash and a jolt as it climbs a perma tier, the
 // yanks quickening; its last yank pulls every string at once in a huge blast
 // and shake. Pays floor income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,10 +44,10 @@ const MASTER = 0.65;
 export const forcePuppeteerEvent = registerWispEvent(
   KEY,
   "Puppeteer",
-  () => CONFIG.puppeteerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, stringMs, yanksMs, holdMs, mergeMs } =
-      CONFIG.puppeteerEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context)
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);

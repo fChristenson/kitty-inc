@@ -4,7 +4,7 @@
 // until the dots make a cat's head; the sketch blazes and drops onto the
 // spot as a new worker, and the bolts move on to sketch the next one, the
 // last landing in a big blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,10 +50,10 @@ interface Sketch {
 export const forceCatSketchEvent = registerWispEvent(
   KEY,
   "Cat Sketch",
-  () => CONFIG.catSketchEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { strikeMs, blazeMs, dropMs, gapMs, holdMs, mergeMs } =
-      CONFIG.catSketchEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_SKETCHES);
     if (hires.length === 0) return;
     let clock = 0;

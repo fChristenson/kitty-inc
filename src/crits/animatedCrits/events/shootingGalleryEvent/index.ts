@@ -7,7 +7,7 @@
 // knocking the target down with a flash, a bang and a jolt as a new worker
 // drops in where it stood; the last target goes down in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -51,9 +51,9 @@ const HIT_SHAKE: [number, number] = [0.7, 1.5];
 export const forceShootingGalleryEvent = registerWispEvent(
   KEY,
   "Shooting Gallery",
-  () => CONFIG.shootingGalleryEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { popMs, burstsMs, holdMs, mergeMs } = CONFIG.shootingGalleryEvent;
+    const { popMs, burstsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context)
       .sort((a, b) => a.y - b.y)
       .slice(0, MAX_HIRES);

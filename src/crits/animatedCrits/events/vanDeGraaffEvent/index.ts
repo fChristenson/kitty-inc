@@ -6,7 +6,7 @@
 // one after another, each a blinding flash, a crack and a jolt as a new
 // worker forms there; the last bolt lands in a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const HIT_SHAKE: [number, number] = [0.7, 1.4];
 export const forceVanDeGraaffEvent = registerWispEvent(
   KEY,
   "Van de Graaff",
-  () => CONFIG.vanDeGraaffEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { chargeMs, gapsMs, holdMs, mergeMs } = CONFIG.vanDeGraaffEvent;
+    const { chargeMs, gapsMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

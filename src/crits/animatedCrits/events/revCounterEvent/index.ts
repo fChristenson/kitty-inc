@@ -6,7 +6,7 @@
 // surges higher, ever quicker; on the last rev it smashes into the redline
 // and the whole gauge blows in a huge blast and shake. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -43,9 +43,9 @@ const REV_SHAKE: [number, number] = [0.6, 1.3];
 export const forceRevCounterEvent = registerWispEvent(
   KEY,
   "Rev Counter",
-  () => CONFIG.revCounterEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { dialMs, revsMs, holdMs, mergeMs } = CONFIG.revCounterEvent;
+    const { dialMs, revsMs, holdMs, mergeMs } = meta.values;
     const center: Point = {
       x: (area.left + area.right) / 2,
       y: (area.top + area.bottom) / 2,

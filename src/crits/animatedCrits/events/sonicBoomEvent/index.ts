@@ -5,8 +5,8 @@
 // a huge boom, off the screen's right edge almost at once, leaving a big ball
 // of money where it set off and a trail of it all along its path, which
 // merges into the total. Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -51,14 +51,14 @@ const SPRAY: [number, number] = [4, 40];
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.sonicBoomEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { glideMs, revMs, burstMs, holdMs, mergeMs } =
-        CONFIG.sonicBoomEvent;
+        meta.values;
       const width = area.right - area.left;
       const y = area.top + (area.bottom - area.top) * FLIGHT_HEIGHT;
       const startX = area.left - OUT;

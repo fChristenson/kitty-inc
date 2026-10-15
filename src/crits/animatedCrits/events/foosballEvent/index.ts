@@ -7,7 +7,7 @@
 // splash and a boing, quicker each pass; the last rod fires it into the
 // total in a huge blast and shake. Pays floor income × floor number ×
 // REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,10 +52,10 @@ const BANK_SHAKE = 0.35;
 export const forceFoosballEvent = registerWispEvent(
   KEY,
   "Foosball",
-  () => CONFIG.foosballEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { serveMs, legsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.foosballEvent;
+      meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => b.center.y - a.center.y);

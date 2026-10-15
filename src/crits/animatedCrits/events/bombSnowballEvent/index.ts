@@ -7,7 +7,7 @@
 // onto the empty spots, where they go off one after another in a rolling
 // chain, each a big blast, a bang and a shake as a new worker forms in it;
 // the last a huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -48,10 +48,10 @@ const CHAIN_SHAKE: [number, number] = [0.9, 1.6];
 export const forceBombSnowballEvent = registerWispEvent(
   KEY,
   "Bomb Snowball",
-  () => CONFIG.bombSnowballEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { rollMs, shudderMs, flyMs, staggerMs, holdMs, mergeMs } =
-      CONFIG.bombSnowballEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

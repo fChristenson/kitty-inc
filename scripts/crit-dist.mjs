@@ -1,9 +1,10 @@
 // How the crits are spread: every played crit (floor, income, button, lock,
 // rate) and every animated crit (event) counted by style and by reward, per
 // group, with each style's share of its group's odds, so the thin spots show.
-// Event tags come from the comment over their CONFIG entry ("explosion,
-// levels: src/...") or, failing that, their module's header ("event (style;
-// reward)"); played crits' styles and chances from their meta.ts.
+// Event tags come from their meta.ts's style and reward ("explosion",
+// "levels"), failing that their module's header ("event (style; reward)"),
+// guessed from their descriptions as a last resort; played crits' styles and
+// chances from their meta.ts.
 // Usage: node scripts/crit-dist.mjs [--style <style>] [--reward <reward>]
 //          [--untagged] [--json]
 import fs from "node:fs";
@@ -20,13 +21,6 @@ const option = (name) => {
 };
 
 // ---------- the crits ----------
-
-const chancesIn = (file) =>
-  new Map(
-    [...read(file).matchAll(/^ {2,4}(\w+): \{\s*chance: ([\d.e-]+)/gm)].map(
-      (m) => [m[1], Number(m[2])],
-    ),
-  );
 
 // each played group's reward
 const PLAYED = [
@@ -185,18 +179,15 @@ for (const file of fs.readdirSync(
   ))
     loaded.add(m[1]);
 
-const eventConfig = read("src/crits/animatedCrits/config.ts").split(/\r?\n/);
-const eventChances = chancesIn("src/crits/animatedCrits/config.ts");
-for (let i = 0; i < eventConfig.length; i++) {
-  const key = eventConfig[i].match(/^ {2}(\w+Event): \{/)?.[1];
-  if (!key || !loaded.has(key)) continue;
-  const comment = [];
-  for (let j = i - 1; j >= 0 && /^\s*\/\//.test(eventConfig[j]); j--)
-    comment.unshift(eventConfig[j].replace(/^\s*\/\/\s?/, ""));
-  const text = comment
-    .join(" ")
-    .replace(/^.*?(?=[a-z][\w +-]*,[^:]*: src\/|[a-z][\w +-]*: src\/)/i, "")
-    .replace(/^batch \d+\s*/i, "");
+for (const key of loaded) {
+  const metaFile = `src/crits/animatedCrits/events/${key}/meta.ts`;
+  if (!fs.existsSync(path.join(ROOT, metaFile))) continue;
+  const meta = read(metaFile);
+  const field = (name) =>
+    new RegExp(`^ {2}${name}: "([^"]*)"`, "m").exec(meta)?.[1];
+  const comment = (meta.match(/(^\/\/.*\r?\n)+(?=export default)/m)?.[0] ?? "")
+    .split(/\r?\n/)
+    .map((line) => line.replace(/^\/\/\s?/, ""));
   const file = `src/crits/animatedCrits/events/${key}/index.ts`;
   const header = fs.existsSync(path.join(ROOT, file))
     ? (read(file).match(/^(\/\/.*\r?\n)+/)?.[0] ?? "").replace(
@@ -204,7 +195,9 @@ for (let i = 0; i < eventConfig.length; i++) {
         " ",
       )
     : "";
-  let tag = text.match(/^([^:]+?):\s*src\//)?.[1];
+  const style = field("style");
+  const reward = field("reward");
+  let tag = style ? (reward ? `${style}, ${reward}` : style) : undefined;
   if (!tag) {
     const m = header.match(/event \(([^;)]+);\s*([^)]+)\)/);
     if (m) tag = `${m[1]}, ${m[2]}`;
@@ -231,7 +224,7 @@ for (let i = 0; i < eventConfig.length; i++) {
     kind: key,
     styles,
     rewards,
-    chance: eventChances.get(key) ?? 0,
+    chance: Number(/^ {2}chance: ([\d._e-]+)/m.exec(meta)?.[1] ?? 0),
     guessed,
   });
 }

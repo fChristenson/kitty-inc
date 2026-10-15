@@ -7,7 +7,7 @@
 // the butterfly bursts and its glimmers stream off onto the workers in
 // view, one after another, each lighting up a perma tier, the last in a
 // huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -91,10 +91,10 @@ function lorenz(): Float32Array {
 export const forceStrangeAttractorEvent = registerWispEvent(
   KEY,
   "Strange Attractor",
-  () => CONFIG.strangeAttractorEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { traceMs, gatherMs, flyMs, holdMs, mergeMs } =
-      CONFIG.strangeAttractorEvent;
+      meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const flow = lorenz();

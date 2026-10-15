@@ -7,7 +7,7 @@
 // that blows up onto every income bar with a jolt of free levels, the last
 // in a huge blast and shake. Pays floor income × floor number × REWARD,
 // plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceDuneEvent = registerWispEvent(
   KEY,
   "Dune",
-  () => CONFIG.duneEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { crawlMs, levelShare, holdMs, mergeMs } = CONFIG.duneEvent;
+    const { crawlMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const width = area.right - area.left;

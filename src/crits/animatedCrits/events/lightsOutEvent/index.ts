@@ -6,7 +6,7 @@
 // quicker, until with the last press every light blazes gold at once and
 // the whole board bursts into cash in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -36,9 +36,9 @@ const FINAL_SHAKE = 2.0;
 export const forceLightsOutEvent = registerWispEvent(
   KEY,
   "Lights Out",
-  () => CONFIG.lightsOutEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { pressesMs, holdMs, mergeMs } = CONFIG.lightsOutEvent;
+    const { pressesMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const cell = Math.min(width * 0.85, height * 0.6) / N;

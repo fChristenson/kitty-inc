@@ -5,7 +5,7 @@
 // bar, quicker each time; the last eight hop up off the bottom bar and burst
 // in a rattling cluster of sixteen, capped by one huge blast as every bar
 // slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -68,10 +68,10 @@ interface Blast {
 export const forceDoublingBounceEvent = registerWispEvent(
   KEY,
   "Doubling Bounce",
-  () => CONFIG.doublingBounceEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { dropMs, hopMs, levelShare, holdMs, mergeMs } =
-      CONFIG.doublingBounceEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

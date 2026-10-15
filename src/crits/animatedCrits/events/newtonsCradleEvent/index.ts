@@ -6,8 +6,8 @@
 // a flash, a bang, a jolt and coins sprayed out of it. On the last clack all
 // five fly apart in a huge blast and shake, and the coins sweep into the
 // total. Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   playExplosion,
@@ -71,14 +71,14 @@ interface Clack {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.newtonsCradleEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const { popMs, firstSwingMs, swingMs, flyMs, holdMs, mergeMs } =
-        CONFIG.newtonsCradleEvent;
+        meta.values;
       const center = {
         x: (area.left + area.right) / 2,
         y: (area.top + area.bottom) / 2,

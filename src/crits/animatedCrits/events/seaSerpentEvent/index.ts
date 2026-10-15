@@ -5,7 +5,7 @@
 // every time it breaks the surface a splash, a bang and a jolt; at the far
 // side it breaches, leaping high out of the water into the total in a huge
 // blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const SPLASH_SHAKE: [number, number] = [0.6, 1.2];
 export const forceSeaSerpentEvent = registerWispEvent(
   KEY,
   "Sea Serpent",
-  () => CONFIG.seaSerpentEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { swimMs, breachMs, holdMs, mergeMs } = CONFIG.seaSerpentEvent;
+    const { swimMs, breachMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const ltr = button.x > (area.left + area.right) / 2;
     const from = ltr ? area.left - EDGE : area.right + EDGE;

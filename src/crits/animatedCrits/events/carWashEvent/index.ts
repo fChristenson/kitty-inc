@@ -6,7 +6,7 @@
 // worker it passes over foams up gold, flashes white and lights up a perma
 // tier with a jolt, the last going off in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -54,9 +54,9 @@ interface Wash {
 export const forceCarWashEvent = registerWispEvent(
   KEY,
   "Car Wash",
-  () => CONFIG.carWashEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { sweepMs, holdMs, mergeMs } = CONFIG.carWashEvent;
+    const { sweepMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const startY = area.top - 40;

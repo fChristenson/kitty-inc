@@ -5,8 +5,8 @@
 // upgrade button in view slams and shines as it passes over them. Each
 // floor's free upgrade levels land as its label is lit. Then the beam fades,
 // the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh, startBoostEventStreamLoop } from "../../../../sound";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -141,7 +141,7 @@ function findParts(
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.lighthouseEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -161,7 +161,7 @@ export function forceLighthouseEvent(floor: Floor): void {
 
 // the beam's angle ms into the event: one steady clockwise turn after the flight
 function beamAngle(ms: number): number {
-  const { flyMs, sweepMs } = CONFIG.lighthouseEvent;
+  const { flyMs, sweepMs } = meta.values;
   const u = Math.min(1, Math.max(0, (ms - flyMs) / sweepMs));
   return START_ANGLE + u * Math.PI * 2;
 }
@@ -222,7 +222,7 @@ function drawOverlay(
   if (!rect) return;
   const now = performance.now();
   const ms = now - event.startedAt;
-  const { flyMs, sweepMs } = CONFIG.lighthouseEvent;
+  const { flyMs, sweepMs } = meta.values;
 
   // everything sits dim in the dark until the beam finds it
   const drawAt = (c: CanvasRenderingContext2D, part: Part) => {
@@ -300,7 +300,7 @@ function startLighthouse(floor: Floor, context: EventProcContext): void {
   const found = findParts(floor, context);
   if (!area || !upgradeFloorFree || found.length === 0) return;
   const { flyMs, sweepMs, holdMs, levelShare, minLevels } =
-    CONFIG.lighthouseEvent;
+    meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const button = getButtonCenter(context.isGroundFloor);
   const lamp = {

@@ -6,7 +6,7 @@
 // leading flings its wisp off along its swing, arcing down onto a bar for
 // free levels with a jolt; the last is flung onto the clicked floor's bar in
 // a big blast and every bar slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -61,10 +61,10 @@ interface Fling {
 export const forceBarredSpiralEvent = registerWispEvent(
   KEY,
   "Barred Spiral",
-  () => CONFIG.barredSpiralEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { growMs, spinMs, flyMs, levelShare, holdMs, mergeMs } =
-      CONFIG.barredSpiralEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

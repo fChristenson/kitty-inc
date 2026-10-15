@@ -5,7 +5,7 @@
 // higher and across the building, quicker and quicker; then it drops back
 // over its bar, both guns riddle it in a rattling burst and it blows in a
 // huge blast that tiers the bar up. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -81,10 +81,10 @@ interface Shot {
 export const forceAirJuggleEvent = registerWispEvent(
   KEY,
   "Air Juggle",
-  () => CONFIG.airJuggleEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { tossMs, dropMs, levelShare, holdMs, mergeMs } =
-      CONFIG.airJuggleEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

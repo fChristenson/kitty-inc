@@ -5,7 +5,7 @@
 // outline; each bar it laps jolts with a crack, a bang and free levels;
 // then every bar's outline blazes at once in a huge blast and shake as
 // every bar slams. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -58,9 +58,9 @@ function around(bar: RewardBar, p: number, into: Point): Point {
 export const forceCrawlEvent = registerWispEvent(
   KEY,
   "Crawl",
-  () => CONFIG.crawlEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { lapsMs, levelShare, holdMs, mergeMs } = CONFIG.crawlEvent;
+    const { lapsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     // the crawler's joints, shared by its bolts

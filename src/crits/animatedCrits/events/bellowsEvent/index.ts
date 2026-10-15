@@ -6,7 +6,7 @@
 // pumps again for the next bar, faster each time, and its last great
 // squeeze blasts jets onto every bar at once in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,9 +52,9 @@ interface Pump {
 export const forceBellowsEvent = registerWispEvent(
   KEY,
   "Bellows",
-  () => CONFIG.bellowsEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { pumpsMs, levelShare, holdMs, mergeMs } = CONFIG.bellowsEvent;
+    const { pumpsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

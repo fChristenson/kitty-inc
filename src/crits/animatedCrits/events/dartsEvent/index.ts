@@ -6,7 +6,7 @@
 // "TRIPLE 20"), and a beam leaping from the dart to an income bar, which
 // jumps a crit tier; the last dart hits the bullseye: "BULLSEYE!" in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -49,9 +49,9 @@ const HIT_SHAKE: [number, number] = [0.7, 1.3];
 export const forceDartsEvent = registerWispEvent(
   KEY,
   "Darts",
-  () => CONFIG.dartsEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { throwsMs, flightMs, holdMs, mergeMs } = CONFIG.dartsEvent;
+    const { throwsMs, flightMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

@@ -6,7 +6,7 @@
 // and the target bursts into a spray of coins with a pop and a jolt; the
 // targets pop up ever faster, the last bursting in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -50,9 +50,9 @@ const HIT_SHAKE: [number, number] = [0.4, 1.1];
 export const forceTargetPracticeEvent = registerWispEvent(
   KEY,
   "Target Practice",
-  () => CONFIG.targetPracticeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { targetsMs, holdMs, mergeMs } = CONFIG.targetPracticeEvent;
+    const { targetsMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

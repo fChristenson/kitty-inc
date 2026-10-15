@@ -6,7 +6,7 @@
 // "PERFECT!", the notes ever faster; every few perfect hits a worker climbs
 // a perma tier with a jolt, and the final chord lands in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -43,9 +43,9 @@ const PROMOTE_SHAKE: [number, number] = [0.6, 1.3];
 export const forceNoteHighwayEvent = registerWispEvent(
   KEY,
   "Note Highway",
-  () => CONFIG.noteHighwayEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { notesMs, fallMs, holdMs, mergeMs } = CONFIG.noteHighwayEvent;
+    const { notesMs, fallMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const cx = (area.left + area.right) / 2;

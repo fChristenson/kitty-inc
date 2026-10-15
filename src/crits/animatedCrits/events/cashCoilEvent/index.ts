@@ -5,7 +5,7 @@
 // bar the head of the river crashes through on the way up blows with a
 // jolt of free levels, and at the roof it arcs off into the total-income
 // readout in a huge blast. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,10 +47,10 @@ interface Crash {
 export const forceCashCoilEvent = registerWispEvent(
   KEY,
   "Cash Coil",
-  () => CONFIG.cashCoilEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { streamMs, climbMs, levelShare, holdMs, mergeMs } =
-      CONFIG.cashCoilEvent;
+      meta.values;
     const width = area.right - area.left;
     const cx = (area.left + area.right) / 2;
     const radius = width / 2 - INSET;

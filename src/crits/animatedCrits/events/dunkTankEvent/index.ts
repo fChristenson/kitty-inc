@@ -7,7 +7,7 @@
 // bar jumping a crit tier; then the next bar's dunkee climbs up, each pitch
 // faster, the last dunk in a huge blast and shake. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -50,9 +50,9 @@ const DUNK_SHAKE: [number, number] = [0.9, 1.4];
 export const forceDunkTankEvent = registerWispEvent(
   KEY,
   "Dunk Tank",
-  () => CONFIG.dunkTankEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { pitchesMs, flightMs, holdMs, mergeMs } = CONFIG.dunkTankEvent;
+    const { pitchesMs, flightMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const own = found.find((b) => b.floor === floor);
     const bars = [

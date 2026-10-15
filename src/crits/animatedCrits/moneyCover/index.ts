@@ -5,7 +5,7 @@
 // which pays the floor's income times its floor number before revealing the
 // covered crit itself
 import type { Floor } from "../../../gameState";
-import { CONFIG } from "../../../config";
+import burst from "../events/burstEvent/meta";
 import { playCoinDrop, playSold } from "../../../sound";
 import { playExplosion } from "../../../shared/explosionBang";
 import { shakeScreen } from "../../../shared/screenShake";
@@ -335,7 +335,7 @@ export function startBurstCover(
   context: EventProcContext,
   options: MoneyCoverOptions = {},
 ): boolean {
-  const cover = startMoneyCover(key, floor, context, CONFIG.burstEvent, {
+  const cover = startMoneyCover(key, floor, context, burst.values, {
     ...options,
     layout: (area) => coverSpots(area, BURST_COINS),
   });

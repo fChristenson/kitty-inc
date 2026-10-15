@@ -5,7 +5,7 @@
 // along the bar, a bloop and a jolt as it lands free levels; then back up
 // twice as fast, and a last double-handed strike lands on every bar at once
 // in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -33,9 +33,9 @@ const STRIKE_SHAKE: [number, number] = [0.4, 1];
 export const forceXylophoneEvent = registerWispEvent(
   KEY,
   "Xylophone",
-  () => CONFIG.xylophoneEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { downMs, upMs, holdMs, mergeMs, levelShare } = CONFIG.xylophoneEvent;
+    const { downMs, upMs, holdMs, mergeMs, levelShare } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

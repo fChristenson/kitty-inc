@@ -6,7 +6,7 @@
 // pits into a store with a jolt; then every seed left on the board streams
 // into gold's store, which bursts into cash in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -49,9 +49,9 @@ interface Hop {
 export const forceMancalaEvent = registerWispEvent(
   KEY,
   "Mancala",
-  () => CONFIG.mancalaEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { movesMs, holdMs, mergeMs } = CONFIG.mancalaEvent;
+    const { movesMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const cell = Math.min((width * 0.9) / (PITS + 2), 160);

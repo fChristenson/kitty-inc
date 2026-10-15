@@ -4,7 +4,7 @@
 // to edge, every bend a splash, a bloop and a jolt, harder each time; at the
 // bottom it crashes out in a huge blast and shake and the coins sweep into
 // the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -25,9 +25,9 @@ const BEND_SHAKE: [number, number] = [0.4, 1.3];
 export const forceSluiceEvent = registerWispEvent(
   KEY,
   "Sluice",
-  () => CONFIG.sluiceEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { streamMs, travelMs, holdMs, mergeMs } = CONFIG.sluiceEvent;
+    const { streamMs, travelMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const left = area.left + EDGE;
     const right = area.right - EDGE;

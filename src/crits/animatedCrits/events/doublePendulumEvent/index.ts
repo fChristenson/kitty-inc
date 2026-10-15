@@ -6,7 +6,7 @@
 // tip whips past lights up a perma tier with a crack, a flash and a jolt;
 // then the tip snaps loose, darts onto any worker it missed and the last
 // lands in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -101,9 +101,9 @@ function swing(
 export const forceDoublePendulumEvent = registerWispEvent(
   KEY,
   "Double Pendulum",
-  () => CONFIG.doublePendulumEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flailMs, holdMs, mergeMs } = CONFIG.doublePendulumEvent;
+    const { flailMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const pivot: Point = {

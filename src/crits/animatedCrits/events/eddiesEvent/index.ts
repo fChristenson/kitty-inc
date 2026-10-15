@@ -5,7 +5,7 @@
 // jolt, spinning downstream ever bigger like a vortex street, then whirling
 // up into the total, the last in a huge blast and shake. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -53,9 +53,9 @@ interface Eddy {
 export const forceEddiesEvent = registerWispEvent(
   KEY,
   "Eddies",
-  () => CONFIG.eddiesEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shedMs, riverMs, liftMs, holdMs, mergeMs } = CONFIG.eddiesEvent;
+    const { shedMs, riverMs, liftMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const width = area.right - area.left;
     const y = area.top + (area.bottom - area.top) * HEIGHT;

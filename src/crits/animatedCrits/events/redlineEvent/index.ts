@@ -6,7 +6,7 @@
 // together into one colossal bolt that strikes up into the total, a river
 // of cash surging up it, in a huge blast and shake. Pays floor income ×
 // floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const REDLINE_SHAKE = 2.2;
 export const forceRedlineEvent = registerWispEvent(
   KEY,
   "Redline",
-  () => CONFIG.redlineEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { firesMs, holdMs, mergeMs } = CONFIG.redlineEvent;
+    const { firesMs, holdMs, mergeMs } = meta.values;
     const total = totalSpot(area);
     const midX = (area.left + area.right) / 2;
     const plugs: Point[] = Array.from({ length: PLUGS }, (_, i) => ({

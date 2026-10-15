@@ -6,7 +6,7 @@
 // corners as beams flare across its middle; then it crushes down to a
 // point and goes off in a huge blast and shake. Pays floor income × floor
 // number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -41,9 +41,9 @@ const SNAP_SHAKE: [number, number] = [0.6, 1.3];
 export const forceHexRingEvent = registerWispEvent(
   KEY,
   "Hex Ring",
-  () => CONFIG.hexRingEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { formMs, gapsMs, crushMs, holdMs, mergeMs } = CONFIG.hexRingEvent;
+    const { formMs, gapsMs, crushMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const center: Point = {
       x: (area.left + area.right) / 2,

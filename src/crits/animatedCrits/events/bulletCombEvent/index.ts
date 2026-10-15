@@ -5,7 +5,7 @@
 // tears through the bar it flashes with a pop, a jolt and free levels; the
 // gun hops to the far side for the next bar, quicker each time, the last
 // comb landing in a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,9 +55,9 @@ interface Comb {
 export const forceBulletCombEvent = registerWispEvent(
   KEY,
   "Bullet Comb",
-  () => CONFIG.bulletCombEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { combsMs, levelShare, holdMs, mergeMs } = CONFIG.bulletCombEvent;
+    const { combsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let from: Point = getButtonCenter(context.isGroundFloor);

@@ -7,7 +7,7 @@
 // next garland swings in over the next bar as the last one meets, quicker
 // each time, the last meeting a colossal blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,9 +47,9 @@ interface Garland {
 export const forceBombGarlandEvent = registerWispEvent(
   KEY,
   "Bomb Garland",
-  () => CONFIG.bombGarlandEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { burnsMs, levelShare, holdMs, mergeMs } = CONFIG.bombGarlandEvent;
+    const { burnsMs, levelShare, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const mid = (BOMBS - 1) / 2;

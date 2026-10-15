@@ -7,7 +7,7 @@
 // with a jolt, then the gun swings to the next worker, quicker each time,
 // the last outline going off in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -60,9 +60,9 @@ interface Act {
 export const forceKnifeThrowerEvent = registerWispEvent(
   KEY,
   "Knife Thrower",
-  () => CONFIG.knifeThrowerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { shotsMs, holdMs, mergeMs } = CONFIG.knifeThrowerEvent;
+    const { shotsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     let clock = GLIDE_MS;

@@ -7,7 +7,7 @@
 // a jolt, back through the button, faster each time, its path closing in
 // on the long axis, until it slams into the lock and bursts it open in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,9 +43,9 @@ const LOCK_SHAKE: [number, number] = [0.6, 1.2];
 export const forceWhisperingGalleryEvent = registerWispEvent(
   KEY,
   "Whispering Gallery",
-  () => CONFIG.whisperingGalleryEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { drawMs, legsMs, holdMs, mergeMs } = CONFIG.whisperingGalleryEvent;
+    const { drawMs, legsMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);

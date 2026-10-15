@@ -5,7 +5,7 @@
 // jolt and spinning up; the whole train whirls faster and faster until the
 // last gear wrenches the lock round and it bursts in a colossal blast and
 // shake, the floor unlocked for free. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const CLANK_SHAKE: [number, number] = [0.3, 0.8];
 export const forceGearTrainEvent = registerWispEvent(
   KEY,
   "Gear Train",
-  () => CONFIG.gearTrainEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { clanksMs, whirlMs, holdMs, mergeMs } = CONFIG.gearTrainEvent;
+    const { clanksMs, whirlMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

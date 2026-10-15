@@ -6,7 +6,7 @@
 // levels; then the whole tree discharges at once in a blinding flash, every
 // bar slams and the clicked floor's bar jumps one crit tier in a huge blast
 // and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -47,10 +47,10 @@ interface Limb {
 export const forceLichtenbergEvent = registerWispEvent(
   KEY,
   "Lichtenberg",
-  () => CONFIG.lichtenbergEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { limbsMs, dischargeMs, levelShare, holdMs, mergeMs } =
-      CONFIG.lichtenbergEvent;
+      meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const own = bars.find((b) => b.floor === floor) ?? bars[bars.length - 1];

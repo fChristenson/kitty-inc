@@ -3,8 +3,8 @@
 // shove by shove, sparks gushing out both sides; it punches through and the
 // button turns over gold: its next taps cost half; quicker button by
 // button, its own last
+import meta from "./meta";
 import { addHalfTaps } from "../../buttonBonus";
-import { CONFIG } from "../../../../config";
 import {
   drawDrillHead,
   drawDrillSpray,
@@ -69,7 +69,7 @@ const tip: Point = { x: 0, y: 0 };
 registerFloorCrit("halfOffCrit", {
   // taps that each cost half, twice as many on its own
   reward(t) {
-    const taps = Math.max(1, Math.round(t.count * CONFIG.crit.halfOffTaps));
+    const taps = Math.max(1, Math.round(t.count * meta.values.taps));
     addHalfTaps(t.floor, t.own ? taps * 2 : taps);
     t.flipButton();
   },

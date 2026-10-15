@@ -6,7 +6,7 @@
 // bolt slams into the charge in a huge blast and shake, and as the screen
 // unfreezes the floor bursts open: unlocked for free. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const STRIKE_SHAKE: [number, number] = [0.8, 1.6];
 export const forceLightningRodEvent = registerWispEvent(
   KEY,
   "Lightning Rod",
-  () => CONFIG.lightningRodEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gapsMs, finalGapMs, holdMs, mergeMs } = CONFIG.lightningRodEvent;
+    const { gapsMs, finalGapMs, holdMs, mergeMs } = meta.values;
     const locked = findRewardLocked(floor, context);
     if (!locked) return;
     const centre: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };

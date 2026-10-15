@@ -5,7 +5,7 @@
 // tier; volley after volley, ever faster and harder, until every worker in
 // view is struck, the last volley in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -35,9 +35,9 @@ const VOLLEY_SHAKE: [number, number] = [1, 1.8];
 export const forceTridentEvent = registerWispEvent(
   KEY,
   "Trident",
-  () => CONFIG.tridentEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { volleysMs, holdMs, mergeMs } = CONFIG.tridentEvent;
+    const { volleysMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .sort((a, b) => a.at.x - b.at.x)
       .slice(0, MAX_WORKERS);

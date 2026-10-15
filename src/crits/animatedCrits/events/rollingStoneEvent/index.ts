@@ -5,7 +5,7 @@
 // each lane, a jolt at each end; at the bottom it bursts with a huge blast,
 // flinging its crust off as wisps that drop onto every empty spot in view,
 // each a new worker. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   drawSnowball,
@@ -63,10 +63,10 @@ const HIRE_SHAKE = 1;
 export const forceRollingStoneEvent = registerWispEvent(
   KEY,
   "Rolling Stone",
-  () => CONFIG.rollingStoneEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { firstMs, rollsMs, hireMs, hireGapMs, holdMs, mergeMs } =
-      CONFIG.rollingStoneEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const width = area.right - area.left;

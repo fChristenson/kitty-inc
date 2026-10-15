@@ -2,8 +2,8 @@
 // one or two below the building's locked floor, whose coins stream into that
 // floor's unlock price. When the stream ends the floor unlocks for free and
 // rolls its own unlock crit, which (when it lands) also raises its tier
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { isFloorLocked } from "../../../../shared/detachedJob";
 import type { CritTier } from "../../../critTypes";
@@ -30,7 +30,7 @@ const armUnlockEvent = registerStreamTargetEvent({
   key: "unlock",
   cover: { label: "Unlock", color: COLOR.amber },
   stream: "coins",
-  chance: () => CONFIG.unlockEvent.chance,
+  chance: () => meta.chance,
   targetFloor: (floor, { floors }) => lockedFloorNear(floor, floors),
   target: () => getLockCenter(),
   canStart: (_floor, { unlockFloorFree }) => unlockFloorFree !== undefined,

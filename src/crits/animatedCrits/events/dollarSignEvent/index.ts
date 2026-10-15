@@ -5,7 +5,7 @@
 // throbs three times, ever harder, each a ka-ching and a jolt; then it
 // bursts and all of it pours into the total in a huge blast and shake.
 // Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,10 +37,10 @@ const THROB_SHAKE: [number, number] = [0.7, 1.4];
 export const forceDollarSignEvent = registerWispEvent(
   KEY,
   "Dollar Sign",
-  () => CONFIG.dollarSignEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { writeMs, throbsMs, flightMs, holdMs, mergeMs } =
-      CONFIG.dollarSignEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const cx = (area.left + area.right) / 2;

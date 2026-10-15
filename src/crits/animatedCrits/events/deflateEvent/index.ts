@@ -6,7 +6,7 @@
 // past every income bar with a jolt and free levels; it sputters its last
 // into the total in a huge blast and shake. Pays floor income × floor
 // number × REWARD, plus the levels
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const PASS_SHAKE: [number, number] = [0.5, 1.2];
 export const forceDeflateEvent = registerWispEvent(
   KEY,
   "Deflate",
-  () => CONFIG.deflateEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { blowMs, zipMs, levelShare, holdMs, mergeMs } = CONFIG.deflateEvent;
+    const { blowMs, zipMs, levelShare, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const total = totalSpot(area);
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);

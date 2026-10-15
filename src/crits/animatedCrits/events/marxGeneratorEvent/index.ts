@@ -6,7 +6,7 @@
 // every fired gap left arcing; at the top the whole stack dumps it in one
 // colossal bolt across onto the clicked floor's bar, which jumps a crit
 // tier. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -55,10 +55,10 @@ interface Stage {
 export const forceMarxGeneratorEvent = registerWispEvent(
   KEY,
   "Marx Generator",
-  () => CONFIG.marxGeneratorEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { chargeMs, fireMs, dischargeMs, holdMs, mergeMs } =
-      CONFIG.marxGeneratorEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

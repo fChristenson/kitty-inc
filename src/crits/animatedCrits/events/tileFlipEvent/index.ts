@@ -6,7 +6,7 @@
 // spreads; once the whole screen is gold it all flips back at once in a
 // white flash and a huge blast that sprays cash everywhere, and the coins
 // sweep into the total. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -43,10 +43,10 @@ interface Tile {
 export const forceTileFlipEvent = registerWispEvent(
   KEY,
   "Tile Flip",
-  () => CONFIG.tileFlipEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { waveMs, flipMs, showMs, backMs, holdMs, mergeMs } =
-      CONFIG.tileFlipEvent;
+      meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;
     const height = area.bottom - area.top;

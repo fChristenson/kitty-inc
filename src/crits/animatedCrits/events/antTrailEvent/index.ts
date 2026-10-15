@@ -5,7 +5,7 @@
 // and thicker, every ant that reaches the total dumping its crumb with a
 // pop and a jolt; the queen brings up the rear with a huge load that lands
 // in a huge blast and shake. Pays floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -40,9 +40,9 @@ const DUMP_SHAKE = 0.25;
 export const forceAntTrailEvent = registerWispEvent(
   KEY,
   "Ant Trail",
-  () => CONFIG.antTrailEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { marchMs, travelMs, holdMs, mergeMs } = CONFIG.antTrailEvent;
+    const { marchMs, travelMs, holdMs, mergeMs } = meta.values;
     const total0 = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const route: Point[] = [button];

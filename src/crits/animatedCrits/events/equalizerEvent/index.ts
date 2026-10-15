@@ -6,7 +6,7 @@
 // beat after beat, ever faster and higher; on the drop every column
 // maxes out at once and every bar slams in a huge blast and shake. Then
 // the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -36,10 +36,10 @@ const BEAT_SHAKE: [number, number] = [0.5, 1.2];
 export const forceEqualizerEvent = registerWispEvent(
   KEY,
   "Equalizer",
-  () => CONFIG.equalizerEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { riseMs, beatsMs, levelShare, holdMs, mergeMs } =
-      CONFIG.equalizerEvent;
+      meta.values;
     const bars = findRewardBars(floor, context)
       .slice(0, MAX_BARS)
       .sort((a, b) => b.center.y - a.center.y);

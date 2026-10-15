@@ -4,8 +4,8 @@
 // and burst all round it into glitter chrysanthemums that fly apart and
 // droop, each paying into the live total, quicker and quicker, then a
 // finale of six bursting at once
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { multiply } from "../../../../shared/bigNumber";
 import { createBeats } from "../../../../shared/eventBeats";
@@ -83,7 +83,7 @@ interface Shell {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.fireworksFlightEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isFlightStageRunning(KEY),
     canArm: (floor, context) => floor.unlocked && canStartFlightStage(context),
     arm: startFireworksFlight,
@@ -144,7 +144,7 @@ function drawBloom(
 }
 
 function startFireworksFlight(floor: Floor, context: EventProcContext): void {
-  const { payoutsPerShell } = CONFIG.fireworksFlightEvent;
+  const { payoutsPerShell } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const shells = planShells();
   const flyMs = Math.max(...shells.map((s) => s.burst)) + BLOOM_MS;

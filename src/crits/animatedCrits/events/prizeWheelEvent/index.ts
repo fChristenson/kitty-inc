@@ -5,7 +5,7 @@
 // crawls and tips onto the winner, which flares white; then the wheel blows
 // apart, every wisp slamming onto a bar with its levels, and the winner
 // dives last onto the clicked one, climbing a crit tier in a huge blast
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSpinTick } from "../../../../sound";
 import { drawBeam } from "../../../../shared/animationStyles/beam";
@@ -64,10 +64,10 @@ const SOUND_GAP_MS = 55;
 export const forcePrizeWheelEvent = registerWispEvent(
   KEY,
   "Prize Wheel",
-  () => CONFIG.prizeWheelEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { spinMs, turns, flyMs, levelShare, winnerShare, holdMs, mergeMs } =
-      CONFIG.prizeWheelEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

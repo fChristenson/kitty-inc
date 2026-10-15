@@ -6,7 +6,7 @@
 // its blades whirling a blur of light, its downwash a flash and a jolt that
 // sets down a new worker under it; over the last it drops down hard in a
 // huge blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -37,9 +37,9 @@ const DROP_SHAKE = 1.0;
 export const forceChopperEvent = registerWispEvent(
   KEY,
   "Chopper",
-  () => CONFIG.chopperEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinUpMs, flyMs, hoverMs, holdMs, mergeMs } = CONFIG.chopperEvent;
+    const { spinUpMs, flyMs, hoverMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

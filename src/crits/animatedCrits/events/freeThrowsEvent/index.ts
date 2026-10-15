@@ -5,7 +5,7 @@
 // pop up and drop in, some swish straight through, every touch a splash and
 // a jolt; each drops through onto its spot and a new worker forms where it
 // lands, the last in a big blast. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -57,10 +57,10 @@ interface Shot {
 export const forceFreeThrowsEvent = registerWispEvent(
   KEY,
   "Free Throws",
-  () => CONFIG.freeThrowsEvent.chance,
+  () => meta.chance,
   (floor, context) => {
     const { growMs, shotMs, gapMs, dropMs, holdMs, mergeMs } =
-      CONFIG.freeThrowsEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_SHOTS);
     if (hires.length === 0) return;
     const from = getButtonCenter(context.isGroundFloor);

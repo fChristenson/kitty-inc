@@ -5,7 +5,7 @@
 // closes up, blazes and beats twice, then bursts, its dots arcing down onto
 // the workers in showers, each climbing a perma tier as its shower lands.
 // Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
@@ -45,9 +45,9 @@ const SOUND_GAP_MS = 60;
 export const forceSweetheartEvent = registerWispEvent(
   KEY,
   "Sweetheart",
-  () => CONFIG.sweetheartEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { drawMs, burstMs, gapMs, holdMs, mergeMs } = CONFIG.sweetheartEvent;
+    const { drawMs, burstMs, gapMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const size = Math.min(SIZE, (area.right - area.left) * WIDTH);

@@ -7,7 +7,7 @@
 // shove by shove, each harder, the sparks spraying ever thicker and
 // faster, until it punches out the underside in a huge blast and shake and
 // the bar jumps a crit tier with free levels. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -33,10 +33,10 @@ const PUSH_SHAKE: [number, number] = [0.35, 0.8];
 export const forceBreakthroughEvent = registerWispEvent(
   KEY,
   "Breakthrough",
-  () => CONFIG.breakthroughEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { approachMs, stallMs, boreMs, levelShare, holdMs, mergeMs } =
-      CONFIG.breakthroughEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const bar = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!bar) return;

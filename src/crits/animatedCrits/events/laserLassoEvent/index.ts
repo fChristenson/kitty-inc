@@ -6,7 +6,7 @@
 // flash and a jolt that lights it up a perma tier, and is yanked back for
 // the next throw, ever faster; the last cinch goes off in a huge blast and
 // shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -44,9 +44,9 @@ const CINCH_SHAKE: [number, number] = [0.7, 1.4];
 export const forceLaserLassoEvent = registerWispEvent(
   KEY,
   "Laser Lasso",
-  () => CONFIG.laserLassoEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { riseMs, throwsMs, holdMs, mergeMs } = CONFIG.laserLassoEvent;
+    const { riseMs, throwsMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context).slice(0, MAX_WORKERS);
     if (workers.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

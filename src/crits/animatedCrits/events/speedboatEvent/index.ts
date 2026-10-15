@@ -5,7 +5,7 @@
 // spray with a whoosh and a jolt; then it bolts into the total and the
 // whole wake washes in after it in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
@@ -39,9 +39,9 @@ const TURN_SHAKE: [number, number] = [0.6, 1.4];
 export const forceSpeedboatEvent = registerWispEvent(
   KEY,
   "Speedboat",
-  () => CONFIG.speedboatEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { runMs, flightMs, holdMs, mergeMs } = CONFIG.speedboatEvent;
+    const { runMs, flightMs, holdMs, mergeMs } = meta.values;
     const fallback = totalSpot(area);
     const button = getButtonCenter(context.isGroundFloor);
     const width = area.right - area.left;

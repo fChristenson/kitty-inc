@@ -4,8 +4,8 @@
 // then a blazing beam of light slams down from the sky in a huge blast and
 // shake: the bar jumps one crit tier. Then the screen unfreezes and the
 // crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop, startBoostEventStreamLoop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -90,7 +90,7 @@ let running: RunningStrike | null = null;
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.orbitalStrikeEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
       !running &&
@@ -111,13 +111,13 @@ export function forceOrbitalStrikeEvent(floor: Floor): void {
 }
 
 function strikeMs(): number {
-  const { lockMs, aimMs } = CONFIG.orbitalStrikeEvent;
+  const { lockMs, aimMs } = meta.values;
   return lockMs + aimMs;
 }
 
 // lock-on and strike go off on the frame they're drawn
 function landBeats(strike: RunningStrike, ms: number): void {
-  const { lockMs } = CONFIG.orbitalStrikeEvent;
+  const { lockMs } = meta.values;
   if (strike.lockedAt === null && ms >= lockMs) {
     strike.lockedAt = strike.startedAt + lockMs;
     strike.onLock();
@@ -134,7 +134,7 @@ function drawReticle(
   ms: number,
   now: number,
 ): void {
-  const { lockMs } = CONFIG.orbitalStrikeEvent;
+  const { lockMs } = meta.values;
   const { box } = strike;
   const u = clamp01(ms / lockMs);
   const close = 1 - (1 - u) ** 3;
@@ -213,7 +213,7 @@ function drawBeam(
   strike: RunningStrike,
   since: number,
 ): void {
-  const t = since / CONFIG.orbitalStrikeEvent.beamMs;
+  const t = since / meta.values.beamMs;
   if (t >= 1) return;
   const { box } = strike;
   const cx = box.x + box.width / 2;
@@ -282,7 +282,7 @@ function drawOverlay(
 function startStrike(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   if (running || isScreenFrozen() || !area) return;
-  const { holdMs } = CONFIG.orbitalStrikeEvent;
+  const { holdMs } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const strike: RunningStrike = {
     floor,

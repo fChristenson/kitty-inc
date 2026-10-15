@@ -5,7 +5,7 @@
 // in the middle of the bar with a huge burst, a bang and a jolt, and the bar
 // jumps a crit tier; each joust quicker, the last clash a huge blast as
 // every bar slams. Pays floor income × floor number × REWARD, plus the tiers
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -40,9 +40,9 @@ const CLASH_SHAKE: [number, number] = [0.8, 1.4];
 export const forceJoustEvent = registerWispEvent(
   KEY,
   "Joust",
-  () => CONFIG.joustEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { chargesMs, gapMs, holdMs, mergeMs } = CONFIG.joustEvent;
+    const { chargesMs, gapMs, holdMs, mergeMs } = meta.values;
     const found = findRewardBars(floor, context);
     const bars = [
       ...found.filter((b) => b.floor === floor),

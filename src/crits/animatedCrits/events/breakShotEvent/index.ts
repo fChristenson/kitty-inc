@@ -6,8 +6,8 @@
 // screen's edges, each hard hit a burst and a jolt; then every wisp pops at
 // once in a blast, flash and shake into coins, which merge into the total.
 // Pays floor income × floor number × REWARD (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
@@ -84,7 +84,7 @@ interface Ball {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.breakShotEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (floor, context) =>
       canStartMoneyCover(context) &&
@@ -93,7 +93,7 @@ registerEventProc(
     arm: (floor, context) => {
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
-      const { popMs, holdMs, mergeMs } = CONFIG.breakShotEvent;
+      const { popMs, holdMs, mergeMs } = meta.values;
       const width = area.right - area.left;
       const pitch = R * 2 + GAP;
       const apex = {

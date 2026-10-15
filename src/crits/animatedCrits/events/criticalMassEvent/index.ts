@@ -7,7 +7,7 @@
 // cluster round it; ball after ball, quicker each time, the last core going
 // off in one colossal blast with the hardest shake of all. Pays floor income
 // × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import {
   playExplosion,
@@ -72,9 +72,9 @@ interface Blast {
 export const forceCriticalMassEvent = registerWispEvent(
   KEY,
   "Critical Mass",
-  () => CONFIG.criticalMassEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { gatherMs, ballsMs, holdMs, mergeMs } = CONFIG.criticalMassEvent;
+    const { gatherMs, ballsMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const bombs: Bomb[] = [];

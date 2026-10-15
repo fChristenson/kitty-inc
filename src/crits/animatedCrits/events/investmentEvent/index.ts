@@ -3,8 +3,8 @@
 // full and pays out; then glimmer lights burst out of the bar into the button,
 // which slams and climbs one crit tier, its new tier's label popping above it.
 // Then the screen unfreezes and the crit's tier pays out
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSold, startBoostEventStreamLoop } from "../../../../sound";
 import { multiply } from "../../../../shared/bigNumber";
@@ -88,7 +88,7 @@ function canStart(floor: Floor, context: EventProcContext): boolean {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.investmentEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => running !== null,
     canArm: canStart,
     arm: startInvestment,
@@ -118,7 +118,7 @@ function drawOverlay(
     if (event.buttonFx === null) {
       const t = Math.min(
         1,
-        (now - event.startedAt) / CONFIG.investmentEvent.fillMs,
+        (now - event.startedAt) / meta.values.fillMs,
       );
       const fill = event.startFill + (1 - event.startFill) * (1 - (1 - t) ** 2);
       event.barFx.draw(ctx, bar.x, bar.y, ({ white, rotation }) =>
@@ -160,7 +160,7 @@ function drawOverlay(
 
 function startInvestment(floor: Floor, context: EventProcContext): void {
   if (!canStart(floor, context)) return;
-  const { fillMs, liftMs, holdMs, payouts } = CONFIG.investmentEvent;
+  const { fillMs, liftMs, holdMs, payouts } = meta.values;
   const tier = context.critTier ?? pickCritTierByOdds();
   const event: RunningInvestment = {
     floor,

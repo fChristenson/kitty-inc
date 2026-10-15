@@ -6,7 +6,7 @@
 // a floor in view, where a new worker forms out of the flash with a bang
 // and a jolt; the last burst lands in a huge blast and shake. Then the
 // crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ const HIT_SHAKE: [number, number] = [0.6, 1.3];
 export const forceGunshipEvent = registerWispEvent(
   KEY,
   "Gunship",
-  () => CONFIG.gunshipEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { enterMs, orbitMs, holdMs, mergeMs } = CONFIG.gunshipEvent;
+    const { enterMs, orbitMs, holdMs, mergeMs } = meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

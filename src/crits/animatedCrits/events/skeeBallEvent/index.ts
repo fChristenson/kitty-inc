@@ -6,7 +6,7 @@
 // score popping up in gold and coins spraying out, more for the higher
 // holes; the last ball sinks the 100 in a huge blast and shake. Pays floor
 // income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -48,9 +48,9 @@ const SINK_SHAKE: [number, number] = [0.4, 1.1];
 export const forceSkeeBallEvent = registerWispEvent(
   KEY,
   "Skee Ball",
-  () => CONFIG.skeeBallEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { rollMs, ballsMs, holdMs, mergeMs } = CONFIG.skeeBallEvent;
+    const { rollMs, ballsMs, holdMs, mergeMs } = meta.values;
     const cx = (area.left + area.right) / 2;
     const height = area.bottom - area.top;
     const start: Point = { x: cx, y: area.bottom - 40 };

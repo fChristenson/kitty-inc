@@ -6,7 +6,7 @@
 // wingtips, its wings beating ever faster; then it folds its wings and
 // dives into the middle of the screen in a huge blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -38,9 +38,9 @@ const BEAT_SHAKE: [number, number] = [0.5, 1.2];
 export const forceThunderbirdEvent = registerWispEvent(
   KEY,
   "Thunderbird",
-  () => CONFIG.thunderbirdEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { flightMs, diveMs, holdMs, mergeMs } = CONFIG.thunderbirdEvent;
+    const { flightMs, diveMs, holdMs, mergeMs } = meta.values;
     const button = getButtonCenter(context.isGroundFloor);
     const w = area.right - area.left;
     const h = area.bottom - area.top;

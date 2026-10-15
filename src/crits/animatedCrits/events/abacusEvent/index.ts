@@ -8,7 +8,7 @@
 // sweeping clear at once onto a fifth rod's single bead, and every bead
 // bursts into cash in a huge blast. Pays floor income × floor number ×
 // REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { drawGlitterLight, type Point } from "../../../../shared/wisp";
@@ -39,9 +39,9 @@ const SWEEP_SHAKE = 1.2;
 export const forceAbacusEvent = registerWispEvent(
   KEY,
   "Abacus",
-  () => CONFIG.abacusEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { countMs, holdMs, mergeMs } = CONFIG.abacusEvent;
+    const { countMs, holdMs, mergeMs } = meta.values;
     const width = area.right - area.left;
     const left = area.left + (width * (1 - WIDTH)) / 2;
     const right = area.right - (width * (1 - WIDTH)) / 2;

@@ -6,7 +6,7 @@
 // behind it in a rolling wave of blasts, every bar it reaches jolting with
 // free levels, into a huge blast on the clicked bar. Then the crit's tier
 // pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -77,10 +77,10 @@ interface Speck {
 export const forceIonHazeEvent = registerWispEvent(
   KEY,
   "Ion Haze",
-  () => CONFIG.ionHazeEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { sprayMs, strikeLagMs, levelShare, holdMs, mergeMs } =
-      CONFIG.ionHazeEvent;
+      meta.values;
     const bars = findRewardBars(floor, context);
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;

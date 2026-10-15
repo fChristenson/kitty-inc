@@ -5,7 +5,7 @@
 // to a point on the bar with a flash, a bang and a jolt, and the bar jumps a
 // crit tier; braid after braid, quicker each time, the last landing in a
 // huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -81,9 +81,9 @@ interface Braid {
 export const forceBulletBraidEvent = registerWispEvent(
   KEY,
   "Bullet Braid",
-  () => CONFIG.bulletBraidEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { braidsMs, holdMs, mergeMs } = CONFIG.bulletBraidEvent;
+    const { braidsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

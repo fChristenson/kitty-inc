@@ -3,7 +3,7 @@
 // round its ends, quicker each, the crit's own last with two laps; as the
 // chaser crosses the line the bar shifts up a gear with a jolt, its readout
 // turning over onto twice its rate for good
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { drawDetonation } from "../../../../shared/animationStyles/explosion";
 import { smoothstep } from "../../../../shared/easing";
 import { planRace, type Race, type RaceCorner } from "../../../../shared/animationStyles/race";
@@ -63,7 +63,7 @@ const spot: Point = { x: 0, y: 0 };
 registerFloorCrit("shiftUpCrit", {
   // faster for good
   reward(t) {
-    t.floor.incomeIntervalSeconds /= CONFIG.crit.shiftUpSpeed;
+    t.floor.incomeIntervalSeconds /= meta.values.speed;
   },
   plan(r, bars, hit) {
     const half = r.play.barHalfWidth - END_INSET;

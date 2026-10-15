@@ -6,7 +6,7 @@
 // smaller ones, blowing cash everywhere with a bang and a shake, quicker and
 // quicker; then the core of the funnel goes up in a colossal blast. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,9 +46,9 @@ interface Blast {
 export const forceBombTornadoEvent = registerWispEvent(
   KEY,
   "Bomb Tornado",
-  () => CONFIG.bombTornadoEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
-    const { spinUpMs, flingsMs, holdMs, mergeMs } = CONFIG.bombTornadoEvent;
+    const { spinUpMs, flingsMs, holdMs, mergeMs } = meta.values;
     const base: Point = {
       x: (area.left + area.right) / 2,
       y: area.bottom - 90,

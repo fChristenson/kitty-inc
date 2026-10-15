@@ -6,8 +6,8 @@
 // catcher races back under it and catches it in a huge blast and shake, and
 // the coins sweep into the total. Pays floor income × floor number × REWARD
 // (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop } from "../../../../sound";
 import {
@@ -77,7 +77,7 @@ interface Drop {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.catcherEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
@@ -91,7 +91,7 @@ registerEventProc(
         finalGapMs,
         holdMs,
         mergeMs,
-      } = CONFIG.catcherEvent;
+      } = meta.values;
       const width = area.right - area.left;
       const margin = width * EDGE_MARGIN;
       const button = getButtonCenter(context.isGroundFloor);

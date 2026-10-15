@@ -6,7 +6,7 @@
 // jolt, the stalls ever shorter; at 100% COMPLETE! slams down and the
 // whole bar of cash surges into the total in a huge blast and shake. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
@@ -45,10 +45,10 @@ const LURCH_SHAKE: [number, number] = [0.3, 0.9];
 export const forceLoadingBarEvent = registerWispEvent(
   KEY,
   "Loading Bar",
-  () => CONFIG.loadingBarEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { frameMs, stallsMs, flightMs, holdMs, mergeMs } =
-      CONFIG.loadingBarEvent;
+      meta.values;
     const fallback = totalSpot(area);
     const width = (area.right - area.left) * WIDTH;
     const left = (area.left + area.right) / 2 - width / 2;

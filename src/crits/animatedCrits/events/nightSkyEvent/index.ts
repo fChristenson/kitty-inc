@@ -4,8 +4,8 @@
 // leaving twinkling stars along every outline. The finished number twinkles,
 // then its stars stream into the total, which pays like Draw: times that
 // number (see ../moneyCover)
+import meta from "./meta";
 import type { Floor } from "../../../../gameState";
-import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import {
   playSold,
@@ -56,12 +56,12 @@ interface Star extends Point {
 registerEventProc(
   {
     key: KEY,
-    chance: () => CONFIG.nightSkyEvent.chance,
+    chance: () => meta.chance,
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
       const { flightMs, hopMs, showMs, mergeSpreadMs, mergeFlyMs } =
-        CONFIG.nightSkyEvent;
+        meta.values;
       const area = context.getScreenAreaLocal?.(floor);
       if (!area) return;
       const tier = context.critTier ?? pickCritTierByOdds();

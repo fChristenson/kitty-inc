@@ -4,8 +4,8 @@
 // trickling down quicker, until one huge drop from high lands on its own
 // button with the biggest blast and a double ring, and every button turns
 // over: its next taps also level the floors below it
+import meta from "./meta";
 import { defineTapPerk } from "../../buttonBonus";
-import { CONFIG } from "../../../../config";
 import {
   drawDrop,
   drawRipple,
@@ -77,7 +77,7 @@ const topOf = (button: Point, into: Point): Point => {
 // each tap levelling up to trickleDownFloors floors below too
 const tideTaps = defineTapPerk("Tide", (t) => {
   const index = t.floors.indexOf(t.floor);
-  const last = Math.max(0, index - CONFIG.crit.trickleDownFloors);
+  const last = Math.max(0, index - meta.values.floors);
   for (let below = index - 1; below >= last; below--)
     t.levelUp(t.floors[below], 1, "+1 Lvl");
 });
@@ -85,7 +85,7 @@ const tideTaps = defineTapPerk("Tide", (t) => {
 registerFloorCrit("trickleDownCrit", {
   // trickling taps, twice as many on its own
   reward(t) {
-    const taps = Math.max(1, Math.round(t.count * CONFIG.crit.trickleDownTaps));
+    const taps = Math.max(1, Math.round(t.count * meta.values.taps));
     tideTaps.add(t.floor, t.own ? taps * 2 : taps);
     t.flipButton();
   },

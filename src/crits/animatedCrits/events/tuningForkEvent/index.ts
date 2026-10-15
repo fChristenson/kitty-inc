@@ -6,7 +6,7 @@
 // cracking a bolt into it, in a flash, a bang and a jolt as it jumps a crit
 // tier; the fork rings on the next bar, quicker each time, the last strike
 // a huge blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -52,9 +52,9 @@ interface Fork {
 export const forceTuningForkEvent = registerWispEvent(
   KEY,
   "Tuning Fork",
-  () => CONFIG.tuningForkEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { humsMs, holdMs, mergeMs } = CONFIG.tuningForkEvent;
+    const { humsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     let clock = 0;

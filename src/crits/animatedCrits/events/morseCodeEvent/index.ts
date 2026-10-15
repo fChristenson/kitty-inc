@@ -7,7 +7,7 @@
 // bang and a big jolt, letter after letter, ever faster; the last letter
 // ends in a huge blast and shake that slams every bar. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -42,9 +42,9 @@ const LETTER_SHAKE: [number, number] = [0.9, 1.5];
 export const forceMorseCodeEvent = registerWispEvent(
   KEY,
   "Morse Code",
-  () => CONFIG.morseCodeEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { riseMs, dotsMs, holdMs, mergeMs } = CONFIG.morseCodeEvent;
+    const { riseMs, dotsMs, holdMs, mergeMs } = meta.values;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);

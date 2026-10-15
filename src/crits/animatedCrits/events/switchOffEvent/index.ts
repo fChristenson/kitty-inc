@@ -5,7 +5,7 @@
 // explodes in a colossal blast and shake, flinging a ring of cash and
 // rivers of it curling into the total as the screen pops back on. Pays
 // floor income × floor number × REWARD
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -46,10 +46,10 @@ const POP_SHAKE = 2.6;
 export const forceSwitchOffEvent = registerWispEvent(
   KEY,
   "Switch Off",
-  () => CONFIG.switchOffEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { squashMs, shrinkMs, swellMs, onMs, holdMs, mergeMs } =
-      CONFIG.switchOffEvent;
+      meta.values;
     const left = area.left;
     const top = area.top;
     const width = area.right - area.left;

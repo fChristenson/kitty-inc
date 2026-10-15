@@ -10,5 +10,4 @@ export default {
   // fetching taps on each button, twice as many on its own, and the payouts
   // each pays out of the most upgraded floor
   values: { taps: 3, payouts: 1 },
-  isNew: true,
 } satisfies CritMeta;

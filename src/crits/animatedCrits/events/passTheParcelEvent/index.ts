@@ -5,7 +5,7 @@
 // every catch lights the worker up a perma tier with a flash, a bloop and a
 // jolt; the last catch blows it in a huge blast and shake. Then the crit's
 // tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
@@ -30,9 +30,9 @@ const CATCH_SHAKE: [number, number] = [0.6, 1.4];
 export const forcePassTheParcelEvent = registerWispEvent(
   KEY,
   "Pass the Parcel",
-  () => CONFIG.passTheParcelEvent.chance,
+  () => meta.chance,
   (floor, context) => {
-    const { tossesMs, holdMs, mergeMs } = CONFIG.passTheParcelEvent;
+    const { tossesMs, holdMs, mergeMs } = meta.values;
     const workers = findRewardWorkers(floor, context)
       .sort(() => Math.random() - 0.5)
       .slice(0, MAX_WORKERS);

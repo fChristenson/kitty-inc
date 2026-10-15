@@ -6,7 +6,7 @@
 // the screen and rolls onto an empty spot, where a new worker forms with a
 // pop and a jolt; flick after flick, quicker each time, the last in a huge
 // blast and shake. Then the crit's tier pays out
-import { CONFIG } from "../../../../config";
+import meta from "./meta";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../../shared/screenShake";
@@ -62,10 +62,10 @@ interface Flick {
 export const forceRingTawEvent = registerWispEvent(
   KEY,
   "Ring Taw",
-  () => CONFIG.ringTawEvent.chance,
+  () => meta.chance,
   (floor, context, area) => {
     const { firstMs, flicksMs, shotMs, rollMs, holdMs, mergeMs } =
-      CONFIG.ringTawEvent;
+      meta.values;
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const width = area.right - area.left;
