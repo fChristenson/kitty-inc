@@ -8,5 +8,4 @@ export default {
   style: "drill",
   // the doubling payouts, on each bar and on its own
   values: { payouts: 3, ownPayouts: 4 },
-  isNew: true,
 } satisfies CritMeta;

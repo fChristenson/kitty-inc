@@ -9,5 +9,4 @@ export default {
   style: "lightning",
   // striking taps on the opened floor's button
   values: { taps: 4 },
-  isNew: true,
 } satisfies CritMeta;
