@@ -11,5 +11,4 @@ export default {
   // for `ms`, every payout on any rewarded bar adds `step` to all their
   // payouts, at most x`cap`
   values: { ms: 15000, step: 0.04, cap: 3 },
-  isNew: true,
 } satisfies CritMeta;

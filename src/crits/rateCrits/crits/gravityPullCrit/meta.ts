@@ -10,5 +10,4 @@ export default {
   // for `ms` (`ownMs` on its own bar) each payout x(`k` / the bar's speed
   // factor), kept within `min`..`max`
   values: { ms: 15000, ownMs: 25000, min: 1.5, max: 4, k: 6 },
-  isNew: true,
 } satisfies CritMeta;

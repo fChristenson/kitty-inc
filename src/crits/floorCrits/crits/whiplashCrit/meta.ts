@@ -6,5 +6,4 @@ export default {
   label: "Whiplash",
   chance: 0.03,
   style: "tornado",
-  isNew: true,
 } satisfies CritMeta;

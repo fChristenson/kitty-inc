@@ -7,5 +7,4 @@ export default {
   label: "Andromeda",
   chance: 0.03,
   style: "galaxy",
-  isNew: true,
 } satisfies CritMeta;

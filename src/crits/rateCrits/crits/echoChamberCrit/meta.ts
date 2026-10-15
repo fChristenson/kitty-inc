@@ -11,5 +11,4 @@ export default {
   // again `echoMs` later at `echo` of it, and again `echoMs` after that at
   // `echo` squared
   values: { payouts: 5, ownPayouts: 10, echo: 0.5, echoMs: 350 },
-  isNew: true,
 } satisfies CritMeta;
