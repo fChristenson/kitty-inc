@@ -1,6 +1,6 @@
 // Zero Hour, a floor crit: the number bursts into time bombs that fly onto
-// the left end of every bar in view; their dials of light run down together,
-// beeping in unison, faster and faster, every beep a flash and a jolt, the
+// the left end of every bar in view; they count down together, throbbing
+// in unison, faster and faster, every beep a throb and a jolt, the
 // bombs trembling and swelling; at zero they blow in a chain down the
 // building, each tearing along its bar in a ripple of blasts with levels,
 // its own last in the biggest blast

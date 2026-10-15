@@ -1,8 +1,7 @@
 // Tick Tock, an income crit: the green amount drops under the total and
-// shrinks into a time bomb ringed by a dial of pips of light; they go out
-// one by one as it counts down, every beep a flash, a tick and a jolt, the
-// beeps closing up into a frantic rattle, the bomb trembling and swelling,
-// sparks spitting off its fuse; it blows in the biggest blast, its shrapnel
+// shrinks into a time bomb counting down, throbbing at every beep with a
+// tick and a jolt, the beeps closing up into a frantic rattle, the bomb
+// trembling and swelling; it blows in the biggest blast, its shrapnel
 // streaking up into the readout in a rattle of blasts, a share each, then
 // the finale
 import {

@@ -8,5 +8,4 @@ export default {
   style: "wisp",
   // payouts boosted, how many times as fast and as big (its own twice as many)
   values: { payouts: 4, speed: 2, payout: 1.5 },
-  isNew: true,
 } satisfies CritMeta;
