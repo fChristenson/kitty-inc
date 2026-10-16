@@ -160,23 +160,6 @@ export const SPAWN_CONFIG = {
       rewardSeconds: 40,
       minShare: 0.25,
     },
-    // src/spawn/sweetSpot — a ring closing in on a coin again and again: a
-    // tap while it's in the gold zone pays and starts it over with a thinner
-    // zone; the last round bursts the coin, a miss ends it
-    sweetSpot: {
-      rollEveryMs: 5_000,
-      procChance: 0.05,
-      cooldownMs: 5_000,
-      // how long it waits for a tap each round, pulsing over its last pulseMs
-      durationMs: 6_000,
-      pulseMs: 2_000,
-      // how long the ring takes to close in, every pass
-      passMs: 1_000,
-      rounds: 5,
-      // the seconds of the company's income a match pays, times its round
-      // (1, 2, 3...)
-      matchSeconds: 5,
-    },
     // src/spawn/bounce — a wisp hovering: tapped or flicked, it shoots off
     // and bounces round the screen, every wall, bar and button it hits paying
     bounce: {

@@ -10,7 +10,7 @@ import {
   type CritTextSprite,
   type CritTier,
 } from "../../crits";
-import { getIncomeBarBox } from "../../floors";
+import { getIncomeBarBox, type FloorActionsDeps } from "../../floors";
 import type { Floor } from "../../gameState";
 import { playJackpot } from "../../sound";
 import { drawBeam } from "../../shared/animationStyles/beam";
@@ -46,11 +46,11 @@ export interface SimonEffect {
   ): boolean;
 }
 
-// fever: every right tap pops a crit number off its bar in a blast; the
-// last tips the game into fever: a huge blast, every bar in view pours gold,
-// light streaks rush over the screen, and a rush of hits blows
-// bar after bar, fountaining coins into the total (the player's own taps
-// adding more), until one huge blast ends it
+// fever: every right tap pops a crit number off its bar; the last tips the
+// game into fever: every bar in view pours gold, light streaks rush over the
+// screen, five small blasts rattle across the middle, a bar fountains coins
+// into the total (the player's own taps adding coins), and one big blast
+// ends it
 const FV_POP_MS = 600;
 const FV_POP_RISE = 150;
 const FV_POP_ACROSS = -260;
@@ -61,12 +61,20 @@ const FV_POP_RES = 2;
 const FV_POP_FADE_MS = 150;
 const FV_STEP_BLAST = 60;
 const FV_STEP_SHAKE = 0.6;
-const FV_RUSH = 12;
-const FV_RUSH_FROM_MS = 150;
-const FV_RUSH_GAP_MS = 110;
-const FV_MS = FV_RUSH_FROM_MS + (FV_RUSH - 1) * FV_RUSH_GAP_MS + 250;
-const FV_START_BLAST = 300;
-const FV_START_SHAKE = 2.4;
+const FV_RUSH = 1;
+const FV_RUSH_FROM_MS = 200;
+const FV_RUSH_GAP_MS = 300;
+// the five small blasts, across the middle at these fractions of RATTLE_W
+// of the width either side
+const FV_RATTLE = [-0.8, -0.4, 0, 0.4, 0.8];
+const FV_RATTLE_W = 0.35;
+const FV_RATTLE_MS = 120;
+const FV_MS =
+  FV_RUSH_FROM_MS +
+  (FV_RUSH - 1) * FV_RUSH_GAP_MS +
+  FV_RATTLE.length * FV_RATTLE_MS +
+  250;
+const FV_START_SHAKE = 0.8;
 const FV_POUR_MS = 300;
 const FV_GOLD_ALPHA = 0.85;
 const FV_GLOSS = 0.5;
@@ -77,10 +85,9 @@ const FV_STREAK_LEN = 160;
 const FV_STREAK_SPEED = 1.8;
 const FV_STREAK_WIDTH = 12;
 const FV_STREAK_ALPHA = 0.45;
-const FV_RATTLE = [-0.8, -0.4, 0, 0.4, 0.8];
-const FV_RATTLE_MS = 45;
 const FV_BLOW_BLAST = 90;
 const FV_BLOW_SHAKE = 1.2;
+const FV_TAP_SHAKE = 0.4;
 const FV_BLOW_COINS: [number, number] = [14, 18];
 const FV_BLOW_GLOW = 420;
 const FV_BLOW_GLOW_ALPHA = 0.7;
@@ -88,13 +95,9 @@ const FV_BLOW_GLOW_MS = 300;
 // the share of rewardSeconds the blows pay between them (about
 // FV_BLOWS_EXPECTED of them), the rest paid at the end
 const FV_BLOWS_SHARE = 0.4;
-const FV_BLOWS_EXPECTED = 16;
+const FV_BLOWS_EXPECTED = 3;
 const FV_END_BLAST = 340;
 const FV_END_COINS: [number, number] = [60, 70];
-const FV_RING = 6;
-const FV_RING_R = 260;
-const FV_RING_MS = 45;
-const FV_RING_BLAST = 110;
 const FV_FLASH_MS = 400;
 const FV_FLASH = 600;
 const FV_FLASH_ALPHA = 0.6;
@@ -125,6 +128,7 @@ function createFever(): SimonEffect {
   let feverAt = -1;
   let boomAt = -1;
   let rushed = 0;
+  let rattled = 0;
   const bar: Point = { x: 0, y: 0 };
   const spot: Point = { x: 0, y: 0 };
   const middle: Point = { x: 0, y: 0 };
@@ -148,7 +152,7 @@ function createFever(): SimonEffect {
     playJackpot();
   }
 
-  // floor's bar hit: it blows, fountaining coins into the total
+  // floor's bar hit: it fountains coins into the total
   function blow(floor: Floor, now: number): void {
     const deps = spawnGameDeps();
     taps.push({ floor, at: now });
@@ -168,8 +172,28 @@ function createFever(): SimonEffect {
           FV_BLOW_COINS,
         );
     }
-    shakeScreen(FV_BLOW_SHAKE);
-    playBarExplosion(1.5);
+    shakeScreen(FV_TAP_SHAKE);
+  }
+
+  const rattleAt = (j: number) => feverAt + FV_RUSH_FROM_MS + j * FV_RATTLE_MS;
+
+  // each small blast's bang and jolt as it goes off
+  function rattle(now: number): void {
+    while (rattled < FV_RATTLE.length && now >= rattleAt(rattled)) {
+      shakeScreen(FV_BLOW_SHAKE);
+      playBarExplosion(1 + rattled * 0.15);
+      rattled++;
+    }
+  }
+
+  // an open floor in view to rattle: below the level cap if one is, else any
+  function rushFloor(deps: FloorActionsDeps, k: number): Floor | null {
+    const floors = barFloorsInView(deps);
+    if (floors.length) return floors[(k * 3 + 1) % floors.length];
+    for (const entry of deps.getOnScreenFloors?.() ?? [])
+      if (entry.floor.unlocked && barOnScreen(deps, entry.floor, bar))
+        return entry.floor;
+    return null;
   }
 
   // the rush's presses due by now, bar after bar in view
@@ -180,8 +204,8 @@ function createFever(): SimonEffect {
       rushed < FV_RUSH &&
       now >= feverAt + FV_RUSH_FROM_MS + rushed * FV_RUSH_GAP_MS
     ) {
-      const floors = barFloorsInView(deps);
-      if (floors.length) blow(floors[(rushed * 3 + 1) % floors.length], now);
+      const floor = rushFloor(deps, rushed);
+      if (floor) blow(floor, now);
       rushed++;
     }
   }
@@ -255,12 +279,10 @@ function createFever(): SimonEffect {
           COLOR.heavenlyGold,
         );
       shakeScreen(FV_STEP_SHAKE);
-      playBarExplosion(1 + k / n);
     },
     start(now) {
       feverAt = now;
       shakeScreen(FV_START_SHAKE);
-      playExplosion();
       playJackpot();
     },
     tap(floor, now) {
@@ -273,6 +295,7 @@ function createFever(): SimonEffect {
       middle.y = h / 2;
       if (feverAt >= 0 && boomAt < 0) {
         rush(now);
+        rattle(now);
         if (now - feverAt >= FV_MS) boom(now);
       }
       const deps = spawnGameDeps();
@@ -282,15 +305,18 @@ function createFever(): SimonEffect {
         const heat = boomAt >= 0 ? 1 - clamp01((now - boomAt) / FV_COOL_MS) : 1;
         drawGoldBars(ctx, clamp01((now - feverAt) / FV_POUR_MS), heat);
         drawStreaks(ctx, heat, now);
-        drawDetonation(ctx, middle, now - feverAt, FV_START_BLAST, now);
+        for (let j = 0; j < FV_RATTLE.length; j++) {
+          spot.x = middle.x + FV_RATTLE[j] * FV_RATTLE_W * w;
+          spot.y = middle.y;
+          drawDetonation(ctx, spot, now - rattleAt(j), FV_BLOW_BLAST, now);
+        }
       }
 
-      // the right taps' crit numbers popping off their bars in a blast
+      // the right taps' crit numbers popping off their bars
       for (let i = 0; i < pops.length; i++) {
         const p = pops[i];
         if (!deps || !barOnScreen(deps, p.floor, spot)) continue;
         const since = now - p.at;
-        drawDetonation(ctx, spot, since, FV_STEP_BLAST, now);
         if (since >= FV_POP_MS) continue;
         const u = since / FV_POP_MS;
         ctx.save();
@@ -306,7 +332,7 @@ function createFever(): SimonEffect {
         ctx.restore();
       }
 
-      // the blows flashing gold and blasting along their bars
+      // the blows flashing gold, the rush's rattling with small blasts
       for (let t = 0; t < taps.length; t++) {
         const tap = taps[t];
         if (!deps || !barOnScreen(deps, tap.floor, bar)) continue;
@@ -318,19 +344,6 @@ function createFever(): SimonEffect {
           ctx.globalAlpha = glow;
           drawGlow(ctx, GOLD, bar.x, bar.y, FV_BLOW_GLOW);
           ctx.restore();
-        }
-        const half =
-          getIncomeBarBox(deps.floors.indexOf(tap.floor) === 0).width / 2;
-        for (let j = 0; j < FV_RATTLE.length; j++) {
-          spot.x = bar.x + FV_RATTLE[j] * half;
-          spot.y = bar.y;
-          drawDetonation(
-            ctx,
-            spot,
-            since - j * FV_RATTLE_MS,
-            FV_BLOW_BLAST,
-            now,
-          );
         }
       }
 
@@ -345,18 +358,6 @@ function createFever(): SimonEffect {
           ctx.restore();
         }
         drawDetonation(ctx, middle, since, FV_END_BLAST, now);
-        for (let k = 0; k < FV_RING; k++) {
-          const a = (k / FV_RING) * Math.PI * 2;
-          spot.x = middle.x + Math.cos(a) * FV_RING_R;
-          spot.y = middle.y + Math.sin(a) * FV_RING_R;
-          drawDetonation(
-            ctx,
-            spot,
-            since - (k + 1) * FV_RING_MS,
-            FV_RING_BLAST,
-            now,
-          );
-        }
         return since < FV_LINGER_MS;
       }
       return feverAt >= 0;

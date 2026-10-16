@@ -129,7 +129,7 @@ Each spawn uses a gesture no other spawn uses. Gestures already taken: tap a run
 
 ## List 205: more random spawns, each its own gesture ([playground](../tmp/_playground/ideas.html?list=next182))
 
-More spawns with gestures no spawn uses yet. On top of List 204's list, Pull Shot (pull back and let go) and Sweet Spot (tap on the beat) are now taken.
+More spawns with gestures no spawn uses yet. On top of List 204's list, Pull Shot (pull back and let go) is now taken.
 
 1. **Balloon** (hold, then let go in time): a gold balloon swells under the finger, wobbling and straining harder the bigger it gets. Let go and it shoots up into the total and pops, paying for its size. Hold on too long and it bursts early for a small pay.
 2. **Spinner** (flick to spin): a prize wheel of gold slices with one glowing jackpot slice. Flick its rim and it spins, the harder the flick the longer, ticking past the pointer and slowing to a crawl. The slice it stops on flashes and pays.
@@ -146,11 +146,10 @@ More spawns with gestures no spawn uses yet. On top of List 204's list, Pull Sho
   - It bounces off the screen's edges and off every income bar and upgrade button in view (`boxesInView` in `shared/spawnGames`). Each hit flashes and pays `hitSeconds` into the total.
   - It slows over `flightMs`, then dives into the total for `finalSeconds`.
 
-- **Moved out of New Effects**: Wisp Swarm, Pull Shot and Sweet Spot (to Random Spawns), and batch 21's crits (Big Bang, Ton Weight, Claw Marks, Fairy Ring, Steam Clean, Coin Slot, Magnetar) to their tabs.
+- **Moved out of New Effects**: Wisp Swarm and Pull Shot (to Random Spawns), and batch 21's crits (Big Bang, Ton Weight, Claw Marks, Fairy Ring, Steam Clean, Coin Slot, Magnetar) to their tabs.
 
-- **List 204: Pull Shot and Sweet Spot** (random spawns). Test: Random Spawns.
+- **List 204: Pull Shot** (random spawn; Sweet Spot was removed). Test: Random Spawns.
   - **Pull Shot** (`spawn/pullShot`, pull back and let go): a wisp in a band of light between two posts. The further the pull, the bigger the pay (`rewardSeconds` for a full pull, `minShare` for the shortest). A pull too short just snaps back.
-  - **Sweet Spot** (`spawn/sweetSpot`, tap on the beat): a ring closes in on a coin every `passMs`. A tap while the ring is in the gold band is a match: it pays `matchSeconds` times its round (`payTotal`) and the ring starts over with the band thinner (`SHRINK`). Matching round `rounds` bursts the coin for the biggest payout and the jackpot; a miss ends it.
 
 - **Another drawn batch**, eight crits. Test: their tabs.
   - **Torch Relay** (`animatedCrits/events/torchRelayEvent`, Summon, free floor, batch 101): circles on the floors' grounds relay pillars up the building, quicker each, the last bursting the locked floor open.
