@@ -3,7 +3,6 @@
 // itself when it loads
 import "../animatedCrits/events/baitBallEvent";
 import "../animatedCrits/events/barHopEvent";
-import "../animatedCrits/events/beamSplitterEvent";
 import "../animatedCrits/events/blastCoatEvent";
 import "../animatedCrits/events/bombCrownEvent";
 import "../animatedCrits/events/bossRushEvent";
@@ -19,7 +18,6 @@ import "../animatedCrits/events/clusterBombEvent";
 import "../animatedCrits/events/cocoonEvent";
 import "../animatedCrits/events/colliderEvent";
 import "../animatedCrits/events/cutTheRopeEvent";
-import "../animatedCrits/events/eddiesEvent";
 import "../animatedCrits/events/eternityEvent";
 import "../animatedCrits/events/franklinsKiteEvent";
 import "../animatedCrits/events/geodeEvent";
@@ -29,10 +27,12 @@ import "../animatedCrits/events/gravityFlipEvent";
 import "../animatedCrits/events/groundCurrentEvent";
 import "../animatedCrits/events/groundbreakingEvent";
 import "../animatedCrits/events/halftoneEvent";
+import "../animatedCrits/events/harrierEvent";
 import "../animatedCrits/events/hideAndSeekEvent";
 import "../animatedCrits/events/hydraEvent";
 import "../animatedCrits/events/ionStormEvent";
 import "../animatedCrits/events/joustEvent";
+import "../animatedCrits/events/lightBridgeEvent";
 import "../animatedCrits/events/monacoEvent";
 import "../animatedCrits/events/moonTideEvent";
 import "../animatedCrits/events/neuronsEvent";
@@ -72,7 +72,6 @@ import "../animatedCrits/events/zenGardenEvent";
 // the dev test bar's hooks
 export { forceBaitBallEvent } from "../animatedCrits/events/baitBallEvent";
 export { forceBarHopEvent } from "../animatedCrits/events/barHopEvent";
-export { forceBeamSplitterEvent } from "../animatedCrits/events/beamSplitterEvent";
 export { forceBlastCoatEvent } from "../animatedCrits/events/blastCoatEvent";
 export { forceBombCrownEvent } from "../animatedCrits/events/bombCrownEvent";
 export { forceBossRushEvent } from "../animatedCrits/events/bossRushEvent";
@@ -88,7 +87,6 @@ export { forceClusterBombEvent } from "../animatedCrits/events/clusterBombEvent"
 export { forceCocoonEvent } from "../animatedCrits/events/cocoonEvent";
 export { forceColliderEvent } from "../animatedCrits/events/colliderEvent";
 export { forceCutTheRopeEvent } from "../animatedCrits/events/cutTheRopeEvent";
-export { forceEddiesEvent } from "../animatedCrits/events/eddiesEvent";
 export { forceEternityEvent } from "../animatedCrits/events/eternityEvent";
 export { forceFranklinsKiteEvent } from "../animatedCrits/events/franklinsKiteEvent";
 export { forceGeodeEvent } from "../animatedCrits/events/geodeEvent";
@@ -98,10 +96,12 @@ export { forceGravityFlipEvent } from "../animatedCrits/events/gravityFlipEvent"
 export { forceGroundCurrentEvent } from "../animatedCrits/events/groundCurrentEvent";
 export { forceGroundbreakingEvent } from "../animatedCrits/events/groundbreakingEvent";
 export { forceHalftoneEvent } from "../animatedCrits/events/halftoneEvent";
+export { forceHarrierEvent } from "../animatedCrits/events/harrierEvent";
 export { forceHideAndSeekEvent } from "../animatedCrits/events/hideAndSeekEvent";
 export { forceHydraEvent } from "../animatedCrits/events/hydraEvent";
 export { forceIonStormEvent } from "../animatedCrits/events/ionStormEvent";
 export { forceJoustEvent } from "../animatedCrits/events/joustEvent";
+export { forceLightBridgeEvent } from "../animatedCrits/events/lightBridgeEvent";
 export { forceMonacoEvent } from "../animatedCrits/events/monacoEvent";
 export { forceMoonTideEvent } from "../animatedCrits/events/moonTideEvent";
 export { forceNeuronsEvent } from "../animatedCrits/events/neuronsEvent";

@@ -6,5 +6,4 @@ export default {
   label: "Yarn Ball",
   chance: 0.03,
   style: "snowball",
-  isNew: true,
 } satisfies CritMeta;

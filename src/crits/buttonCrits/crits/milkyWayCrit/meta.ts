@@ -11,5 +11,4 @@ export default {
     // Star taps left on each button it lands on, twice as many on its own
     taps: 3,
   },
-  isNew: true,
 } satisfies CritMeta;

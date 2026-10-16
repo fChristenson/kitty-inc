@@ -11,5 +11,4 @@ export default {
     // the opened floor's next taps that each promote a cat a perma tier
     taps: 3,
   },
-  isNew: true,
 } satisfies CritMeta;

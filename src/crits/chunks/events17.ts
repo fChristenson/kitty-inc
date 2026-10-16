@@ -45,6 +45,7 @@ import "../animatedCrits/events/knightsTourEvent";
 import "../animatedCrits/events/laserRainEvent";
 import "../animatedCrits/events/leafBlowerEvent";
 import "../animatedCrits/events/matadorEvent";
+import "../animatedCrits/events/moleEvent";
 import "../animatedCrits/events/ninjaEvent";
 import "../animatedCrits/events/overtakeEvent";
 import "../animatedCrits/events/partingEvent";
@@ -74,7 +75,6 @@ import "../animatedCrits/events/tommyGunEvent";
 import "../animatedCrits/events/towerDefenseEvent";
 import "../animatedCrits/events/ulamSpiralEvent";
 import "../animatedCrits/events/upgradeEvent";
-import "../animatedCrits/events/volcanicLightningEvent";
 import "../animatedCrits/events/waltzEvent";
 
 // the dev test bar's hooks
@@ -122,6 +122,7 @@ export { forceKnightsTourEvent } from "../animatedCrits/events/knightsTourEvent"
 export { forceLaserRainEvent } from "../animatedCrits/events/laserRainEvent";
 export { forceLeafBlowerEvent } from "../animatedCrits/events/leafBlowerEvent";
 export { forceMatadorEvent } from "../animatedCrits/events/matadorEvent";
+export { forceMoleEvent } from "../animatedCrits/events/moleEvent";
 export { forceNinjaEvent } from "../animatedCrits/events/ninjaEvent";
 export { forceOvertakeEvent } from "../animatedCrits/events/overtakeEvent";
 export { forcePartingEvent } from "../animatedCrits/events/partingEvent";
@@ -151,5 +152,4 @@ export { forceTommyGunEvent } from "../animatedCrits/events/tommyGunEvent";
 export { forceTowerDefenseEvent } from "../animatedCrits/events/towerDefenseEvent";
 export { forceUlamSpiralEvent } from "../animatedCrits/events/ulamSpiralEvent";
 export { forceUpgradeEvent } from "../animatedCrits/events/upgradeEvent";
-export { forceVolcanicLightningEvent } from "../animatedCrits/events/volcanicLightningEvent";
 export { forceWaltzEvent } from "../animatedCrits/events/waltzEvent";

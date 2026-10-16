@@ -58,7 +58,6 @@ import "../animatedCrits/events/shotPutEvent";
 import "../animatedCrits/events/shuffleEvent";
 import "../animatedCrits/events/sinkholeEvent";
 import "../animatedCrits/events/skewerEvent";
-import "../animatedCrits/events/skyChaseEvent";
 import "../animatedCrits/events/smartRocketsEvent";
 import "../animatedCrits/events/snowflakeEvent";
 import "../animatedCrits/events/sparkPlugEvent";
@@ -73,6 +72,7 @@ import "../animatedCrits/events/travellingSalesmanEvent";
 import "../animatedCrits/events/trolleyEvent";
 import "../animatedCrits/events/underPressureEvent";
 import "../animatedCrits/events/waggleDanceEvent";
+import "../animatedCrits/events/waterwheelEvent";
 
 // the dev test bar's hooks
 export { forceAirburstEvent } from "../animatedCrits/events/airburstEvent";
@@ -132,7 +132,6 @@ export { forceShotPutEvent } from "../animatedCrits/events/shotPutEvent";
 export { forceShuffleEvent } from "../animatedCrits/events/shuffleEvent";
 export { forceSinkholeEvent } from "../animatedCrits/events/sinkholeEvent";
 export { forceSkewerEvent } from "../animatedCrits/events/skewerEvent";
-export { forceSkyChaseEvent } from "../animatedCrits/events/skyChaseEvent";
 export { forceSmartRocketsEvent } from "../animatedCrits/events/smartRocketsEvent";
 export { forceSnowflakeEvent } from "../animatedCrits/events/snowflakeEvent";
 export { forceSparkPlugEvent } from "../animatedCrits/events/sparkPlugEvent";
@@ -147,3 +146,4 @@ export { forceTravellingSalesmanEvent } from "../animatedCrits/events/travelling
 export { forceTrolleyEvent } from "../animatedCrits/events/trolleyEvent";
 export { forceUnderPressureEvent } from "../animatedCrits/events/underPressureEvent";
 export { forceWaggleDanceEvent } from "../animatedCrits/events/waggleDanceEvent";
+export { forceWaterwheelEvent } from "../animatedCrits/events/waterwheelEvent";

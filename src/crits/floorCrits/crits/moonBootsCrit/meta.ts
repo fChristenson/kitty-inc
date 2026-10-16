@@ -6,5 +6,4 @@ export default {
   label: "Moon Boots",
   chance: 0.03,
   style: "bounce",
-  isNew: true,
 } satisfies CritMeta;

@@ -6,5 +6,4 @@ export default {
   label: "Thunderbolt",
   chance: 0.03,
   style: "lightning",
-  isNew: true,
 } satisfies CritMeta;

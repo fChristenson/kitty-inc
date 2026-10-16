@@ -11,5 +11,4 @@ export default {
   // the next `payouts` payouts (`ownPayouts` on its own bar) each pay 1 +
   // `perFloor` per open floor of its building, at most x`max`
   values: { payouts: 4, ownPayouts: 8, perFloor: 0.15, max: 4 },
-  isNew: true,
 } satisfies CritMeta;
