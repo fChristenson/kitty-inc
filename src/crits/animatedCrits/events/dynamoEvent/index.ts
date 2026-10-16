@@ -290,8 +290,7 @@ export const forceDynamoEvent = registerWispEvent(
             // the wheel, blurred by trailing copies as it spins up
             const blur = clamp01((spin - SPIN[1] * 0.15) / (SPIN[1] * 0.5));
             if (blur > 0) {
-              const step =
-                Math.min(spin * 16, (TAU / SPOKES) * 0.5) / GHOSTS;
+              const step = Math.min(spin * 16, (TAU / SPOKES) * 0.5) / GHOSTS;
               ctx.globalCompositeOperation = "lighter";
               for (let g = 1; g <= GHOSTS; g++)
                 drawWheel(

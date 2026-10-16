@@ -153,7 +153,12 @@ function buildHammer(): HTMLCanvasElement {
   halo.addColorStop(0.55, `${COLOR.heavenlyGold}55`);
   halo.addColorStop(1, `${COLOR.heavenlyGold}00`);
   g.fillStyle = halo;
-  g.fillRect(-HEAD_H / 2 - PAD, -HEAD_H / 2 - PAD, HEAD_H + 2 * PAD, HEAD_H + 2 * PAD);
+  g.fillRect(
+    -HEAD_H / 2 - PAD,
+    -HEAD_H / 2 - PAD,
+    HEAD_H + 2 * PAD,
+    HEAD_H + 2 * PAD,
+  );
   g.restore();
   // the handle
   g.beginPath();
@@ -392,7 +397,11 @@ registerFloorCrit("sledgehammerCrit", {
     const a = targets[from];
     const b = targets[j];
     const scale = mix(a.own ? OWN : 1, b.own ? OWN : 1, move);
-    const faceY = mix(topOf(state, bars, from, ms), topOf(state, bars, j, ms), move);
+    const faceY = mix(
+      topOf(state, bars, from, ms),
+      topOf(state, bars, j, ms),
+      move,
+    );
     let hx = mix(readoutX(r, bars, a), readoutX(r, bars, b), move);
     let hy = faceY - (FACE + RISE * lift) * scale;
     // rearing back over its own readout: trembling, glowing white-hot

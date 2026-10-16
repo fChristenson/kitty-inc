@@ -206,7 +206,8 @@ registerFloorCrit("milkyWayCrit", {
     }
     const order = byHeight(bars);
     const list: number[] = [];
-    for (let k = 0; k < order.length; k++) if (order[k] !== 0) list.push(order[k]);
+    for (let k = 0; k < order.length; k++)
+      if (order[k] !== 0) list.push(order[k]);
     const n = list.length;
     const releaseAt = new Float32Array(n);
     const landAt = new Float32Array(n);
@@ -226,8 +227,7 @@ registerFloorCrit("milkyWayCrit", {
       OUTER[1],
       Math.max(OUTER[0], (bottom - top) * 0.6 + 90),
     );
-    const half =
-      outer * Math.hypot(Math.cos(TILT), SQUASH * Math.sin(TILT));
+    const half = outer * Math.hypot(Math.cos(TILT), SQUASH * Math.sin(TILT));
     const centre: Point = {
       x: own.x - BTN_W / 2 - half * REACH,
       y: (top + bottom) / 2,

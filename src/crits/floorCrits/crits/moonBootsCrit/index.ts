@@ -172,7 +172,8 @@ function poseAt(t: number): void {
           (t - t0 - crouch) / Math.max(1, landAt[k] - t0 - crouch),
         );
         const tl = k / Math.max(1, climbs - 1);
-        const lift = lerp(LIFT[0], LIFT[1], tl) + 0.5 * Math.max(0, from.y - to.y);
+        const lift =
+          lerp(LIFT[0], LIFT[1], tl) + 0.5 * Math.max(0, from.y - to.y);
         fx = lerp(from.x, to.x, u);
         fy = lerp(from.y, to.y, u) - lift * 4 * u * (1 - u);
         c = u < 0.3 ? -0.6 * (1 - u / 0.3) : 0;
@@ -223,7 +224,10 @@ function drawBoots(
   const top = BODY_R * 0.7 * squashY(c);
   const spring = springOf(c);
   const sole = top + spring;
-  const hot = Math.min(HEAT_COLORS.length - 1, Math.floor(heat * HEAT_COLORS.length));
+  const hot = Math.min(
+    HEAT_COLORS.length - 1,
+    Math.floor(heat * HEAT_COLORS.length),
+  );
   const previous = ctx.globalCompositeOperation;
   ctx.globalAlpha = alpha;
   ctx.strokeStyle = HEAT_COLORS[hot];

@@ -465,7 +465,8 @@ function startGetaway(floor: Floor, context: EventProcContext): void {
       y = HOVER + RAMP_H * (1 - p) + AIR_RISE * 4 * p * (1 - p);
     } else if (sz >= rampFrom && sz < rampTo)
       y = HOVER + (RAMP_H * (sz - rampFrom)) / RAMP_LONG;
-    else if (ms >= land) y = HOVER * (1 - DIP * Math.exp(-(ms - land) / DIP_MS));
+    else if (ms >= land)
+      y = HOVER * (1 - DIP * Math.exp(-(ms - land) / DIP_MS));
     return y + (aimY - y) * toGate(ms);
   };
   const airAt = (ms: number) =>
@@ -475,7 +476,8 @@ function startGetaway(floor: Floor, context: EventProcContext): void {
     const to = shipZ(b.exit);
     b.curve.from = from;
     b.curve.to = to;
-    b.curve.turn = (pick(SIDE, b.k) * pick(TURN, b.k)) / Math.max(0.5, to - from);
+    b.curve.turn =
+      (pick(SIDE, b.k) * pick(TURN, b.k)) / Math.max(0.5, to - from);
   }
 
   // a sack flung off the back at each exit, bursting as the car powers out

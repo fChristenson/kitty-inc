@@ -137,7 +137,11 @@ function passAt(ball: Snowball, ms: number): number {
 // each of its next taps also levelling the next open floors above
 const scurryTaps = defineTapPerk("Scurry", (t) => {
   let left = meta.values.floors;
-  for (let i = t.floors.indexOf(t.floor) + 1; i < t.floors.length && left > 0; i++) {
+  for (
+    let i = t.floors.indexOf(t.floor) + 1;
+    i < t.floors.length && left > 0;
+    i++
+  ) {
     if (!t.floors[i].unlocked) continue;
     t.levelUp(t.floors[i], 1);
     left--;
@@ -171,9 +175,19 @@ registerFloorCrit("hamsterBallCrit", {
       const from = wall(side, contact);
       if (k > 0) {
         // bounced back off the lock, under it and up to the other wall
-        passes.push({ from: last, to: under, startMs: t, endMs: t + RECOIL_MS * q });
+        passes.push({
+          from: last,
+          to: under,
+          startMs: t,
+          endMs: t + RECOIL_MS * q,
+        });
         t += RECOIL_MS * q;
-        passes.push({ from: under, to: from, startMs: t, endMs: t + RECOIL_MS * q });
+        passes.push({
+          from: under,
+          to: from,
+          startMs: t,
+          endMs: t + RECOIL_MS * q,
+        });
         t += RECOIL_MS * q;
       }
       const to: Point = { x: side * contact, y: 0 };
@@ -287,7 +301,8 @@ registerFloorCrit("hamsterBallCrit", {
         let sq = 0;
         for (let k = 0; k < bumps; k++) {
           const since = ms - s.bumpAt[k];
-          if (since >= 0 && since < BUMP_MS) sq = SQUASH * (1 - since / BUMP_MS);
+          if (since >= 0 && since < BUMP_MS)
+            sq = SQUASH * (1 - since / BUMP_MS);
         }
         ctx.globalCompositeOperation = "lighter";
         // the lock straining, the ball blazing brighter as it swells

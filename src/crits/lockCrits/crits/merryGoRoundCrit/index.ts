@@ -139,7 +139,9 @@ function phaseAt(ms: number): number {
   }
   const s = Math.min(ms, OPEN_AT) - BLUR_FROM;
   return (
-    SEG_PHASE[N - 1] + W_TOP * s + (W_TOP * (BLUR_GROW - 1) * s * s) / (2 * BLUR_MS)
+    SEG_PHASE[N - 1] +
+    W_TOP * s +
+    (W_TOP * (BLUR_GROW - 1) * s * s) / (2 * BLUR_MS)
   );
 }
 
@@ -241,7 +243,9 @@ registerFloorCrit("merryGoRoundCrit", {
           at.x = spot.x;
           at.y =
             spot.y -
-            HOP * (1 - s / SETTLE_MS) * Math.abs(Math.sin((Math.PI * s) / HOP_MS));
+            HOP *
+              (1 - s / SETTLE_MS) *
+              Math.abs(Math.sin((Math.PI * s) / HOP_MS));
           return at;
         }
         if (ms >= OPEN_AT) {
@@ -365,7 +369,13 @@ registerFloorCrit("merryGoRoundCrit", {
       const f = 1 - s / LAND_FLASH_MS;
       ctx.globalAlpha = f;
       const spot = state.spots[i];
-      drawGlow(ctx, RIDER_STOPS[i], spot.x, spot.y, LAND_GLOW * (0.6 + 0.4 * f));
+      drawGlow(
+        ctx,
+        RIDER_STOPS[i],
+        spot.x,
+        spot.y,
+        LAND_GLOW * (0.6 + 0.4 * f),
+      );
     }
     // each rider's own colour round its head
     for (let i = 0; i < N; i++) {
@@ -385,7 +395,14 @@ registerFloorCrit("merryGoRoundCrit", {
       if (ms < state.starts[i]) continue;
       if (ms <= end) drawWisp(ctx, runner, ms, now, WISP, heat);
       else if (ms < end + TRAIL_FADE_MS)
-        drawWispTrail(ctx, runner, ms, now, WISP, 1 - (ms - end) / TRAIL_FADE_MS);
+        drawWispTrail(
+          ctx,
+          runner,
+          ms,
+          now,
+          WISP,
+          1 - (ms - end) / TRAIL_FADE_MS,
+        );
     }
     ctx.restore();
   },

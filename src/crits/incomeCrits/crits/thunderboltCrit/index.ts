@@ -291,8 +291,16 @@ registerFloorCrit("thunderboltCrit", {
     // crackles round each wisp, re-aimed in flickers, longer as they charge
     if (ms >= APPEAR_MS && ms < CLASH_MS) {
       const flick = Math.floor(ms / CRACKLE_MS);
-      const reach = lerp(CRACKLE_REACH[0], CRACKLE_REACH[1], Math.max(h * 0.5, c));
-      const scale = lerp(CRACKLE_SCALE[0], CRACKLE_SCALE[1], Math.max(h * 0.5, c));
+      const reach = lerp(
+        CRACKLE_REACH[0],
+        CRACKLE_REACH[1],
+        Math.max(h * 0.5, c),
+      );
+      const scale = lerp(
+        CRACKLE_SCALE[0],
+        CRACKLE_SCALE[1],
+        Math.max(h * 0.5, c),
+      );
       for (let d = 0; d < duelists.length; d++) {
         const w = duelists[d];
         const p = w.at(ms);
@@ -333,9 +341,22 @@ registerFloorCrit("thunderboltCrit", {
       const spot = cross[k];
       const muzzle = bolts[k].from;
       ctx.globalAlpha = alpha * f;
-      drawGlow(ctx, GREEN, spot.x, spot.y, CROSS_FLASH * grow * (1.5 - 0.5 * f), 0.5);
+      drawGlow(
+        ctx,
+        GREEN,
+        spot.x,
+        spot.y,
+        CROSS_FLASH * grow * (1.5 - 0.5 * f),
+        0.5,
+      );
       drawGlow(ctx, WHITE, spot.x, spot.y, CROSS_FLASH * 0.4 * grow * f);
-      drawGlow(ctx, k % 2 ? WHITE : GOLD, muzzle.x, muzzle.y, MUZZLE_FLASH * grow * f);
+      drawGlow(
+        ctx,
+        k % 2 ? WHITE : GOLD,
+        muzzle.x,
+        muzzle.y,
+        MUZZLE_FLASH * grow * f,
+      );
     }
     // the clash's flash, white-hot then green over the readout
     const g = ms - CLASH_MS;

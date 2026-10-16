@@ -276,8 +276,7 @@ registerFloorCrit("cashFloodCrit", {
         let y = pos.y;
         if ((s & 1) === 0) {
           x += JX[i] * thick * 0.6;
-          y -=
-            JY[i] * thick + size * 0.5 + Math.sin(ms * WAVE + i) * WAVE_H;
+          y -= JY[i] * thick + size * 0.5 + Math.sin(ms * WAVE + i) * WAVE_H;
         } else {
           x += JX[i] * thick * 0.5;
           y += (JY[i] - 0.5) * thick * 0.8;

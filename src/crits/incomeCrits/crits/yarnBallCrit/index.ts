@@ -148,7 +148,13 @@ function drawSwipe(
   ctx.lineWidth = 4 + 16 * f;
   ctx.lineCap = "round";
   ctx.beginPath();
-  ctx.arc(x, y + size * 2.4, Math.max(0, size * 1.6), Math.PI * 1.2, Math.PI * 1.8);
+  ctx.arc(
+    x,
+    y + size * 2.4,
+    Math.max(0, size * 1.6),
+    Math.PI * 1.2,
+    Math.PI * 1.8,
+  );
   ctx.stroke();
   ctx.globalAlpha = base;
 }
@@ -188,7 +194,8 @@ registerFloorCrit("yarnBallCrit", {
     const cy = to.y + DROP;
     // the laps' length, for the strands' turning
     const h = ((rx - RY) / (rx + RY)) ** 2;
-    const lap = Math.PI * (rx + RY) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
+    const lap =
+      Math.PI * (rx + RY) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
     const specks: Point[] = [];
     const turns = new Float32Array(SPECKS);
     for (let i = 0; i < SPECKS; i++) {

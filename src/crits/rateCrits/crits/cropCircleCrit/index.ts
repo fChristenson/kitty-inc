@@ -462,7 +462,9 @@ registerFloorCrit("cropCircleCrit", {
         const c = circles[i];
         const build =
           i === last
-            ? clamp01((ms - s.arrive[i]) / Math.max(1, s.leave[i] - s.arrive[i]))
+            ? clamp01(
+                (ms - s.arrive[i]) / Math.max(1, s.leave[i] - s.arrive[i]),
+              )
             : 0;
         beamTo.x = c.at.x;
         beamTo.y = c.at.y;
@@ -497,7 +499,9 @@ registerFloorCrit("cropCircleCrit", {
     const heat =
       ms < s.arrive[last]
         ? 0
-        : clamp01((ms - s.arrive[last]) / Math.max(1, s.launchMs - s.arrive[last]));
+        : clamp01(
+            (ms - s.arrive[last]) / Math.max(1, s.launchMs - s.arrive[last]),
+          );
     if (at && ms < s.launchMs + LAUNCH_MS) {
       ctx.globalAlpha = alpha * (1 - clamp01((ms - s.launchMs) / LAUNCH_MS));
       drawSaucer(ctx, at, now, heat);

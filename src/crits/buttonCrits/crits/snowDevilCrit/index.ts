@@ -397,7 +397,8 @@ registerFloorCrit("snowDevilCrit", {
     for (let k = 0; k < n; k++) {
       const b = order[n - 1 - k];
       passOrder[k] = b;
-      passMs[b] = IN_MS + CLIMB_MS * quickenAt(clamp01((lo - bars[b].y) / span));
+      passMs[b] =
+        IN_MS + CLIMB_MS * quickenAt(clamp01((lo - bars[b].y) / span));
       hit(b, passMs[b], b === 0 ? 0 : 1);
     }
     hit(0, landMs, 2);
@@ -447,10 +448,14 @@ registerFloorCrit("snowDevilCrit", {
         sway: SWAY,
         growMs: GROW_MS,
       }),
-      charge: planCharge(runEnd - CHARGE_LEAD_MS, climaxMs - runEnd + CHARGE_LEAD_MS, {
-        climaxShake: 1.8,
-        bang: false,
-      }),
+      charge: planCharge(
+        runEnd - CHARGE_LEAD_MS,
+        climaxMs - runEnd + CHARGE_LEAD_MS,
+        {
+          climaxShake: 1.8,
+          bang: false,
+        },
+      ),
       runEnd,
       diveMs,
       climaxMs,
@@ -559,7 +564,13 @@ registerFloorCrit("snowDevilCrit", {
         }
         ctx.globalAlpha = base;
         if (i % FLAKE_EVERY === 0)
-          stampFlake(ctx, spot.x, spot.y, FLAKE_SIZE, seed[i] * TAU + ms * 0.01);
+          stampFlake(
+            ctx,
+            spot.x,
+            spot.y,
+            FLAKE_SIZE,
+            seed[i] * TAU + ms * 0.01,
+          );
         else
           stampGlimmer(
             ctx,
@@ -578,7 +589,8 @@ registerFloorCrit("snowDevilCrit", {
           home.x = own.x + bJx[i];
           home.y = own.y + bJy[i];
           flingFrom(tornado, climaxMs, 0, bSeed[i], home, fling, spot);
-          if (i % 2) stampFlake(ctx, spot.x, spot.y, FLAKE_SIZE * 1.2, i + ms * 0.012);
+          if (i % 2)
+            stampFlake(ctx, spot.x, spot.y, FLAKE_SIZE * 1.2, i + ms * 0.012);
           else stampGlimmer(ctx, spot.x, spot.y, SPECK_SIZE, i, FROST);
         }
       }

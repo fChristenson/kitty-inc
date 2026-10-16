@@ -373,13 +373,7 @@ function drawBill(
   const w = BILL_W * (1 - 0.35 * t);
   const h = (w * frame.height) / (frame.width || 1);
   ctx.globalAlpha = 1 - t * t * t;
-  ctx.drawImage(
-    frame,
-    arcX(fx, tx, t) - w / 2,
-    arcY(fy, ty, t) - h / 2,
-    w,
-    h,
-  );
+  ctx.drawImage(frame, arcX(fx, tx, t) - w / 2, arcY(fy, ty, t) - h / 2, w, h);
 }
 
 // a speck showering from (fx, fy) up onto (tx, ty) `since` ms on, then its
@@ -431,8 +425,7 @@ registerFloorCrit("cleaverCrit", {
       const upMs = lerp(UP_MS[0], UP_MS[1], p);
       const x = side * lerp(SIDE_X[0], SIDE_X[1], hash01(i, 7710));
       const y = lerp(PEAK_Y[0], PEAK_Y[1], hash01(i, 7711));
-      const a =
-        Math.PI / 2 - side * lerp(TILT[0], TILT[1], hash01(i, 7712));
+      const a = Math.PI / 2 - side * lerp(TILT[0], TILT[1], hash01(i, 7712));
       const dx = Math.cos(a) * REACH;
       const dy = Math.sin(a) * REACH;
       const swipe = lerp(SWIPE_MS[0], SWIPE_MS[1], p);
@@ -618,7 +611,10 @@ registerFloorCrit("cleaverCrit", {
           const l = Math.hypot(ox, oy) || 1;
           ctx.save();
           ctx.globalAlpha = alpha;
-          ctx.translate(apart.x + (ox / l) * fling, FIN_Y + apart.y + (oy / l) * fling);
+          ctx.translate(
+            apart.x + (ox / l) * fling,
+            FIN_Y + apart.y + (oy / l) * fling,
+          );
           ctx.rotate(
             CROSS_ANGLE + (burst > 0 ? QX[q] * QY[q] * FIN_TUMBLE * burst : 0),
           );
@@ -746,7 +742,10 @@ registerFloorCrit("cleaverCrit", {
           j + i * 20,
         );
     }
-    if (burstSince >= 0 && burstSince < FLY_MS + LAND_MS + BURST_N * BURST_GAP_MS)
+    if (
+      burstSince >= 0 &&
+      burstSince < FLY_MS + LAND_MS + BURST_N * BURST_GAP_MS
+    )
       for (let j = 0; j < BURST_N; j++)
         drawSpeck(
           ctx,

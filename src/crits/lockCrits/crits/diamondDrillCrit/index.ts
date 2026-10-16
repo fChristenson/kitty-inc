@@ -158,7 +158,12 @@ function shaftSprites(): HTMLCanvasElement[] {
     const g = c.getContext("2d")!;
     const mid = c.height / 2;
     const top = mid - SHAFT_H / 2;
-    const collar = g.createLinearGradient(0, mid - COLLAR_H / 2, 0, mid + COLLAR_H / 2);
+    const collar = g.createLinearGradient(
+      0,
+      mid - COLLAR_H / 2,
+      0,
+      mid + COLLAR_H / 2,
+    );
     collar.addColorStop(0, "#e9eef6");
     collar.addColorStop(0.4, "#8d99ab");
     collar.addColorStop(1, "#2f3846");
@@ -180,7 +185,11 @@ function shaftSprites(): HTMLCanvasElement[] {
     g.clip();
     g.fillStyle = "#2b3444";
     const slant = SHAFT_H * 0.6;
-    for (let x = COLLAR - FLUTE + (f * FLUTE) / FRAMES; x < SHAFT_W + slant; x += FLUTE) {
+    for (
+      let x = COLLAR - FLUTE + (f * FLUTE) / FRAMES;
+      x < SHAFT_W + slant;
+      x += FLUTE
+    ) {
       g.beginPath();
       g.moveTo(x, top);
       g.lineTo(x + FLUTE * 0.35, top);
