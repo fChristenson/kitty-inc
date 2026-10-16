@@ -7,9 +7,10 @@
 // each spot. Draws in screen space over the crit flash
 import { CONFIG } from "../../config";
 import {
-  playCoinDrop,
+  playBubblePop,
   playPayout,
   playSpawnNotice,
+  playSold,
   playSwoosh,
 } from "../../sound";
 import { getActiveCompanyIndex } from "../../company";
@@ -65,7 +66,6 @@ const RUSH_REACH: [number, number] = [0.16, 0.42];
 const RUSH_DELAY_MS = 260;
 const RUSH_MS: [number, number] = [260, 380];
 const RUSH_BOW = 0.15;
-const DROP_GAP_MS = 45;
 const CLEAR_SHAKE = 0.9;
 // a flash where it scatters and where it gathers
 const FLASH_MS = 220;
@@ -80,9 +80,11 @@ const RUSH = 2;
 interface Hop {
   kind: number;
   at: number;
+  // spots as fractions of the screen
   from: Point;
   to: Point;
-  // per member: its burst out, and how late it starts
+  // per member: its burst out (of the screen's shorter side), and how late
+  // it starts
   sx: Float32Array;
   sy: Float32Array;
   delay: Float32Array;
@@ -100,7 +102,6 @@ interface Flash {
 interface Run {
   hops: Hop[];
   flashes: Flash[];
-  unit: number;
   // when it's settled at its current spot, and when it runs out there
   settleAt: number;
   endAt: number;
@@ -111,6 +112,8 @@ interface Run {
   left: number;
   lastLandAt: number;
   share: BigNumber;
+  // when its next flight (a gather or the rush) sets off, for its swoosh
+  swooshAt: number;
 }
 
 // each member's place in the flock, fixed for every swarm
@@ -135,11 +138,12 @@ for (let i = 0; i < COUNT; i++) {
 
 let run: Run | null = null;
 const roll = createSpawnRoll(CONFIG.randomSpawns.swarm, performance.now());
-// the screen as last drawn, in gameCanvas's screen units
+// the screen as last drawn, in gameCanvas's screen units (1 x 1 until the
+// first draw, so spots stay fractions until drawn)
 let width = 1;
 let height = 1;
+let unit = 1;
 let totalY = 0;
-let lastDropAt = -Infinity;
 const spot: Point = { x: 0, y: 0 };
 const middle: Point = { x: 0, y: 0 };
 const wispAt = Array.from(
@@ -159,13 +163,13 @@ function updateSwarmSpawn(now: number): void {
   if (roll.procs(now)) startRun(performance.now());
 }
 
-function pickSpot(from: Point, unit: number): Point {
-  let best: Point = { x: width / 2, y: height / 2 };
+function pickSpot(from: Point): Point {
+  let best: Point = { x: 0.5, y: 0.5 };
   let bestFar = -1;
   for (let k = 0; k < SPOT_TRIES; k++) {
-    const x = between(SPOT_X) * width;
-    const y = between(SPOT_Y) * height;
-    const far = Math.hypot(x - from.x, y - from.y);
+    const x = between(SPOT_X);
+    const y = between(SPOT_Y);
+    const far = Math.hypot((x - from.x) * width, (y - from.y) * height);
     if (far >= HOP_FAR * unit) return { x, y };
     if (far > bestFar) {
       bestFar = far;
@@ -175,13 +179,7 @@ function pickSpot(from: Point, unit: number): Point {
   return best;
 }
 
-function makeHop(
-  kind: number,
-  at: number,
-  from: Point,
-  to: Point,
-  unit: number,
-): Hop {
+function makeHop(kind: number, at: number, from: Point, to: Point): Hop {
   const sx = new Float32Array(COUNT);
   const sy = new Float32Array(COUNT);
   const delay = new Float32Array(COUNT);
@@ -189,7 +187,7 @@ function makeHop(
     const range = kind === RUSH ? RUSH_REACH : SCATTER_REACH;
     for (let i = 0; i < COUNT; i++) {
       const a = ((i + Math.random() * 0.6) / COUNT) * TAU;
-      const d = between(range) * unit;
+      const d = between(range);
       sx[i] = Math.cos(a) * d;
       sy[i] = Math.sin(a) * d;
       delay[i] = Math.random() * STAGGER_MS;
@@ -200,19 +198,14 @@ function makeHop(
 
 function startRun(now: number): void {
   const { durationMs, rewardSeconds } = CONFIG.randomSpawns.swarm;
-  const unit = Math.min(width, height);
   const fromLeft = Math.random() < 0.5;
-  const from = {
-    x: (fromLeft ? -0.15 : 1.15) * width,
-    y: between([0.3, 0.7]) * height,
-  };
-  const to = pickSpot(from, unit);
+  const from = { x: fromLeft ? -0.15 : 1.15, y: between([0.3, 0.7]) };
+  const to = pickSpot(from);
   const settleAt = now + ENTER_MS + LAG_MS;
   const rate = getCompanyIncomeRatePerSecond(getActiveCompanyIndex());
   run = {
-    hops: [makeHop(ENTER, now, from, to, unit)],
+    hops: [makeHop(ENTER, now, from, to)],
     flashes: [],
-    unit,
     settleAt,
     endAt: settleAt + durationMs,
     taps: 0,
@@ -220,15 +213,17 @@ function startRun(now: number): void {
     paid: new Uint8Array(COUNT),
     left: COUNT,
     lastLandAt: Infinity,
+    swooshAt: Infinity,
     share: multiply(rate, rewardSeconds / COUNT),
   };
   playSpawnNotice();
+  playSwoosh();
 }
 
-// the flock's middle at t (bobbing on its spot)
-function middleAt(r: Run, to: Point, t: number, into: Point): Point {
-  into.x = to.x;
-  into.y = to.y + Math.sin(t * BOB_RATE) * BOB * CLUSTER_R * r.unit;
+// the flock's middle at t on spot `to` (a fraction of the screen), bobbing
+function middleAt(to: Point, t: number, into: Point): Point {
+  into.x = to.x * width;
+  into.y = to.y * height + Math.sin(t * BOB_RATE) * BOB * CLUSTER_R * unit;
   return into;
 }
 
@@ -240,7 +235,7 @@ function memberAt(r: Run, i: number, t: number, into: Point): Point | null {
   const hop = r.hops[h];
   if (t < hop.at) return null;
   const s = t - hop.at;
-  const radius = CLUSTER_R * r.unit;
+  const radius = CLUSTER_R * unit;
   const a = angle[i] + t * wheel[i];
   const d =
     reach[i] * radius * (1 + BREATHE * Math.sin(t * BREATHE_RATE + phase[i]));
@@ -248,14 +243,16 @@ function memberAt(r: Run, i: number, t: number, into: Point): Point | null {
   const oy = Math.sin(a) * d * SQUASH;
   if (hop.kind === ENTER) {
     const e = easeOutCubic(clamp01((s - lag[i] * LAG_MS) / ENTER_MS));
-    middleAt(r, hop.to, t, middle);
-    into.x = hop.from.x + (middle.x - hop.from.x) * e + ox;
-    into.y = hop.from.y + (middle.y - hop.from.y) * e + oy;
+    const fx = hop.from.x * width;
+    const fy = hop.from.y * height;
+    middleAt(hop.to, t, middle);
+    into.x = fx + (middle.x - fx) * e + ox;
+    into.y = fy + (middle.y - fy) * e + oy;
     return into;
   }
-  middleAt(r, hop.from, t, middle);
+  middleAt(hop.from, t, middle);
   const k = s - hop.delay[i];
-  const out = easeOutCubic(clamp01(k / SCATTER_MS));
+  const out = easeOutCubic(clamp01(k / SCATTER_MS)) * unit;
   const px = middle.x + ox + hop.sx[i] * out;
   const py = middle.y + oy + hop.sy[i] * out;
   if (k < SCATTER_MS) {
@@ -266,7 +263,7 @@ function memberAt(r: Run, i: number, t: number, into: Point): Point | null {
   if (hop.kind === HOP) {
     const g = clamp01((k - SCATTER_MS) / GATHER_MS);
     const e = g * g * (3 - 2 * g);
-    middleAt(r, hop.to, t, middle);
+    middleAt(hop.to, t, middle);
     into.x = px + (middle.x + ox - px) * e;
     into.y = py + (middle.y + oy - py) * e;
     return into;
@@ -298,7 +295,7 @@ function addFlash(
     x: at.x,
     y: at.y,
     at: t,
-    size: scale * CLUSTER_R * r.unit,
+    size: scale * CLUSTER_R * unit,
     shake,
     fired: false,
   });
@@ -310,8 +307,8 @@ function hitsSwarm(x: number, y: number, t: number): boolean {
   if (!r || t < r.settleAt || isSpawnGone(r.endAt - t)) return false;
   const hop = r.hops[r.hops.length - 1];
   if (hop.kind === RUSH) return false;
-  middleAt(r, hop.to, t, middle);
-  return tapHits(x, y, middle, CLUSTER_R * r.unit * 1.3);
+  middleAt(hop.to, t, middle);
+  return tapHits(x, y, middle, CLUSTER_R * unit * 1.3);
 }
 
 function tapSwarm(t: number): void {
@@ -319,12 +316,13 @@ function tapSwarm(t: number): void {
   const { durationMs, taps } = CONFIG.randomSpawns.swarm;
   const from = r.hops[r.hops.length - 1].to;
   r.taps++;
-  middleAt(r, from, t, spot);
+  middleAt(from, t, spot);
   addFlash(r, spot, t, SCATTER_FLASH, SCATTER_SHAKE);
-  playSwoosh();
+  playBubblePop();
+  r.swooshAt = t + SCATTER_MS;
   if (r.hops.length > 2) r.hops.shift();
   if (r.taps >= taps) {
-    const hop = makeHop(RUSH, t, from, from, r.unit);
+    const hop = makeHop(RUSH, t, from, from);
     r.hops.push(hop);
     let last = 0;
     for (let i = 0; i < COUNT; i++) {
@@ -336,22 +334,20 @@ function tapSwarm(t: number): void {
     r.endAt = Infinity;
     return;
   }
-  const to = pickSpot(from, r.unit);
-  r.hops.push(makeHop(HOP, t, from, to, r.unit));
+  const to = pickSpot(from);
+  r.hops.push(makeHop(HOP, t, from, to));
   r.settleAt = t + STAGGER_MS + SCATTER_MS + GATHER_MS;
   r.endAt = r.settleAt + durationMs;
-  addFlash(r, to, r.settleAt, GATHER_FLASH, GATHER_SHAKE);
+  middleAt(to, r.settleAt, middle);
+  addFlash(r, middle, r.settleAt, GATHER_FLASH, GATHER_SHAKE);
 }
 
-function pay(r: Run, i: number, t: number): void {
+function pay(r: Run, i: number): void {
   r.paid[i] = 1;
   r.left--;
   addTotalIncome(r.share);
   pulseHudTotalFlash();
-  if (t - lastDropAt > DROP_GAP_MS) {
-    lastDropAt = t;
-    playCoinDrop();
-  }
+  playSold();
   if (r.left === 0) {
     shakeScreen(CLEAR_SHAKE);
     playPayout();
@@ -367,6 +363,7 @@ function drawSwarmSpawn(
 ): void {
   width = w;
   height = h;
+  unit = Math.min(w, h);
   totalY = totalAtY;
   const r = run;
   if (!r) return;
@@ -377,9 +374,13 @@ function drawSwarmSpawn(
     return;
   }
   const fade = spawnFade(msLeft, CONFIG.randomSpawns.swarm.pulseMs, now);
+  if (t >= r.swooshAt) {
+    r.swooshAt = Infinity;
+    playSwoosh();
+  }
   for (let i = 0; i < COUNT; i++) {
     if (r.paid[i]) continue;
-    if (t >= r.landAt[i]) pay(r, i, t);
+    if (t >= r.landAt[i]) pay(r, i);
   }
   for (let i = 0; i < COUNT; i++)
     drawWisp(ctx, wispAt[i], t, now, size[i] * fade.scale, 0.3, fade.alpha);
