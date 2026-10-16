@@ -3,7 +3,9 @@
 // paying levels or cash
 import { isVisibleOnFloor } from "../../crits";
 import {
+  getButtonBox,
   getButtonCenter,
+  getIncomeBarBox,
   getIncomeBarCenter,
   increaseIncomeRateBy,
   punchIncomeBar,
@@ -23,6 +25,44 @@ import type { Point } from "../wisp";
 
 const isGround = (deps: FloorActionsDeps, floor: Floor) =>
   deps.floors.indexOf(floor) === 0;
+
+// a box on screen
+export interface ScreenBox {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+function putBox(
+  into: ScreenBox[],
+  n: number,
+  box: { x: number; y: number; width: number; height: number },
+  left: number,
+  top: number,
+): number {
+  const b = (into[n] ??= { x: 0, y: 0, w: 0, h: 0 });
+  b.x = box.x - left;
+  b.y = box.y - top;
+  b.w = box.width;
+  b.h = box.height;
+  return n + 1;
+}
+
+// the income bar and upgrade button of every open floor in view, written
+// into `into` (kept between calls); returns how many
+export function boxesInView(deps: FloorActionsDeps, into: ScreenBox[]): number {
+  let n = 0;
+  for (const entry of deps.getOnScreenFloors?.() ?? []) {
+    const floor = entry.floor;
+    const area = floor.unlocked ? deps.getScreenAreaLocal?.(floor) : null;
+    if (!area) continue;
+    const ground = isGround(deps, floor);
+    n = putBox(into, n, getIncomeBarBox(ground), area.left, area.top);
+    n = putBox(into, n, getButtonBox(ground), area.left, area.top);
+  }
+  return n;
+}
 
 // floor's income bar's middle on screen; false once the floor is gone
 export function barOnScreen(

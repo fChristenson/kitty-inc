@@ -177,18 +177,20 @@ export const SPAWN_CONFIG = {
       // (1, 2, 3...)
       matchSeconds: 5,
     },
-    // src/spawn/keepItUp — a wisp twirling, a coin dropping onto it: held
-    // down, the wisp darts there and sweeps a line of light the coin bounces
-    // on; the last bounce sends it into the total, a miss lets it fall
-    keepItUp: {
+    // src/spawn/bounce — a wisp hovering: tapped or flicked, it shoots off
+    // and bounces round the screen, every wall, bar and button it hits paying
+    bounce: {
       rollEveryMs: 5_000,
       procChance: 0.05,
       cooldownMs: 5_000,
-      bounces: 6,
-      // the seconds of the company's income a bounce pays, times its count
-      // (1, 2, 3...), and the last one's into the total
-      bounceSeconds: 3,
-      finalSeconds: 30,
+      // how long it waits to be hit, pulsing over its last pulseMs
+      durationMs: 6_000,
+      pulseMs: 2_000,
+      // how long it bounces before diving into the total
+      flightMs: 4_000,
+      // the seconds of the company's income each hit pays, and the dive
+      hitSeconds: 1,
+      finalSeconds: 10,
     },
   },
 } as const;

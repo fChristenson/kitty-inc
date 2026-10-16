@@ -141,10 +141,10 @@ More spawns with gestures no spawn uses yet. On top of List 204's list, Pull Sho
 
 ## Built
 
-- **Keep It Up** (`spawn/keepItUp`, List 205, press and hold to make a paddle). Test: Random Spawns (New Effects).
-  - A wisp twirls back and forth low on the screen and a coin glints at the top, then drops towards it.
-  - Press and hold and the wisp darts to the finger and sweeps a solid line of light that follows it. The coin bounces off the line, paying `bounceSeconds` times its count each bounce, and arcs off to land somewhere else, quicker each time.
-  - The `bounces`-th bounce sends it flying into the total for `finalSeconds`; a miss lets it fall off the screen.
+- **Bouncy Wisp** (`spawn/bounce`, tap or flick). Test: Random Spawns (New Effects).
+  - A wisp hovers, bobbing. A tap sends it off away from the finger; a flick sends it the way of the flick, faster the harder the flick.
+  - It bounces off the screen's edges and off every income bar and upgrade button in view (`boxesInView` in `shared/spawnGames`). Each hit flashes and pays `hitSeconds` into the total.
+  - It slows over `flightMs`, then dives into the total for `finalSeconds`.
 
 - **Moved out of New Effects**: Wisp Swarm, Pull Shot and Sweet Spot (to Random Spawns), and batch 21's crits (Big Bang, Ton Weight, Claw Marks, Fairy Ring, Steam Clean, Coin Slot, Magnetar) to their tabs.
 
