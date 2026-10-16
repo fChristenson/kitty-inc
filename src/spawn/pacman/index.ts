@@ -49,6 +49,13 @@ const BOTTOM_Y = 0.85;
 const OFF_SIDE = 0.12;
 const MIN_RUN_X = 0.3;
 const MIN_RUN_Y = 0.12;
+// no run comes within CLEAR px of an earlier one (but the one it turns off),
+// and the badge sits BADGE_CLEAR px clear of the path before it; a route is
+// redrawn up to ROUTE_TRIES times, each run up to RUN_TRIES
+const CLEAR = 160;
+const BADGE_CLEAR = 160;
+const ROUTE_TRIES = 40;
+const RUN_TRIES = 16;
 const ROUTE_SAMPLES = 360;
 // a light every DOT_GAP along it, DOT big; the finger's swipe eats every
 // light up to the furthest of the next LOOKAHEAD it passes within DOT_REACH
@@ -102,29 +109,89 @@ let drawnH = 0;
 // started before the screen's size was known: starts on the next frame
 let startPending = false;
 
-// a spot in range at least `min` away from `from`, the last try if none is
-function runTo(from: number, range: [number, number], min: number): number {
-  let to = from;
-  for (let k = 0; k < 12; k++) {
-    to = lerp(range, Math.random());
-    if (Math.abs(to - from) >= min) break;
-  }
-  return to;
+// a spot in range at least `min` away from `from`, or null
+function runTo(
+  from: number,
+  range: [number, number],
+  min: number,
+): number | null {
+  const to = lerp(range, Math.random());
+  return Math.abs(to - from) >= min ? to : null;
 }
 
+function pointToSegment(p: Point, a: Point, b: Point): number {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const t = clamp01(
+    ((p.x - a.x) * dx + (p.y - a.y) * dy) / (dx * dx + dy * dy || 1),
+  );
+  return Math.hypot(p.x - a.x - dx * t, p.y - a.y - dy * t);
+}
+
+// the gap between two runs, 0 where they cross
+function runGap(a: Point, b: Point, c: Point, d: Point): number {
+  const ah = a.y === b.y;
+  const ch = c.y === d.y;
+  if (ah !== ch) {
+    const [h0, h1, v0, v1] = ah ? [a, b, c, d] : [c, d, a, b];
+    const crossX = v0.x >= Math.min(h0.x, h1.x) && v0.x <= Math.max(h0.x, h1.x);
+    const crossY = h0.y >= Math.min(v0.y, v1.y) && h0.y <= Math.max(v0.y, v1.y);
+    if (crossX && crossY) return 0;
+  }
+  return Math.min(
+    pointToSegment(a, c, d),
+    pointToSegment(b, c, d),
+    pointToSegment(c, a, b),
+    pointToSegment(d, a, b),
+  );
+}
+
+// the next run off the route's end keeps clear of every earlier run; the last
+// one's end (the badge) clear of the whole path too
+function clearOf(route: Point[], to: Point, last: boolean): boolean {
+  const from = route[route.length - 1];
+  for (let k = 0; k < route.length - 2; k++)
+    if (runGap(route[k], route[k + 1], from, to) < CLEAR) return false;
+  if (last)
+    for (let k = 0; k < route.length - 1; k++)
+      if (pointToSegment(to, route[k], route[k + 1]) < BADGE_CLEAR)
+        return false;
+  return true;
+}
+
+// TURNS runs that never cross or crowd each other; the most found if no
+// try manages all of them
 function planRoute(w: number, h: number): Point[] {
-  const fromRight = Math.random() < 0.5;
   const ys: [number, number] = [h * TOP_Y, h * BOTTOM_Y];
   const xs: [number, number] = [w * SIDE_X[0], w * SIDE_X[1]];
-  let x = fromRight ? w * (1 + OFF_SIDE) : -w * OFF_SIDE;
-  let y = lerp(ys, Math.random());
-  const route: Point[] = [{ x, y }];
-  for (let k = 0; k < TURNS; k++) {
-    if (k % 2 === 0) x = runTo(x, xs, w * MIN_RUN_X);
-    else y = runTo(y, ys, h * MIN_RUN_Y);
-    route.push({ x, y });
+  let best: Point[] = [];
+  for (let attempt = 0; attempt < ROUTE_TRIES; attempt++) {
+    const fromRight = Math.random() < 0.5;
+    const route: Point[] = [
+      {
+        x: fromRight ? w * (1 + OFF_SIDE) : -w * OFF_SIDE,
+        y: lerp(ys, Math.random()),
+      },
+    ];
+    for (let k = 0; k < TURNS; k++) {
+      const from = route[route.length - 1];
+      let next: Point | null = null;
+      for (let t = 0; t < RUN_TRIES && !next; t++) {
+        const to =
+          k % 2 === 0
+            ? runTo(from.x, xs, w * MIN_RUN_X)
+            : runTo(from.y, ys, h * MIN_RUN_Y);
+        if (to === null) continue;
+        const p = k % 2 === 0 ? { x: to, y: from.y } : { x: from.x, y: to };
+        if (clearOf(route, p, k === TURNS - 1)) next = p;
+      }
+      if (!next) break;
+      route.push(next);
+    }
+    if (route.length > best.length) best = route;
+    if (route.length === TURNS + 1) break;
   }
-  return route;
+  return best;
 }
 
 function start(now: number): void {
@@ -137,6 +204,7 @@ function start(now: number): void {
   }
   if (!deps) return;
   const route = planRoute(w, h);
+  if (route.length < 3) return;
   // the route spaced evenly along its length
   const lengths: number[] = [0];
   for (let k = 1; k < route.length; k++)
