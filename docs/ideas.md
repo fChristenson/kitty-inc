@@ -116,7 +116,7 @@ One element crushing another (`shared/animationStyles/crush`), shown three ways.
 
 ## List 204: random spawns, each its own gesture ([playground](../tmp/_playground/ideas.html?list=next181))
 
-Each spawn uses a gesture no other spawn uses. Gestures already taken: tap a runner (Mouse), pop many (Bubbles), swipe through (Wisp), tap to flip (Coin), pick one of three (Pick Me), trace a path (Pacman), hold still (Black Hole), tap in order (Simon Says), hold and drag along a bar (Lightning Storm), tap a moving cluster (Wisp Swarm), and the Lasso loop in List 117.
+Each spawn uses a gesture no other spawn uses. Gestures already taken: tap a runner (Mouse), pop many (Bubbles), swipe through (Wisp), tap to flip (Coin), pick one of three (Pick Me), trace a path (Pacman), hold still (Black Hole), tap in order (Simon Says), hold and drag along a bar (Lightning Storm), and the Lasso loop in List 117.
 
 1. **Scratch Off** (scrub back and forth): a gold foil card lands. Rubbing it flakes the foil off in glitter, revealing the cash prize under it. Fully scratched, the prize flies up into the total.
 2. **Crank** (turn in circles): a gold drum with a crank handle appears. Circle a finger round it to wind it up, faster each turn, the drum glowing and trembling harder with a jolt per turn. After four turns the spring lets go and coins burst into the total.
@@ -141,12 +141,7 @@ More spawns with gestures no spawn uses yet. On top of List 204's list, Pull Sho
 
 ## Built
 
-- **Bouncy Wisp** (`spawn/bounce`, tap or flick). Test: Random Spawns (New Effects).
-  - A wisp hovers, bobbing. A tap sends it off away from the finger; a flick sends it the way of the flick, faster the harder the flick.
-  - It bounces off the screen's edges and off every income bar and upgrade button in view (`boxesInView` in `shared/spawnGames`). Each hit flashes and pays `hitSeconds` into the total.
-  - It slows over `flightMs`, then dives into the total for `finalSeconds`.
-
-- **Moved out of New Effects**: Wisp Swarm and Pull Shot (to Random Spawns), and batch 21's crits (Big Bang, Ton Weight, Claw Marks, Fairy Ring, Steam Clean, Coin Slot, Magnetar) to their tabs.
+- **Moved out of New Effects**: Pull Shot (to Random Spawns), and batch 21's crits (Big Bang, Ton Weight, Claw Marks, Fairy Ring, Steam Clean, Coin Slot, Magnetar) to their tabs.
 
 - **List 204: Pull Shot** (random spawn; Sweet Spot was removed). Test: Random Spawns.
   - **Pull Shot** (`spawn/pullShot`, pull back and let go): a wisp in a band of light between two posts. The further the pull, the bigger the pay (`rewardSeconds` for a full pull, `minShare` for the shortest). A pull too short just snaps back.

@@ -133,20 +133,6 @@ export const SPAWN_CONFIG = {
       strikes: 12,
       rewardSeconds: 30,
     },
-    // src/spawn/swarm — a cluster of wisps flies in and settles: each tap
-    // scatters it to gather somewhere else, the last one rushes it into the
-    // total
-    swarm: {
-      rollEveryMs: 5_000,
-      procChance: 0.05,
-      cooldownMs: 5_000,
-      // how long it waits at each spot, pulsing over its last pulseMs
-      durationMs: 5_000,
-      pulseMs: 2_000,
-      taps: 3,
-      // the seconds of the company's income the whole swarm pays
-      rewardSeconds: 30,
-    },
     // src/spawn/pullShot — a wisp in a band of light between two posts:
     // pulled back and let go, it shoots into the total
     pullShot: {
@@ -159,21 +145,6 @@ export const SPAWN_CONFIG = {
       // shot pays minShare of it
       rewardSeconds: 40,
       minShare: 0.25,
-    },
-    // src/spawn/bounce — a wisp hovering: tapped or flicked, it shoots off
-    // and bounces round the screen, every wall, bar and button it hits paying
-    bounce: {
-      rollEveryMs: 5_000,
-      procChance: 0.05,
-      cooldownMs: 5_000,
-      // how long it waits to be hit, pulsing over its last pulseMs
-      durationMs: 6_000,
-      pulseMs: 2_000,
-      // how long it bounces before diving into the total
-      flightMs: 4_000,
-      // the seconds of the company's income each hit pays, and the dive
-      hitSeconds: 1,
-      finalSeconds: 10,
     },
   },
 } as const;

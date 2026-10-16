@@ -56,16 +56,6 @@ export function getButtonCenter(isGroundFloor: boolean): {
   return { x: BTN_X + BTN_W / 2, y: getBtnY(isGroundFloor) + BTN_H / 2 };
 }
 
-// the upgrade button's floor-local box
-export function getButtonBox(isGroundFloor: boolean): {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-} {
-  return { x: BTN_X, y: getBtnY(isGroundFloor), width: BTN_W, height: BTN_H };
-}
-
 // whether a floor-local canvas point falls on the upgrade button
 export function hitTestUpgradeButton(
   x: number,

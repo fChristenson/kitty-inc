@@ -8,12 +8,10 @@ import type { Floor } from "../../gameState";
 export {
   barFloorsInView,
   barOnScreen,
-  boxesInView,
   buttonFloorsInView,
   buttonOnScreen,
   giveLevels,
   payTotal,
-  type ScreenBox,
 } from "./floors";
 
 // a spawn's card: its src/spawn/<key>/meta.ts default-exports one
