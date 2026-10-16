@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import { defineConfig, type Plugin } from "vite";
 import { writeCritKinds } from "./scripts/crit-kinds.mjs";
+import { eventHooksChanged, writeCritChunks } from "./scripts/crit-chunks.mjs";
 
 // critData/kinds.ts follows the badge crit catalog: written on start and
 // whenever a critData file changes
@@ -10,6 +11,26 @@ const critKinds: Plugin = {
   configureServer(server) {
     server.watcher.on("all", (_event, file) => {
       if (/critData[\\/](?!kinds\.ts)\w+\.ts$/.test(file)) writeCritKinds();
+    });
+  },
+};
+
+// src/crits/chunks follows the crit folders: written on start and whenever a
+// crit's meta.ts or index.ts comes or goes, or an event's test hooks change
+const critChunks: Plugin = {
+  name: "crit-chunks",
+  config: () => void writeCritChunks(),
+  configureServer(server) {
+    const CRIT_FILE =
+      /(animatedCrits[\\/]events|\w+Crits[\\/]crits)[\\/]\w+[\\/](meta|index)\.ts$/;
+    const EVENT_INDEX = /animatedCrits[\\/]events[\\/]\w+[\\/]index\.ts$/;
+    server.watcher.on("all", (event, file) => {
+      if (
+        event === "change"
+          ? EVENT_INDEX.test(file) && eventHooksChanged(file)
+          : CRIT_FILE.test(file)
+      )
+        writeCritChunks();
     });
   },
 };
@@ -48,7 +69,7 @@ const profiling = { "Document-Policy": "js-profiling" };
 // the rig's canvas sources and profiles keep their function names
 export default defineConfig(({ mode }) => ({
   base: "/kitty-inc/",
-  plugins: [critKinds, gameMarkup],
+  plugins: [critKinds, critChunks, gameMarkup],
   server: { headers: profiling },
   preview: { headers: profiling },
   ...(mode === "perf" && {

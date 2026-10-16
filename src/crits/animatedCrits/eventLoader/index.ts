@@ -1,34 +1,19 @@
-// The ~1,100 event modules are most of the game's code, so they ship in
-// chunks: a small starter pile of every look, then 9 big parts of about 140
-// events each (new events go in the last), each loaded
+// The ~1,300 event modules are most of the game's code, so they ship in
+// chunks: a small starter pile of every look (eventsStarter.ts, picked by
+// hand), then the event chunks of src/crits/chunks (split by size, each a mix
+// of old and new: see scripts/crit-chunks.mjs). Each is loaded
 // on its own while the game is quiet (shared/idle's loadWhenIdle, queued by
 // main.ts). Only the loaded events can claim a crit; crits roll as plain
 // crits until the starter pile is in.
 import { loadWhenIdle } from "../../../shared/idle";
+import { EVENT_CHUNKS, type EventChunkHooks } from "../../chunks/manifest";
 
-const PARTS = [
+const PARTS: (() => Promise<object>)[] = [
   () => import("./eventsStarter"),
-  () => import("./events0"),
-  () => import("./events1"),
-  () => import("./events2"),
-  () => import("./events3"),
-  () => import("./events4"),
-  () => import("./events5"),
-  () => import("./events6"),
-  () => import("./events7"),
-  () => import("./events8"),
+  ...EVENT_CHUNKS,
 ];
 
-export type EventCatalog = typeof import("./eventsStarter") &
-  typeof import("./events0") &
-  typeof import("./events1") &
-  typeof import("./events2") &
-  typeof import("./events3") &
-  typeof import("./events4") &
-  typeof import("./events5") &
-  typeof import("./events6") &
-  typeof import("./events7") &
-  typeof import("./events8");
+export type EventCatalog = typeof import("./eventsStarter") & EventChunkHooks;
 
 const parts = new Map<number, Promise<object>>();
 let partsRequested = 0;

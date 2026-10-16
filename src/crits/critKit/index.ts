@@ -4,11 +4,15 @@
 //   meta.ts   its card (label, odds, style; see ./meta), all startup reads
 //   index.ts  its animation and its reward (registerFloorCrit, with its
 //             group's hooks: see floorCrits/critPlayer's FloorCritDef),
-//             loaded when it's armed or plays; none for a floor crit's
-//             `twist` (see ./meta)
+//             shipped in the played crit chunks of src/crits/chunks (split
+//             by size, every group mixed: see scripts/crit-chunks.mjs),
+//             loaded at idle or when one of them is armed; none for a floor
+//             crit's `twist` (see ./meta)
 // the rolls, the player's loaders and the test buttons all read the folders
 // from here
 import type { CritMeta } from "./meta";
+import { PLAYED_CHUNKS, PLAYED_CHUNK_OF } from "../chunks/manifest";
+import { loadWhenIdle } from "../../shared/idle";
 
 export type { CritMeta, CritStyle } from "./meta";
 
@@ -39,13 +43,17 @@ const METAS = import.meta.glob<CritMeta>(
   ],
   { eager: true, import: "default" },
 );
-const MODULES = import.meta.glob([
-  "../floorCrits/crits/*/index.ts",
-  "../incomeCrits/crits/*/index.ts",
-  "../buttonCrits/crits/*/index.ts",
-  "../lockCrits/crits/*/index.ts",
-  "../rateCrits/crits/*/index.ts",
-]);
+
+const chunks = new Map<number, Promise<unknown>>();
+function loadPlayedChunk(index: number): Promise<unknown> {
+  let chunk = chunks.get(index);
+  if (!chunk) {
+    chunk = PLAYED_CHUNKS[index]();
+    chunk.catch(() => chunks.delete(index));
+    chunks.set(index, chunk);
+  }
+  return chunk;
+}
 
 // each group's crits, by kind: their cards, chances included
 export const PLAYED_CRITS = Object.fromEntries(
@@ -55,12 +63,13 @@ const LOADERS: Record<string, () => Promise<unknown>> = {};
 const GROUP_OF: Record<string, CritGroup> = {};
 for (const [path, meta] of Object.entries(METAS)) {
   const [, group, kind] = /^\.\.\/(\w+)Crits\/crits\/(\w+)\//.exec(path)!;
-  const load = meta.twist
-    ? () => Promise.resolve()
-    : MODULES[path.replace(/meta\.ts$/, "index.ts")];
-  if (!load) throw new Error(`${kind}: a meta.ts with no index.ts`);
+  const chunk = PLAYED_CHUNK_OF[kind];
+  if (!meta.twist && chunk === undefined)
+    throw new Error(`${kind}: in no chunk (run scripts/crit-chunks.mjs)`);
   PLAYED_CRITS[group as CritGroup][kind] = meta;
-  LOADERS[kind] = load;
+  LOADERS[kind] = meta.twist
+    ? () => Promise.resolve()
+    : () => loadPlayedChunk(chunk!);
   GROUP_OF[kind] = group as CritGroup;
 }
 
@@ -93,7 +102,14 @@ export function isRateCritKind(kind: string | null): kind is RateCritKind {
   return critGroupOf(kind) === "rate";
 }
 
-// loads kind's module, which registers it
+// loads kind's module (its whole chunk), which registers it
 export function loadCritModule(kind: CritPlayKind): Promise<unknown> {
   return LOADERS[kind]();
+}
+
+// queues every played crit chunk, each loaded on its own at idle, so a crit is
+// usually in before it's armed
+export function queuePlayedCritChunks(): void {
+  for (let i = 0; i < PLAYED_CHUNKS.length; i++)
+    loadWhenIdle(() => loadPlayedChunk(i));
 }

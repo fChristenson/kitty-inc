@@ -169,15 +169,15 @@ const guessRewards = (text) => {
   return found.length ? [...new Set(found)] : ["untagged"];
 };
 
-// the events every loader part imports: the ones that can play
+// the events the starter pile and the event chunks import: the ones that can
+// play
 const loaded = new Set();
-for (const file of fs.readdirSync(
-  path.join(ROOT, "src/crits/animatedCrits/eventLoader"),
-))
-  for (const m of read(`src/crits/animatedCrits/eventLoader/${file}`).matchAll(
-    /import "\.\.\/events\/(\w+)";/g,
-  ))
-    loaded.add(m[1]);
+for (const dir of ["src/crits/animatedCrits/eventLoader", "src/crits/chunks"])
+  for (const file of fs.readdirSync(path.join(ROOT, dir)))
+    for (const m of read(`${dir}/${file}`).matchAll(
+      /import "\.\.\/(?:animatedCrits\/)?events\/(\w+)";/g,
+    ))
+      loaded.add(m[1]);
 
 for (const key of loaded) {
   const metaFile = `src/crits/animatedCrits/events/${key}/meta.ts`;

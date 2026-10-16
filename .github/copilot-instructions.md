@@ -49,7 +49,7 @@ Everything (crits, events, spawns, menus, HUD, startup, the first tap) holds 60f
 
 ## Events
 
-A slot-machine lever pull: only beneficial, no waiting or input, about 1.5–2.5s (screen-game worlds longer). Each event in `src/crits/animatedCrits/events/<name>Event` with a `meta.ts` (`EventMeta`: label, `style`, `reward`, `chance`, its own `values`, `isNew` on the latest batch), imported into the last `eventLoader` part; never confusable with another. Rewards vary (cash, levels, crit tiers, perma tiers, hires, free floors) and land on screen on the hit that gives them (`animatedCrits/eventRewards`, `wispCover`). Each batch covers the styles plus a few experiments (simulations, puzzles, algorithms, self-playing games).
+A slot-machine lever pull: only beneficial, no waiting or input, about 1.5–2.5s (screen-game worlds longer). Each event in `src/crits/animatedCrits/events/<name>Event` with a `meta.ts` (`EventMeta`: label, `style`, `reward`, `chance`, its own `values`, `isNew` on the latest batch), found automatically (`scripts/crit-chunks.mjs` deals every event and played crit into the size-balanced chunks of `src/crits/chunks`, each a mix of old and new; never edit those by hand); never confusable with another. Rewards vary (cash, levels, crit tiers, perma tiers, hires, free floors) and land on screen on the hit that gives them (`animatedCrits/eventRewards`, `wispCover`). Each batch covers the styles plus a few experiments (simulations, puzzles, algorithms, self-playing games).
 
 ## Animation styles
 

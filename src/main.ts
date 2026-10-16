@@ -13,6 +13,7 @@ import {
   takeBadgeCapsule,
   loadNextEventPart,
   queueEventParts,
+  queuePlayedCritChunks,
   getCritBadgeOverlay,
   warmTierFlashes,
   createBuildingCrits,
@@ -220,12 +221,13 @@ async function main() {
   preheat(drainSoon);
   preheat(prepareAudio);
   preheat(() => chunks);
-  // the events and badge crit rewards are most of the code: kept out of the
-  // startup bundle, they load one chunk at a time while the game is quiet
-  // (crits roll without them till then): the starter pile of events, the
-  // badge rewards, then the rest of the events
+  // the events, the played crits and the badge crit rewards are most of the
+  // code: kept out of the startup bundle, they load one chunk at a time while
+  // the game is quiet (crits roll without them till then): the starter pile
+  // of events, the badge rewards, the played crits, then the rest of the events
   queueEventParts(1);
   loadWhenIdle(loadBadgeRewards);
+  queuePlayedCritChunks();
   // the random spawns roll once their chunks land
   loadWhenIdle(loadSpawns);
   queueEventParts();

@@ -40,6 +40,7 @@ export type {
 export {
   CRIT_GROUPS,
   PLAYED_CRITS,
+  queuePlayedCritChunks,
   type CritGroup,
   type CritMeta,
 } from "./critKit";
