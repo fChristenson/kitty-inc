@@ -127,7 +127,26 @@ Each spawn uses a gesture no other spawn uses. Gestures already taken: tap a run
 7. **Pairs** (remember and match): six gold cards flip up for a moment to show three pairs, then flip back. Tap two that match and both glow and fly into the total as coins.
 8. **Gold Fish** (pulse to keep a gauge in the zone): a glowing fish is hooked deep down the screen with a tension gauge beside it. Hold to reel and let go to ease off, keeping the gauge in its green zone. While it stays there the fish comes up, and at the top it leaps into the total.
 
+## List 205: more random spawns, each its own gesture ([playground](../tmp/_playground/ideas.html?list=next182))
+
+More spawns with gestures no spawn uses yet. On top of List 204's list, Pull Shot (pull back and let go) and Sweet Spot (tap on the beat) are now taken.
+
+1. **Balloon** (hold, then let go in time): a gold balloon swells under the finger, wobbling and straining harder the bigger it gets. Let go and it shoots up into the total and pops, paying for its size. Hold on too long and it bursts early for a small pay.
+2. **Spinner** (flick to spin): a prize wheel of gold slices with one glowing jackpot slice. Flick its rim and it spins, the harder the flick the longer, ticking past the pointer and slowing to a crawl. The slice it stops on flashes and pays.
+3. **Sigil** (draw the shape): a faint star of glitter dots appears. Draw it with a finger anywhere (roughly is enough) and it leaves a gold trail. Once the shape is closed, the trail snaps onto it and blazes, then the star bursts into the total. The closer the drawing, the more it pays.
+4. **Hand Over Hand** (swipe down again and again): a bucket of coins hangs on a rope over a gold pulley. Every swipe down the other end of the rope hauls it up a jerk, the pulley squeaking round. At the top the bucket tips and its coins pour into the total.
+5. **Mirror** (turn to aim): a wisp shines a beam into a gold mirror that bounces it off somewhere useless. Drag the mirror's end round its pivot and the bounced beam sweeps across the screen. Lock it onto the total and coins stream up the beam until the total bursts.
+6. **Skimming Stone** (flick hard): a glowing stone sits at the end of a bar. A fast flick along the bar sends it skimming, and the faster the flick, the more skips. Every skip splashes a ring of light on the bar and pays, the hops shorter and quicker, until it sinks in a splash of coins.
+7. **Safe Cracker** (turn the dial to the notch): a gold safe dial with one glowing notch on its rim. Drag the dial round until its marker meets the notch and it clicks with a jolt, then the next notch lights up the other way round. Three clicks and the door swings open, its coins bursting into the total.
+
 ## Built
+
+- **Keep It Up** (`spawn/keepItUp`, List 205, press and hold to make a paddle). Test: Random Spawns (New Effects).
+  - A wisp twirls back and forth low on the screen and a coin glints at the top, then drops towards it.
+  - Press and hold and the wisp darts to the finger and sweeps a solid line of light that follows it. The coin bounces off the line, paying `bounceSeconds` times its count each bounce, and arcs off to land somewhere else, quicker each time.
+  - The `bounces`-th bounce sends it flying into the total for `finalSeconds`; a miss lets it fall off the screen.
+
+- **Moved out of New Effects**: Wisp Swarm, Pull Shot and Sweet Spot (to Random Spawns), and batch 21's crits (Big Bang, Ton Weight, Claw Marks, Fairy Ring, Steam Clean, Coin Slot, Magnetar) to their tabs.
 
 - **List 204: Pull Shot and Sweet Spot** (random spawns). Test: Random Spawns.
   - **Pull Shot** (`spawn/pullShot`, pull back and let go): a wisp in a band of light between two posts. The further the pull, the bigger the pay (`rewardSeconds` for a full pull, `minShare` for the shortest). A pull too short just snaps back.

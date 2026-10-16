@@ -10,5 +10,4 @@ export default {
   style: "mix",
   // how many payouts the jackpot ladder climbs, and how much each rung adds
   values: { payouts: 5, step: 1 },
-  isNew: true,
 } satisfies CritMeta;

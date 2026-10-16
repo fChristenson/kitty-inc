@@ -6,5 +6,4 @@ export default {
   label: "Ton Weight",
   chance: 0.03,
   style: "crush",
-  isNew: true,
 } satisfies CritMeta;

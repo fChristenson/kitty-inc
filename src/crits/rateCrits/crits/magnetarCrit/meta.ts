@@ -11,5 +11,4 @@ export default {
   // for `ms` (`ownMs` on its own bar) every payout of a magnetized bar runs
   // every other one `speed` times as fast for `burstMs` (a lone one, itself)
   values: { ms: 15000, ownMs: 25000, speed: 3, burstMs: 600 },
-  isNew: true,
 } satisfies CritMeta;

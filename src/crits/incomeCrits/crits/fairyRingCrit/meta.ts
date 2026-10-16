@@ -7,5 +7,4 @@ export default {
   label: "Fairy Ring",
   chance: 0.03,
   style: "summon",
-  isNew: true,
 } satisfies CritMeta;

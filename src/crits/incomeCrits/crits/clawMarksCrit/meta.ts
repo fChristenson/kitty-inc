@@ -7,5 +7,4 @@ export default {
   label: "Claw Marks",
   chance: 0.03,
   style: "slice",
-  isNew: true,
 } satisfies CritMeta;
