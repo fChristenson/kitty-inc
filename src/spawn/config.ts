@@ -147,5 +147,35 @@ export const SPAWN_CONFIG = {
       // the seconds of the company's income the whole swarm pays
       rewardSeconds: 30,
     },
+    // src/spawn/pullShot — a wisp in a band of light between two posts:
+    // pulled back and let go, it shoots into the total
+    pullShot: {
+      rollEveryMs: 5_000,
+      procChance: 0.05,
+      cooldownMs: 5_000,
+      durationMs: 6_000,
+      pulseMs: 2_000,
+      // the seconds of the company's income a full pull pays; the shortest
+      // shot pays minShare of it
+      rewardSeconds: 40,
+      minShare: 0.25,
+    },
+    // src/spawn/sweetSpot — a ring closing in on a coin again and again: a
+    // tap while it's in the gold zone pays and starts it over with a thinner
+    // zone; the last round bursts the coin, a miss ends it
+    sweetSpot: {
+      rollEveryMs: 5_000,
+      procChance: 0.05,
+      cooldownMs: 5_000,
+      // how long it waits for a tap each round, pulsing over its last pulseMs
+      durationMs: 6_000,
+      pulseMs: 2_000,
+      // how long the ring takes to close in, every pass
+      passMs: 1_000,
+      rounds: 5,
+      // the seconds of the company's income a match pays, times its round
+      // (1, 2, 3...)
+      matchSeconds: 5,
+    },
   },
 } as const;

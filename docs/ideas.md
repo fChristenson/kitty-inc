@@ -114,7 +114,24 @@ One element crushing another (`shared/animationStyles/crush`), shown three ways.
 3. **Hard Sell** (income, the amount as the crusher): the green amount slams down on a big wisp under the readout like a press, a share each slam. The last crushes it flat and the amount shoots up into the readout.
 4. **Hydraulic** (floor, a press): a slab of light lowers onto stacks of coins on its own bar and pushes without letting up, trembling harder, glitter oozing out, the stacks giving in jolts closer and closer, levels each, until they crumble into tumbling coins and dust.
 
+## List 204: random spawns, each its own gesture ([playground](../tmp/_playground/ideas.html?list=next181))
+
+Each spawn uses a gesture no other spawn uses. Gestures already taken: tap a runner (Mouse), pop many (Bubbles), swipe through (Wisp), tap to flip (Coin), pick one of three (Pick Me), trace a path (Pacman), hold still (Black Hole), tap in order (Simon Says), hold and drag along a bar (Lightning Storm), tap a moving cluster (Wisp Swarm), and the Lasso loop in List 117.
+
+1. **Scratch Off** (scrub back and forth): a gold foil card lands. Rubbing it flakes the foil off in glitter, revealing the cash prize under it. Fully scratched, the prize flies up into the total.
+2. **Crank** (turn in circles): a gold drum with a crank handle appears. Circle a finger round it to wind it up, faster each turn, the drum glowing and trembling harder with a jolt per turn. After four turns the spring lets go and coins burst into the total.
+3. **Gold Rain** (steer side to side): coins rain down from the top. Drag a basket of light left and right to catch them, the heap in it growing. When the rain stops, the basket flings the heap up into the total.
+4. **Arrow Rush** (flick the way it points): big gold arrows pop up one after another, quicker each. Flick in the arrow's direction and it shoots off that way, spilling coins into the total. The last always points up and slams into the total.
+5. **Special Delivery** (drag and drop): a money bag thumps down and one floor's bar starts glowing. Drag the bag onto that bar and it bursts, giving the floor levels and pouring coins into the total.
+6. **Drum Roll** (tap as fast as you can): a gold drum lands. Every tap thumps it, squashing it and popping coins into the total, more coins the faster the taps come. The last thump bursts it.
+7. **Pairs** (remember and match): six gold cards flip up for a moment to show three pairs, then flip back. Tap two that match and both glow and fly into the total as coins.
+8. **Gold Fish** (pulse to keep a gauge in the zone): a glowing fish is hooked deep down the screen with a tension gauge beside it. Hold to reel and let go to ease off, keeping the gauge in its green zone. While it stays there the fish comes up, and at the top it leaps into the total.
+
 ## Built
+
+- **List 204: Pull Shot and Sweet Spot** (random spawns). Test: Random Spawns.
+  - **Pull Shot** (`spawn/pullShot`, pull back and let go): a wisp in a band of light between two posts. The further the pull, the bigger the pay (`rewardSeconds` for a full pull, `minShare` for the shortest). A pull too short just snaps back.
+  - **Sweet Spot** (`spawn/sweetSpot`, tap on the beat): a ring closes in on a coin every `passMs`. A tap while the ring is in the gold band is a match: it pays `matchSeconds` times its round (`payTotal`) and the ring starts over with the band thinner (`SHRINK`). Matching round `rounds` bursts the coin for the biggest payout and the jackpot; a miss ends it.
 
 - **Another drawn batch**, eight crits. Test: their tabs.
   - **Torch Relay** (`animatedCrits/events/torchRelayEvent`, Summon, free floor, batch 101): circles on the floors' grounds relay pillars up the building, quicker each, the last bursting the locked floor open.
