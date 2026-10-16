@@ -59,7 +59,6 @@ const FV_POP_FONT = 70;
 const FV_POP_STROKE = 12;
 const FV_POP_RES = 2;
 const FV_POP_FADE_MS = 150;
-const FV_STEP_BLAST = 60;
 const FV_STEP_SHAKE = 0.6;
 const FV_RUSH = 1;
 const FV_RUSH_FROM_MS = 200;
