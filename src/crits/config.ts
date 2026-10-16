@@ -9,9 +9,9 @@ export const CRIT_CONFIG = {
   // not balance, and stay defined alongside CRIT_TIER_CONFIG itself).
   crit: {
     ...BADGE_CRIT_BALANCE,
-    crit: { chance: 0.04, multiplier: 3 },
-    mega: { chance: 0.0075, multiplier: 7 },
-    ultra: { chance: 0.0005, multiplier: 10 },
+    crit: { chance: 0.02, multiplier: 3 },
+    mega: { chance: 0.004, multiplier: 7 },
+    ultra: { chance: 0.00025, multiplier: 10 },
     // a landed crit of any tier is a cash crit this often (else a multiplier
     // crit): it pays the price of its tier's upgrades times upgradeCosts at
     // once instead of them; special crits ride either

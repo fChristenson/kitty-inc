@@ -11,5 +11,4 @@ export default {
   // bright taps on the opened floor's button; floors above and below each
   // tap lights up
   values: { taps: 4, reach: 2 },
-  isNew: true,
 } satisfies CritMeta;

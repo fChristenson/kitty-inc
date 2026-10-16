@@ -26,5 +26,4 @@ export default {
     levelShare: 0.015, // free levels on the floor per mine
     finalShare: 0.12, // free levels on the floor for the bandit
   },
-  isNew: true,
 } as const satisfies EventMeta;
