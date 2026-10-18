@@ -395,12 +395,24 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   // stars twinkle in the world above STAR_START_ALTITUDE, same global-threshold
   // pattern as clouds — a short building simply hasn't scrolled high enough to reach
   // them yet
-  function drawWorldStars(now: number): void {
+  function drawWorldStars(): void {
     const visibleTop = viewportTopY();
     const visibleBottom = Math.min(viewportBottomY(), -STAR_START_ALTITUDE);
     if (visibleBottom <= visibleTop) return; // nothing at/above floor 8 is on screen
-    // no clip: drawStars skips every star outside these bounds itself
-    drawStars(ctx, SLOT_W, now, 0, SLOT_W, visibleTop, visibleBottom);
+    // no clip: drawStars skips every star outside these bounds itself, and
+    // those behind the floors (opaque, drawn over them)
+    const buildingTop = floorWorldY(Math.max(0, activeFloors.length - 1)).top;
+    drawStars(
+      ctx,
+      SLOT_W,
+      0,
+      SLOT_W,
+      visibleTop,
+      visibleBottom,
+      GUTTER_W,
+      GUTTER_W + FLOOR_W,
+      buildingTop,
+    );
   }
 
   // clouds float in the world above CLOUD_START_ALTITUDE — one global threshold, not
@@ -848,7 +860,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // strict paint order: stars, then city skyline, then ground, then clouds, then
     // the active building's floors on top of all of it — nothing from a later pass
     // can end up underneath one still to come
-    drawWorldStars(performance.now());
+    drawWorldStars();
     drawWorldCity();
     drawWorldGround();
     drawWorldClouds(performance.now());
