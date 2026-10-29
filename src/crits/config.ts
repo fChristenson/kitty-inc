@@ -41,7 +41,7 @@ export const CRIT_CONFIG = {
     // this time, silently (see rollCrit in crits/critTypes). A hit just
     // opens the door to the existing independent-roll-then-cap-at-2 logic,
     // it doesn't guarantee a proc actually lands
-    specialCritGatewayChance: 0.05,
+    specialCritGatewayChance: 0.1,
   },
 
   // crits/critTypes' rollCrit — what a landed crit's special slot carries
@@ -59,29 +59,29 @@ export const CRIT_CONFIG = {
     // and after it played out (they share one player)
     floorCrit: {
       chance: 0.46,
-      cooldownMs: 15_000,
+      cooldownMs: 10_000,
     },
     // a button crit (buttonCrits) or a lock crit (lockCrits, only while the
     // locked floor is in view), always on a multiplier crit; each group can't
     // land again until its cooldownMs after the last was picked and played out
     buttonCrit: {
       chance: 0.46,
-      cooldownMs: 15_000,
+      cooldownMs: 10_000,
     },
     lockCrit: {
       chance: 0.46,
-      cooldownMs: 15_000,
+      cooldownMs: 10_000,
     },
     // a rate crit (rateCrits), always on a multiplier crit
     rateCrit: {
       chance: 0.46,
-      cooldownMs: 15_000,
+      cooldownMs: 10_000,
     },
     // an animated event (its odds in its meta.ts); none can land again
     // until cooldownMs after one has fully played out
     animatedCrit: {
       chance: 0.46,
-      cooldownMs: 15_000,
+      cooldownMs: 10_000,
     },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
     // (100+) foil
