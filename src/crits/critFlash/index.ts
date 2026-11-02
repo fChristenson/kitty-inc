@@ -734,13 +734,20 @@ function lettersTargetScale(
   return (viewportWidth * 0.8) / lettersWidth(label, color, strokeWidth, 1);
 }
 
-// its glyphs baked near their on-screen size, so they stay sharp
+// its glyphs baked at about their on-screen size with the baked flash's
+// headroom and quarter steps, so they're as sharp as its bitmap
+const MAX_LETTERS_RES = 4;
+function letterResAt(onScreenFont: number): number {
+  const wanted = Math.ceil((onScreenFont / FLASH_FONT_SIZE) * 1.1 * 4) / 4;
+  return Math.min(MAX_LETTERS_RES, Math.max(1, wanted));
+}
+
 function lettersRes(label: string, color: string, strokeWidth: number): number {
-  const onScreen =
+  return letterResAt(
     lettersTargetScale(label, color, strokeWidth, lastViewportWidth) *
-    FLASH_FONT_SIZE *
-    lastDrawScale;
-  return Math.min(3, Math.max(1, Math.ceil(onScreen / FLASH_FONT_SIZE)));
+      FLASH_FONT_SIZE *
+      lastDrawScale,
+  );
 }
 
 // builds a letters flash's glyphs on startup slices, held button or not,
@@ -757,14 +764,10 @@ export function warmLetterFlash(
       retryWarm(warm);
       return;
     }
-    // a longer amount shows smaller, so at a lower res: every res is ready,
-    // a glyph a task (all at once was a ~90ms task)
+    // other amounts bake their own set when they land
     const res = lettersRes(sample, color, strokeWidth);
-    const glyphs: [number, string][] = [];
-    for (let r = Math.max(1, res - 1); r <= Math.min(3, res + 1); r++)
-      for (const c of chars) glyphs.push([r, c]);
-    prepareEachSoon(glyphs, ([r, c]) =>
-      warmLetters(c, color, strokeWidth, r, false),
+    prepareEachSoon([...chars], (c) =>
+      warmLetters(c, color, strokeWidth, res, false),
     );
   };
   prepareSoon(warm);
@@ -1101,8 +1104,14 @@ function floorCritGlyphs(
   strokeWidth: number,
   share: number,
 ): FloorCritGlyphs {
+  if (flashLetters)
+    return letterGlyphs(
+      flashLabel,
+      color,
+      strokeWidth,
+      letterResAt(share * lastViewportWidth * lastDrawScale),
+    );
   const res = spinGlyphRes(share);
-  if (flashLetters) return letterGlyphs(flashLabel, color, strokeWidth, res);
   const glyphs = getSpinGlyphs(color, strokeWidth, res);
   return { ...glyphs, index: (c) => SPIN_CHARS.indexOf(c), color };
 }

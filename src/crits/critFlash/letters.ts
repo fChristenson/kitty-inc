@@ -25,6 +25,8 @@ interface LetterSet {
   letters: Map<string, Letter>;
 }
 const letterSets = new Map<string, LetterSet>();
+// each res is its own set: only the latest few stay
+const MAX_LETTER_SETS = 6;
 
 let scratch: CanvasRenderingContext2D | null = null;
 function scratchCtx(): CanvasRenderingContext2D {
@@ -35,7 +37,9 @@ function scratchCtx(): CanvasRenderingContext2D {
 function letterSet(color: string, strokeWidth: number, res: number): LetterSet {
   const key = `${color}|${strokeWidth}|${res}`;
   let set = letterSets.get(key);
-  if (!set) {
+  if (set) {
+    letterSets.delete(key);
+  } else {
     set = {
       color,
       strokeWidth,
@@ -43,8 +47,10 @@ function letterSet(color: string, strokeWidth: number, res: number): LetterSet {
       pad: Math.ceil(strokeWidth * res),
       letters: new Map(),
     };
-    letterSets.set(key, set);
+    if (letterSets.size >= MAX_LETTER_SETS)
+      letterSets.delete(letterSets.keys().next().value as string);
   }
+  letterSets.set(key, set);
   return set;
 }
 
