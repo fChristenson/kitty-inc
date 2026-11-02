@@ -1,15 +1,11 @@
 // a flash label drawn letter by letter from cached glyphs, for labels too
-// varied to bake one bitmap each (a cash crit's amount): its glow is one small
-// blur baked when it lands, its letters stamps cached per colour and size.
+// varied to bake one bitmap each (a cash crit's amount): flat fill in a white
+// outline like the total readout, stamps cached per colour and size.
 // Units: the flash's 100px font, centred on the origin
 import { COLOR } from "../../palette";
-import { critFont, drawCritText } from "./critText";
+import { critFont } from "./critText";
 
 const FONT_SIZE = 100;
-// matches the baked flashes' bloom (critFlash's getBloomLayer)
-const BLOOM_BLUR = 45;
-const BLOOM_PADDING = BLOOM_BLUR * 2;
-const BLOOM_RES = 1 / 3;
 
 interface Letter {
   outline: HTMLCanvasElement;
@@ -65,15 +61,20 @@ function letter(set: LetterSet, c: string): Letter {
     const sprite = document.createElement("canvas");
     sprite.width = Math.ceil(advance + set.pad * 2);
     sprite.height = Math.ceil(font * 1.25 + set.pad * 2);
-    drawCritText(
-      sprite.getContext("2d")!,
-      c,
-      sprite.width / 2,
-      sprite.height / 2,
-      set.color,
-      { fontSize: font, strokeWidth: set.strokeWidth * set.res },
-      which,
-    );
+    const c2 = sprite.getContext("2d")!;
+    c2.font = critFont(font);
+    c2.textAlign = "center";
+    c2.textBaseline = "middle";
+    if (which === "outline") {
+      c2.lineJoin = "round";
+      c2.miterLimit = 2;
+      c2.lineWidth = set.strokeWidth * set.res;
+      c2.strokeStyle = COLOR.white;
+      c2.strokeText(c, sprite.width / 2, sprite.height / 2);
+    } else {
+      c2.fillStyle = set.color;
+      c2.fillText(c, sprite.width / 2, sprite.height / 2);
+    }
     return sprite;
   };
   built = {
@@ -103,35 +104,6 @@ function advanceOf(c: string): number {
     advances.set(c, advance);
   }
   return advance;
-}
-
-// the latest label's glow: only one shows at a time
-let bloom: {
-  label: string;
-  canvas: HTMLCanvasElement;
-  width: number;
-  height: number;
-} | null = null;
-
-function labelBloom(label: string, width: number): NonNullable<typeof bloom> {
-  if (bloom?.label === label) return bloom;
-  const w = Math.ceil(width + BLOOM_PADDING * 2);
-  const h = Math.ceil(FONT_SIZE + BLOOM_PADDING * 2);
-  const canvas = bloom?.canvas ?? document.createElement("canvas");
-  canvas.width = Math.ceil(w * BLOOM_RES);
-  canvas.height = Math.ceil(h * BLOOM_RES);
-  const ctx = canvas.getContext("2d")!;
-  ctx.scale(BLOOM_RES, BLOOM_RES);
-  ctx.font = critFont(FONT_SIZE);
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.shadowColor = COLOR.white;
-  ctx.shadowBlur = BLOOM_BLUR * BLOOM_RES;
-  ctx.fillStyle = COLOR.white;
-  ctx.fillText(label, w / 2, h / 2);
-  ctx.fillText(label, w / 2, h / 2);
-  bloom = { label, canvas, width: w, height: h };
-  return bloom;
 }
 
 // the label's width in FONT_SIZE units (the same at every colour and res)
@@ -176,17 +148,15 @@ export function letterGlyphs(
   };
 }
 
-// builds the glyphs and glow ahead of the first frame
+// builds the glyphs ahead of the first frame
 export function warmLetters(
   label: string,
   color: string,
   strokeWidth: number,
   res: number,
-  glow = true,
 ): void {
   const set = letterSet(color, strokeWidth, res);
   for (let i = 0; i < label.length; i++) letter(set, label[i]);
-  if (label && glow) labelBloom(label, labelWidth(label));
 }
 
 export function drawLetters(
@@ -198,14 +168,6 @@ export function drawLetters(
 ): void {
   const set = letterSet(color, strokeWidth, res);
   const width = labelWidth(label);
-  const glow = labelBloom(label, width);
-  ctx.drawImage(
-    glow.canvas,
-    -glow.width / 2,
-    -glow.height / 2,
-    glow.width,
-    glow.height,
-  );
   const unit = 1 / res;
   for (let pass = 0; pass < 2; pass++) {
     let x = -width / 2;

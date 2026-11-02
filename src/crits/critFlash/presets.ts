@@ -17,6 +17,7 @@ import {
   playSold,
 } from "../../sound";
 import { COLOR } from "../../palette";
+import { AMOUNT_STROKE_TO_FONT_RATIO } from "../../shared/totalIncomeReadout";
 import { playCritExplosion } from "../../shared/explosionBang";
 import { CRIT_TIER_CONFIG, CRIT_TIER_ORDER, type CritTier } from "../critTypes";
 import { tierColor } from "../floorCrits/bonusTierReward";
@@ -48,15 +49,17 @@ export function warmTierFlashes(): void {
       strokeWidth: TIER_FLASH_STROKE_WIDTH[tier],
     })),
   );
-  // every tier's stroke, each sized for a sample amount
-  for (const tier of CRIT_TIER_ORDER)
-    warmLetterFlash(
-      CASH_FLASH_CHARS,
-      "+$123M",
-      COLOR.moneyGreen,
-      TIER_FLASH_STROKE_WIDTH[tier],
-    );
+  // sized for a sample amount
+  warmLetterFlash(
+    CASH_FLASH_CHARS,
+    "+$123M",
+    COLOR.moneyGreen,
+    cashStrokeWidth(),
+  );
 }
+
+// a cash amount reads like the total readout: its stroke at FLASH_FONT_SIZE
+const cashStrokeWidth = (): number => 100 * AMOUNT_STROKE_TO_FONT_RATIO;
 
 // what a cash crit's amount is written with (formatPrice's suffixes build
 // the rest on first use)
@@ -75,7 +78,7 @@ export function playCashFlash(
     intensity: TIER_SHAKE_INTENSITY[tier],
     label,
     color: COLOR.moneyGreen,
-    strokeWidth: TIER_FLASH_STROKE_WIDTH[tier],
+    strokeWidth: cashStrokeWidth(),
     priority: tier === "ultra" ? 2 : tier === "mega" ? 1 : 0,
     minDurationMs: getExplosionDurationMs(),
     letters: true,

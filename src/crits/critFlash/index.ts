@@ -766,9 +766,7 @@ export function warmLetterFlash(
     }
     // other amounts bake their own set when they land
     const res = lettersRes(sample, color, strokeWidth);
-    prepareEachSoon([...chars], (c) =>
-      warmLetters(c, color, strokeWidth, res, false),
-    );
+    prepareEachSoon([...chars], (c) => warmLetters(c, color, strokeWidth, res));
   };
   prepareSoon(warm);
 }

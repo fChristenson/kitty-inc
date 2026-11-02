@@ -25,7 +25,7 @@ import { drawTargetStream, getTargetTension } from "../eventFx";
 // stroke at a 115.2px unit-name font) so every readout reads with the same relative
 // stroke weight regardless of what canvas/scale it's drawn at, instead of each call
 // site hand-picking its own unrelated stroke number.
-const AMOUNT_STROKE_TO_FONT_RATIO = 22 / 144;
+export const AMOUNT_STROKE_TO_FONT_RATIO = 22 / 144;
 const UNIT_FONT_SCALE = 0.8; // unit name is drawn 20% smaller than the amount, everywhere
 const UNIT_STROKE_TO_FONT_RATIO = 10 / (144 * UNIT_FONT_SCALE);
 
