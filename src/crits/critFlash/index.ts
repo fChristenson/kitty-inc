@@ -839,8 +839,9 @@ export function drawCritFlash(
 // a crit's number baked character by character, so a merge or floor crit can
 // draw any number at the size its own flash slams in at
 interface SpinGlyphs {
-  // "x" then 0-9
+  // "x" then 0-9: outlines, and their fills drawn after every outline
   sprites: HTMLCanvasElement[];
+  fills: HTMLCanvasElement[];
   advances: number[];
   pad: number;
   font: number;
@@ -861,21 +862,29 @@ function getSpinGlyphs(
   const scratch = getScratchCtx();
   scratch.font = critFont(font);
   const advances = [...SPIN_CHARS].map((c) => scratch.measureText(c).width);
-  const sprites = [...SPIN_CHARS].map((c, i) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.ceil(advances[i] + pad * 2);
-    canvas.height = Math.ceil(font * 1.25 + pad * 2);
-    drawCritText(
-      canvas.getContext("2d")!,
-      c,
-      canvas.width / 2,
-      canvas.height / 2,
-      color,
-      { fontSize: font, strokeWidth: strokeWidth * res },
-    );
-    return canvas;
-  });
-  const glyphs = { sprites, advances, pad, font };
+  const bake = (part: "outline" | "fill") =>
+    [...SPIN_CHARS].map((c, i) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.ceil(advances[i] + pad * 2);
+      canvas.height = Math.ceil(font * 1.25 + pad * 2);
+      drawCritText(
+        canvas.getContext("2d")!,
+        c,
+        canvas.width / 2,
+        canvas.height / 2,
+        color,
+        { fontSize: font, strokeWidth: strokeWidth * res },
+        part,
+      );
+      return canvas;
+    });
+  const glyphs = {
+    sprites: bake("outline"),
+    fills: bake("fill"),
+    advances,
+    pad,
+    font,
+  };
   spinGlyphCache.set(key, glyphs);
   return glyphs;
 }
@@ -901,18 +910,22 @@ function drawGlyphText(
   centerY: number,
   scale: number,
 ): void {
-  let x = centerX - (glyphTextWidth(glyphs, text) * scale) / 2;
-  for (const c of text) {
-    const i = SPIN_CHARS.indexOf(c);
-    const sprite = glyphs.sprites[i];
-    ctx.drawImage(
-      sprite,
-      x - glyphs.pad * scale,
-      centerY - (sprite.height * scale) / 2,
-      sprite.width * scale,
-      sprite.height * scale,
-    );
-    x += glyphs.advances[i] * scale;
+  const left = centerX - (glyphTextWidth(glyphs, text) * scale) / 2;
+  for (let pass = 0; pass < 2; pass++) {
+    const sprites = pass === 0 ? glyphs.sprites : glyphs.fills;
+    let x = left;
+    for (const c of text) {
+      const i = SPIN_CHARS.indexOf(c);
+      const sprite = sprites[i];
+      ctx.drawImage(
+        sprite,
+        x - glyphs.pad * scale,
+        centerY - (sprite.height * scale) / 2,
+        sprite.width * scale,
+        sprite.height * scale,
+      );
+      x += glyphs.advances[i] * scale;
+    }
   }
 }
 

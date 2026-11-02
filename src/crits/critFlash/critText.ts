@@ -43,10 +43,22 @@ export function drawCritText(
   y: number,
   color: string,
   { fontSize, strokeWidth }: CritTextStyle,
+  // glyphs stamped side by side bake each part alone: a neighbour's outline
+  // must never cover a letter's fill
+  part?: "outline" | "fill",
 ): void {
   ctx.font = critFont(fontSize);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+  const stroke = isLightColor(color) ? COLOR.black : COLOR.white;
+  if (part === "outline") {
+    ctx.lineJoin = "round";
+    ctx.miterLimit = 2;
+    ctx.lineWidth = strokeWidth;
+    ctx.strokeStyle = stroke;
+    ctx.strokeText(label, x, y);
+    return;
+  }
   const gradient = ctx.createLinearGradient(
     x,
     y - fontSize / 2,
@@ -55,15 +67,12 @@ export function drawCritText(
   );
   gradient.addColorStop(0, shadeColor(color, 0.6));
   gradient.addColorStop(1, color);
-  drawCartoonText(
-    ctx,
-    label,
-    x,
-    y,
-    gradient,
-    isLightColor(color) ? COLOR.black : COLOR.white,
-    strokeWidth,
-  );
+  if (part === "fill") {
+    ctx.fillStyle = gradient;
+    ctx.fillText(label, x, y);
+    return;
+  }
+  drawCartoonText(ctx, label, x, y, gradient, stroke, strokeWidth);
 }
 
 const POP_MS = 300;

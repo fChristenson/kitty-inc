@@ -63,7 +63,9 @@ export interface FloorCritPlay {
 
 // the flash's own baked "x0123456789" glyphs (see critFlash's SpinGlyphs)
 export interface FloorCritGlyphs {
+  // outlines, and their fills drawn after every outline
   sprites: HTMLCanvasElement[];
+  fills: HTMLCanvasElement[];
   advances: number[];
   pad: number;
   font: number;
@@ -197,18 +199,21 @@ export function drawText(
     ctx.scale(opts.sx ?? 1, opts.sy ?? 1);
   let width = 0;
   for (const c of text) width += glyphs.advances[glyphs.index(c)];
-  let left = (-width * scale) / 2;
-  for (const c of text) {
-    const i = glyphs.index(c);
-    const sprite = glyphs.sprites[i];
-    ctx.drawImage(
-      sprite,
-      left - glyphs.pad * scale,
-      (-sprite.height * scale) / 2,
-      sprite.width * scale,
-      sprite.height * scale,
-    );
-    left += glyphs.advances[i] * scale;
+  for (let pass = 0; pass < 2; pass++) {
+    const sprites = pass === 0 ? glyphs.sprites : glyphs.fills;
+    let left = (-width * scale) / 2;
+    for (const c of text) {
+      const i = glyphs.index(c);
+      const sprite = sprites[i];
+      ctx.drawImage(
+        sprite,
+        left - glyphs.pad * scale,
+        (-sprite.height * scale) / 2,
+        sprite.width * scale,
+        sprite.height * scale,
+      );
+      left += glyphs.advances[i] * scale;
+    }
   }
   ctx.restore();
 }

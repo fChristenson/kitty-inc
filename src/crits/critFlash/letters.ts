@@ -12,7 +12,8 @@ const BLOOM_PADDING = BLOOM_BLUR * 2;
 const BLOOM_RES = 1 / 3;
 
 interface Letter {
-  sprite: HTMLCanvasElement;
+  outline: HTMLCanvasElement;
+  fill: HTMLCanvasElement;
   // in FONT_SIZE units
   advance: number;
 }
@@ -54,18 +55,26 @@ function letter(set: LetterSet, c: string): Letter {
   const ctx = scratchCtx();
   ctx.font = critFont(font);
   const advance = ctx.measureText(c).width;
-  const sprite = document.createElement("canvas");
-  sprite.width = Math.ceil(advance + set.pad * 2);
-  sprite.height = Math.ceil(font * 1.25 + set.pad * 2);
-  drawCritText(
-    sprite.getContext("2d")!,
-    c,
-    sprite.width / 2,
-    sprite.height / 2,
-    set.color,
-    { fontSize: font, strokeWidth: set.strokeWidth * set.res },
-  );
-  built = { sprite, advance: advance / set.res };
+  const part = (which: "outline" | "fill"): HTMLCanvasElement => {
+    const sprite = document.createElement("canvas");
+    sprite.width = Math.ceil(advance + set.pad * 2);
+    sprite.height = Math.ceil(font * 1.25 + set.pad * 2);
+    drawCritText(
+      sprite.getContext("2d")!,
+      c,
+      sprite.width / 2,
+      sprite.height / 2,
+      set.color,
+      { fontSize: font, strokeWidth: set.strokeWidth * set.res },
+      which,
+    );
+    return sprite;
+  };
+  built = {
+    outline: part("outline"),
+    fill: part("fill"),
+    advance: advance / set.res,
+  };
   set.letters.set(c, built);
   return built;
 }
@@ -139,17 +148,20 @@ export function letterGlyphs(
 ) {
   const set = letterSet(color, strokeWidth, res);
   const sprites: HTMLCanvasElement[] = [];
+  const fills: HTMLCanvasElement[] = [];
   const advances: number[] = [];
   const at = new Map<string, number>();
   for (const c of label) {
     if (at.has(c)) continue;
-    const { sprite, advance } = letter(set, c);
+    const { outline, fill, advance } = letter(set, c);
     at.set(c, sprites.length);
-    sprites.push(sprite);
+    sprites.push(outline);
+    fills.push(fill);
     advances.push(advance * res);
   }
   return {
     sprites,
+    fills,
     advances,
     pad: set.pad,
     font: FONT_SIZE * res,
@@ -189,16 +201,19 @@ export function drawLetters(
     glow.height,
   );
   const unit = 1 / res;
-  let x = -width / 2;
-  for (let i = 0; i < label.length; i++) {
-    const { sprite, advance } = letter(set, label[i]);
-    ctx.drawImage(
-      sprite,
-      x - set.pad * unit,
-      (-sprite.height * unit) / 2,
-      sprite.width * unit,
-      sprite.height * unit,
-    );
-    x += advance;
+  for (let pass = 0; pass < 2; pass++) {
+    let x = -width / 2;
+    for (let i = 0; i < label.length; i++) {
+      const built = letter(set, label[i]);
+      const sprite = pass === 0 ? built.outline : built.fill;
+      ctx.drawImage(
+        sprite,
+        x - set.pad * unit,
+        (-sprite.height * unit) / 2,
+        sprite.width * unit,
+        sprite.height * unit,
+      );
+      x += built.advance;
+    }
   }
 }
