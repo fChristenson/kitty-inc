@@ -197,25 +197,56 @@ export function drawText(
   if (opts.rot) ctx.rotate(opts.rot);
   if (opts.sx !== undefined || opts.sy !== undefined)
     ctx.scale(opts.sx ?? 1, opts.sy ?? 1);
+  const whole = glyphText(glyphs, text);
+  if (whole)
+    ctx.drawImage(
+      whole.canvas,
+      (-whole.width / 2 - glyphs.pad) * scale,
+      (-whole.canvas.height * scale) / 2,
+      whole.canvas.width * scale,
+      whole.canvas.height * scale,
+    );
+  ctx.restore();
+}
+
+// a text composed whole once (every outline under every fill), so a fade
+// dims it as one piece instead of showing outlines through the fills
+interface GlyphText {
+  canvas: HTMLCanvasElement;
+  // the letters' advance, in glyph px
+  width: number;
+}
+// by the sprite of the text's first letter: one per glyph set
+const glyphTexts = new WeakMap<HTMLCanvasElement, Map<string, GlyphText>>();
+const MAX_GLYPH_TEXTS = 8;
+
+function glyphText(glyphs: FloorCritGlyphs, text: string): GlyphText | null {
+  if (!text) return null;
+  const key = glyphs.sprites[glyphs.index(text[0])];
+  let texts = glyphTexts.get(key);
+  if (!texts) glyphTexts.set(key, (texts = new Map()));
+  const known = texts.get(text);
+  if (known) return known;
   let width = 0;
   for (const c of text) width += glyphs.advances[glyphs.index(c)];
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(width + glyphs.pad * 2);
+  canvas.height = key.height;
+  const c2 = canvas.getContext("2d")!;
   for (let pass = 0; pass < 2; pass++) {
     const sprites = pass === 0 ? glyphs.sprites : glyphs.fills;
-    let left = (-width * scale) / 2;
+    let x = 0;
     for (const c of text) {
       const i = glyphs.index(c);
-      const sprite = sprites[i];
-      ctx.drawImage(
-        sprite,
-        left - glyphs.pad * scale,
-        (-sprite.height * scale) / 2,
-        sprite.width * scale,
-        sprite.height * scale,
-      );
-      left += glyphs.advances[i] * scale;
+      c2.drawImage(sprites[i], x, 0);
+      x += glyphs.advances[i];
     }
   }
-  ctx.restore();
+  if (texts.size >= MAX_GLYPH_TEXTS)
+    texts.delete(texts.keys().next().value as string);
+  const built = { canvas, width };
+  texts.set(text, built);
+  return built;
 }
 
 export type Draw = (

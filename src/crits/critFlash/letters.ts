@@ -3,6 +3,7 @@
 // outline like the total readout, stamps cached per colour and size.
 // Units: the flash's 100px font, centred on the origin
 import { COLOR } from "../../palette";
+import { drawText } from "../floorCrits/critPlayer";
 import { critFont } from "./critText";
 
 const FONT_SIZE = 100;
@@ -159,6 +160,13 @@ export function warmLetters(
   for (let i = 0; i < label.length; i++) letter(set, label[i]);
 }
 
+// the label drawn lately, so a frame doesn't rebuild its glyph lists
+let shown: {
+  set: LetterSet;
+  label: string;
+  glyphs: ReturnType<typeof letterGlyphs>;
+} | null = null;
+
 export function drawLetters(
   ctx: CanvasRenderingContext2D,
   label: string,
@@ -167,21 +175,11 @@ export function drawLetters(
   res: number,
 ): void {
   const set = letterSet(color, strokeWidth, res);
-  const width = labelWidth(label);
-  const unit = 1 / res;
-  for (let pass = 0; pass < 2; pass++) {
-    let x = -width / 2;
-    for (let i = 0; i < label.length; i++) {
-      const built = letter(set, label[i]);
-      const sprite = pass === 0 ? built.outline : built.fill;
-      ctx.drawImage(
-        sprite,
-        x - set.pad * unit,
-        (-sprite.height * unit) / 2,
-        sprite.width * unit,
-        sprite.height * unit,
-      );
-      x += built.advance;
-    }
-  }
+  if (shown?.set !== set || shown.label !== label)
+    shown = {
+      set,
+      label,
+      glyphs: letterGlyphs(label, color, strokeWidth, res),
+    };
+  drawText(ctx, shown.glyphs, label, 0, 0, FONT_SIZE);
 }
